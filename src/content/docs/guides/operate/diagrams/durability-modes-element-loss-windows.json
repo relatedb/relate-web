@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "storage-animator",
-  "hash": "de0b9c1e6374b7fe22df016b12f5f34c80a1e56386c1f040f27d17c4c76a643a",
+  "hash": "bbf06eebfc1fcae43c2ed219e3bacc7aefa2a8b71ca7fabbfb6ad7147a13b98c",
   "inputs": [
     "src/content/docs/_data/cli.json"
   ],
@@ -11,8 +11,8 @@
   "caption": "What each durability mode can lose in a crash, as relate documents it",
   "svg": true,
   "svgSha256": {
-    "light": "df87c3ccf5fb693ec21c8a09bafc89743a0cec32854b411ac164604820b73895",
-    "dark": "de6af5caccbf14a8b4fb93002a1b6c7a8dd67a0eb3c9f290315efc70dcd14270"
+    "light": "f1416cb7d7d34cef081ce937957a363c98b3b0dcaff52a94cc5ba80d774f40c5",
+    "dark": "7f49934b502ffbf200aae0e53f1e1066a5e14b89facbb3f035c89f5efe16f905"
   },
   "textSha256": "29f4457fa3e85322eef742ac4c49284fab635e0c5769889b0bf4b383e7c8bac0"
 }

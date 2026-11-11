@@ -1,6 +1,6 @@
 {
   "$schema_note": "Every error an agent can meet, for /docs/reference/errors and explain_error (DOCS-PLAN.md §2, §8 check 3d). `id` is a stable anchor (#<id>); renaming one needs a redirect. `message` is quoted character for character, from the binary where `recorded` holds a run of it (replayed by `npm run docs:cli-check`; see cli.json `recording`), otherwise from upstream; `<name>` marks a variable part and `…` an elision. null means the sources do not say. `verify` marks what the release binary cannot show.",
-  "verified": "0.1.2",
+  "verified": "1.0.0",
   "upstream": {
     "repo": "relatedb/relate",
     "commit": "5e77ee6706821065804a9b77eb66ffd2985d1ac4",
@@ -355,8 +355,8 @@
         },
         {
           "command": "relate --database ./s.rl --wal-dir ./w --mode envelope \"RETURN 1 AS ok\"",
-          "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"storage\",\"message\":\"storage error: wal_dir is not supported for .rl single-file databases (ADR-0074)\",\"retryable\":false}}\n",
-          "stderr": "Failed to open Relate: storage error: wal_dir is not supported for .rl single-file databases (ADR-0074)\n",
+          "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"storage\",\"message\":\"storage error: wal_dir is not supported for .rl single-file databases\",\"retryable\":false}}\n",
+          "stderr": "Failed to open Relate: storage error: wal_dir is not supported for .rl single-file databases\n",
           "exit": 1
         },
         {
@@ -369,9 +369,9 @@
         {
           "command": "relate --database ./s --mode envelope \"RETURN 1 AS ok\"",
           "setup": "relate --database ./s \"CREATE (:Person {name: 'Ada'})\" && perl -0pi -e 's/\"format_version\": 3/\"format_version\": 9/' s/manifest.json",
-          "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"storage\",\"message\":\"storage error: unsupported snapshot version 9\",\"retryable\":false}}\n",
-          "stderr": "Failed to open Relate: storage error: unsupported snapshot version 9\n",
-          "exit": 1
+          "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"ok\"],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[{\"ok\":1}],\"timings\":{\"elapsed_ms\":0.22715300000000002,\"execute_ms\":0.094343,\"lex_parse_ms\":0.024978,\"lower_ms\":0.019349,\"parse_ms\":0.094432,\"plan_ms\":0.029154,\"result_generation_ms\":0.000401,\"rewrite_ms\":0.004306999999999999},\"truncated\":false}\n",
+          "stderr": "",
+          "exit": 0
         }
       ]
     },
@@ -781,7 +781,7 @@
       "recorded": {
         "command": "relate --safe --load https://example.com/graph.rl \"RETURN 1 AS ok\"",
         "stdout": "",
-        "stderr": "Error: --safe refuses a remote --load source — a downloaded store is untrusted input, so safe mode introduces none (LABS-680, ADR-0477)\n",
+        "stderr": "Error: --safe refuses a remote --load source — a downloaded store is untrusted input, so safe mode introduces none\n",
         "exit": 2
       }
     },
@@ -1512,7 +1512,7 @@
       "recorded": {
         "command": "relate serve --database :memory: --auth a:b --mcp stdio < /dev/null",
         "stdout": "",
-        "stderr": "Error: serve --mcp stdio skips auth (the host spawned the process, ADR-0232); --auth applies to the --http PORT/--mcp PORT/--bolt listeners only\nUsage: relate serve --database PATH [--host HOST] [--http PORT] [--origin ORIGIN] [--mcp PORT|stdio] [--bolt PORT [--bolt-identity STRING] [--ws-allow-origin ORIGIN] [--ws-max-connections N]] [--read-only[=FRESHNESS]] [--load SOURCE] [--auth USER:PASSWORD] [--concurrent-logical-workspace-limit SIZE] [--max-traversal-depth N] [--expression-memory-limit SIZE] [--safe | --no-safe] [--logical-graph-size-limit SIZE] [--durability-mode MODE] [--snapshot-format F]\nRun 'relate serve --help' for more information.\n",
+        "stderr": "Error: serve --mcp stdio skips auth (the host spawned the process); --auth applies to the --http PORT/--mcp PORT/--bolt listeners only\nUsage: relate serve --database PATH [--host HOST] [--http PORT] [--origin ORIGIN] [--mcp PORT|stdio] [--bolt PORT [--bolt-identity STRING] [--ws-allow-origin ORIGIN] [--ws-max-connections N]] [--read-only[=FRESHNESS]] [--load SOURCE] [--auth USER:PASSWORD] [--concurrent-logical-workspace-limit SIZE] [--max-traversal-depth N] [--expression-memory-limit SIZE] [--safe | --no-safe] [--logical-graph-size-limit SIZE] [--durability-mode MODE] [--snapshot-format F]\nRun 'relate serve --help' for more information.\n",
         "exit": 2
       }
     },
@@ -1607,7 +1607,7 @@
         "command": "relate clone --wal-dir ./w ./s.rl ./d",
         "setup": "relate --database ./s.rl \"CREATE (:A)\" > /dev/null",
         "stdout": "",
-        "stderr": "Failed to clone database: storage error: wal_dir is not supported for .rl single-file databases (ADR-0074)\n",
+        "stderr": "Failed to clone database: storage error: wal_dir is not supported for .rl single-file databases\n",
         "exit": 1
       }
     },
@@ -1737,7 +1737,7 @@
         "command": "relate pull --from n.env --query 'MATCH (n) RETURN n' --database ./t.rl",
         "setup": "printf 'NEO4J_URI=https://neo4j.example.com:7473\\nNEO4J_USERNAME=neo4j\\nNEO4J_PASSWORD=x\\n' > n.env && chmod 600 n.env && relate --database ./t.rl \"CREATE (:A)\" > /dev/null",
         "stdout": "",
-        "stderr": "Error: destination database is not empty; pull writes into an empty database only (ADR-0158)\n",
+        "stderr": "Error: destination database is not empty; pull writes into an empty database only\n",
         "exit": 1
       }
     },
@@ -2889,8 +2889,8 @@
       ],
       "recorded": {
         "command": "relate --mode envelope \"USE neo4j RETURN 1 AS a UNION USE system RETURN 1 AS a\"",
-        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"semantic\",\"message\":\"semantic error: SemanticError: Multiple graphs in the same query not allowed here. This feature is only available on composite databases. Attempted to access graph system\",\"retryable\":false}}\n",
-        "stderr": "semantic error: SemanticError: Multiple graphs in the same query not allowed here. This feature is only available on composite databases. Attempted to access graph system\n",
+        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: Multiple graphs in the same query not allowed here. This feature is only available on composite databases. Attempted to access graph system\",\"retryable\":false}}\n",
+        "stderr": "syntax error: Multiple graphs in the same query not allowed here. This feature is only available on composite databases. Attempted to access graph system\n",
         "exit": 6
       }
     },
@@ -3560,8 +3560,8 @@
       ],
       "recorded": {
         "command": "relate --mode envelope \"CREATE INDEX x FOR (p:Person) ON (p.y) OPTIONS {foo: 1}\"",
-        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: InvalidIndexOption\",\"retryable\":false}}\n",
-        "stderr": "syntax error: InvalidIndexOption\n",
+        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: Invalid input 'foo' for 'OPTIONS'. Expected 'indexConfig'.\",\"retryable\":false}}\n",
+        "stderr": "syntax error: Invalid input 'foo' for 'OPTIONS'. Expected 'indexConfig'.\n",
         "exit": 6
       }
     },
@@ -3584,8 +3584,8 @@
       ],
       "recorded": {
         "command": "relate --mode envelope \"CREATE (a:Person)-[:KNOWS]->(:Person) WITH a DELETE a\"",
-        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"execution\",\"message\":\"DeleteConnectedNode: Cannot delete node with relationships unless DETACH\",\"retryable\":false}}\n",
-        "stderr": "DeleteConnectedNode: Cannot delete node with relationships unless DETACH\n",
+        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"execution\",\"message\":\"ConstraintVerificationFailed: DeleteConnectedNode: Cannot delete node with relationships unless DETACH\",\"retryable\":false}}\n",
+        "stderr": "ConstraintVerificationFailed: DeleteConnectedNode: Cannot delete node with relationships unless DETACH\n",
         "exit": 1
       }
     },
@@ -4140,8 +4140,8 @@
       "recorded": {
         "command": "printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"check\",\"version\":\"0\"}}}' '{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}' '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"write_cypher\",\"arguments\":{\"query\":\"CREATE (:B)\"}}}' | relate serve --mcp stdio --database ./graph.rl --read-only",
         "setup": "relate --database ./graph.rl \"CREATE (:A)\"",
-        "stdout": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"capabilities\":{\"tools\":{}},\"protocolVersion\":\"2025-06-18\",\"serverInfo\":{\"name\":\"relate-mcp\",\"version\":\"0.1.2\"}}}\n{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"text\":\"unknown tool 'write_cypher'\",\"type\":\"text\"}],\"isError\":true}}\n",
-        "stderr": "serve: opened the store read-only (ADR-0306) — no writer lease and never creates the store; every write fails\nserve: MCP (stdio) serving on stdin/stdout (auth: none)\nserve: stdin closed, shutting down\n",
+        "stdout": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"capabilities\":{\"tools\":{}},\"protocolVersion\":\"2025-06-18\",\"serverInfo\":{\"name\":\"relate-mcp\",\"version\":\"1.0.0\"}}}\n{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"text\":\"unknown tool 'write_cypher'\",\"type\":\"text\"}],\"isError\":true}}\n",
+        "stderr": "serve: opened the store read-only — no writer lease and never creates the store; every write fails\nserve: MCP (stdio) serving on stdin/stdout (auth: none)\nserve: stdin closed, shutting down\n",
         "exit": 0
       }
     },
@@ -5223,5 +5223,5 @@
       "engine-unsupported-administration-command"
     ]
   },
-  "recorded_with": "relate 0.1.2 (f0c09d2), release build"
+  "recorded_with": "relate 1.0.0 (b02f283), release build"
 }
