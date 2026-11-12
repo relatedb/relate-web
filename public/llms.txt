@@ -14,7 +14,7 @@ Agent context and memory (a durable, queryable graph in one `.rl` file; recall i
 curl -sSfL https://relatedb.ai/install.sh | bash
 ```
 
-The install script verifies the pinned-key release signature (SSHSIG) and SHA256SUMS before installing. Prebuilt binaries ship for macOS (amd64/arm64, Developer-ID signed and notarized), Linux (amd64/arm64), and Windows. Windows: download `relate-windows-amd64.exe` from the releases page. Python package: `pip install relate-db` (import as `import relate`).
+The install script verifies the pinned-key release signature (SSHSIG) and SHA256SUMS before installing. Prebuilt binaries ship for macOS (amd64/arm64, Developer-ID signed and notarized), Linux (amd64/arm64), and Windows. Windows (x64): `install.sh` does not run outside WSL; the PowerShell block on the install page's Windows tab (https://relatedb.ai/docs/get-started/install.md) makes the same three checks and installs `relate.exe` on the user PATH. Python package: `pip install relate-db` (import as `import relate`).
 
 ## Documentation
 

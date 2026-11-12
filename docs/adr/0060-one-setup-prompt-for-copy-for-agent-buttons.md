@@ -82,3 +82,8 @@ Pinned binary tab again.
 - The Quickstart shows the whole prompt, so its panel is taller.
 - ADR-0013 gains a Later references entry naming this amendment.
 - DOCS-PLAN.md §3.4 describes the Agent tab as the setup prompt and the AGENTS.md block as unpinned.
+
+## Later references
+
+- ADR-0064 adds a Windows branch to the setup prompt's install step and a Windows install line to
+  the AGENTS.md block, both pointing to the install page's PowerShell block.

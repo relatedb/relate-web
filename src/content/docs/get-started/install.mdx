@@ -11,7 +11,8 @@ By the end of this page, `relate` is on your `PATH`, checked against the release
 
 ## Prerequisites
 
-- macOS or Linux on amd64 or arm64, with `curl` and `ssh-keygen` (the OpenSSH client). Windows on amd64 has a binary too.
+- macOS or Linux on amd64 or arm64, with `curl` and `ssh-keygen` (the OpenSSH client).
+- Or Windows 10 or 11 on x64, with PowerShell and the OpenSSH Client, which Windows includes. [Windows notes](#windows-notes) lists what differs there.
 - For a client package: the language's package manager (`pip`, `npm`, `cargo`, Maven or Gradle, `go`, SwiftPM).
 
 ## Install
@@ -30,7 +31,7 @@ Agent harnesses read a repository's `AGENTS.md` or `CLAUDE.md` before anything e
 
 ## Keep relate up to date
 
-`relate upgrade` downloads the latest release, checks it against the same signing key as `install.sh`, and replaces the running binary. It runs on macOS and Linux; `update` is an alias.
+`relate upgrade` downloads the latest release, checks it against the same signing key as `install.sh`, and replaces the running binary. It runs on macOS and Linux; `update` is an alias. On Windows it exits with code 1, `--check` included, and pasting the Windows install block again installs the latest release over the old one.
 
 ```bash
 relate upgrade --check
@@ -43,6 +44,18 @@ relate upgrade
 ```
 
 A store written by an older release migrates on its first writable open; [Upgrade a store](/docs/guides/operate/upgrade-a-store) covers the backup to take first.
+
+## Windows notes
+
+The Windows install block on the CLI tab is the Windows counterpart of `install.sh`, which runs on macOS and Linux only. These are the differences from macOS and Linux:
+
+- **Git Bash, MSYS2, and Cygwin.** `install.sh` stops there with `unsupported OS`. Run the Windows block in PowerShell instead; the `relate.exe` it installs runs from Git Bash too.
+- **Windows Subsystem for Linux (WSL).** Use the macOS and Linux tab inside WSL. It installs the Linux binary, which runs in WSL only.
+- **The C runtime.** `relate.exe` loads `VCRUNTIME140.dll` from the Microsoft Visual C++ Redistributable (x64). Most Windows installs have it. If `relate` fails with `VCRUNTIME140.dll was not found`, install the [Visual C++ Redistributable for x64](https://aka.ms/vs/17/release/vc_redist.x64.exe) and run it again.
+- **Downloading in a browser.** The binary has no Authenticode signature, so Windows SmartScreen warns about a copy saved from the [releases page](https://github.com/relatedb/relate/releases). Its check is the SHA-256 in the signed `SHA256SUMS`, which the install block makes.
+- **Exit codes and quoting.** In PowerShell the exit code is in `$LASTEXITCODE`, not `$?`. PowerShell also expands `$name` inside double quotes, so put a statement that holds a `$parameter` in single quotes: `relate --param id=1 'MATCH (p:Person {id: $id}) RETURN p'`.
+- **Upgrades.** `relate upgrade` exits with code 1 on Windows. Paste the install block again: it replaces `relate.exe` with the latest release. Stop any running `relate serve` first, since Windows does not replace a running binary.
+- **Extensions.** Extension packages are published for macOS and Linux only. On Windows, `relate extension install` exits with `the extension channel serves macOS and Linux only; this host is windows/x86_64`.
 
 ## Verify
 

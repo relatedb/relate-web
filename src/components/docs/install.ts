@@ -123,10 +123,59 @@ export const VERSION_LINE = VERSION_OUTPUT.split('\n')[0];
 const bash = (code: string): Block => ({ code, lang: 'bash' });
 const text = (code: string): Block => ({ code, lang: 'text' });
 
-function cliTab(v: string): Tab {
-  const n = releaseNames(v);
-  const exe = `${n.prefix}-windows-amd64.exe`;
-  const legacyNote = n.legacy ? ` Releases up to and including ${LAST_CYPHERLITE_RELEASE} use the earlier name, so ${v} ships it as \`${exe}\`; from the first relate-named release it is \`relate-windows-amd64.exe\`.` : '';
+/** The Windows release binary's asset name (from the first relate-named release on). */
+export const WINDOWS_ASSET = 'relate-windows-amd64.exe';
+/** Where the Windows steps install `relate.exe`, as PowerShell spells it. */
+export const WINDOWS_INSTALL_DIR = '$env:LOCALAPPDATA\\Programs\\relate';
+
+/**
+ * The Windows install steps (ADR-0064): install.sh's checks, in PowerShell,
+ * until upstream ships a Windows installer. Like install.sh it installs the
+ * latest release, named by releases.json (upstream ADR-0571), and installs
+ * nothing unless three checks pass: the SSHSIG signature on SHA256SUMS
+ * against the pinned key, verified with the OpenSSH client Windows ships
+ * (`ssh-keygen -Y verify`, SHA256SUMS fed on stdin as install.sh feeds it);
+ * the signed first line naming that release; and the binary's SHA-256. It
+ * runs as one script block so a failed check stops every later line of the
+ * paste, and it writes Windows PowerShell 5.1 and PowerShell 7 alike
+ * (`-UseBasicParsing`, `Start-Process` for the stdin redirect PowerShell
+ * lacks). The binary lands as `relate.exe`, so the docs' `relate …` commands
+ * run, in a per-user folder added to the user PATH and this session's.
+ * .github/workflows/docs-windows-install.yml runs it on Windows.
+ */
+export const WINDOWS_INSTALL_SCRIPT = `& {
+  # relate's release signing key: distribution/release-signing-key.pub in ${REPO.replace('https://', '')}
+  # fingerprint ${SIGNING_KEY_FINGERPRINT}
+  $signingKey = '${SIGNING_KEY}'
+  $ErrorActionPreference = 'Stop'
+  $ProgressPreference = 'SilentlyContinue'
+  if (-not (Get-Command ssh-keygen -ErrorAction SilentlyContinue)) { throw 'ssh-keygen not found: add the OpenSSH Client in Settings > System > Optional features, then run this again' }
+  $tag = (Invoke-RestMethod https://relatedb.ai/releases.json).latest.tag
+  $url = "${REPO}/releases/download/$tag"
+  $tmp = Join-Path ([IO.Path]::GetTempPath()) "relate-install-$tag"
+  New-Item -ItemType Directory -Force $tmp | Out-Null
+  Invoke-WebRequest "$url/SHA256SUMS" -OutFile "$tmp\\SHA256SUMS" -UseBasicParsing
+  Invoke-WebRequest "$url/SHA256SUMS.sig" -OutFile "$tmp\\SHA256SUMS.sig" -UseBasicParsing
+  [IO.File]::WriteAllText("$tmp\\allowed_signers", "${SIGNER} $signingKey\`n")
+  $verify = Start-Process ssh-keygen -ArgumentList '-Y verify -f allowed_signers -I ${SIGNER} -n ${SIGNER} -s SHA256SUMS.sig' -WorkingDirectory $tmp -RedirectStandardInput "$tmp\\SHA256SUMS" -NoNewWindow -Wait -PassThru
+  if ($verify.ExitCode -ne 0) { throw "the SHA256SUMS signature check failed for $tag; installing nothing" }
+  $sums = @(Get-Content "$tmp\\SHA256SUMS")
+  if ($sums[0].Trim() -ne "# ${SIGNER}-version: $tag") { throw "SHA256SUMS does not name $tag on its signed first line; installing nothing" }
+  $line = $sums | Where-Object { $_ -match '^[0-9a-f]{64}\\s+relate-windows-amd64\\.exe$' } | Select-Object -First 1
+  if (-not $line) { throw "SHA256SUMS has no entry for ${WINDOWS_ASSET}; installing nothing" }
+  Invoke-WebRequest "$url/${WINDOWS_ASSET}" -OutFile "$tmp\\relate.exe" -UseBasicParsing
+  if ((Get-FileHash "$tmp\\relate.exe" -Algorithm SHA256).Hash -ne ($line -split '\\s+')[0]) { throw "${WINDOWS_ASSET} does not match its SHA-256 in SHA256SUMS; installing nothing" }
+  $dir = Join-Path $env:LOCALAPPDATA 'Programs\\relate'
+  New-Item -ItemType Directory -Force $dir | Out-Null
+  Move-Item -Force "$tmp\\relate.exe" "$dir\\relate.exe"
+  Remove-Item -Recurse -Force $tmp
+  $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+  if (("$userPath" -split ';') -notcontains $dir) { [Environment]::SetEnvironmentVariable('Path', ((@("$userPath" -split ';') -ne '') + $dir) -join ';', 'User') }
+  if (($env:Path -split ';') -notcontains $dir) { $env:Path = "$env:Path;$dir" }
+  "Installed relate $tag at $dir\\relate.exe"
+}`;
+
+function cliTab(): Tab {
   return {
     key: 'cli',
     label: 'CLI',
@@ -151,11 +200,16 @@ function cliTab(v: string): Tab {
         key: 'windows',
         label: 'Windows',
         blocks: [
+          { p: '`install.sh` runs on macOS and Linux. On Windows 10 or 11 (x64), paste this into PowerShell:' },
+          { code: WINDOWS_INSTALL_SCRIPT, lang: 'powershell' },
           {
             p:
-              `\`install.sh\` runs on macOS and Linux. On Windows, download \`${exe}\` and \`SHA256SUMS\` from the [releases page](${RELEASES}). ` +
-              `In PowerShell, \`Get-FileHash ${exe}\` prints the binary's SHA-256, which must equal its line in \`SHA256SUMS\`.${legacyNote}`,
+              'It makes the same three checks as `install.sh` before it installs anything: the signature on the release\'s `SHA256SUMS` against the signing key in `$signingKey` at the top of the block (its comment gives the key\'s source and fingerprint), ' +
+              `checked with \`ssh-keygen\` from the OpenSSH Client that Windows includes; the signed first line of \`SHA256SUMS\` naming that release; and the SHA-256 of \`${WINDOWS_ASSET}\`. ` +
+              `If a check fails, it stops and installs nothing. It installs the binary as \`relate.exe\` in \`${WINDOWS_INSTALL_DIR}\` and adds that folder to your user \`PATH\`, ` +
+              'so `relate` runs in this window and in every new one.',
           },
+          { p: 'In the Windows Subsystem for Linux (WSL), use the macOS and Linux tab: it installs the Linux binary inside WSL. [Windows notes](/docs/get-started/install#windows-notes) covers Git Bash, the runtime the binary needs, and upgrades.' },
         ],
       },
     ],
@@ -207,6 +261,9 @@ function packageTab(v: string): Tab {
   };
 }
 
+/** The install page's twin, whose Windows tab holds the PowerShell install block. */
+export const WINDOWS_INSTALL_PAGE = 'https://relatedb.ai/docs/get-started/install.md';
+
 /** The page an agent can read for the steps of the setup prompt, and the docs index. */
 export const SETUP_REFERENCES = ['https://relatedb.ai/docs/get-started/agent-quickstart.md', 'https://relatedb.ai/docs/llms.txt'] as const;
 
@@ -223,6 +280,7 @@ export function setupPrompt(): string {
   return [
     'Set up relate, the embedded Cypher graph database (relatedb.ai), for me.',
     `1. Install the CLI with \`${INSTALL_COMMAND}\`, which verifies the release signature and SHA-256 before installing the binary. ` +
+      `On Windows outside WSL, where \`install.sh\` does not run, use the PowerShell block on the Windows tab of ${WINDOWS_INSTALL_PAGE} instead, which makes the same checks, and show it to me before you run it. ` +
       `Stop and report any installation failure. If \`relate\` is not found afterwards, run \`${PATH_LINE}\`. ` +
       'Check that `relate --version` runs and report the installed version; additional license text is normal.',
     `2. Install the relate skill for your agent with \`relate skill install --agent <name>\` (one of ${SKILL_AGENTS.join(', ')}). ` +
@@ -313,6 +371,7 @@ export function agentsMd(): string {
 relate, the embedded Cypher graph database (relatedb.ai).
 
 - Install: \`${INSTALL_COMMAND}\` (checks the release signature and SHA-256 before it installs anything; installs to \`~/.local/bin\`)
+- Install on Windows outside WSL: the PowerShell block on the Windows tab of ${WINDOWS_INSTALL_PAGE} (the same checks; installs \`relate.exe\` on the user PATH)
 - Check: \`relate --version\` runs
 - Query: \`relate --database ./graph.rl --read-only --mode envelope "MATCH (n) RETURN count(n) AS n"\`
 - Pass values as \`$parameters\` with \`--param name=<value>\`, never by pasting them into the statement.
@@ -326,7 +385,7 @@ relate, the embedded Cypher graph database (relatedb.ai).
 
 /** The three tabs. */
 export function tabs(v: string): Tab[] {
-  return [cliTab(v), packageTab(v), { key: 'agent', label: 'Agent', blocks: agentBlocks() }];
+  return [cliTab(), packageTab(v), { key: 'agent', label: 'Agent', blocks: agentBlocks() }];
 }
 
 /** The `part` prop, checked. */
