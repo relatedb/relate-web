@@ -15,7 +15,11 @@ const SECURITY = 'The install script verifies release signatures and SHA256 chec
 interface Tab { id: string; label: string; cmd?: string; note: string; more?: { label: string; href: string }[] }
 const tabs: Tab[] = [
   { id: 'skill', label: 'Agent skill', cmd: `curl -sSfL ${SITE}/install.sh | bash && relate skill install --agent claude-code`, note: `Installs the CLI, then the relate skill for Claude Code. ${SECURITY}` },
-  { id: 'shell', label: 'Shell', cmd: `curl -sSfL ${SITE}/install.sh | bash`, note: `macOS and Linux. ${SECURITY} Windows: download the binary from the releases page.` },
+  { id: 'shell', label: 'Shell', cmd: `curl -sSfL ${SITE}/install.sh | bash`, note: `macOS and Linux. ${SECURITY}` },
+  {
+    id: 'windows', label: 'Windows', note: 'A PowerShell block that makes the same checks as the install script, then puts relate.exe on your PATH.',
+    more: [{ label: 'Install on Windows', href: '/docs/get-started/install/' }],
+  },
   { id: 'py', label: 'Python', cmd: 'pip install relate-db', note: 'The Python client.' },
   { id: 'js', label: 'JavaScript', cmd: 'npm install @relate/relate', note: 'For Node.js. In the browser, use @relate/relate-wasm.' },
   { id: 'rust', label: 'Rust', cmd: 'cargo add relate', note: 'Use relate as a crate inside your application.' },

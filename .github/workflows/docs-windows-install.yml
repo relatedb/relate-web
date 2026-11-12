@@ -1,0 +1,95 @@
+# Runs the install page's Windows install block (WINDOWS_INSTALL_SCRIPT in
+# src/components/docs/install.ts, ADR-0064) on Windows, in Windows
+# PowerShell 5.1 and in PowerShell 7, the way a reader pastes it
+# (Invoke-Expression of the block's text). For each shell it shows:
+#   - a block whose pinned key is swapped for another key stops at the
+#     signature check and installs nothing;
+#   - the block installs relate.exe, puts its folder on the user PATH and
+#     this session's, and `relate --version` and one statement run;
+#   - a second paste (the documented upgrade) replaces the binary in place.
+# No secret: the release assets and releases.json are public.
+#
+# Not a required check: it runs on a paths filter, weekly (a new release or a
+# change on the runner image can break the block with no change here) and by
+# hand. Reproduce on a Windows machine with
+# `node scripts/windows-install-block.ts block.ps1` and pasting block.ps1.
+name: Docs Windows install
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/components/docs/install.ts"
+      - "scripts/windows-install-block.ts"
+      - ".github/workflows/docs-windows-install.yml"
+  push:
+    branches: [main]
+    paths:
+      - "src/components/docs/install.ts"
+      - "scripts/windows-install-block.ts"
+      - ".github/workflows/docs-windows-install.yml"
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-windows-install-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install:
+    name: Install (${{ matrix.shell }})
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shell: [powershell, pwsh]
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Write the block, and a copy with another signing key
+        run: |
+          node scripts/windows-install-block.ts "$env:RUNNER_TEMP\block.ps1"
+          node scripts/windows-install-block.ts "$env:RUNNER_TEMP\wrong-key.ps1" --wrong-key
+
+      - name: The wrong key installs nothing
+        run: |
+          $PSVersionTable.PSVersion.ToString()
+          $failed = $false
+          try { Invoke-Expression (Get-Content -Raw "$env:RUNNER_TEMP\wrong-key.ps1") } catch { $failed = $true; "stopped: $_" }
+          if (-not $failed) { throw 'the block with the wrong key did not stop' }
+          if (Test-Path "$env:LOCALAPPDATA\Programs\relate\relate.exe") { throw 'the block with the wrong key installed relate.exe' }
+
+      - name: Install, then run relate
+        run: |
+          Invoke-Expression (Get-Content -Raw "$env:RUNNER_TEMP\block.ps1")
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\relate'
+          if (([Environment]::GetEnvironmentVariable('Path', 'User') -split ';') -notcontains $dir) { throw 'the user PATH does not carry the install folder' }
+          (Get-Command relate).Source
+          relate --version
+          if ($LASTEXITCODE -ne 0) { throw "relate --version exited $LASTEXITCODE" }
+          relate --mode table "RETURN 1 AS ok"
+          if ($LASTEXITCODE -ne 0) { throw "relate exited $LASTEXITCODE" }
+
+      - name: Paste it again (the documented upgrade)
+        run: |
+          Invoke-Expression (Get-Content -Raw "$env:RUNNER_TEMP\block.ps1")
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\relate'
+          $entries = @([Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | Where-Object { $_ -eq $dir })
+          if ($entries.Count -ne 1) { throw "the user PATH carries the install folder $($entries.Count) times" }
+          & "$dir\relate.exe" --version
+          if ($LASTEXITCODE -ne 0) { throw "relate --version exited $LASTEXITCODE" }

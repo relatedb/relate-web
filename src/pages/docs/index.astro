@@ -6,7 +6,7 @@
 // headed by a link into its section) and a few cookbook examples. A task whose
 // page is not written yet renders as text, not a link.
 import RecipeCard from '../../components/cookbook/RecipeCard.astro';
-import { agentsMd, releaseNames, setupPrompt } from '../../components/docs/install.ts';
+import { agentsMd, setupPrompt } from '../../components/docs/install.ts';
 import TabsStrip from '../../components/docs/TabsStrip.astro';
 import Docs from '../../layouts/Docs.astro';
 import { esc } from '../../lib/cookbook/result-view.ts';
@@ -55,11 +55,9 @@ const GROUP_MORE: Record<string, string> = {
 const book = await cookbook();
 const recipes = byCategory(book.pages.map((p) => p.recipe)).map((g) => g.recipes[0]).slice(0, 3);
 const SHOWN = 6; // tasks a card lists; the rest are one click away in its section
-const releases = 'https://github.com/relatedb/relate/releases';
 const description = `Documentation for ${CANONICAL_PHRASE}: install it, connect an agent, look up a command or an error.`;
 // On the page the domain is dropped; the meta description keeps the canonical phrase.
 const lede = description.replace(' (relatedb.ai)', '');
-const exe = `${releaseNames(site.engine.version).prefix}-windows-amd64.exe`;
 // An icon per quick link, in PRIMARY's order (Get started, Connect your agent, Does relate fit?).
 const QUICK_ICONS = ['Get started', 'Agents', 'Evaluate'];
 const skillGuide = taskHref('guides/agents/install-the-skill', published);
@@ -101,9 +99,8 @@ const skillGuide = taskHref('guides/agents/install-the-skill', published);
           <p class="agent-note">Checks the release's signed SHA256SUMS first, and installs to <code>~/.local/bin</code>.</p>
         </Fragment>
         <Fragment slot="windows">
-          <Fragment set:html={code(exe, 'text')} />
           <p class="agent-note">
-            Download it from the <a href={releases} target="_blank" rel="noopener">releases page<span aria-hidden="true">&nbsp;&#8599;</span><span class="sr-only"> (opens in new tab)</span></a>.
+            <code>install.sh</code> runs on macOS and Linux. On Windows, paste the PowerShell block from <a href="/docs/get-started/install/">Install relate</a>: it makes the same checks, then installs <code>relate.exe</code> on your <code>PATH</code>.
           </p>
         </Fragment>
       </TabsStrip>
