@@ -6,11 +6,12 @@
 // or point to it. .github/workflows/docs-windows-install.yml runs it on Windows.
 
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 
-import { agentsMd, setupPrompt, SIGNER, SIGNING_KEY, tabs, WINDOWS_ASSET, WINDOWS_INSTALL_PAGE, WINDOWS_INSTALL_SCRIPT } from '../../components/docs/install.ts';
+import { agentsMd, setupPrompt, SIGNER, SIGNING_KEY, SIGNING_KEY_FINGERPRINT, tabs, WINDOWS_ASSET, WINDOWS_INSTALL_PAGE, WINDOWS_INSTALL_SCRIPT } from '../../components/docs/install.ts';
 import { engine, ROOT } from './content.ts';
 
 const s = WINDOWS_INSTALL_SCRIPT;
@@ -23,8 +24,19 @@ const at = (needle: string): number => {
 test('the Windows block pins the key install.sh pins', () => {
   const installSh = readFileSync(join(ROOT, 'public/install.sh'), 'utf8');
   assert.ok(installSh.includes(SIGNING_KEY), 'public/install.sh pins SIGNING_KEY');
-  assert.ok(s.includes(`"${SIGNER} ${SIGNING_KEY}\`n"`), 'allowed_signers names the signer, then the key, LF-terminated');
+  const lines = s.split('\n');
+  assert.equal(lines[1], '  # relate\'s release signing key: distribution/release-signing-key.pub in github.com/relatedb/relate', 'the block opens with where the key comes from');
+  assert.equal(lines[2], `  # fingerprint ${SIGNING_KEY_FINGERPRINT}`, 'and its fingerprint');
+  assert.equal(lines[3], `  $signingKey = '${SIGNING_KEY}'`, 'then the key, in one variable');
+  assert.equal(s.split(SIGNING_KEY).length, 2, 'the key appears once, in the variable');
+  assert.ok(s.includes(`"${SIGNER} $signingKey\`n"`), 'allowed_signers names the signer, then the key, LF-terminated');
   assert.ok(s.includes(`-I ${SIGNER} -n ${SIGNER}`), 'the signer identity and namespace are relate-release');
+});
+
+test('the fingerprint in the block\'s comment is the key\'s', () => {
+  // OpenSSH's SHA256 fingerprint: unpadded base64 of the SHA-256 of the key blob (`ssh-keygen -lf`).
+  const blob = Buffer.from(SIGNING_KEY.split(' ')[1], 'base64');
+  assert.equal(`SHA256:${createHash('sha256').update(blob).digest('base64').replace(/=+$/, '')}`, SIGNING_KEY_FINGERPRINT);
 });
 
 test('the Windows block resolves the latest release from releases.json and names no version', () => {

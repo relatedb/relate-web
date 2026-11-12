@@ -144,6 +144,9 @@ export const WINDOWS_INSTALL_DIR = '$env:LOCALAPPDATA\\Programs\\relate';
  * .github/workflows/docs-windows-install.yml runs it on Windows.
  */
 export const WINDOWS_INSTALL_SCRIPT = `& {
+  # relate's release signing key: distribution/release-signing-key.pub in ${REPO.replace('https://', '')}
+  # fingerprint ${SIGNING_KEY_FINGERPRINT}
+  $signingKey = '${SIGNING_KEY}'
   $ErrorActionPreference = 'Stop'
   $ProgressPreference = 'SilentlyContinue'
   if (-not (Get-Command ssh-keygen -ErrorAction SilentlyContinue)) { throw 'ssh-keygen not found: add the OpenSSH Client in Settings > System > Optional features, then run this again' }
@@ -153,7 +156,7 @@ export const WINDOWS_INSTALL_SCRIPT = `& {
   New-Item -ItemType Directory -Force $tmp | Out-Null
   Invoke-WebRequest "$url/SHA256SUMS" -OutFile "$tmp\\SHA256SUMS" -UseBasicParsing
   Invoke-WebRequest "$url/SHA256SUMS.sig" -OutFile "$tmp\\SHA256SUMS.sig" -UseBasicParsing
-  [IO.File]::WriteAllText("$tmp\\allowed_signers", "${SIGNER} ${SIGNING_KEY}\`n")
+  [IO.File]::WriteAllText("$tmp\\allowed_signers", "${SIGNER} $signingKey\`n")
   $verify = Start-Process ssh-keygen -ArgumentList '-Y verify -f allowed_signers -I ${SIGNER} -n ${SIGNER} -s SHA256SUMS.sig' -WorkingDirectory $tmp -RedirectStandardInput "$tmp\\SHA256SUMS" -NoNewWindow -Wait -PassThru
   if ($verify.ExitCode -ne 0) { throw "the SHA256SUMS signature check failed for $tag; installing nothing" }
   $sums = @(Get-Content "$tmp\\SHA256SUMS")
@@ -201,7 +204,7 @@ function cliTab(): Tab {
           { code: WINDOWS_INSTALL_SCRIPT, lang: 'powershell' },
           {
             p:
-              'It makes the same three checks as `install.sh` before it installs anything: the signature on the release\'s `SHA256SUMS` against the signing key in the block, ' +
+              'It makes the same three checks as `install.sh` before it installs anything: the signature on the release\'s `SHA256SUMS` against the signing key in `$signingKey` at the top of the block (its comment gives the key\'s source and fingerprint), ' +
               `checked with \`ssh-keygen\` from the OpenSSH Client that Windows includes; the signed first line of \`SHA256SUMS\` naming that release; and the SHA-256 of \`${WINDOWS_ASSET}\`. ` +
               `If a check fails, it stops and installs nothing. It installs the binary as \`relate.exe\` in \`${WINDOWS_INSTALL_DIR}\` and adds that folder to your user \`PATH\`, ` +
               'so `relate` runs in this window and in every new one.',

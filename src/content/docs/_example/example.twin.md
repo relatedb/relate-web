@@ -502,6 +502,9 @@ export PATH="$HOME/.local/bin:$PATH"
 
 ```powershell
 & {
+  # relate's release signing key: distribution/release-signing-key.pub in github.com/relatedb/relate
+  # fingerprint SHA256:BfnIA0YD0h+ldihdq8V1k/xFY91lm8mRCuVS21+3kzA
+  $signingKey = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHgv/GHY5mtv/HopH/J/T7KrTT7eOVFEG2ueT4iRKwbK relate-release'
   $ErrorActionPreference = 'Stop'
   $ProgressPreference = 'SilentlyContinue'
   if (-not (Get-Command ssh-keygen -ErrorAction SilentlyContinue)) { throw 'ssh-keygen not found: add the OpenSSH Client in Settings > System > Optional features, then run this again' }
@@ -511,7 +514,7 @@ export PATH="$HOME/.local/bin:$PATH"
   New-Item -ItemType Directory -Force $tmp | Out-Null
   Invoke-WebRequest "$url/SHA256SUMS" -OutFile "$tmp\SHA256SUMS" -UseBasicParsing
   Invoke-WebRequest "$url/SHA256SUMS.sig" -OutFile "$tmp\SHA256SUMS.sig" -UseBasicParsing
-  [IO.File]::WriteAllText("$tmp\allowed_signers", "relate-release ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHgv/GHY5mtv/HopH/J/T7KrTT7eOVFEG2ueT4iRKwbK relate-release`n")
+  [IO.File]::WriteAllText("$tmp\allowed_signers", "relate-release $signingKey`n")
   $verify = Start-Process ssh-keygen -ArgumentList '-Y verify -f allowed_signers -I relate-release -n relate-release -s SHA256SUMS.sig' -WorkingDirectory $tmp -RedirectStandardInput "$tmp\SHA256SUMS" -NoNewWindow -Wait -PassThru
   if ($verify.ExitCode -ne 0) { throw "the SHA256SUMS signature check failed for $tag; installing nothing" }
   $sums = @(Get-Content "$tmp\SHA256SUMS")
@@ -531,7 +534,7 @@ export PATH="$HOME/.local/bin:$PATH"
 }
 ```
 
-It makes the same three checks as `install.sh` before it installs anything: the signature on the release's `SHA256SUMS` against the signing key in the block, checked with `ssh-keygen` from the OpenSSH Client that Windows includes; the signed first line of `SHA256SUMS` naming that release; and the SHA-256 of `relate-windows-amd64.exe`. If a check fails, it stops and installs nothing. It installs the binary as `relate.exe` in `$env:LOCALAPPDATA\Programs\relate` and adds that folder to your user `PATH`, so `relate` runs in this window and in every new one.
+It makes the same three checks as `install.sh` before it installs anything: the signature on the release's `SHA256SUMS` against the signing key in `$signingKey` at the top of the block (its comment gives the key's source and fingerprint), checked with `ssh-keygen` from the OpenSSH Client that Windows includes; the signed first line of `SHA256SUMS` naming that release; and the SHA-256 of `relate-windows-amd64.exe`. If a check fails, it stops and installs nothing. It installs the binary as `relate.exe` in `$env:LOCALAPPDATA\Programs\relate` and adds that folder to your user `PATH`, so `relate` runs in this window and in every new one.
 
 In the Windows Subsystem for Linux (WSL), use the macOS and Linux tab: it installs the Linux binary inside WSL. [Windows notes](https://relatedb.ai/docs/get-started/install/#windows-notes) covers Git Bash, the runtime the binary needs, and upgrades.
 
