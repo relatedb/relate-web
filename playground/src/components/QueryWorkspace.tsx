@@ -18,7 +18,6 @@ interface Props {
   elapsed: number | null;
   /** Parameters from a loaded cookbook step, sent with every query. */
   paramsNote: { label: string; onClear: () => void } | null;
-  lastRun: string | null;
   history: string[];
 }
 
@@ -34,7 +33,6 @@ export function QueryWorkspace({
   error,
   elapsed,
   paramsNote,
-  lastRun,
   history,
 }: Props) {
   const mobile = useIsMobile();
@@ -72,7 +70,6 @@ export function QueryWorkspace({
         onRun={onRun}
         engineReady={engineReady}
         running={running}
-        lastRun={lastRun}
         history={history}
       />
       <ResultsPanel

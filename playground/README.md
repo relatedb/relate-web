@@ -51,6 +51,12 @@ scanner and stops at the first error; the results pane shows the last
 statement's result, with counters summed over the script. Each statement
 commits on its own.
 
+The editor and the terminal prompt keep separate drafts. After a run the
+editor keeps the query that ran (typed, a sample, a schema-browser click),
+highlighted and ready to edit; the terminal prompt clears. Clicking a past
+input in the terminal puts it in both. Never show a query as the editor's
+placeholder: CodeMirror does not highlight placeholder text.
+
 ## Graph view
 
 Double-clicking a node in the graph view adds its neighbours from the
