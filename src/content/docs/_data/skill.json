@@ -1,17 +1,17 @@
 {
   "source": "surfaces/relate-cli/src/skill/bundle",
-  "commit": "b02f283c3620be87cba88703fb8d43cf6fb66a12",
-  "synced": "2026-11-11",
-  "version": "1.0.0",
+  "commit": "ef436ce10a54a43c8f84905bc45a8d053d99a0d8",
+  "synced": "2026-11-12",
+  "version": "1.0.1",
   "files": [
     {
       "path": "SKILL.md",
-      "sha256": "8c3d4a0bfcd0cea9d95ee5bcf082e0812921847a286a0bbfd3fa963866ce24d0",
-      "upstream_sha256": "68de16ad663c1454b540018dabf6472eabdc9d9ff0c124048f0ba5e03828ab48"
+      "sha256": "dd428292ed8c2d63e66b3ef0660aa7ad9f2a9c3201e75192fe1ad2551644e609",
+      "upstream_sha256": "d93c71e58840484afee07f69416b4217b9524aeaef1468800853ef0a2e7d9e4d"
     },
     {
       "path": "references/agent-safety.md",
-      "sha256": "f0828e841a92ac7109fe288f0c4e55a3f893282f6e2629d7c9620dcece3a278a"
+      "sha256": "4c3a616f09b801fca4254dfa82e6c24b888d96d13051a2f1f56b9c6244ea495d"
     },
     {
       "path": "references/client-c.md",
@@ -35,7 +35,7 @@
     },
     {
       "path": "references/client-python.md",
-      "sha256": "20b8ce0231cbb03eb37cbb85613469a4867d53557c85dd7472447727ab98208f"
+      "sha256": "8e8134575f392ff68c2e850c55791440c545190610aecd102afd850adb31906c"
     },
     {
       "path": "references/client-swift.md",
@@ -43,11 +43,11 @@
     },
     {
       "path": "references/client-wasm.md",
-      "sha256": "c3dffaf22411afe31bfee1251cd5047cffc16fa9c6c9e14d415852933319c69f"
+      "sha256": "e1cc53e91bd4b761b7a43b669f555c82e843f6653ae5acde96d114d88ddc97c4"
     },
     {
       "path": "references/operations.md",
-      "sha256": "1bdeb9ac3ecc3a17bf6fabb98d95b0084780349f408e8c0a041dd89282b21e99"
+      "sha256": "e99e28a86d68d089984916dd6ab044c08795bbdfb4499966a53d9b6f25ac3b85"
     },
     {
       "path": "references/pull.md",
