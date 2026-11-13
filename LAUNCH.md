@@ -101,7 +101,7 @@ GitHub token.
 - [ ] Light/dark theme, mobile width, cli/agentic toggle, copy buttons all work
 - [ ] Version shown on the page matches the latest release tag
 - [ ] Home "Zero to querying" shows no TCK pass count: the design's "3,893 tests passed" figure is not published by any engine document (upstream `docs/tck/compliance.md`: the count retired 2026-11-05 with the move to the spec harness). Add a number only when the harness publishes one, with its link
-- [ ] The hero banner's Join link (`https://relate.devpost.com`) resolves; the banner runs one month, then remove it from `src/components/Hero.astro`
+- [ ] The hero hackathon banner (ADR-0065): its Join link (`https://relate.devpost.com`) resolves, the prize and the deadline match that page, and both layouts (artwork above the copy below 720 px, beside it above) and both themes read. It comes down after the December 11 submission deadline: `src/components/Hero.astro` and the `--promo` / `--on-promo` tokens in `src/styles/base.css` go, and `public/img/` keeps no campaign art
 
 **Install names** (the table under "Published names" is the source; the site must agree with it)
 - [x] Each name is ours (2026-11-11): `relate-db` 1.0.0 on PyPI, `@relate/relate`, `@relate/relate-wasm` and the five `@relate/relate-<platform>-<arch>` packages at 1.0.0 on npm, `relate` 1.0.0 on crates.io; `com.relate:relate` is not on Maven Central

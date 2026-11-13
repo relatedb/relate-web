@@ -173,6 +173,13 @@
   }
 }
 
+/* Promo: a campaign surface that keeps its own fill in both themes (the hackathon banner,
+   ADR-0065), so it never follows the theme the way --brand or --success do. */
+:root {
+  --promo: #8FCB62;      /* the banner's fill; its text and button invert it */
+  --on-promo: #0A1114;   /* near-black on the fill: 10:1, where white is 1.9:1 */
+}
+
 
 /* ---------- Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }
