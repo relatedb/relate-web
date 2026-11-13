@@ -4,6 +4,7 @@ import {
   useReactTable,
   getCoreRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   createColumnHelper,
 } from '@tanstack/react-table';
 
@@ -18,6 +19,28 @@ type Row = Record<string, CLValue>;
 
 const TABLE_ROW_LIMIT = 1000;
 
+// Rank by type so mixed columns sort stably: null last, then numbers,
+// booleans, strings, everything else (compared by its JSON text).
+function rank(v: CLValue | undefined): number {
+  if (v === null || v === undefined) return 4;
+  if (typeof v === 'number') return 0;
+  if (typeof v === 'boolean') return 1;
+  if (typeof v === 'string') return 2;
+  return 3;
+}
+
+function compareValues(a: CLValue | undefined, b: CLValue | undefined): number {
+  const ra = rank(a);
+  const rb = rank(b);
+  if (ra !== rb) return ra - rb;
+  if (ra === 4) return 0;
+  if (ra === 0) return (a as number) - (b as number);
+  if (ra === 1) return Number(a) - Number(b);
+  const sa = ra === 2 ? (a as string) : JSON.stringify(a);
+  const sb = rb === 2 ? (b as string) : JSON.stringify(b);
+  return sa < sb ? -1 : sa > sb ? 1 : 0;
+}
+
 export function NeedleResultsTable({ result }: Props) {
   const columns = useMemo(() => {
     const h = createColumnHelper<Row>();
@@ -25,6 +48,8 @@ export function NeedleResultsTable({ result }: Props) {
       h.accessor((row) => row[c], {
         id: c,
         header: c,
+        sortingFn: (a, b, id) => compareValues(a.getValue(id), b.getValue(id)),
+        sortUndefined: false,
         cell: (info) => <ValueCell value={info.getValue() ?? null} />,
       }),
     );
@@ -41,6 +66,7 @@ export function NeedleResultsTable({ result }: Props) {
     columns,
     defaultColumn: { minSize: 50 },
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: { pagination: { pageSize: 25 } },
   });
