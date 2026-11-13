@@ -37,6 +37,17 @@ const first = tabs[0];
 ---
 <section class="hero" aria-labelledby="h-hero" data-hero data-version={version} data-tabs={JSON.stringify(tabs)} data-prompt={PROMPT}>
   <div class="hero-in">
+    <!-- The hackathon banner (ADR-0065): one campaign surface, the same fill in both themes.
+         It comes down after the submission deadline. -->
+    <aside class="hbanner" aria-label="Hackathon">
+      <img class="hb-img" src="/img/11-archie-relate-laptop.webp" alt="" width="640" height="640" decoding="async" />
+      <div class="hb-copy">
+        <p class="hb-kicker">Win a Mac Studio</p>
+        <p class="hb-text">Join the Relate by Neo4j Hackathon. Give agents fast, local access to connected data to uncover relationships that matter. Submit by December 11.</p>
+        <a class="hb-join" href="https://relate.devpost.com" target="_blank" rel="noopener" aria-label="Join the Relate by Neo4j Hackathon (opens in new tab)">Join<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>
+      </div>
+    </aside>
+
     <h1 id="h-hero">Relate <span class="hh-t" aria-hidden="true"><Fragment set:html={HERO_MASCOT} /></span><span class="hh-sub">Help agents understand data</span></h1>
     <p class="hero-sub">
       Give your agents an open-source embedded database to keep their data. No signup. No server to deploy.
@@ -71,12 +82,6 @@ const first = tabs[0];
       <p class="sr-only" id="hi-live" aria-live="polite"></p>
     </div>
 
-    <!-- The hackathon banner runs one month; remove it then. relate.devpost.com goes live with the hackathon. -->
-    <div class="ann">
-      <span class="ann-t">Relate Hackathon</span>
-      <span class="ann-x">Build something with Relate</span>
-      <a class="ann-b" href="https://relate.devpost.com" target="_blank" rel="noopener" aria-label="Join the Relate Hackathon (opens in new tab)">Join<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>
-    </div>
   </div>
 </section>
 
@@ -84,24 +89,33 @@ const first = tabs[0];
   .hero { position: relative; padding: 72px 24px 56px; text-align: center; overflow: hidden; }
   .hero-in { position: relative; max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
 
-  .ann {
-    display: inline-flex; align-items: center; gap: 8px; max-width: 100%; margin: 40px 0 0; padding: 4px;
-    border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface-1);
+  /* The hackathon banner: the image above the copy on narrow screens, beside it from 720px. */
+  .hbanner {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    width: 100%; margin: 0 0 40px; padding: 16px 18px 18px;
+    background: var(--promo); color: var(--on-promo);
+    border-radius: 12px; text-align: left;
   }
-  .ann-t {
-    display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 999px;
-    background: var(--brand-soft); color: var(--brand); font: 500 13px/1 var(--font); white-space: nowrap;
+  .hb-img { flex: none; width: 144px; height: auto; }
+  .hb-copy { min-width: 0; }
+  .hb-kicker { margin: 0; font: 500 clamp(22px, 2.6vw, 30px) / 1.1 var(--font); letter-spacing: -.03em; }
+  .hb-text { margin: 6px 0 0; font-size: 15px; line-height: 22px; }
+  .hb-join {
+    display: inline-flex; align-items: center; gap: 6px; height: 36px; margin-top: 12px; padding: 0 14px 0 16px;
+    border-radius: 999px; background: var(--on-promo); color: var(--promo);
+    font: 500 14px/1 var(--font); text-decoration: none; transition: opacity .15s;
   }
-  .ann-x { color: var(--ink); font: 400 14px/1 var(--font); white-space: nowrap; }
-  .ann-b {
-    display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 12px 0 14px;
-    border-radius: 999px; background: var(--surface-2); color: var(--ink);
-    font: 500 13px/1 var(--font); text-decoration: none; transition: background-color .15s;
+  .hb-join:hover { opacity: .86; }
+  .hb-join:focus-visible { outline-color: var(--on-promo); }
+  .hb-join svg { flex: none; transition: transform .15s; }
+  .hb-join:hover svg { transform: translateX(2px); }
+  @media (min-width: 720px) {
+    .hbanner { flex-direction: row-reverse; align-items: center; gap: 24px; padding: 16px 24px; }
+    .hb-img { width: 164px; }   /* 164 + 16 + 16 of padding: the banner's 196px */
   }
-  .ann-b:hover { background: var(--surface-3); }
-  .ann-b svg { flex: none; transition: transform .15s; }
-  .ann-b:hover svg { transform: translateX(2px); }
-  @media (max-width: 560px) { .ann-x { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .hb-join svg { transition: none; }
+  }
 
   h1 {
     margin: 0; font: 500 clamp(46px, 6.2vw, 92px) / 1 var(--font);
