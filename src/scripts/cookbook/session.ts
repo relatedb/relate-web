@@ -480,11 +480,27 @@ const defaultView = (result: Result): View => (result.kind === 'gram' && result.
 
 let session: Session | null = null;
 
+/** The live highlighter (live-highlight.ts), loaded on the first Edit and shared by every step. */
+let liveHighlighter: Promise<(code: string) => string> | null = null;
+const loadHighlighter = () =>
+  (liveHighlighter ??= import('./live-highlight.ts').then((m) => m.cypherHighlighter()).catch((err) => {
+    liveHighlighter = null;
+    throw err;
+  }));
+
+const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 class CypherCell extends HTMLElement {
   upgraded = false;
   session!: Session;
   editor!: HTMLTextAreaElement;
   codeView!: HTMLElement;
+  /**
+   * The editor's highlighted layer: made on the first Edit, it wraps the
+   * textarea (its text transparent, its caret and selection visible) over a
+   * <pre> re-highlighted on every input, so an edit keeps its colours.
+   */
+  editLayer: { wrap: HTMLElement; hl: HTMLElement; highlight: ((code: string) => string) | null } | null = null;
   paramsEditor!: HTMLTextAreaElement | null;
   outText!: HTMLElement;
   outTable!: HTMLElement;
@@ -547,7 +563,14 @@ class CypherCell extends HTMLElement {
         this.session.runUpTo(this);
       }
     });
-    this.editor.addEventListener('input', () => this.fitEditor());
+    this.editor.addEventListener('input', () => {
+      this.fitEditor();
+      // At once, not on the next frame: the layer must never lag the transparent text.
+      this.paintCode();
+    });
+    this.editor.addEventListener('scroll', () => this.syncScroll());
+    // Fetch the highlighter as soon as an edit looks likely.
+    for (const ev of ['pointerenter', 'focus']) this.editBtn.addEventListener(ev, () => void loadHighlighter().catch(() => {}), { once: true });
     for (const tab of this.tabs.querySelectorAll<HTMLElement>('[data-view]')) {
       tab.addEventListener('click', () => this.showView(tab.dataset.view as View));
     }
@@ -584,15 +607,64 @@ class CypherCell extends HTMLElement {
       // Leaving edit mode restores the recipe's query.
       this.editor.value = this.editor.defaultValue;
       this.editor.hidden = true;
+      if (this.editLayer) this.editLayer.wrap.hidden = true;
       this.codeView.hidden = false;
       this.editBtn.textContent = 'Edit';
     } else {
+      this.ensureEditLayer();
+      this.editLayer!.wrap.hidden = false;
       this.editor.hidden = false;
       this.codeView.hidden = true;
       this.editBtn.textContent = 'Revert';
       this.fitEditor();
+      this.paintCode();
       this.editor.focus();
     }
+  }
+
+  /** Wrap the textarea in the highlighted layer, once. */
+  ensureEditLayer() {
+    if (this.editLayer) return;
+    const wrap = Object.assign(document.createElement('div'), { className: 'cell-edit' });
+    const hl = Object.assign(document.createElement('div'), { className: 'cell-edit-hl' });
+    hl.setAttribute('aria-hidden', 'true');
+    this.editor.before(wrap);
+    wrap.append(hl, this.editor);
+    this.editLayer = { wrap, hl, highlight: null };
+    loadHighlighter().then(
+      (highlight) => {
+        this.editLayer!.highlight = highlight;
+        this.paintCode();
+      },
+      // Without the highlighter the layer shows plain text: still aligned, still editable.
+      () => {},
+    );
+  }
+
+  /** Draw the editor's text into the highlighted layer. */
+  paintCode() {
+    const layer = this.editLayer;
+    if (!layer || this.editor.hidden) return;
+    const code = this.editor.value;
+    // A <pre> drops a final empty line that the textarea shows: keep one so both scroll alike.
+    const shown = code.endsWith('\n') || code === '' ? `${code} ` : code;
+    if (layer.highlight) {
+      layer.hl.innerHTML = layer.highlight(shown);
+    } else if (code === this.editor.defaultValue) {
+      // The build's highlighting of the authored query, until the highlighter loads.
+      layer.hl.innerHTML = this.codeView.innerHTML;
+    } else {
+      layer.hl.innerHTML = `<pre class="shiki"><code>${escapeHtml(shown)}</code></pre>`;
+    }
+    layer.hl.querySelector('pre')?.removeAttribute('tabindex');
+    this.syncScroll();
+  }
+
+  syncScroll() {
+    const pre = this.editLayer?.hl.querySelector('pre');
+    if (!pre) return;
+    pre.scrollTop = this.editor.scrollTop;
+    pre.scrollLeft = this.editor.scrollLeft;
   }
 
   fitEditor() {

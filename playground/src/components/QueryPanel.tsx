@@ -13,7 +13,6 @@ interface Props {
   onRun: (text: string) => void;
   engineReady: boolean;
   running: boolean;
-  lastRun: string | null;
   // Past executed inputs, newest first; drives the editor's up/down REPL recall.
   history: string[];
 }
@@ -24,7 +23,6 @@ export function QueryPanel({
   onRun,
   engineReady,
   running,
-  lastRun,
   history,
 }: Props) {
   const isMobile = useIsMobile();
@@ -61,7 +59,7 @@ export function QueryPanel({
           newLineOnEnter
           lineWrap
           theme="dark"
-          placeholder={lastRun ?? PROMPT_HINT}
+          placeholder={PROMPT_HINT}
         />
       </Box>
       <Flex flexDirection="row" justifyContent={isMobile ? 'stretch' : 'flex-end'}>

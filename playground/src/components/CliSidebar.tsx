@@ -17,6 +17,8 @@ interface Props {
   running: boolean;
   draft: string;
   onDraftChange: (v: string) => void;
+  /** A past input clicked in the history: back into the prompt and the editor. */
+  onRecall: (text: string) => void;
   onSubmit: (text: string) => void;
   // Shown in mobile-tab context as a "switch to query" affordance.
   onSwitchToQuery: () => void;
@@ -42,6 +44,7 @@ export function CliSidebar({
   running,
   draft,
   onDraftChange,
+  onRecall,
   onSubmit,
   onSwitchToQuery,
 }: Props) {
@@ -92,10 +95,10 @@ export function CliSidebar({
   const focusPrompt = () => textareaRef.current?.focus();
   const recall = useCallback(
     (text: string) => {
-      onDraftChange(text);
+      onRecall(text);
       textareaRef.current?.focus();
     },
-    [onDraftChange],
+    [onRecall],
   );
 
   return (

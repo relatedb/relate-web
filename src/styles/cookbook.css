@@ -215,13 +215,13 @@ docs-element > [hidden] { display: none; }
 
 /* Static code blocks */
 .code-block { position: relative; margin: 16px 0; }
-.code-block pre, .cell-code pre {
+.code-block pre, .cell-code pre, .cell-edit-hl pre {
   margin: 0; padding: 14px 16px; overflow-x: auto;
   background: var(--code-bg) !important; color: var(--code-fg);
   border: 1px solid var(--code-border); border-radius: 8px;
   font-family: var(--font-mono); font-size: 13.5px; line-height: 1.6; tab-size: 2;
 }
-.code-block pre code, .cell-code pre code { font-size: inherit; background: none; border: 0; padding: 0; }
+.code-block pre code, .cell-code pre code, .cell-edit-hl pre code { font-size: inherit; background: none; border: 0; padding: 0; }
 /* Shiki emits both themes as variables; Night uses the dark one, Day the light one. */
 .shiki, .shiki span { color: var(--shiki-dark); font-style: var(--shiki-dark-font-style); font-weight: var(--shiki-dark-font-weight); }
 :root[data-theme="light"] .shiki, :root[data-theme="light"] .shiki span { color: var(--shiki-light); font-style: var(--shiki-light-font-style); font-weight: var(--shiki-light-font-weight); }
@@ -256,6 +256,18 @@ cypher-cell { display: block; margin: 20px 0 28px; }
   border: 1px solid var(--accent); border-radius: 8px; outline: none;
   font-family: var(--font-mono); font-size: 13.5px; line-height: 1.6; tab-size: 2; white-space: pre; overflow-x: auto;
 }
+/* Editing a step (session.ts): the textarea's text is transparent over a
+   copy of it highlighted on every input, so the two share every metric
+   (font, padding, border, no wrapping) and scroll together. */
+.cell-edit { position: relative; }
+.cell-edit[hidden] { display: none; }
+.cell-edit-hl { position: absolute; inset: 0; pointer-events: none; }
+.cell-edit-hl pre { height: 100%; overflow: hidden; white-space: pre; border-color: var(--accent); }
+.cell-edit .cell-editor {
+  position: relative; background: transparent;
+  color: transparent; -webkit-text-fill-color: transparent;
+}
+.cell-edit .cell-editor::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
 .cell-params { margin-top: 8px; font-size: 14px; color: var(--fg-muted); }
 .cell-params summary { cursor: pointer; }
 .cell-params .params-editor {

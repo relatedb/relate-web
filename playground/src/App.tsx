@@ -35,7 +35,11 @@ function queryChangedSchema(stats: QueryStats): boolean {
 }
 
 export function App() {
+  // The editor and the terminal prompt keep separate drafts. The editor keeps
+  // the query that last ran, so it stays highlighted and editable (placeholder
+  // text in CodeMirror is never highlighted); the prompt clears after a submit.
   const [query, setQuery] = useState('');
+  const [cliDraft, setCliDraft] = useState('');
   const [run, setRun] = useState<ScriptRun | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState<number | null>(null);
@@ -66,6 +70,7 @@ export function App() {
     setParams(null);
     setLoadedRecipe(null);
     setQuery('');
+    setCliDraft('');
     setSchemaRefreshKey((k) => k + 1);
   }, []);
 
@@ -92,8 +97,12 @@ export function App() {
     };
   }, []);
 
-  const echoInput = useCallback((text: string) => {
+  /** Echo `text` into the terminal; with `toEditor`, also show it in the
+   * editor, so whatever ran last (typed, a sample, a schema click) can be
+   * edited and run again. */
+  const echoInput = useCallback((text: string, toEditor = true) => {
     setCliHistory((h) => [...h, { kind: 'input', text: text.trimEnd() }]);
+    if (toEditor) setQuery(text);
   }, []);
 
   /** Run `q` with `paramsJson` (a JSON object as text, or null). Call sites
@@ -101,10 +110,6 @@ export function App() {
    * input text; `runQuery` only handles execution and the output/error reply. */
   const runQuery = useCallback(async (q: string, paramsJson: string | null) => {
     if (!canRunQuery(engineReady, running, q)) return false;
-    // Terminal & editor share `query` as one draft: clear both after running so
-    // the next prompt starts fresh. Past inputs remain in the terminal history
-    // and are clickable to restore.
-    setQuery('');
     setRunning(true);
     setError(null);
     const t0 = performance.now();
@@ -177,7 +182,8 @@ export function App() {
   const runSeed = useCallback(async () => {
     setSeeding(true);
     try {
-      echoInput(SEED_DISPLAY_SCRIPT);
+      // The LOAD CSV teaser cannot run in the browser: terminal only.
+      echoInput(SEED_DISPLAY_SCRIPT, false);
       if (!(await runQuery(SEED_SCRIPT, SEED_PARAMS))) return;
       echoInput(PREVIEW_QUERY);
       if (!(await runQuery(PREVIEW_QUERY, null))) return;
@@ -233,6 +239,11 @@ export function App() {
     void runQuery(text, params?.text ?? null);
   };
 
+  const runFromCli = (text: string) => {
+    setCliDraft('');
+    runWithParams(text);
+  };
+
   // The sample list: a loaded recipe's steps (its setup steps left out), or
   // the queries about the sample data.
   const samples = useMemo<{ title: string; items: Sample[] }>(
@@ -274,9 +285,6 @@ export function App() {
     })();
   };
 
-  // Ghost-text in the editor after a run: the most recent input in history.
-  const lastRun = [...cliHistory].reverse().find((e) => e.kind === 'input')?.text ?? null;
-
   // CypherEditor's REPL history (up/down arrows) wants newest-first.
   const editorHistory = useMemo(
     () =>
@@ -311,7 +319,6 @@ export function App() {
       run={run}
       error={error}
       elapsed={elapsed}
-      lastRun={lastRun}
     />
   );
   const cliSidebar = (
@@ -319,9 +326,13 @@ export function App() {
       history={cliHistory}
       engineReady={engineReady}
       running={running}
-      draft={query}
-      onDraftChange={setQuery}
-      onSubmit={runWithParams}
+      draft={cliDraft}
+      onDraftChange={setCliDraft}
+      onRecall={(text) => {
+        setCliDraft(text);
+        setQuery(text);
+      }}
+      onSubmit={runFromCli}
       onSwitchToQuery={() => setMobileTab('query')}
     />
   );
