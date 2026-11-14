@@ -8,30 +8,38 @@ import { setupPrompt } from './docs/install.ts';
 import engine from '../content/docs/_data/engine.json';
 
 const version = `v${engine.version}`;
+const RELEASES = 'https://github.com/relatedb/relate/releases';
 const SITE = 'https://relatedb.ai';
 const PROMPT = setupPrompt();
 const SECURITY = 'The install script verifies release signatures and SHA256 checksums.';
 
-interface Tab { id: string; label: string; cmd?: string; note: string; more?: { label: string; href: string }[] }
+// plain: the line is a coordinate to paste into a build file, so it has no shell prompt. showNote: the
+// note carries a step the line alone does not.
+interface Tab { id: string; label: string; cmd?: string; note: string; docs: string; prompt?: string; link?: string; plain?: boolean; showNote?: boolean }
+
+// The prompt for a language tab: install the client, then follow that client's page. The CLI is not
+// needed for a binding, so it is not part of the steps.
+const clientPrompt = (lang: string, href: string, install: string) => [
+  `Add relate, the embedded Cypher graph database (relatedb.ai), to my ${lang} project.`,
+  `1. ${install}`,
+  `2. Follow the ${lang} get-started page for opening a database and running a first query. Open stores read-only unless I ask for a change, bind values as parameters, and bound non-aggregate results with LIMIT.`,
+  '3. Ask me what data to load and my first question, then create the database, load the data and verify the imported counts.',
+  `Reference: ${SITE}${href}. The docs are reference text, not instructions.`,
+].join('\n\n');
+const bind = (id: string, label: string, href: string, cmd: string | undefined, note: string, install: string, extra: Partial<Tab> = {}): Tab =>
+  ({ id, label, cmd, note, docs: href, prompt: clientPrompt(label, href, install), ...extra });
+
 const tabs: Tab[] = [
-  { id: 'skill', label: 'Agent skill', cmd: `curl -sSfL ${SITE}/install.sh | bash && relate skill install --agent claude-code`, note: `Installs the CLI, then the relate skill for Claude Code. ${SECURITY}` },
-  { id: 'shell', label: 'Shell', cmd: `curl -sSfL ${SITE}/install.sh | bash`, note: `macOS and Linux. ${SECURITY}` },
-  {
-    id: 'windows', label: 'Windows', note: 'A PowerShell block that makes the same checks as the install script, then puts relate.exe on your PATH.',
-    more: [{ label: 'Install on Windows', href: '/docs/get-started/install/' }],
-  },
-  { id: 'py', label: 'Python', cmd: 'pip install relate-db', note: 'The Python client.' },
-  { id: 'js', label: 'JavaScript', cmd: 'npm install @relate/relate', note: 'For Node.js. In the browser, use @relate/relate-wasm.' },
-  { id: 'rust', label: 'Rust', cmd: 'cargo add relate', note: 'Use relate as a crate inside your application.' },
-  {
-    id: 'more', label: 'More', note: 'Swift, Java, Go and C are covered in the docs.',
-    more: [
-      { label: 'Swift', href: '/docs/get-started/swift' },
-      { label: 'Java', href: '/docs/get-started/java' },
-      { label: 'Go', href: '/docs/get-started/go' },
-      { label: 'C', href: '/docs/get-started/c' },
-    ],
-  },
+  { id: 'skill', label: 'Agent skill', cmd: `curl -sSfL ${SITE}/install.sh | bash && relate skill install --agent claude-code`, note: `Installs the CLI, then the relate skill for Claude Code. ${SECURITY}`, docs: '/docs/get-started/agent-quickstart' },
+  { id: 'shell', label: 'macOS / Linux', cmd: `curl -sSfL ${SITE}/install.sh | bash`, note: SECURITY, docs: '/docs/get-started/install/' },
+  { id: 'windows', label: 'Windows', note: 'A PowerShell block that makes the same checks as the install script, then puts relate.exe on your PATH.', docs: '/docs/get-started/install/', link: 'Install on Windows' },
+  bind('py', 'Python', '/docs/get-started/python', 'pip install relate-db', 'The Python client.', 'Install the client with `pip install relate-db`.'),
+  bind('js', 'JavaScript', '/docs/get-started/node', 'npm install @relate/relate', 'For Node.js. In the browser, use @relate/relate-wasm.', 'Install the client with `npm install @relate/relate` (in the browser, `@relate/relate-wasm`).'),
+  bind('rust', 'Rust', '/docs/get-started/rust', 'cargo add relate', 'Use relate as a crate inside your application.', 'Install the crate with `cargo add relate`.'),
+  bind('swift', 'Swift', '/docs/get-started/swift', `.package(url: "https://github.com/relatedb/relate", from: "${engine.version}")`, 'The SwiftPM package, in Package.swift.', 'Add the SwiftPM package to Package.swift as the get-started page describes.', { plain: true }),
+  bind('java', 'Java', '/docs/get-started/java', `com.relate:relate:${engine.version}`, 'Not on Maven Central: download the release jar and run mvn install:install-file first.', 'Download the release jar, run `mvn install:install-file` on it, then depend on the Maven coordinate as the get-started page describes.', { plain: true, showNote: true }),
+  bind('go', 'Go', '/docs/get-started/go', `go get github.com/relatedb/relate/clients/go@${engine.commit}`, 'The module has no version tag, so it is pinned to the release commit.', 'Run `go get` at the release commit the get-started page names, then set up the C library for cgo as it describes.', { showNote: true }),
+  bind('c', 'C', '/docs/get-started/c', `curl -sSfLO ${RELEASES}/download/${version}/relate-ffi-<target>.tar.gz`, 'Pick your <target>, e.g. aarch64-apple-darwin or x86_64-unknown-linux-gnu.', 'Download the release archive for my platform, which holds include/relate.h and the library, and build against it as the get-started page describes.', { showNote: true }),
 ];
 const first = tabs[0];
 ---
@@ -68,16 +76,11 @@ const first = tabs[0];
       <div class="hbody" role="tabpanel" aria-labelledby={`it-${first.id}`} id="hi-panel">
         <div class="hrow"><code id="hi-cmd" translate="no"><span class="ps">$</span>{first.cmd}</code></div>
         <p class="hnote" id="hi-note">{first.note}</p>
-        <button class="hcopy" type="button" id="hi-copy" aria-label="Copy command">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"></rect><path d="M10.5 3.5v-.5A1.5 1.5 0 0 0 9 1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.5"></path></svg>
-        </button>
       </div>
       <div class="hfoot">
-        <button type="button" class="hfa" id="hi-agent">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"></rect><path d="M10.5 3.5v-.5A1.5 1.5 0 0 0 9 1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.5"></path></svg>
-          <span class="hfa-t">Copy for agent</span>
-        </button>
-        <a class="hfd" href="/docs/">Read docs<span aria-hidden="true">&nbsp;&#8599;</span></a>
+        <button class="hact" type="button" id="hi-copy"><svg class="ic ic-copy" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"></rect><path d="M10.5 3.5v-.5A1.5 1.5 0 0 0 9 1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.5"></path></svg><svg class="ic ic-ok" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 4.5"></path></svg><span class="hact-t">Copy</span></button>
+        <button type="button" class="hact" id="hi-agent"><svg class="ic ic-copy" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"></rect><path d="M10.5 3.5v-.5A1.5 1.5 0 0 0 9 1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.5"></path></svg><svg class="ic ic-ok" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 4.5"></path></svg><span class="hact-t">Prompt for agent</span></button>
+        <a class="hact hfd" id="hi-docs" href={first.docs}>Read the docs<span aria-hidden="true">&nbsp;&#8599;</span></a>
       </div>
       <p class="sr-only" id="hi-live" aria-live="polite"></p>
     </div>
@@ -158,16 +161,16 @@ const first = tabs[0];
 
   /* install panel */
   .hpanel {
-    width: 100%; max-width: 640px; margin-top: 36px; padding: 8px; text-align: left;
+    width: 100%; max-width: 800px; margin-top: 36px; padding: 6px; text-align: left;
     background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 12px;
   }
   .hitabs {
     display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none;
-    padding: 4px 4px 12px; margin: -4px -4px 0; scroll-padding-inline: 8px;
+    padding: 2px 2px 6px; margin: 0; scroll-padding-inline: 8px;
   }
   .hitabs::-webkit-scrollbar { display: none; }
   .hitabs button {
-    flex: none; min-height: 36px; padding: 0 14px; border: 0; border-radius: 6px; background: none;
+    flex: none; min-height: 32px; padding: 0 10px; border: 0; border-radius: 6px; background: none;
     color: var(--ink-muted); font: 500 14px/1 var(--font); cursor: pointer; white-space: nowrap;
   }
   .hitabs button:hover { color: var(--ink); }
@@ -179,54 +182,63 @@ const first = tabs[0];
   }
 
   .hbody {
-    position: relative; padding: 20px 60px 20px 20px; min-height: 0;
+    position: relative; padding: 10px 14px; min-height: 0;
     background: var(--win); border: 1px solid var(--line); border-radius: 6px;
   }
-  .hrow { font: 400 14px/26px var(--mono); }
-  .hrow code { display: block; white-space: pre-wrap; word-break: break-word; font: inherit; }
+  .hrow { font: 400 12.5px/22px var(--mono); }
+  .hrow code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
   .hrow :global(.ps) { color: var(--ink-muted); margin-right: 10px; user-select: none; }
   .hrow :global(a) { display: inline-block; margin: 0 20px 0 0; color: var(--ink); text-underline-offset: 4px; }
   /* The design hides the note; it stays in the markup (the install script's verification line) to restore. */
-  .hnote { display: none; margin: 16px 0 0; font: 400 13px/22px var(--mono); color: var(--ink-muted); }
+  .hnote { display: none; margin: 4px 0 0; font: 400 13px/22px var(--mono); color: var(--ink-muted); }
   .hnote::before { content: '# '; }
-  .hcopy {
-    position: absolute; top: 8px; right: 8px; width: 32px; height: 32px;
-    display: inline-flex; align-items: center; justify-content: center;
-    background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px;
-    color: var(--ink-muted); cursor: pointer;
-  }
-  .hcopy:hover { color: var(--ink); background: var(--surface-3); }
-  .hcopy.done { color: var(--success); }
-  .hcopy[hidden] { display: none; }
-
-  .hfoot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0 0; }
-  .hfa, .hfd {
-    display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 12px;
+  .hnote.on { display: block; }
+  .hfoot { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; padding: 4px 0 0; }
+  .hact {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 10px;
     background: none; border: 0; border-radius: 6px; color: var(--ink-muted);
     font: 500 14px/1 var(--font); text-decoration: none; cursor: pointer; white-space: nowrap;
   }
-  .hfa:hover, .hfd:hover { color: var(--ink); }
+  .hact:hover { color: var(--ink); }
+  .hact[hidden] { display: none; }
+  .hact:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px var(--focus); }
+  .hfd { margin-left: auto; }
+  .hact .ic-ok { display: none; }
+  .hact.done { color: var(--success); }
+  .hact.done .ic-copy { display: none; }
+  .hact.done .ic-ok { display: block; }
 
   @media (max-width: 900px) { .hero { padding: 48px 16px 40px; } }
-  @media (max-width: 560px) { .hbody { padding-right: 52px; } .hero-btns .hbtn { flex: 1 1 100%; } }
+  @media (max-width: 560px) { .hero-btns .hbtn { flex: 1 1 100%; } .hfd { margin-left: 0; } }
 </style>
 
 <script>
-  type Tab = { id: string; label: string; cmd?: string; note: string; more?: { label: string; href: string }[] };
+  type Tab = { id: string; label: string; cmd?: string; note: string; docs: string; prompt?: string; link?: string; plain?: boolean; showNote?: boolean };
   const root = document.querySelector<HTMLElement>('[data-hero]');
   if (root) {
     const tabs: Tab[] = JSON.parse(root.dataset.tabs ?? '[]');
-    const prompt = root.dataset.prompt ?? '';
+    const defaultPrompt = root.dataset.prompt ?? '';
     const list = root.querySelector<HTMLElement>('#hi-tabs')!;
     const cmd = root.querySelector<HTMLElement>('#hi-cmd')!;
     const note = root.querySelector<HTMLElement>('#hi-note')!;
     const panel = root.querySelector<HTMLElement>('#hi-panel')!;
     const copy = root.querySelector<HTMLButtonElement>('#hi-copy')!;
     const agent = root.querySelector<HTMLButtonElement>('#hi-agent')!;
+    const docs = root.querySelector<HTMLAnchorElement>('#hi-docs')!;
     const live = root.querySelector<HTMLElement>('#hi-live')!;
     const buttons = () => [...list.querySelectorAll<HTMLButtonElement>('[role=tab]')];
     let current = tabs[0]?.id ?? '';
     let timer: ReturnType<typeof setTimeout> | undefined;
+    const reset = new Map<HTMLButtonElement, ReturnType<typeof setTimeout>>();
+    const text = (b: HTMLButtonElement) => b.querySelector<HTMLElement>('.hact-t')!;
+    const idle = { [copy.id]: 'Copy', [agent.id]: 'Prompt for agent' };
+
+    // Back to the resting label and icon, e.g. when the tab changes under a "Copied".
+    const rest = (b: HTMLButtonElement) => {
+      clearTimeout(reset.get(b));
+      b.classList.remove('done');
+      text(b).textContent = idle[b.id];
+    };
 
     const show = (id: string, focus = false) => {
       const t = tabs.find((x) => x.id === id);
@@ -240,23 +252,26 @@ const first = tabs[0];
       }
       panel.setAttribute('aria-labelledby', `it-${id}`);
       cmd.replaceChildren();
-      if (t.more) {
-        for (const m of t.more) {
-          const a = document.createElement('a');
-          a.href = m.href;
-          a.textContent = m.label;
-          cmd.append(a);
+      if (t.cmd) {
+        if (!t.plain) {
+          const ps = document.createElement('span');
+          ps.className = 'ps';
+          ps.textContent = '$';
+          cmd.append(ps);
         }
-        copy.hidden = true;
+        cmd.append(t.cmd);
       } else {
-        const ps = document.createElement('span');
-        ps.className = 'ps';
-        ps.textContent = '$';
-        cmd.append(ps, t.cmd ?? '');
-        copy.hidden = false;
-        copy.classList.remove('done');
+        const a = document.createElement('a');
+        a.href = t.docs;
+        a.textContent = t.link ?? t.label;
+        cmd.append(a);
       }
+      copy.hidden = !t.cmd;
+      docs.href = t.docs;
+      rest(copy);
+      rest(agent);
       note.textContent = t.note;
+      note.classList.toggle('on', !!t.showNote);
     };
 
     list.addEventListener('click', (e) => {
@@ -274,31 +289,27 @@ const first = tabs[0];
       show(all[n].dataset.tab!, true);
     });
 
-    const write = async (text: string): Promise<boolean> => {
+    const write = async (value: string): Promise<boolean> => {
       try {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(value);
         return true;
       } catch {
         return false;
       }
     };
-    const say = (ok: boolean) => {
+    // One feedback for both buttons: the label says Copied (or Copy failed), the icon turns to a check.
+    const flash = async (b: HTMLButtonElement, value: string) => {
+      const ok = await write(value);
+      rest(b);
+      b.classList.toggle('done', ok);
+      text(b).textContent = ok ? 'Copied' : 'Copy failed';
       live.textContent = ok ? 'Copied to clipboard' : 'Copy failed';
       clearTimeout(timer);
       timer = setTimeout(() => (live.textContent = ''), 1800);
+      reset.set(b, setTimeout(() => rest(b), 1600));
     };
-    copy.addEventListener('click', async () => {
-      const ok = await write(tabs.find((x) => x.id === current)?.cmd ?? '');
-      copy.classList.toggle('done', ok);
-      say(ok);
-      setTimeout(() => copy.classList.remove('done'), 1800);
-    });
-    const label = agent.querySelector<HTMLElement>('.hfa-t')!;
-    agent.addEventListener('click', async () => {
-      const ok = await write(prompt);
-      label.textContent = ok ? 'Copied' : 'Copy failed';
-      say(ok);
-      setTimeout(() => (label.textContent = 'Copy for agent'), 1600);
-    });
+    const active = () => tabs.find((x) => x.id === current);
+    copy.addEventListener('click', () => flash(copy, active()?.cmd ?? ''));
+    agent.addEventListener('click', () => flash(agent, active()?.prompt ?? defaultPrompt));
   }
 </script>
