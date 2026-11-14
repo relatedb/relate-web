@@ -29,7 +29,7 @@ cypherlite-era redo) and should not be extended.
 | Python | `relate-db` (`import relate`) | PyPI |
 | npm (Node / browser) | `@relate/relate` (+ `@relate/relate-<platform>-<arch>`) / `@relate/relate-wasm` | npm |
 | Rust | `relate` (+ the crates it depends on) | crates.io |
-| Java | `com.relate:relate` | release jars only; **not on Maven Central** |
+| Java | `com.relate:relate` (becomes `ai.relatedb:relate` on Maven Central from 1.0.2, see Open work) | release jars only; **not on Maven Central** until 1.0.2 |
 | Go | `github.com/relatedb/relate/clients/go` | the repository; **no `clients/go/vX.Y.Z` tag**, so `go get` records a pseudo-version |
 | Swift | `Relate` via `github.com/relatedb/relate` | the release tag + `RelateFFI.xcframework.zip` |
 
@@ -54,6 +54,7 @@ cypherlite-era redo) and should not be extended.
 - [x] The docs samples environment and the CLI recordings are pinned to the v1.0.0 release, not a source build: re-pin at each release with `scripts/release-refresh.sh` (AGENTS.md §4)
 - [x] After the first release with published clients: `scripts/samples/setup.sh` installs `relate-db`, `@relate/relate` and the `relate` crate from their registries, and `docs-samples.yml` no longer needs a token to check out upstream (ADR-0062)
 - [ ] Java on Maven Central and a `clients/go/vX.Y.Z` module tag: both are upstream decisions; until then the docs describe the release jar plus `mvn install:install-file`, and the pseudo-version
+- [ ] **Java on Maven Central from relate 1.0.2, as `ai.relatedb:relate:1.0.2`** (today `com.relate:relate`, release jar only). At the 1.0.2 re-pin, update every place that names the old coordinate or the `mvn install:install-file` step: the home hero's Java tab (`src/components/Hero.astro`: the coordinate, and its "Not on Maven Central" note, which should go), `get-started/java.mdx`, `guides/embed/java.mdx`, `reference/api/java.mdx`, `reference/api/index.mdx`, `reference/limitations.mdx`, `reference/project.mdx`, `_data/surfaces.json`, `_data/samples.json` and `scripts/samples/setup.sh`, the cookbook's `codebase-context-graph.md`, `public/llms.txt` and the conventions in `AGENTS.md`. The Java package may change with the group id: confirm with upstream before editing the samples. The skill's `references/client-java.md` is upstream's, so it arrives with `npm run skill:sync`. `git grep -n "com\.relate"` finds them all
 - [ ] A vulnerability disclosure address (and `_data/project.json` `security.contact`, which builds `/.well-known/security.txt`): none exists upstream at v1.0.0
 - [ ] `/docs/relate-docs.rl` is still not built or served (`reference/docs-graph` says so)
 
