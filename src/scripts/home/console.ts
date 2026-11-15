@@ -257,7 +257,15 @@ if (root && typeof Worker !== 'undefined') {
       out.append(frame);
     }
     lastRun = { key, frame, runs };
-    put(frame, `<p class="tc-echo"><span class="tc-ps">cypher&gt;</span> ${esc(compact.endsWith(';') ? compact : `${compact};`)}</p>`);
+    // The typed text goes in as text, never as markup.
+    const echo = document.createElement('p');
+    echo.className = 'tc-echo';
+    const ps = document.createElement('span');
+    ps.className = 'tc-ps';
+    ps.textContent = 'cypher>';
+    echo.append(ps, ` ${compact.endsWith(';') ? compact : `${compact};`}`);
+    frame.append(echo);
+    scroll();
     const count = runs > 1 ? `<span class="tc-count" title="Run ${runs} times in a row; only the latest result is kept">×${runs}</span>` : '';
     try {
       const reply = await engine.run(query);
