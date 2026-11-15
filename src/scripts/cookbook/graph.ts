@@ -83,6 +83,10 @@ const ICONS = {
   reset: '<path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9"/><path d="M2.5 2v3h3"/>',
   // Two arrows pointing out of the corners: unlike Fit's four brackets.
   full: '<path d="M9.5 6.5 14 2M10.5 2H14v3.5M6.5 9.5 2 14M5.5 14H2v-3.5"/>',
+  // The compact view's menus: layout (three linked nodes), caption (text lines), highlight (a path through nodes).
+  layout: '<circle cx="3.5" cy="8" r="1.7"/><circle cx="12.5" cy="3.5" r="1.7"/><circle cx="12.5" cy="12.5" r="1.7"/><path d="m5 7.2 6-2.9M5 8.8l6 2.9"/>',
+  caption: '<path d="M2 4h12M2 8h9M2 12h6"/>',
+  highlight: '<circle cx="3" cy="12" r="1.6"/><circle cx="13" cy="4" r="1.6"/><path d="M4.4 11 8 8l1.5 1.5L11.8 5"/>',
 };
 
 // A pinned node's marker, drawn by NVL on its canvas (an overlay icon): a
@@ -435,15 +439,21 @@ function drawLegend(
   legend: HTMLElement,
   drawn: DrawnGraph,
   note: string | null,
-  extras: { theme: Theme; paths: string | null; highlight: boolean },
+  extras: { theme: Theme; paths: string | null; highlight: boolean; compact?: boolean },
 ) {
   legend.replaceChildren();
   const sets = new Map([...drawn.nodes.values()].map((n) => [labelKey(n.labels), n.labels]));
+  // The compact legend counts what it lists.
+  const nodeCount = new Map<string, number>();
+  for (const n of drawn.nodes.values()) nodeCount.set(labelKey(n.labels), (nodeCount.get(labelKey(n.labels)) ?? 0) + 1);
+  const relCount = new Map<string, number>();
+  for (const r of drawn.rels.values()) relCount.set(r.type, (relCount.get(r.type) ?? 0) + 1);
   const labels = el('span', { class: 'graph-legend-group', role: 'list', 'aria-label': 'Node labels' }, legend);
-  for (const l of sets.values()) {
+  for (const [key, l] of sets) {
     const item = el('span', { role: 'listitem' }, labels);
     el('i', {}, item).style.background = labelColor(l, COLORS);
     item.append(labelText(l));
+    if (extras.compact) el('b', { class: 'graph-count', text: `(${nodeCount.get(key) ?? 0})` }, item);
   }
   const types = relTypes(drawn.rels.values());
   if (types.length) {
@@ -452,6 +462,7 @@ function drawLegend(
       const item = el('span', { role: 'listitem', 'data-type': type }, group);
       el('i', { class: 'graph-type-swatch' }, item).style.background = relColor(type, extras.theme.name);
       item.append(`:${type}`);
+      if (extras.compact) el('b', { class: 'graph-count', text: `(${relCount.get(type) ?? 0})` }, item);
     }
   }
   if (extras.paths) {
@@ -460,7 +471,9 @@ function drawLegend(
     item.append(extras.paths);
   }
   if (note) el('span', { class: 'graph-note', text: note }, legend);
-  el('span', { class: 'graph-hint', text: 'Double-click a node to expand it; drag a node, or double-tap it on a touch screen, to pin it' }, legend);
+  if (!extras.compact) {
+    el('span', { class: 'graph-hint', text: 'Double-click a node to expand it; drag a node, or double-tap it on a touch screen, to pin it' }, legend);
+  }
 }
 
 /**
@@ -597,7 +610,17 @@ export function renderGraph(
     onExpand,
     envelope,
     words,
-  }: { onExpand: (id: number, drawn: number[]) => Promise<void>; envelope?: unknown; words?: Record<string, string> | null },
+    compact = false,
+  }: {
+    onExpand: (id: number, drawn: number[]) => Promise<void>;
+    envelope?: unknown;
+    words?: Record<string, string> | null;
+    /**
+     * The home page console's layout: no controls row, no pin marker, no hint; layout and caption (and the
+     * path highlight) are menus in the tool column, and the legend is a box over the canvas with counts.
+     */
+    compact?: boolean;
+  },
 ): GraphView {
   adoptExtrasStyles();
   const original = new DrawnGraph();
@@ -662,12 +685,12 @@ export function renderGraph(
   const pinOverlay = () => ({ url: pinIcon(theme), position: [0.75, -0.75], size: 0.45 });
   const pinLook = (id: number) => {
     const at = pins.get(id);
-    return at ? { x: at.x, y: at.y, pinned: true, overlayIcon: pinOverlay() } : {};
+    return at ? { x: at.x, y: at.y, pinned: true, ...(compact ? {} : { overlayIcon: pinOverlay() }) } : {};
   };
   const nodeOf = (n: WireNode) => ({ ...nvlNode(n, COLORS), caption: captionOf(n), ...nodeLook(n, highlightOn()), ...pinLook(n.id) });
   const relOf = (r: WireRel) => ({ ...nvlRel(r, theme.rel), ...relLook(r, highlightOn()) });
 
-  const root = el('div', { class: 'graph-view' }, container);
+  const root = el('div', { class: compact ? 'graph-view is-compact' : 'graph-view' }, container);
   // NVL sizes its element to its parent's height, so it gets one inside the
   // stage, which the reader can resize.
   const stage = el('div', { class: 'graph-stage' }, root);
@@ -710,7 +733,64 @@ export function renderGraph(
   const highlightBtn = el('button', { type: 'button', class: 'graph-btn graph-highlight', 'data-action': 'highlight', 'aria-pressed': 'false', text: 'Highlight path' }, controls);
   const pinAllBtn = el('button', { type: 'button', class: 'graph-btn', 'data-action': 'pin-all', text: 'Pin all' }, controls);
   const unpinAllBtn = el('button', { type: 'button', class: 'graph-btn', 'data-action': 'unpin-all', text: 'Unpin all' }, controls);
-  const legend = el('div', { class: 'graph-legend' }, root);
+  const legend = el('div', { class: 'graph-legend' }, compact ? stage : root);
+
+  // The compact view: layout, caption and the path highlight are buttons in the tool column; a click opens
+  // a menu of the options, which sets the (hidden) control that does the work.
+  let highlightTool: HTMLButtonElement | null = null;
+  if (compact) {
+    const tools = root.querySelector<HTMLElement>('.graph-tools')!;
+    const menu = el('div', { class: 'graph-menu', role: 'menu', hidden: '' }, root);
+    let openFor: HTMLButtonElement | null = null;
+    const close = () => {
+      menu.hidden = true;
+      openFor?.setAttribute('aria-expanded', 'false');
+      openFor = null;
+    };
+    const open = (tool: HTMLButtonElement, select: HTMLSelectElement, label: string) => {
+      const same = openFor === tool;
+      close();
+      if (same) return;
+      menu.replaceChildren();
+      menu.setAttribute('aria-label', label);
+      for (const o of [...select.options]) {
+        const item = el('button', { type: 'button', role: 'menuitemradio', 'aria-checked': String(o.value === select.value), text: o.text }, menu);
+        item.addEventListener('click', () => {
+          select.value = o.value;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          close();
+        });
+      }
+      menu.hidden = false;
+      openFor = tool;
+      tool.setAttribute('aria-expanded', 'true');
+      menu.querySelector<HTMLButtonElement>('[aria-checked=true]')?.focus();
+    };
+    const layoutTool = button(tools, 'layout', 'Layout');
+    layoutTool.setAttribute('aria-haspopup', 'menu');
+    layoutTool.setAttribute('aria-expanded', 'false');
+    layoutTool.addEventListener('click', () => open(layoutTool, layoutSelect, 'Layout'));
+    const captionTool = button(tools, 'caption', 'Node caption');
+    captionTool.setAttribute('aria-haspopup', 'menu');
+    captionTool.setAttribute('aria-expanded', 'false');
+    captionTool.addEventListener('click', () => open(captionTool, captionSelect, 'Node caption'));
+    highlightTool = button(tools, 'highlight', 'Highlight the path');
+    highlightTool.hidden = true;
+    highlightTool.addEventListener('click', () => highlightBtn.click());
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !menu.hidden) {
+        e.stopPropagation();
+        openFor?.focus();
+        close();
+      }
+    });
+    // A click anywhere else closes the menu; the listener goes with the view.
+    const away = (e: PointerEvent) => {
+      if (!root.isConnected) return document.removeEventListener('pointerdown', away, true);
+      if (!menu.hidden && !menu.contains(e.target as Node) && !tools.contains(e.target as Node)) close();
+    };
+    document.addEventListener('pointerdown', away, true);
+  }
 
   // A double-tap on a touch screen pins; a double-click expands. On a touch
   // screen a tap opens the inspector only once no second tap came: opened at
@@ -864,6 +944,10 @@ export function renderGraph(
     highlightBtn.hidden = !hasPaths();
     highlightBtn.setAttribute('aria-pressed', String(on));
     highlightBtn.textContent = paths.paths.length > 1 ? 'Highlight paths' : 'Highlight path';
+    if (highlightTool) {
+      highlightTool.hidden = !hasPaths();
+      highlightTool.setAttribute('aria-pressed', String(on));
+    }
     // A node's size goes to NVL only when it changes (the highlight turned on
     // or off), not on a theme repaint: see select().
     const sizes = new Map((nvl.getNodes() as { id: string; size?: number }[]).map((n) => [n.id, n.size]));
@@ -910,6 +994,7 @@ export function renderGraph(
 
   /** The pin marker on `ids`, in the current theme's colours. */
   function paintPinIcons(ids: Iterable<number>) {
+    if (compact) return;
     const overlayIcon = pinOverlay();
     nvl.updateElementsInGraph([...ids].map((id) => ({ id: nodeKey(id), overlayIcon })) as never, []);
   }
@@ -981,6 +1066,7 @@ export function renderGraph(
       theme,
       paths: hasPaths() ? pathText(paths, drawn, captionOf) : null,
       highlight: prefs.highlight,
+      compact,
     });
   }
 

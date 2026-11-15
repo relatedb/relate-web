@@ -18,12 +18,6 @@ export interface Scenario {
   demos: Demo[];
 }
 
-export const SCENARIO_TABS: { id: string; title: string }[] = [
-  { id: 'analytics', title: 'Recommendations' },
-  { id: 'agent-memory', title: 'Agent memory' },
-  { id: 'codebase', title: 'Codebase context' },
-];
-
 export const SCENARIOS: Record<string, Scenario> = {
   'analytics': {
     label: 'analytics · movies · 12 films · 5 raters',
@@ -300,6 +294,97 @@ export const SCENARIOS: Record<string, Scenario> = {
           "       count { (c)-[:DEPENDS_ON]->(:Crate) } AS directDeps,\n" +
           "       count { (c)-[:CITES]->(:ADR) } AS citedADRs\n" +
           "ORDER BY transitiveDeps DESC, crate" },
+    ],
+  },
+
+  'deps': {
+    label: 'dependencies · 2 packages · 7 advisories',
+    banner: [
+      'Resolved dependency graph for two npm packages, with advisories.',
+      'Shaped like the deps.dev output in the cookbook; small enough to see.',
+    ],
+    seed: [
+      "CREATE CONSTRAINT version_key IF NOT EXISTS FOR (v:Version) REQUIRE v.key IS UNIQUE",
+      "CREATE CONSTRAINT advisory_id IF NOT EXISTS FOR (a:Advisory) REQUIRE a.id IS UNIQUE",
+      "UNWIND [" +
+      "  {key:'npm/express@4.17.1', name:'express', version:'4.17.1', root:true}," +
+      "  {key:'npm/body-parser@1.19.0', name:'body-parser', version:'1.19.0'}," +
+      "  {key:'npm/qs@6.7.0', name:'qs', version:'6.7.0'}," +
+      "  {key:'npm/debug@2.6.9', name:'debug', version:'2.6.9'}," +
+      "  {key:'npm/ms@2.0.0', name:'ms', version:'2.0.0'}," +
+      "  {key:'npm/accepts@1.3.7', name:'accepts', version:'1.3.7'}," +
+      "  {key:'npm/mime-types@2.1.24', name:'mime-types', version:'2.1.24'}," +
+      "  {key:'npm/cookie@0.4.0', name:'cookie', version:'0.4.0'}," +
+      "  {key:'npm/jsonwebtoken@8.5.1', name:'jsonwebtoken', version:'8.5.1', root:true}," +
+      "  {key:'npm/jws@3.2.2', name:'jws', version:'3.2.2'}," +
+      "  {key:'npm/lodash@4.17.11', name:'lodash', version:'4.17.11'}," +
+      "  {key:'npm/semver@5.6.0', name:'semver', version:'5.6.0'}" +
+      "] AS v " +
+      "CREATE (n:Version {key:v.key, name:v.name, version:v.version}) " +
+      "FOREACH (_ IN CASE WHEN v.root THEN [1] ELSE [] END | SET n:Root)",
+      "UNWIND [" +
+      "  ['npm/express@4.17.1','npm/body-parser@1.19.0']," +
+      "  ['npm/express@4.17.1','npm/qs@6.7.0']," +
+      "  ['npm/express@4.17.1','npm/debug@2.6.9']," +
+      "  ['npm/express@4.17.1','npm/accepts@1.3.7']," +
+      "  ['npm/express@4.17.1','npm/cookie@0.4.0']," +
+      "  ['npm/body-parser@1.19.0','npm/debug@2.6.9']," +
+      "  ['npm/body-parser@1.19.0','npm/qs@6.7.0']," +
+      "  ['npm/debug@2.6.9','npm/ms@2.0.0']," +
+      "  ['npm/accepts@1.3.7','npm/mime-types@2.1.24']," +
+      "  ['npm/jsonwebtoken@8.5.1','npm/jws@3.2.2']," +
+      "  ['npm/jsonwebtoken@8.5.1','npm/lodash@4.17.11']," +
+      "  ['npm/jsonwebtoken@8.5.1','npm/semver@5.6.0']," +
+      "  ['npm/jws@3.2.2','npm/lodash@4.17.11']" +
+      "] AS d MATCH (a:Version {key:d[0]}), (b:Version {key:d[1]}) MERGE (a)-[:DEPENDS_ON]->(b)",
+      "UNWIND [" +
+      "  {id:'GHSA-hrpp-h998-j3pp', title:'qs prototype pollution', cvss:7.5}," +
+      "  {id:'GHSA-p8p7-x288-28g6', title:'lodash prototype pollution', cvss:7.4}," +
+      "  {id:'GHSA-29mw-wpgm-hmr9', title:'lodash command injection', cvss:7.2}," +
+      "  {id:'GHSA-c4w7-xm78-47vh', title:'semver ReDoS', cvss:5.3}," +
+      "  {id:'GHSA-pxg6-pf52-xh8x', title:'cookie range', cvss:4.3}," +
+      "  {id:'GHSA-rvg8-pwq2-xj7q', title:'body-parser DoS', cvss:7.5}," +
+      "  {id:'GHSA-9wv6-86v2-598j', title:'express redirect', cvss:6.1}" +
+      "] AS a CREATE (:Advisory {id:a.id, title:a.title, cvss3:a.cvss})",
+      "UNWIND [" +
+      "  ['npm/qs@6.7.0','GHSA-hrpp-h998-j3pp']," +
+      "  ['npm/lodash@4.17.11','GHSA-p8p7-x288-28g6']," +
+      "  ['npm/lodash@4.17.11','GHSA-29mw-wpgm-hmr9']," +
+      "  ['npm/semver@5.6.0','GHSA-c4w7-xm78-47vh']," +
+      "  ['npm/cookie@0.4.0','GHSA-pxg6-pf52-xh8x']," +
+      "  ['npm/body-parser@1.19.0','GHSA-rvg8-pwq2-xj7q']," +
+      "  ['npm/express@4.17.1','GHSA-9wv6-86v2-598j']" +
+      "] AS r MATCH (v:Version {key:r[0]}), (a:Advisory {id:r[1]}) MERGE (v)-[:AFFECTED_BY]->(a)",
+    ],
+    demos: [
+      { name: 'the resolved graph',
+        query: 'MATCH (n) WITH n LIMIT 80 OPTIONAL MATCH (n)-[r]-(m) RETURN n, r, m' },
+      { name: 'advisories express can reach',
+        query:
+          "MATCH p = (:Version:Root {name:'express'})-[:DEPENDS_ON*0..5]->(v:Version)-[:AFFECTED_BY]->(a:Advisory)\n" +
+          "RETURN p" },
+      { name: 'rank each root by worst advisory it reaches',
+        query:
+          "MATCH (root:Root)-[:DEPENDS_ON*0..5]->(v:Version)-[:AFFECTED_BY]->(a:Advisory)\n" +
+          "RETURN root.name AS package, count(DISTINCT a) AS advisories,\n" +
+          "       max(a.cvss3) AS worstCvss\n" +
+          "ORDER BY worstCvss DESC" },
+      { name: 'what goes if we drop jsonwebtoken?',
+        query:
+          "MATCH (root:Version:Root {name:'jsonwebtoken'})-[:DEPENDS_ON*1..5]->(v:Version)\n" +
+          "WITH collect(DISTINCT v) AS reachable\n" +
+          "UNWIND reachable AS v\n" +
+          "WITH v WHERE NOT EXISTS {\n" +
+          "  MATCH (r:Root)-[:DEPENDS_ON*0..5]->(v)\n" +
+          "  WHERE r.name <> 'jsonwebtoken'\n" +
+          "}\n" +
+          "RETURN v.name AS gone, v.version AS version ORDER BY gone" },
+      { name: 'shortest chain to the worst advisory',
+        query:
+          "MATCH (root:Root)-[:DEPENDS_ON*0..5]->(v:Version)-[:AFFECTED_BY]->(a:Advisory)\n" +
+          "WITH a ORDER BY a.cvss3 DESC LIMIT 1\n" +
+          "MATCH p = SHORTEST 1 (root:Root)-[:DEPENDS_ON*0..5]->(v:Version)-[:AFFECTED_BY]->(a)\n" +
+          "RETURN p" },
     ],
   },
 };

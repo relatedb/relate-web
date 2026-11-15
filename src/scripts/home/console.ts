@@ -7,6 +7,7 @@
 import { failed } from '../../lib/cookbook/cells.ts';
 import { expandNode, type Graph, type StatementRun } from '../../lib/cookbook/graph-model.ts';
 import { canDraw, esc, lastEnvelope, tableHtml, type TableCells } from '../../lib/cookbook/result-view.ts';
+import { planText, splitStatement, type PlanDoc, type PlanNote } from '../../lib/docs/elements/_plan-model.ts';
 import { SCENARIOS, type Scenario } from '../../lib/home/console-scenarios.ts';
 import type { GraphView } from '../cookbook/graph.ts';
 
@@ -94,29 +95,35 @@ class Engine {
 const root = document.querySelector<HTMLElement>('[data-console]');
 if (root && typeof Worker !== 'undefined') {
   const $ = <T extends HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
-  const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role=tab]')];
   const out = $('#tc-out');
   const chips = $('#tc-chips');
   const form = $<HTMLFormElement>('#tc-form');
   const input = $<HTMLInputElement>('#tc-input');
   const runBtn = $<HTMLButtonElement>('#tc-run');
+  const explainBtn = $<HTMLButtonElement>('#tc-explain');
+  const profileBtn = $<HTMLButtonElement>('#tc-profile');
   const resetBtn = $<HTMLButtonElement>('#tc-reset');
-  const label = $('#tc-label');
+  const picker = $<HTMLSelectElement>('#tc-scenario');
   const status = $('#tc-status');
-  const panel = $('#tc-panel');
+
+  /** The first command of every dataset: its shape, drawn. */
+  const SCHEMA = 'CALL db.schema.visualization()';
 
   const engine = new Engine();
-  let current = tabs[0]?.dataset.id ?? '';
+  let current = picker.value || Object.keys(SCENARIOS)[0];
   let generation = 0; // a load that finds a newer one gave up its place
-  let loaded = ''; // the scenario the engine holds
+  let loaded = ''; // the dataset the engine holds
   let busy = false;
   let version: string | null = null;
-  const views: GraphView[] = [];
+  const views = new Map<HTMLElement, GraphView[]>();
   const history: string[] = [];
   let at = -1;
+  /** The last statement's frame: running the same read again replaces it (with a count) instead of adding another. */
+  let lastRun: { key: string; frame: HTMLElement; runs: number } | null = null;
 
   const scenario = (): Scenario => SCENARIOS[current];
   const flat = (q: string) => q.replace(/\s+/g, ' ').trim();
+  const isRead = (q: string) => !/\b(create|merge|set|delete|remove|drop|load|foreach)\b/i.test(q);
 
   const setStatus = (text: string, state: 'idle' | 'busy' | 'ready' | 'error') => {
     status.textContent = text;
@@ -124,20 +131,30 @@ if (root && typeof Worker !== 'undefined') {
   };
   const setBusy = (on: boolean) => {
     busy = on;
-    runBtn.disabled = on;
-    resetBtn.disabled = on;
+    for (const b of [runBtn, explainBtn, profileBtn, resetBtn]) b.disabled = on;
     root.toggleAttribute('data-busy', on);
   };
   const scroll = () => {
     out.scrollTop = out.scrollHeight;
   };
-  const append = (html: string) => {
-    out.insertAdjacentHTML('beforeend', html);
+  const addFrame = () => {
+    const frame = document.createElement('div');
+    frame.className = 'tc-frame';
+    out.append(frame);
+    return frame;
+  };
+  const put = (frame: HTMLElement, html: string) => {
+    frame.insertAdjacentHTML('beforeend', html);
     scroll();
   };
+  const dropViews = (frame: HTMLElement) => {
+    for (const v of views.get(frame) ?? []) v.destroy();
+    views.delete(frame);
+  };
   const clearOutput = () => {
-    for (const v of views.splice(0)) v.destroy();
+    for (const frame of [...views.keys()]) dropViews(frame);
     out.replaceChildren();
+    lastRun = null;
   };
 
   const renderChips = () => {
@@ -161,20 +178,13 @@ if (root && typeof Worker !== 'undefined') {
     }
   };
 
-  const banner = () => {
-    const s = scenario();
-    const head = `relate${version ? ` ${version}` : ''} · in your browser · ${s.label}`;
-    const lines = [head, ...(s.banner ?? [])];
-    append(`<p class="tc-banner">${lines.map(esc).join('<br>')}</p>`);
-  };
-
-  /** Load the current scenario into an empty database and print its banner. */
+  /** Load the current dataset into an empty database, then run its schema as the first command. */
   async function load() {
     const mine = ++generation;
     setBusy(true);
     setStatus('loading the engine…', 'busy');
     clearOutput();
-    label.textContent = scenario().label;
+    picker.value = current;
     renderChips();
     try {
       const info = await engine.start();
@@ -188,27 +198,30 @@ if (root && typeof Worker !== 'undefined') {
         if (failed(last)) throw new Error(`${last!.error}\nin: ${stmt.slice(0, 80)}`);
       }
       loaded = current;
-      banner();
+      const lines = scenario().banner;
+      if (lines?.length) put(addFrame(), `<p class="tc-banner">${lines.map(esc).join('<br>')}</p>`);
       setStatus(version ? `ready · relate ${version}` : 'ready', 'ready');
+      await execute(SCHEMA);
     } catch (err) {
       if (mine !== generation) return;
       loaded = '';
-      append(`<p class="tc-err">error: ${esc((err as Error).message)}</p>`);
+      put(addFrame(), `<p class="tc-err">error: ${esc((err as Error).message)}</p>`);
       setStatus('engine unavailable', 'error');
     } finally {
       if (mine === generation) setBusy(false);
     }
   }
 
-  async function drawGraph(graph: Graph, reply: RunReply) {
+  async function drawGraph(frame: HTMLElement, graph: Graph, reply: RunReply) {
     const host = document.createElement('div');
     host.className = 'tc-graph';
-    out.append(host);
+    frame.append(host);
     scroll();
     try {
       const { renderGraph } = await import('../cookbook/graph.ts');
       let view: GraphView | null = null;
       view = renderGraph(host, graph, {
+        compact: true,
         envelope: lastEnvelope(reply.envelopes),
         onExpand: async (id, drawn) => {
           try {
@@ -219,55 +232,86 @@ if (root && typeof Worker !== 'undefined') {
           }
         },
       });
-      views.push(view);
+      views.set(frame, [...(views.get(frame) ?? []), view]);
     } catch (err) {
       host.remove();
-      append(`<p class="tc-err">The graph view could not load: ${esc((err as Error).message)}</p>`);
+      put(frame, `<p class="tc-err">The graph view could not load: ${esc((err as Error).message)}</p>`);
     }
   }
 
-  async function runQuery(query: string) {
+  /**
+   * Run one statement and show it in a frame at the end of the stream, or, when it is the same read as the
+   * last statement, in that statement's place with a count: the time shown is the latest end to end.
+   */
+  async function execute(query: string) {
     const compact = flat(query);
-    append(`<p class="tc-echo"><span class="tc-ps">cypher&gt;</span> ${esc(compact.endsWith(';') ? compact : `${compact};`)}</p>`);
-    setBusy(true);
+    const key = compact.replace(/;$/, '');
+    const frame = document.createElement('div');
+    frame.className = 'tc-frame';
+    let runs = 1;
+    if (lastRun && lastRun.key === key && isRead(key) && lastRun.frame.isConnected) {
+      runs = lastRun.runs + 1;
+      dropViews(lastRun.frame);
+      lastRun.frame.replaceWith(frame);
+    } else {
+      out.append(frame);
+    }
+    lastRun = { key, frame, runs };
+    put(frame, `<p class="tc-echo"><span class="tc-ps">cypher&gt;</span> ${esc(compact.endsWith(';') ? compact : `${compact};`)}</p>`);
+    const count = runs > 1 ? `<span class="tc-count" title="Run ${runs} times in a row; only the latest result is kept">×${runs}</span>` : '';
     try {
       const reply = await engine.run(query);
       const last = lastEnvelope(reply.envelopes);
       if (failed(last)) {
-        append(`<p class="tc-err">error: ${esc(last!.error)}</p>`);
+        put(frame, `<p class="tc-err">error: ${esc(last!.error)}</p>`);
         return;
       }
       const rec = reply.recording;
       const ms = `${reply.ms.toFixed(1)} ms`;
-      if (rec?.graph && canDraw(rec.graph)) {
+      const env = last as { plan?: PlanDoc | null; notifications?: PlanNote[] } | null;
+      if (env?.plan) {
+        // EXPLAIN and PROFILE: the plan as the CLI's table (the docs' plan model), notifications below it.
+        put(frame, `<pre class="tc-text tc-plan">${esc(planText(env.plan, env.notifications ?? []))}</pre><p class="out-summary">${env.plan.profiled ? 'profile' : 'explain'} · ${ms}${count}</p>`);
+      } else if (rec?.graph && canDraw(rec.graph)) {
         // A graph result is shown as the picture: the table of raw values adds nothing to it.
-        await drawGraph(rec.graph, reply);
-        append(`<p class="out-summary">${esc(rec.table?.summary ?? 'graph')} · ${ms}</p>`);
+        await drawGraph(frame, rec.graph, reply);
+        put(frame, `<p class="out-summary">${esc(rec.table?.summary ?? 'graph')} · ${ms}${count}</p>`);
       } else if (rec?.table) {
-        append(tableHtml({ ...rec.table, summary: `${rec.table.summary} · ${ms}` }));
+        put(frame, tableHtml({ ...rec.table, summary: `${rec.table.summary} · ${ms}` }).replace(/<\/p>$/, `${count}</p>`));
       } else {
-        append(`<pre class="tc-text">${esc(rec?.text ?? '')}</pre><p class="out-summary">${ms}</p>`);
+        put(frame, `<pre class="tc-text">${esc(rec?.text ?? '')}</pre><p class="out-summary">${ms}${count}</p>`);
       }
     } catch (err) {
-      // A trap discards the engine: the database is gone, so the scenario loads again on the next run.
-      append(`<p class="tc-err">error: ${esc((err as Error).message)}</p>`);
+      // A trap discards the engine: the database is gone, so the dataset loads again on the next run.
+      put(frame, `<p class="tc-err">error: ${esc((err as Error).message)}</p>`);
       loaded = '';
     } finally {
-      setBusy(false);
       scroll();
     }
   }
 
-  async function submit() {
-    const q = input.value.trim();
-    if (!q || busy) return;
+  async function runQuery(query: string) {
+    setBusy(true);
+    try {
+      await execute(query);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** Run what is typed, or with `mode` its EXPLAIN or PROFILE; an empty prompt takes the last statement. */
+  async function submit(mode?: 'EXPLAIN' | 'PROFILE') {
+    const typed = input.value.trim() || (mode ? (history[0] ?? '') : '');
+    if (!typed || busy) return;
     if (loaded !== current) await load();
     if (loaded !== current) return;
+    const body = splitStatement(typed)?.body ?? typed.replace(/;\s*$/, '');
+    const q = mode ? `${mode} ${body}` : typed;
     input.value = '';
     at = -1;
-    const seen = history.indexOf(q);
+    const seen = history.indexOf(typed);
     if (seen >= 0) history.splice(seen, 1);
-    history.unshift(q);
+    history.unshift(mode ? body : typed);
     await runQuery(q);
   }
 
@@ -288,37 +332,14 @@ if (root && typeof Worker !== 'undefined') {
     { rootMargin: '300px 0px' },
   ).observe(root);
 
-  const select = (id: string, focus = false) => {
-    if (!SCENARIOS[id]) return;
-    current = id;
-    for (const t of tabs) {
-      const on = t.dataset.id === id;
-      t.setAttribute('aria-selected', String(on));
-      t.tabIndex = on ? 0 : -1;
-      if (on && focus) t.focus();
-    }
-    panel.setAttribute('aria-labelledby', `tc-tab-${id}`);
+  picker.addEventListener('change', () => {
+    if (!SCENARIOS[picker.value]) return;
+    current = picker.value;
     input.value = '';
     at = -1;
     started = true;
     void load();
-  };
-
-  const tablist = $('#tc-tabs');
-  tablist.addEventListener('click', (e) => {
-    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[role=tab]');
-    if (b?.dataset.id && b.dataset.id !== current) select(b.dataset.id);
   });
-  tablist.addEventListener('keydown', (e) => {
-    const i = tabs.findIndex((t) => t === document.activeElement);
-    if (i < 0) return;
-    const step: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
-    if (!(e.key in step) && e.key !== 'Home' && e.key !== 'End') return;
-    e.preventDefault();
-    const n = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (i + step[e.key] + tabs.length) % tabs.length;
-    select(tabs[n].dataset.id!, true);
-  });
-
   resetBtn.addEventListener('click', () => {
     input.value = '';
     at = -1;
@@ -328,8 +349,10 @@ if (root && typeof Worker !== 'undefined') {
     e.preventDefault();
     void submit();
   });
+  explainBtn.addEventListener('click', () => void submit('EXPLAIN'));
+  profileBtn.addEventListener('click', () => void submit('PROFILE'));
   input.addEventListener('focus', start);
-  // Arrow keys walk the queries run so far, then the scenario's suggestions.
+  // Arrow keys walk the queries run so far, then the dataset's suggestions.
   input.addEventListener('keydown', (e) => {
     if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
     const list = [...history, ...scenario().demos.map((d) => flat(d.query))];
@@ -340,5 +363,4 @@ if (root && typeof Worker !== 'undefined') {
   });
 
   renderChips();
-  label.textContent = scenario().label;
 }

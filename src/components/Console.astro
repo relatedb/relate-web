@@ -1,35 +1,29 @@
 ---
-// "Try it live": the engine in the page. Three scenarios (tabs) each load a small graph into an
-// in-memory database in the browser, with suggested queries and a Cypher prompt. The engine is the
-// site's WASM build, loaded from /wasm/ only when the console nears the viewport; results use the
-// cookbook's table and graph views (src/scripts/home/console.ts). Scenario data:
-// src/lib/home/console-scenarios.ts.
-import { SCENARIO_TABS } from '../lib/home/console-scenarios.ts';
+// "Try it live": the engine in the page. A dataset menu in the window bar picks one of a few small
+// graphs, each loaded into an in-memory database in the browser, with suggested queries and a Cypher
+// prompt (Run, Explain, Profile). The engine is the site's WASM build, loaded from /wasm/ only when the
+// console nears the viewport; results use the cookbook's table and graph views and the docs' plan table
+// (src/scripts/home/console.ts). Scenario data: src/lib/home/console-scenarios.ts.
+import { SCENARIOS } from '../lib/home/console-scenarios.ts';
 import '../styles/graph-view.css';
 
-const first = SCENARIO_TABS[0];
+const ids = Object.keys(SCENARIOS);
 ---
 <section class="tc" id="try" aria-labelledby="h-try" data-console>
   <div class="tc-h">
-    <p class="tc-eyebrow">Try it live</p>
     <h2 id="h-try">Run Cypher in your browser.</h2>
-    <p class="tc-lede">
-      Pick a scenario and query it. The database runs entirely in this page: nothing is sent anywhere.{' '}
-      <a href="/playground/" target="_blank" rel="noopener">Open the playground<span aria-hidden="true">&nbsp;&#8599;</span><span class="sr-only"> (opens in new tab)</span></a>
-    </p>
+    <p class="tc-lede">Pick a dataset and query it. The database runs entirely in this page: nothing is sent anywhere. <a href="/playground/" target="_blank" rel="noopener">Open the playground<span aria-hidden="true">&nbsp;&#8599;</span><span class="sr-only"> (opens in new tab)</span></a></p>
   </div>
 
-  <div class="tc-tabs" id="tc-tabs" role="tablist" aria-label="Scenario">
-    {SCENARIO_TABS.map((t) => (
-      <button type="button" role="tab" id={`tc-tab-${t.id}`} aria-selected={t.id === first.id ? 'true' : 'false'} tabindex={t.id === first.id ? 0 : -1} aria-controls="tc-panel" data-id={t.id}>{t.title}</button>
-    ))}
-  </div>
-
-  <div class="tc-win" id="tc-panel" role="tabpanel" aria-labelledby={`tc-tab-${first.id}`}>
+  <div class="tc-win" id="tc-panel">
     <div class="tc-bar">
-      <span class="tc-title" translate="no">relate · :memory: · wasm · <span id="tc-label"></span></span>
+      <span class="tc-title" translate="no">relate · :memory: · wasm ·</span>
+      <label class="sr-only" for="tc-scenario">Dataset</label>
+      <select class="tc-select" id="tc-scenario" translate="no">
+        {ids.map((id) => <option value={id}>{SCENARIOS[id].label}</option>)}
+      </select>
       <span class="tc-status" id="tc-status" role="status" data-state="idle">starts when you scroll here</span>
-      <button type="button" class="tc-reset" id="tc-reset" aria-label="Reset the scenario" title="Reset the scenario">
+      <button type="button" class="tc-reset" id="tc-reset" aria-label="Reset the dataset" title="Reset the dataset">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
       </button>
     </div>
@@ -41,6 +35,8 @@ const first = SCENARIO_TABS[0];
       <label class="sr-only" for="tc-input">Cypher query</label>
       <span class="tc-ps" aria-hidden="true">cypher&gt;</span>
       <input id="tc-input" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="type a Cypher query and press Enter" translate="no" />
+      <button type="button" class="tc-mode" id="tc-explain" title="Show the query plan without running it (EXPLAIN)">Explain</button>
+      <button type="button" class="tc-mode" id="tc-profile" title="Run the query and show the plan with measured rows and time (PROFILE)">Profile</button>
       <button type="submit" class="tc-run" id="tc-run">Run<span aria-hidden="true"> &#9654;</span></button>
     </form>
   </div>
@@ -48,30 +44,22 @@ const first = SCENARIO_TABS[0];
 
 <style is:global>
   /* Global: the script adds the chips, echoes, tables and graph at run time, which scoped styles do not reach. Every selector starts with .tc. */
-  .tc { position: relative; max-width: var(--page-w); margin: 0 auto; padding: 24px 24px 96px; }
-  .tc-h { margin-bottom: 32px; }
-  .tc-eyebrow { margin: 0 0 16px; font: 500 12px/16px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); }
-  .tc-h h2 { margin: 0; max-width: 20ch; font: 500 clamp(30px, 3.2vw, 48px) / 1.04 var(--font); letter-spacing: -.04em; color: var(--ink); }
-  .tc-lede { margin: 20px 0 0; max-width: 60ch; color: var(--ink-muted); font-size: 17px; line-height: 28px; }
+  .tc { position: relative; max-width: var(--page-w); margin: 0 auto; padding: 8px 24px 80px; }
+  .tc-h { margin-bottom: 20px; }
+  .tc-h h2 { margin: 0; font: 500 clamp(24px, 2.4vw, 32px) / 1.1 var(--font); letter-spacing: -.03em; color: var(--ink); }
+  .tc-lede { margin: 8px 0 0; color: var(--ink-muted); font-size: 16px; line-height: 24px; }
   .tc-lede a { color: var(--ink); text-underline-offset: 4px; white-space: nowrap; }
 
-  .tc-tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; margin-bottom: 8px; }
-  .tc-tabs::-webkit-scrollbar { display: none; }
-  .tc-tabs button {
-    flex: none; min-height: 36px; padding: 0 14px; border: 0; border-radius: 6px; background: none;
-    color: var(--ink-muted); font: 500 14px/1 var(--font); cursor: pointer; white-space: nowrap;
-  }
-  .tc-tabs button:hover { color: var(--ink); }
-  .tc-tabs button[aria-selected='true'] { background: var(--ink); color: var(--surface-0); }
-  .tc-tabs button:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px var(--focus); }
-  :root[data-theme='light'] .tc-tabs button[aria-selected='true'] { background: var(--surface-3); color: var(--ink); }
-  @media (prefers-color-scheme: light) {
-    :root:not([data-theme='dark']) .tc-tabs button[aria-selected='true'] { background: var(--surface-3); color: var(--ink); }
-  }
-
   .tc-win { border: 1px solid var(--line); background: var(--win); box-shadow: var(--ui-shadow); overflow: hidden; }
-  .tc-bar { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 8px 0 16px; border-bottom: 1px solid var(--line); background: var(--surface-2); }
-  .tc-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 12px/16px var(--mono); color: var(--ink-muted); }
+  .tc-bar { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 8px 0 16px; border-bottom: 1px solid var(--line); background: var(--surface-2); }
+  .tc-title { flex: none; font: 400 12px/16px var(--mono); color: var(--ink-muted); white-space: nowrap; }
+  .tc-select {
+    min-width: 0; max-width: 100%; height: 30px; padding: 0 28px 0 8px; border: 1px solid var(--line-strong); border-radius: 4px;
+    background: var(--win) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='%239B9BA3' stroke-width='1.5'%3E%3Cpath d='m1 1 4 4 4-4'/%3E%3C/svg%3E") no-repeat right 9px center;
+    color: var(--ink); font: 400 12px/1 var(--mono); cursor: pointer; appearance: none; -webkit-appearance: none; text-overflow: ellipsis;
+  }
+  .tc-select:hover { background-color: var(--surface-3); }
+  .tc-select:focus-visible, .tc-reset:focus-visible, .tc-chip:focus-visible, .tc-run:focus-visible, .tc-mode:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px var(--focus); }
   .tc-status { margin-left: auto; flex: none; padding: 2px 8px; border: 1px solid var(--line); font: 500 11px/14px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); }
   .tc-status[data-state='ready'] { color: var(--success); }
   .tc-status[data-state='busy'] { color: var(--brand); }
@@ -82,27 +70,33 @@ const first = SCENARIO_TABS[0];
   }
   .tc-reset:hover:not(:disabled) { color: var(--ink); background: var(--surface-3); }
   .tc-reset:disabled { opacity: .4; cursor: default; }
-  .tc-reset:focus-visible, .tc-chip:focus-visible, .tc-run:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px var(--focus); }
 
-  /* The output stream: echoed statements, result tables and graphs, like a terminal with attachments. */
-  .tc-out { height: clamp(360px, 56vh, 520px); overflow: auto; padding: 14px 20px 8px; font: 400 13px/1.5 var(--mono); color: var(--ink); background: var(--win); }
+  /* The output stream: statements, result tables and graphs. The reader can drag its bottom edge to resize it. */
+  .tc-out {
+    height: clamp(270px, 42vh, 390px); min-height: 160px; resize: vertical; overflow: auto;
+    padding: 12px 20px 8px; font: 400 13px/1.5 var(--mono); color: var(--ink); background: var(--win);
+  }
   .tc-out:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px var(--focus); }
   .tc-out > p, .tc-out > pre { margin: 0 0 8px; }
+  .tc-frame { margin: 0 0 10px; }
+  .tc-frame > p, .tc-frame > pre { margin: 0 0 6px; }
   .tc-banner { color: var(--ink-muted); }
   .tc-ps { color: var(--success); user-select: none; }
   .tc-echo { white-space: pre-wrap; overflow-wrap: anywhere; }
   .tc-err { color: var(--danger); white-space: pre-wrap; overflow-wrap: anywhere; }
-  .tc-text { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
-  .tc-out .table-scroll { overflow: auto; max-height: 360px; margin: 0 0 4px; border: 1px solid var(--line); }
+  .tc-text { white-space: pre; overflow-x: auto; font: inherit; }
+  .tc-plan { padding: 8px 12px; border: 1px solid var(--line); background: var(--surface-0); }
+  .tc-out .table-scroll { overflow: auto; max-height: 320px; margin: 0 0 4px; border: 1px solid var(--line); }
   .tc-out table { border-collapse: collapse; width: 100%; font: inherit; }
   .tc-out th, .tc-out td { padding: 4px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
   .tc-out th { position: sticky; top: 0; background: var(--surface-2); color: var(--ink-muted); font-weight: 500; }
   .tc-out tbody tr:last-child td { border-bottom: 0; }
   .tc-out .num { text-align: right; font-variant-numeric: tabular-nums; }
-  .tc-out .out-summary { margin: 0 0 14px; font-size: 12px; color: var(--ink-muted); }
-  /* The graph view's pane (NVL, from the cookbook): a fixed-height block in the stream. */
+  .tc-out .out-summary { margin: 0; padding: 0; border: 0; font-size: 12px; color: var(--ink-muted); }
+  .tc-count { margin-left: 6px; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--ink); font-size: 11px; }
+  /* The graph view (compact, from the cookbook): a block in the stream; the reader can resize it too. */
   .tc-graph { margin: 0 0 4px; border: 1px solid var(--line); background: var(--surface-0); overflow: hidden; }
-  .tc-out .graph-stage { height: 340px; }
+  .tc-out .graph-stage { height: 260px; min-height: 160px; }
 
   .tc-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 16px; border-top: 1px solid var(--line); }
   .tc-try { margin-right: 4px; font: 400 11px/14px var(--mono); color: var(--ink-muted); }
@@ -119,6 +113,12 @@ const first = SCENARIO_TABS[0];
     color: var(--ink); font: 400 13px/1 var(--mono);
   }
   .tc-in input::placeholder { color: var(--ink-muted); opacity: .8; }
+  .tc-mode {
+    flex: none; min-height: 36px; padding: 0 10px; border: 0; border-radius: 6px; background: none;
+    color: var(--ink-muted); font: 500 13px/1 var(--font); cursor: pointer;
+  }
+  .tc-mode:hover:not(:disabled) { color: var(--ink); background: var(--surface-3); }
+  .tc-mode:disabled { opacity: .4; cursor: default; }
   .tc-run {
     flex: none; min-height: 36px; padding: 0 16px; border: 0; border-radius: 6px;
     background: var(--ink); color: var(--surface-0); font: 500 13px/1 var(--font); cursor: pointer;
@@ -126,12 +126,17 @@ const first = SCENARIO_TABS[0];
   .tc-run:hover:not(:disabled) { opacity: .88; }
   .tc-run:disabled { opacity: .4; cursor: default; }
 
-  @media (max-width: 900px) { .tc { padding: 16px 16px 72px; } .tc-h { margin-bottom: 24px; } }
+  @media (max-width: 900px) { .tc { padding: 8px 16px 64px; } }
+  @media (max-width: 640px) {
+    .tc-title { display: none; }
+    .tc-select { flex: 1 1 0; }
+    .tc-status { display: none; }
+  }
   @media (max-width: 560px) {
     .tc-out { padding: 12px 12px 4px; }
     .tc-chips { padding: 8px 12px; }
-    .tc-in { padding-left: 12px; }
-    .tc-title { display: none; }
+    .tc-in { padding-left: 12px; gap: 4px; }
+    .tc-mode { padding: 0 6px; }
   }
 </style>
 
