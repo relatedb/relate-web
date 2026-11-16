@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.0.2",
   "cells": {
     "seed": {
       "kind": "table",
@@ -134,7 +134,7 @@
     },
     "terms": {
       "kind": "table",
-      "text": "| query           | ids                            |\n|-----------------|--------------------------------|\n| \"wal\"           | [\"n6\", \"n1\"]                   |\n| \"replay\"        | []                             |\n| \"replays\"       | [\"n5\", \"n1\"]                   |\n| \"test\"          | []                             |\n| \"the\"           | [\"n5\", \"n3\", \"n2\", \"n6\", \"n1\"] |\n| \"pull-request\"  | [\"n3\"]                         |\n| \"\\\"torn tail\\\"\" | [\"n1\"]                         |\n| \"tor*\"          | []                             |\n8 rows",
+      "text": "| query           | ids                            |\n|-----------------|--------------------------------|\n| \"wal\"           | [\"n6\", \"n1\"]                   |\n| \"replay\"        | []                             |\n| \"replays\"       | [\"n5\", \"n1\"]                   |\n| \"test\"          | []                             |\n| \"the\"           | [\"n5\", \"n3\", \"n2\", \"n6\", \"n1\"] |\n| \"pull-request\"  | [\"n3\"]                         |\n| \"\\\"torn tail\\\"\" | [\"n1\"]                         |\n| \"tor*\"          | [\"n1\"]                         |\n8 rows",
       "table": {
         "columns": [
           "query",
@@ -175,7 +175,7 @@
           ],
           [
             "\"tor*\"",
-            "[]"
+            "[\"n1\"]"
           ]
         ],
         "summary": "8 rows"
@@ -240,7 +240,9 @@
             "query": "\"torn tail\""
           },
           {
-            "ids": [],
+            "ids": [
+              "n1"
+            ],
             "query": "tor*"
           }
         ],

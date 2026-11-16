@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.0.2",
   "cells": {
     "seed": {
       "kind": "table",
@@ -255,12 +255,12 @@
     },
     "create-violated": {
       "kind": "table",
-      "text": "error: semantic error: ConstraintValidationFailed: `person_role_unique` uniqueness",
+      "text": "error: semantic error: ConstraintCreationFailed: ConstraintValidationFailed: `person_role_unique` uniqueness",
       "table": null,
       "graph": null,
       "envelope": {
         "columns": [],
-        "error": "semantic error: ConstraintValidationFailed: `person_role_unique` uniqueness",
+        "error": "semantic error: ConstraintCreationFailed: ConstraintValidationFailed: `person_role_unique` uniqueness",
         "rows": [],
         "stats": {}
       },

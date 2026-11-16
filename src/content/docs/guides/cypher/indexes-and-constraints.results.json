@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.0.2",
   "cells": {
     "seed": {
       "kind": "table",
@@ -160,12 +160,12 @@
     },
     "existing-data": {
       "kind": "table",
-      "text": "error: semantic error: ConstraintValidationFailed: `project_tag` requires properties",
+      "text": "error: semantic error: ConstraintCreationFailed: ConstraintValidationFailed: `project_tag` requires properties",
       "table": null,
       "graph": null,
       "envelope": {
         "columns": [],
-        "error": "semantic error: ConstraintValidationFailed: `project_tag` requires properties",
+        "error": "semantic error: ConstraintCreationFailed: ConstraintValidationFailed: `project_tag` requires properties",
         "rows": [],
         "stats": {}
       },

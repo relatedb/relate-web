@@ -1,7 +1,7 @@
 ---
 name: relate
 description: Relate is an embedded openCypher graph database with a single-binary CLI. Use this skill when the user wants to run Cypher queries, manage a local graph database, or embed it from Python; its focused references cover vector search, geospatial, operations, and agent safety.
-version: 1.0.1
+version: 1.0.2
 ---
 
 # Relate
@@ -28,8 +28,9 @@ it:
 | Push a local database (or a scoped subgraph) into Neo4j / Aura | [push](references/push.md) |
 | Git history: coupling, ownership, churn, reviewers from a checkout | [run-git-to-graph](references/run-git-to-graph.md) |
 | Command-kind extensions: author, install, or run `relate run <name>` packages | [client-extensions](references/client-extensions.md) |
+| Agent-proposed feedback: draft the friction, get the person's approval, then `relate agent-feedback` | [client-cli](references/client-cli.md) |
 | Node.js client: `@relate/relate` install, native-lib resolution | [client-javascript](references/client-javascript.md) |
-| Java client: `com.relate:relate` dependency, bundled natives, classifier jars | [client-java](references/client-java.md) |
+| Java client: `ai.relatedb:relate` dependency, bundled natives, classifier jars | [client-java](references/client-java.md) |
 | Go client: cgo link, typed values, numeric + element ids, typed errors | [client-go](references/client-go.md) |
 | Browser/WASM client: `@relate/relate-wasm` init, OPFS, traps | [client-wasm](references/client-wasm.md) |
 | iOS/macOS Swift client: SwiftPM `Relate`, XCFramework, concurrency traps | [client-swift](references/client-swift.md) |
@@ -42,6 +43,17 @@ it:
 curl -sSfL https://relatedb.ai/install.sh | bash
 relate --version        # always verify the version before relying on behavior
 ```
+
+On Windows (PowerShell, `cmd`, or Git Bash — `install.sh` points there too):
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://relatedb.ai/install.ps1 | iex"
+```
+
+It installs `%LOCALAPPDATA%\Programs\relate\relate.exe` and adds it to the
+user `PATH`; open a new shell before running `relate`. `relate upgrade`
+cannot replace a running `.exe`, so rerun the installer to upgrade
+(`relate upgrade --check` still reports versions).
 
 From source: `git clone https://github.com/relatedb/relate && cargo build --release`.
 The Python package (`relate-db`) is pending its first tagged PyPI
@@ -71,7 +83,8 @@ RELATE_PREVIEW=ontology relate query "CALL db.ontology.get()" --database ./mydat
 `null` means no ontology is set. Without the opt-in the call fails with
 `preview feature 'ontology' is not enabled` and `SHOW PROCEDURES` omits the
 four `db.ontology.*` rows; if you cannot set it, fall back to schema
-discovery (Agent rule 4).
+discovery and take labels, relationship types, and property names from
+what the graph actually holds.
 
 - `-d` / `--database` sets the store (directory, `.rl` bundle, or `:memory:`;
   default `:memory:`). The same flag is the store on `query`, the path-first
@@ -119,11 +132,14 @@ discovery (Agent rule 4).
   block.
 - Namespaces: every store has three fixed namespaces — `neo4j` (user data,
   the default), `system` (SHOW/administration commands) and
-  `system_ontologies` (listed but not queryable: every non-administration
-  statement routed there fails with 42N17 `This database is not queryable.
-  Use the db.ontology.* procedures on the user database 'neo4j' instead.`
+  `system_ontologies` (visible only under `RELATE_PREVIEW=ontology`,
+  ADR-0593: without it the connect fails "Graph not found:
+  system_ontologies" and `SHOW DATABASES` lists the two CE rows; with it,
+  every non-administration statement routed there fails with 42N17
+  `This database is not queryable. Use the db.ontology.* procedures on
+  the user database 'neo4j' instead.`
   — read the stored ontology through `CALL db.ontology.get()` on `neo4j`,
-  with `RELATE_PREVIEW=ontology` set).
+  with the same opt-in set).
   `--namespace NAME` (case-insensitive) sets the session namespace for the
   whole run; `USE <name>` inside a statement switches it for that
   statement. Example:
@@ -199,8 +215,9 @@ Extensions beyond openCypher: label expressions (`n:A|B&!C`), quantified
 path patterns and selectors (`SHORTEST 1`, `ANY`, `TRAIL`), `SEARCH`
 (vector + fulltext indexes), `vector()`/UUID types, string interpolation
 (`s'Hello {name}'`), map comprehensions (`{i IN list | k: v}`), explicit
-`GROUP BY`, `CYPHER 5` / `CYPHER 25` preambles. Parameters are `$name`
-(passed with `--param` or from Python dict keys). Every referenced
+`GROUP BY`, the `CYPHER 25` preamble (an accepted no-op — the only
+supported Cypher version; every other integer fails, ADR-0584). Parameters
+are `$name` (passed with `--param` or from Python dict keys). Every referenced
 parameter must be supplied: a missing one fails the statement with
 `ParameterMissing: Expected parameter(s): <names>`, never binds `null`.
 
@@ -301,5 +318,11 @@ docs/api/python/spec.md#visualization-relateviz-optional).
 - **One writer at a time** — single-process engine; use the Bolt server for
   multi-client access, or `relate serve --read-only[=snapshot|live]` to serve
   a store beside the process writing it (ADR-0306).
+- **A pipe hides failure** — `relate query ... | head` exits with `head`'s
+  status, and `tail` can cut the error itself. Prefer `--max-rows`, `LIMIT`
+  and `SKIP` over piping; if you must pipe, `set -o pipefail`, and judge
+  success by the exit code or the JSON `error` envelope, never the last
+  lines. A capped result still exits `0`: read `rowCap` (or the stderr
+  warning) before treating rows as complete.
 - **Destructive DDL is silent** — `DROP INDEX`/`DROP CONSTRAINT` print
   nothing on success; list first.
