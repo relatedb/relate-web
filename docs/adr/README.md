@@ -144,3 +144,4 @@ Copy `template.md`.
 | [0064](0064-windows-install-block-until-upstream-installer.md) | Windows gets a verified PowerShell install block until upstream ships an installer | Proposed |
 | [0065](0065-home-promo-banner-in-a-fixed-colour.md) | The home hero carries one promo banner in its own fixed colour | Proposed |
 | [0066](0066-serve-upstream-windows-installer.md) | The site serves upstream's Windows installer beside install.sh | Proposed |
+| [0067](0067-windows-installs-with-upstreams-one-liner.md) | Windows installs with upstream's one-line installer, and CI runs it | Proposed |
