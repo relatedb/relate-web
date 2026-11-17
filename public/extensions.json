@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-10T09:42:48Z",
+  "generated_at": "2026-11-17T10:49:36Z",
   "packages": [
     {
       "name": "dungeon",
@@ -47,6 +47,40 @@
       "hidden": false,
       "versions": [
         {
+          "version": "0.14.0",
+          "protocol": "2025-06-18",
+          "assets": [
+            {
+              "os": "darwin",
+              "arch": "amd64",
+              "tag": "relate-extensions-fs-to-graph-0.14.0",
+              "asset": "fs-to-graph-0.14.0-darwin-amd64.tar.gz",
+              "sha256": "db95d70de23d6caf16890652efcfce5bd0152d7a7416afa17b72404cefb6f4b2"
+            },
+            {
+              "os": "darwin",
+              "arch": "arm64",
+              "tag": "relate-extensions-fs-to-graph-0.14.0",
+              "asset": "fs-to-graph-0.14.0-darwin-arm64.tar.gz",
+              "sha256": "5457d0bc837fb43bb8ec8730f21f86151193626fc9055102f4d8d3698bff594f"
+            },
+            {
+              "os": "linux",
+              "arch": "amd64",
+              "tag": "relate-extensions-fs-to-graph-0.14.0",
+              "asset": "fs-to-graph-0.14.0-linux-amd64.tar.gz",
+              "sha256": "ac0c101ed1773794983581e9ea9894a057c9e86500a340095d1a9f370a30556a"
+            },
+            {
+              "os": "linux",
+              "arch": "arm64",
+              "tag": "relate-extensions-fs-to-graph-0.14.0",
+              "asset": "fs-to-graph-0.14.0-linux-arm64.tar.gz",
+              "sha256": "c92add41d61ccf0cc661f87a2e095075a8f2118f512d479df4b333fb57c6a4c3"
+            }
+          ]
+        },
+        {
           "version": "0.13.0",
           "protocol": "2025-06-18",
           "assets": [
@@ -86,6 +120,40 @@
       "name": "git-to-graph",
       "hidden": false,
       "versions": [
+        {
+          "version": "0.14.0",
+          "protocol": "2025-06-18",
+          "assets": [
+            {
+              "os": "darwin",
+              "arch": "amd64",
+              "tag": "relate-extensions-git-to-graph-0.14.0",
+              "asset": "git-to-graph-0.14.0-darwin-amd64.tar.gz",
+              "sha256": "777f33e70802ee2afc7043558993f4be0d1074b5bf4e13e5c2e45f1cd26504fe"
+            },
+            {
+              "os": "darwin",
+              "arch": "arm64",
+              "tag": "relate-extensions-git-to-graph-0.14.0",
+              "asset": "git-to-graph-0.14.0-darwin-arm64.tar.gz",
+              "sha256": "a4ba1da97c98c3ab01182d687b8446274900def2a677e23ce0724111504404ce"
+            },
+            {
+              "os": "linux",
+              "arch": "amd64",
+              "tag": "relate-extensions-git-to-graph-0.14.0",
+              "asset": "git-to-graph-0.14.0-linux-amd64.tar.gz",
+              "sha256": "7c34c775f337129cbdad40a27f90bcacdeac9732f284c0ad1b7fa0eaaec861cf"
+            },
+            {
+              "os": "linux",
+              "arch": "arm64",
+              "tag": "relate-extensions-git-to-graph-0.14.0",
+              "asset": "git-to-graph-0.14.0-linux-arm64.tar.gz",
+              "sha256": "8e6bf47489ebe1158e25626f64acbefd8baf97216883f4ecc9285eb051ea3edc"
+            }
+          ]
+        },
         {
           "version": "0.13.0",
           "protocol": "2025-06-18",
