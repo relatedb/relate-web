@@ -15,6 +15,8 @@
 #        public/releases.json   too, so these reach the live site with no
 #        public/extensions.json review): upstream's release assets (ADR-0546),
 #        public/extensions.json.sig   the newest stable core and extension releases
+#        public/install.ps1     the same core release's Windows installer, when it
+#                               attaches one (ADR-0066)
 #      releases.json must list the release as latest; extensions.json must
 #      verify against the release signing key pinned in install.sh
 #      (SSHSIG namespace relate-release)

@@ -1,8 +1,8 @@
 # Release discovery files
 
-`install.sh`, `releases.json`, `extensions.json` and `extensions.json.sig` are
-served at `/install.sh`, `/releases.json` and `/extensions.json` (canonical:
-`https://relatedb.ai/…`). The CLI pins these URLs: `install.sh` installs it and
+`install.sh`, `install.ps1`, `releases.json`, `extensions.json` and
+`extensions.json.sig` are served at `/install.sh`, `/install.ps1`,
+`/releases.json` and `/extensions.json` (canonical: `https://relatedb.ai/…`). The CLI pins these URLs: `install.sh` installs it and
 `relate upgrade --check` reads `releases.json`. Design: upstream ADR-0546
 (`relatedb/relate`, `docs/adr/0546-release-discovery-via-relate-web.md`).
 
@@ -32,6 +32,9 @@ the live site stays as it was):
 - the newest core release has both `install.sh` and `releases.json` assets;
 - `releases.json` parses and lists that release as `latest`;
 - `install.sh` pins a `SIGNING_KEY`;
+- `install.ps1`, when the release attaches one (relate 1.0.2 on), pins the same
+  key as `install.sh` (ADR-0066); a release without one keeps the copy already
+  in `public/`;
 - `extensions.json` parses and `extensions.json.sig` verifies against that key
   (SSHSIG, namespace `relate-release`).
 
@@ -62,6 +65,7 @@ or the summary it writes. Messages come from `scripts/fetch-discovery.sh`.
 | `… is the newest core release but has no install.sh and releases.json assets` | The release exists but upstream has not attached the files (pipeline still running, or it failed). | Wait for upstream's release run, or backfill (below); then redeploy. |
 | `releases.json on vX lists 'vY' as latest` | Stale or wrong generated document. | Backfill `publish-releases-json` upstream; redeploy. |
 | `install.sh … pins no SIGNING_KEY` | Wrong or truncated `install.sh` asset. | Check upstream `distribution/install.sh`; backfill. |
+| `install.ps1 from vX does not pin the SIGNING_KEY install.sh pins` | The two installers of one release disagree on the release key, or `install.ps1` is truncated. | Check upstream `distribution/install.ps1` against `distribution/install.sh`; backfill. |
 | `no pinned SIGNING_KEY in install.sh to verify extensions.json` | Same, hit from the extensions step. | As above. |
 | `extensions.json.sig … does not verify` | Signed with a different key or namespace, or the pair is mismatched. | Do not bypass. Backfill `publish-extensions-json` upstream. Known: the pre-release seed `.sig` verifies only under the old `cypherlite-release` namespace. |
 | `… is not JSON` | Corrupt asset. | Backfill upstream. |
@@ -101,7 +105,7 @@ Overwrites the four files in `public/`; revert afterwards.
 
 ```bash
 GH_TOKEN=$(gh auth token) npm run discovery:fetch
-git status --short public && git checkout -- public/install.sh public/releases.json public/extensions.json public/extensions.json.sig
+git status --short public && git checkout -- public/install.sh public/install.ps1 public/releases.json public/extensions.json public/extensions.json.sig
 ```
 
 ## Take a bad release off the site
