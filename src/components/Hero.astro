@@ -4,7 +4,7 @@
 // Commands are the ones the docs verify (get-started/*); "Copy for agent" copies the setup prompt
 // every copy-for-agent button shares (setupPrompt, ADR-0060).
 import { HERO_MASCOT } from '../lib/home/brand-art.ts';
-import { setupPrompt } from './docs/install.ts';
+import { setupPrompt, WINDOWS_INSTALL_COMMAND } from './docs/install.ts';
 import engine from '../content/docs/_data/engine.json';
 
 const version = `v${engine.version}`;
@@ -13,7 +13,7 @@ const SITE = 'https://relatedb.ai';
 const PROMPT = setupPrompt();
 const SECURITY = 'The install script verifies release signatures and SHA256 checksums.';
 
-// plain: the line is a coordinate to paste into a build file, so it has no shell prompt. showNote: the
+// plain: the line is a coordinate to paste into a build file, or a PowerShell line, so it has no `$` prompt. showNote: the
 // note carries a step the line alone does not.
 interface Tab { id: string; label: string; cmd?: string; note: string; docs: string; prompt?: string; link?: string; plain?: boolean; showNote?: boolean }
 
@@ -32,7 +32,7 @@ const bind = (id: string, label: string, href: string, cmd: string | undefined, 
 const tabs: Tab[] = [
   { id: 'skill', label: 'Agent skill', cmd: `curl -sSfL ${SITE}/install.sh | bash && relate skill install --agent claude-code`, note: `Installs the CLI, then the relate skill for Claude Code. ${SECURITY}`, docs: '/docs/get-started/agent-quickstart' },
   { id: 'shell', label: 'macOS / Linux', cmd: `curl -sSfL ${SITE}/install.sh | bash`, note: SECURITY, docs: '/docs/get-started/install/' },
-  { id: 'windows', label: 'Windows', note: 'A PowerShell block that makes the same checks as the install script, then puts relate.exe on your PATH.', docs: '/docs/get-started/install/', link: 'Install on Windows' },
+  { id: 'windows', label: 'Windows', cmd: WINDOWS_INSTALL_COMMAND, note: 'Run it in PowerShell. The installer verifies release signatures and SHA256 checksums, then puts relate.exe on your PATH.', docs: '/docs/get-started/install/', plain: true, showNote: true },
   bind('py', 'Python', '/docs/get-started/python', 'pip install relate-db', 'The Python client.', 'Install the client with `pip install relate-db`.'),
   bind('js', 'JavaScript', '/docs/get-started/node', 'npm install @relate/relate', 'For Node.js. In the browser, use @relate/relate-wasm.', 'Install the client with `npm install @relate/relate` (in the browser, `@relate/relate-wasm`).'),
   bind('rust', 'Rust', '/docs/get-started/rust', 'cargo add relate', 'Use relate as a crate inside your application.', 'Install the crate with `cargo add relate`.'),

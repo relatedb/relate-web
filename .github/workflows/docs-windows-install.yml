@@ -1,18 +1,30 @@
-# Runs the install page's Windows install block (WINDOWS_INSTALL_SCRIPT in
-# src/components/docs/install.ts, ADR-0064) on Windows, in Windows
-# PowerShell 5.1 and in PowerShell 7, the way a reader pastes it
-# (Invoke-Expression of the block's text). For each shell it shows:
-#   - a block whose pinned key is swapped for another key stops at the
-#     signature check and installs nothing;
-#   - the block installs relate.exe, puts its folder on the user PATH and
-#     this session's, and `relate --version` and one statement run;
-#   - a second paste (the documented upgrade) replaces the binary in place.
-# No secret: the release assets and releases.json are public.
+# Runs the Windows install the site documents (WINDOWS_INSTALL_COMMAND and
+# WINDOWS_INSTALL_COMMAND_ANY_SHELL in src/components/docs/install.ts,
+# ADR-0067) on Windows: upstream's install.ps1, served by the site (ADR-0066),
+# run the way a reader runs it. Two sources, each in Windows PowerShell 5.1 and
+# in PowerShell 7:
+#   - checkout: the public/install.ps1 this commit carries, served on loopback
+#     with the content type the host gives it, so a pull request tests the
+#     installer it would publish;
+#   - live: the exact line on the page, against https://relatedb.ai, and the
+#     bytes served there against the newest release's install.ps1 asset.
+# For each it shows (scripts/windows-install-check.ps1):
+#   - install.sh, in Git Bash, stops and prints the line the docs give;
+#   - the PowerShell line installs relate.exe, puts its folder on the user PATH
+#     once and resolves `relate` in the same window; `relate --version` and one
+#     statement run; a second run (the documented upgrade) replaces the binary;
+#   - `relate upgrade` exits 1 with the message the docs quote, and
+#     `relate upgrade --check` reports the versions;
+#   - the line for cmd and Git Bash installs from each of those shells.
+# The installer's own checks (a wrong key or a wrong hash installs nothing) are
+# tested upstream, and scripts/fetch-discovery.sh refuses a copy that pins
+# another key than install.sh's. No secret: the release assets and
+# releases.json are public.
 #
-# Not a required check: it runs on a paths filter, weekly (a new release or a
-# change on the runner image can break the block with no change here) and by
-# hand. Reproduce on a Windows machine with
-# `node scripts/windows-install-block.ts block.ps1` and pasting block.ps1.
+# Not a required check: it needs the network and a published release. It runs
+# on a paths filter, after each deploy of main, weekly (a new release or a
+# change on the runner image can break the install with no change here) and by
+# hand. Reproduce on a Windows machine with the line on the install page.
 name: Docs Windows install
 
 on:
@@ -20,14 +32,25 @@ on:
     branches: [main]
     paths:
       - "src/components/docs/install.ts"
-      - "scripts/windows-install-block.ts"
+      - "public/install.ps1"
+      - "public/install.sh"
+      - "scripts/windows-install.ts"
+      - "scripts/windows-install-check.ps1"
       - ".github/workflows/docs-windows-install.yml"
   push:
     branches: [main]
     paths:
       - "src/components/docs/install.ts"
-      - "scripts/windows-install-block.ts"
+      - "public/install.ps1"
+      - "public/install.sh"
+      - "scripts/windows-install.ts"
+      - "scripts/windows-install-check.ps1"
       - ".github/workflows/docs-windows-install.yml"
+  # A deploy is what changes the installer the live site serves.
+  workflow_run:
+    workflows: ["Deploy to Cloudflare Pages"]
+    types: [completed]
+    branches: [main]
   schedule:
     - cron: "17 6 * * 1"
   workflow_dispatch:
@@ -36,21 +59,28 @@ permissions:
   contents: read
 
 concurrency:
-  group: docs-windows-install-${{ github.ref }}
+  group: docs-windows-install-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   install:
-    name: Install (${{ matrix.shell }})
+    name: Install (${{ matrix.source }}, ${{ matrix.shell }})
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: windows-latest
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
+        source: [checkout, live]
         shell: [powershell, pwsh]
     defaults:
       run:
         shell: ${{ matrix.shell }}
+    env:
+      # Where the documented commands fetch the installer from; empty means the
+      # live site, the URL the page shows.
+      ORIGIN: ${{ matrix.source == 'checkout' && 'http://127.0.0.1:8765' || '' }}
+      DO_NOT_TRACK: "1"
     steps:
       - uses: actions/checkout@v4
 
@@ -61,35 +91,64 @@ jobs:
 
       - run: npm ci
 
-      - name: Write the block, and a copy with another signing key
+      - name: install.sh in Git Bash names the PowerShell installer
+        shell: bash
         run: |
-          node scripts/windows-install-block.ts "$env:RUNNER_TEMP\block.ps1"
-          node scripts/windows-install-block.ts "$env:RUNNER_TEMP\wrong-key.ps1" --wrong-key
+          set -euo pipefail
+          out="$(bash public/install.sh 2>&1)" && { echo "install.sh did not stop on Windows"; exit 1; }
+          echo "$out"
+          want="$(node scripts/windows-install.ts command --any-shell)"
+          grep -qF "install.sh: on Windows (Git Bash, MSYS2 or Cygwin), install with the PowerShell installer instead: $want" <<<"$out"
 
-      - name: The wrong key installs nothing
+      - name: Serve this checkout's install.ps1
+        if: matrix.source == 'checkout'
         run: |
-          $PSVersionTable.PSVersion.ToString()
-          $failed = $false
-          try { Invoke-Expression (Get-Content -Raw "$env:RUNNER_TEMP\wrong-key.ps1") } catch { $failed = $true; "stopped: $_" }
-          if (-not $failed) { throw 'the block with the wrong key did not stop' }
-          if (Test-Path "$env:LOCALAPPDATA\Programs\relate\relate.exe") { throw 'the block with the wrong key installed relate.exe' }
+          Start-Process node -ArgumentList 'scripts/windows-install.ts', 'serve', '8765' -WindowStyle Hidden
+          $up = $false
+          foreach ($try in 1..30) {
+            try { Invoke-WebRequest "$env:ORIGIN/install.ps1" -UseBasicParsing | Out-Null; $up = $true; break } catch { Start-Sleep -Seconds 1 }
+          }
+          if (-not $up) { throw "nothing answers at $env:ORIGIN/install.ps1" }
 
-      - name: Install, then run relate
+      - name: The live site serves the newest release's install.ps1
+        if: matrix.source == 'live'
         run: |
-          Invoke-Expression (Get-Content -Raw "$env:RUNNER_TEMP\block.ps1")
-          $dir = Join-Path $env:LOCALAPPDATA 'Programs\relate'
-          if (([Environment]::GetEnvironmentVariable('Path', 'User') -split ';') -notcontains $dir) { throw 'the user PATH does not carry the install folder' }
-          (Get-Command relate).Source
-          relate --version
-          if ($LASTEXITCODE -ne 0) { throw "relate --version exited $LASTEXITCODE" }
-          relate --mode table "RETURN 1 AS ok"
-          if ($LASTEXITCODE -ne 0) { throw "relate exited $LASTEXITCODE" }
+          $ProgressPreference = 'SilentlyContinue'
+          $tag = (Invoke-RestMethod https://relatedb.ai/releases.json).latest.tag
+          $response = Invoke-WebRequest https://relatedb.ai/install.ps1 -OutFile "$env:RUNNER_TEMP\live.ps1" -UseBasicParsing -PassThru
+          "content type: $($response.Headers['Content-Type'])"
+          Invoke-WebRequest "https://github.com/relatedb/relate/releases/download/$tag/install.ps1" -OutFile "$env:RUNNER_TEMP\asset.ps1" -UseBasicParsing
+          $live = (Get-FileHash "$env:RUNNER_TEMP\live.ps1" -Algorithm SHA256).Hash
+          $asset = (Get-FileHash "$env:RUNNER_TEMP\asset.ps1" -Algorithm SHA256).Hash
+          "live:  $live"
+          "$tag`: $asset"
+          if ($live -ne $asset) { throw "https://relatedb.ai/install.ps1 is not the install.ps1 of $tag" }
 
-      - name: Paste it again (the documented upgrade)
+      - name: The PowerShell line installs relate, twice, and relate runs
         run: |
-          Invoke-Expression (Get-Content -Raw "$env:RUNNER_TEMP\block.ps1")
-          $dir = Join-Path $env:LOCALAPPDATA 'Programs\relate'
-          $entries = @([Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | Where-Object { $_ -eq $dir })
-          if ($entries.Count -ne 1) { throw "the user PATH carries the install folder $($entries.Count) times" }
-          & "$dir\relate.exe" --version
-          if ($LASTEXITCODE -ne 0) { throw "relate --version exited $LASTEXITCODE" }
+          $arguments = @('scripts/windows-install.ts', 'command')
+          if ($env:ORIGIN) { $arguments += @('--origin', $env:ORIGIN) }
+          $command = node @arguments
+          $reinstall = node scripts/windows-install.ts command --any-shell
+          & scripts\windows-install-check.ps1 -Command $command -ReinstallLine $reinstall
+
+      - name: The line for cmd installs from cmd
+        shell: cmd
+        run: |
+          del /q "%LOCALAPPDATA%\Programs\relate\relate.exe" || exit /b 1
+          if defined ORIGIN (set "ORIGIN_ARGS=--origin %ORIGIN%") else (set "ORIGIN_ARGS=")
+          node scripts/windows-install.ts command --any-shell %ORIGIN_ARGS% > "%RUNNER_TEMP%\install.cmd" || exit /b 1
+          type "%RUNNER_TEMP%\install.cmd"
+          call "%RUNNER_TEMP%\install.cmd" || exit /b 1
+          "%LOCALAPPDATA%\Programs\relate\relate.exe" --version || exit /b 1
+
+      - name: The line for Git Bash installs from Git Bash
+        shell: bash
+        run: |
+          set -euo pipefail
+          exe="$(cygpath -u "$LOCALAPPDATA")/Programs/relate/relate.exe"
+          rm -f "$exe"
+          line="$(node scripts/windows-install.ts command --any-shell ${ORIGIN:+--origin "$ORIGIN"})"
+          echo "$line"
+          eval "$line"
+          "$exe" --version

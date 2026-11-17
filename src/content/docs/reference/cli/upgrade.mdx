@@ -32,7 +32,7 @@ Any other argument, such as `--json`, is a usage error (exit code 2).
 
 | Step | Check | On failure |
 | --- | --- | --- |
-| 1 | The platform is macOS or Linux on amd64 or arm64 | Exits 1; on Windows the message points to a manual download, because a running `.exe` cannot replace itself |
+| 1 | The platform is macOS or Linux on amd64 or arm64 | Exits 1. On Windows, before any request: `Error: upgrade: self-upgrade is not supported on Windows (a running .exe cannot replace itself); reinstall with the PowerShell installer to upgrade: powershell -ExecutionPolicy ByPass -c "irm https://relatedb.ai/install.ps1 \| iex"` |
 | 2 | `releases.json` is read, and its `latest.tag` has the form `v<major>.<minor>.<patch>` | Exits 1 naming the URL and the reinstall command |
 | 3 | The latest version is compared with the binary's own as three numbers | Not newer: prints that relate is up to date and exits 0 |
 | 4 | The release lists the platform binary (`relate-<os>-<arch>`), `SHA256SUMS` and `SHA256SUMS.sig` | Exits 1 naming the missing file |
@@ -42,7 +42,7 @@ Any other argument, such as `--json`, is a usage error (exit code 2).
 | 8 | The new binary replaces the running one at its path | Exits 1 naming the reinstall command |
 | 9 | The skill copies are refreshed | Never fails the upgrade |
 
-`--check` stops after step 3. The key is the one `install.sh` pins; the [security reference](/docs/reference/security) gives it and the manual checks that match these steps. Steps 4 to 9 are described from the binary's source, not from a recorded run, because no release newer than the verified version exists to upgrade to.
+`--check` stops after step 3 and never fails at step 1, so it runs on Windows too: there, for a newer release, its last line is `upgrade available: <version>; ` followed by the step 1 message. The key is the one `install.sh` pins; the [security reference](/docs/reference/security) gives it and the manual checks that match these steps. Steps 4 to 9 are described from the binary's source, not from a recorded run, because no release newer than the verified version exists to upgrade to.
 
 ## Where it downloads from
 

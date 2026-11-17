@@ -6,7 +6,7 @@
 // headed by a link into its section) and a few cookbook examples. A task whose
 // page is not written yet renders as text, not a link.
 import RecipeCard from '../../components/cookbook/RecipeCard.astro';
-import { agentsMd, setupPrompt } from '../../components/docs/install.ts';
+import { agentsMd, setupPrompt, WINDOWS_INSTALL_COMMAND } from '../../components/docs/install.ts';
 import TabsStrip from '../../components/docs/TabsStrip.astro';
 import Docs from '../../layouts/Docs.astro';
 import { esc } from '../../lib/cookbook/result-view.ts';
@@ -99,9 +99,8 @@ const skillGuide = taskHref('guides/agents/install-the-skill', published);
           <p class="agent-note">Checks the release's signed SHA256SUMS first, and installs to <code>~/.local/bin</code>.</p>
         </Fragment>
         <Fragment slot="windows">
-          <p class="agent-note">
-            <code>install.sh</code> runs on macOS and Linux. On Windows, paste the PowerShell block from <a href="/docs/get-started/install/">Install relate</a>: it makes the same checks, then installs <code>relate.exe</code> on your <code>PATH</code>.
-          </p>
+          <Fragment set:html={code(WINDOWS_INSTALL_COMMAND, 'powershell')} />
+          <p class="agent-note">Run it in PowerShell. It makes the same checks, and installs <code>relate.exe</code> on your <code>PATH</code>. <a href="/docs/get-started/install/#windows-notes">Windows notes</a> covers <code>cmd</code> and Git Bash.</p>
         </Fragment>
       </TabsStrip>
       <p class="agent-actions">

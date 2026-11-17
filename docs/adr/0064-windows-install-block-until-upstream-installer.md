@@ -80,3 +80,8 @@ from the release binary and the CLI source.
 - `docs-windows-install.yml` is one more non-required workflow; a release that changes asset names,
   the manifest header or the signer identity breaks it, as it breaks `install.sh`.
 - `example.twin.md` is re-pinned, since the example page renders the Install block.
+
+## Later references
+
+- Superseded by ADR-0067: upstream's `install.ps1`, served by the site (ADR-0066), replaces the
+  block on every surface, and the workflow runs the documented one-liners instead.
