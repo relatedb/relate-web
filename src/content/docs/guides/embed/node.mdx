@@ -34,7 +34,7 @@ npm installs the engine library as the platform package for your system, `@relat
 | `Database.open("./team")` | A directory store | Created when missing; another process may read it with `readOnly: true` while you write |
 | `Database.open("./team.rl")` | A :term[single-file store]{id=single-file-store} | Created when missing; opens only while no other process writes it |
 | `Database.open(path, { readOnly: true })` | An existing store, read-only | Loads once and refuses writes; a missing store is an error, never created |
-| `db.connect("system")` | A connection in another namespace | `neo4j` (default), `system` or `system_ontologies` |
+| `db.connect("system")` | A connection in another namespace | `neo4j` (default) or `system`; `system_ontologies` only under `RELATE_PREVIEW=ontology` |
 
 The client has no close method. Each statement is durable when `query()` returns, and `db.checkpoint()` writes the current state to the snapshot. A new directory store writes its snapshot with the codec in `RELATE_SNAPSHOT_FORMAT` (`parquet` by default, `json` or `markdown`). This program writes a directory store, then reads it through a second, read-only handle beside the writer:
 

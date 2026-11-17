@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.1.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -170,6 +170,177 @@
           {
             "name": "Grace",
             "score": 0.22443993531397488
+          }
+        ],
+        "stats": {
+          "constraints_added": 0,
+          "constraints_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "nodes_created": 0,
+          "nodes_deleted": 0,
+          "properties_set": 0,
+          "relationships_created": 0,
+          "relationships_deleted": 0
+        }
+      },
+      "expectError": false
+    },
+    "fulltext-forms": {
+      "kind": "table",
+      "text": "| query          | names             |\n|----------------|-------------------|\n| \"stor*\"        | [\"Ada\"]           |\n| \"t?sts\"        | [\"Grace\", \"Noor\"] |\n| \"conformence~\" | [\"Grace\"]         |\n| \"docs^2 green\" | [\"Noor\", \"Grace\"] |\n4 rows",
+      "table": {
+        "columns": [
+          "query",
+          "names"
+        ],
+        "numeric": [
+          false,
+          false
+        ],
+        "rows": [
+          [
+            "\"stor*\"",
+            "[\"Ada\"]"
+          ],
+          [
+            "\"t?sts\"",
+            "[\"Grace\", \"Noor\"]"
+          ],
+          [
+            "\"conformence~\"",
+            "[\"Grace\"]"
+          ],
+          [
+            "\"docs^2 green\"",
+            "[\"Noor\", \"Grace\"]"
+          ]
+        ],
+        "summary": "4 rows"
+      },
+      "graph": null,
+      "envelope": {
+        "columnTypes": [
+          "STRING",
+          "LIST"
+        ],
+        "columns": [
+          "query",
+          "names"
+        ],
+        "error": null,
+        "notifications": [],
+        "plan": null,
+        "plan_cache": "miss",
+        "rows": [
+          {
+            "names": [
+              "Ada"
+            ],
+            "query": "stor*"
+          },
+          {
+            "names": [
+              "Grace",
+              "Noor"
+            ],
+            "query": "t?sts"
+          },
+          {
+            "names": [
+              "Grace"
+            ],
+            "query": "conformence~"
+          },
+          {
+            "names": [
+              "Noor",
+              "Grace"
+            ],
+            "query": "docs^2 green"
+          }
+        ],
+        "stats": {
+          "constraints_added": 0,
+          "constraints_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "nodes_created": 0,
+          "nodes_deleted": 0,
+          "properties_set": 0,
+          "relationships_created": 0,
+          "relationships_deleted": 0
+        }
+      },
+      "expectError": false
+    },
+    "folding": {
+      "kind": "table",
+      "text": "| query  | names                        |\n|--------|------------------------------|\n| \"cafe\" | [\"Cafe Orbit\", \"Café Lumen\"] |\n| \"café\" | [\"Cafe Orbit\", \"Café Lumen\"] |\n| \"CAF*\" | [\"Cafe Orbit\", \"Café Lumen\"] |\n3 rows · nodes created: 2, properties set: 2, labels added: 2, indexes added: 1",
+      "table": {
+        "columns": [
+          "query",
+          "names"
+        ],
+        "numeric": [
+          false,
+          false
+        ],
+        "rows": [
+          [
+            "\"cafe\"",
+            "[\"Cafe Orbit\", \"Café Lumen\"]"
+          ],
+          [
+            "\"café\"",
+            "[\"Cafe Orbit\", \"Café Lumen\"]"
+          ],
+          [
+            "\"CAF*\"",
+            "[\"Cafe Orbit\", \"Café Lumen\"]"
+          ]
+        ],
+        "summary": "3 rows · nodes created: 2, properties set: 2, labels added: 2, indexes added: 1"
+      },
+      "graph": null,
+      "envelope": {
+        "columnTypes": [
+          "STRING",
+          "LIST"
+        ],
+        "columns": [
+          "query",
+          "names"
+        ],
+        "error": null,
+        "notifications": [],
+        "plan": null,
+        "plan_cache": "miss",
+        "rows": [
+          {
+            "names": [
+              "Cafe Orbit",
+              "Café Lumen"
+            ],
+            "query": "cafe"
+          },
+          {
+            "names": [
+              "Cafe Orbit",
+              "Café Lumen"
+            ],
+            "query": "café"
+          },
+          {
+            "names": [
+              "Cafe Orbit",
+              "Café Lumen"
+            ],
+            "query": "CAF*"
           }
         ],
         "stats": {

@@ -16,7 +16,7 @@ relate agent-context [COMMAND]
 
 | Argument | Meaning |
 | --- | --- |
-| `COMMAND` | Optional. One command word: `query`, `clone`, `info`, `pull`, `push`, `skill`, `upgrade`, `telemetry`, `run`, `serve`, `agent-context` or `extension`. `update` names `upgrade`, its alias |
+| `COMMAND` | Optional. One command word: `query`, `clone`, `info`, `pull`, `push`, `skill`, `upgrade`, `telemetry`, `feedback`, `agent-feedback`, `run`, `serve`, `agent-context` or `extension`. `update` names `upgrade`, its alias |
 
 | Run | Prints |
 | --- | --- |
@@ -35,21 +35,23 @@ relate agent-context
 ```
 
 ```text
-relate v1.0.1 — agent context
+relate v1.1.0 — agent context
 
 Commands (detail: relate agent-context <COMMAND>):
-  query          Run a statement session (oneshot, stdin, or shell)
-  clone          Copy a database into a new store and exit
-  info           Print store metadata for a database without opening it
-  pull           Copy a Neo4j/Aura subgraph into a database
-  push           Copy a database subgraph into Neo4j/Aura
-  skill          Install, inspect, or remove the embedded agent skill bundle
-  upgrade        Update the relate binary (alias: update)
-  telemetry      Manage anonymous usage metrics (on, off, status)
-  run            Run an installed extension action into a store the host owns
-  serve          Host the HTTP Query API and MCP surfaces on a database
-  agent-context  Print the compact agent briefing (commands, flags, exit codes)
-  extension      Scaffold, install, check, list, or remove command extensions
+  query           Run a statement session (oneshot, stdin, or shell)
+  clone           Copy a database into a new store and exit
+  info            Print store metadata for a database without opening it
+  pull            Copy a Neo4j/Aura subgraph into a database
+  push            Copy a database subgraph into Neo4j/Aura
+  skill           Install, inspect, or remove the embedded agent skill bundle
+  upgrade         Update the relate binary (alias: update)
+  telemetry       Manage anonymous usage metrics (on, off, status)
+  feedback        File a GitHub issue about CLI friction, or manage the agent grant (enable, disable)
+  agent-feedback  Send one consented feedback report (agent surface)
+  run             Run an installed extension action into a store the host owns
+  serve           Host the HTTP Query API and MCP surfaces on a database
+  agent-context   Print the compact agent briefing (commands, flags, exit codes)
+  extension       Scaffold, install, check, list, or remove command extensions
 
 Query-run flags (relate [OPTIONS] [QUERY]):
   --help --version --database --json --csv --markdown --jsonl --toon --noheader --mode --format --pretty --timings --param --fetch-params --snapshot-format --markdown-body-properties --wal-dir --checkpoint-interval-secs --durability-mode --logical-graph-size-limit --expression-memory-limit --concurrent-logical-workspace-limit --max-traversal-depth --safe --no-safe --agent-mode --no-agent-mode --max-rows --width --timeout --load --read-only --load-csv-dir --namespace --command
@@ -115,7 +117,7 @@ echo "exit=$?"
 ```
 
 ```text
-Error: agent-context: unknown command '--json' (expected one of: query, clone, info, pull, push, skill, upgrade, telemetry, run, serve, agent-context, extension)
+Error: agent-context: unknown command '--json' (expected one of: query, clone, info, pull, push, skill, upgrade, telemetry, feedback, agent-feedback, run, serve, agent-context, extension)
 Usage: relate agent-context [COMMAND]
 Run 'relate agent-context --help' for more information.
 exit=2

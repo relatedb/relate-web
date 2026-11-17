@@ -56,6 +56,7 @@ The flags come from the extension's manifest, plus relate's own `-d`:
 | `DIR` | the current directory | The checkout to read; the history is `HEAD`'s |
 | `--max-commits N` | `0` | Read at most N commits, newest first; `0` reads every commit |
 | `--since VALUE` | empty | Pass `--since=VALUE` to `git log`, a lower bound on the committer date; empty means no bound |
+| `--until VALUE` | empty | Pass `--until=VALUE` to `git log`, an upper bound on the committer date; empty means no bound. With `--since`, the two bound a closed range. As of git-to-graph 0.14.0 |
 | `--max-changeset N` | `50` | A commit that touched more than N files adds no `CO_CHANGED` pair; accepts 1 to 1000 |
 | `-d`, `--database PATH` | `:memory:` | The store to import into; relate opens it, not the extension |
 
@@ -94,7 +95,7 @@ These rules shape the graph:
 - Merge commits are left out, and only `HEAD`'s history is read: branches, tags, and the commit graph itself are not imported.
 - A `:File` is every path a commit touched, including files deleted since. `path` is `DIR` joined with the path git prints, so `planner` gives `planner/src/main.rs`, the same key `fs-to-graph` writes for the same `DIR`.
 - Each batch of rows commits on its own. A failed run can leave its earlier batches committed; running the same command again completes the import, because every write is a `MERGE` and `count` is overwritten, never added to.
-- A narrower run, with `--since` or `--max-commits`, overwrites only the pairs it recounts. Import into a new store when the window changes.
+- A narrower run, with `--since`, `--until` or `--max-commits`, overwrites only the pairs it recounts. Import into a new store when the window changes.
 - An import refuses before it writes anything when `git log` prints more than 134217728 bytes (128 MiB), or when it would write more than 5000000 `CO_CHANGED` pairs.
 
 ## Query the graph
@@ -252,7 +253,7 @@ The counts match the run's summary: one `AUTHORED` per commit, 9 `TOUCHED`, and 
 
 **`Error: the extension child exited with 1: invalid --max-changeset: '2000' is above the maximum 1000`** (exit code 1). Pass a value from 1 to 1000.
 
-**`git log output exceeds the 134217728-byte import limit (128 MiB); pass --max-commits or --since to read a smaller window`** (exit code 1, after `Error: the extension child exited with 1:`). The history is larger than one import reads. Import a window with `--max-commits` or `--since`, into a new store.
+**`git log output exceeds the 134217728-byte import limit (128 MiB); pass --max-commits, --since or --until to read a smaller window`** (exit code 1, after `Error: the extension child exited with 1:`). The history is larger than one import reads. Import a window with `--max-commits`, `--since` or `--until`, into a new store.
 
 **`git was not found on PATH; install git and retry`** (exit code 1, after the same prefix). The extension could not start `git`.
 

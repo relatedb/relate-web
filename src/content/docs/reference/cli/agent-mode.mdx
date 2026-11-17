@@ -217,13 +217,13 @@ relate --mode envelope --max-rows 2 "UNWIND range(1, 5) AS x RETURN x"
 ```
 
 ```text
-warning: result truncated to 2 rows (the statement returned 5); pass --max-rows 0 for all rows
+warning: result truncated to 2 rows (the statement returned 5); pass --max-rows 0 for all rows, or page with SKIP/LIMIT
 {"columnTypes":["INTEGER"],"columns":["x"],"notifications":[],"planCache":"miss","rowCap":{"kept":2,"total":5},"rows":[{"x":1},{"x":2}],"timings":{"elapsed_ms":0.34175,"execute_ms":0.20358400000000001,"lex_parse_ms":0.021709,"lower_ms":0.032666,"parse_ms":0.08629200000000001,"plan_ms":0.044333,"result_generation_ms":0.0011250000000000001,"rewrite_ms":0.007042},"truncated":true}
 ```
 
 A failed statement in `envelope`, `json`, `jsonl` or `speedscope` prints the error object instead, with the same keys in each; its fields are on the [exit codes page](/docs/reference/cli/exit-codes-and-errors#the-error-object). New envelope fields may be added; existing ones are never renamed.
 
-`toon` prints no error object. Under a detected harness with stdout piped, a failed statement leaves the stderr message and the exit code, and nothing on stdout:
+`toon` prints no error object. Under a detected harness with stdout piped, a failed statement leaves the stderr message and the exit code, and nothing on stdout. As of relate 1.1.0, a failed run with agent mode on also prints one hint line on stderr that names [`relate agent-feedback`](/docs/reference/cli/feedback#relate-agent-feedback):
 
 ```bash verify
 CLAUDECODE=1 relate "RETURN 1/0 AS x"
@@ -232,6 +232,7 @@ echo "exit=$?"
 
 ```text
 type error: / by zero
+hint: agents can report Relate friction to its developers — draft it, ask the person, then run 'relate agent-feedback'
 exit=6
 ```
 

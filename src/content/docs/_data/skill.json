@@ -1,13 +1,13 @@
 {
   "source": "surfaces/relate-cli/src/skill/bundle",
-  "commit": "ef436ce10a54a43c8f84905bc45a8d053d99a0d8",
-  "synced": "2026-11-12",
-  "version": "1.0.1",
+  "commit": "f529cbb512f69e7175f83c192af9707777ef57f4",
+  "synced": "2026-11-17",
+  "version": "1.1.0",
   "files": [
     {
       "path": "SKILL.md",
-      "sha256": "dd428292ed8c2d63e66b3ef0660aa7ad9f2a9c3201e75192fe1ad2551644e609",
-      "upstream_sha256": "d93c71e58840484afee07f69416b4217b9524aeaef1468800853ef0a2e7d9e4d"
+      "sha256": "36f7048e9dc8339b86572c2cfbda06abf5afad46e9d771ebbe0d5f52aab2ded8",
+      "upstream_sha256": "2a33393844a45ea710deabeb0171554cbf97d0e3f516e1bbfdba649f0d848357"
     },
     {
       "path": "references/agent-safety.md",
@@ -15,19 +15,23 @@
     },
     {
       "path": "references/client-c.md",
-      "sha256": "1bbc0c4acaf2e03391f7dadc6b8a21e1176bd710cabf71b246b0f05c534911d7"
+      "sha256": "e7245d0e09103dd0641853bc89a95ed82357c79fcca52820e06da8b1fe5776e1"
+    },
+    {
+      "path": "references/client-cli.md",
+      "sha256": "fa886a5eec869d07f52a96737e4fd41c9c0f10033162add3c7d4618cd81efd35"
     },
     {
       "path": "references/client-extensions.md",
-      "sha256": "f3d907430e468fbbc422c3ec6e10c2ba2fda7d245e3d4f453b4a9734b20b0390"
+      "sha256": "9439bd8b6b06f6045e16cac23221f7545b0d3ec7bcf53bfc67640fd1310b9dfe"
     },
     {
       "path": "references/client-go.md",
-      "sha256": "b5743ddfd4f5190ebf74b17f43beeff4f80a5eedcaada7bf463cd722e44ba09f"
+      "sha256": "bd8156006a79602eb113c461fb950251a24fd897f1693e3fa710f1b8e0b3d51f"
     },
     {
       "path": "references/client-java.md",
-      "sha256": "582bb06fd00bae27f52d73362f13487fe4ed37bf524ea8d6f084d97030b23a88"
+      "sha256": "5438ef388ad6ac10cbd45f61cbe94d08d06357945f79fcb464c9392657a2060d"
     },
     {
       "path": "references/client-javascript.md",
@@ -39,7 +43,7 @@
     },
     {
       "path": "references/client-swift.md",
-      "sha256": "520b9e7a1475e2e697736729c5040d4643a8e1536380553c876ef4baa4283583"
+      "sha256": "bf8d577e08db26a6efa83d0c547255279b23f078c77edeae358597c5394d339c"
     },
     {
       "path": "references/client-wasm.md",
@@ -59,7 +63,7 @@
     },
     {
       "path": "references/run-git-to-graph.md",
-      "sha256": "d1b191414fb10cb2207650552a78c74034ca3559c79bbd6831f655f9d10d286c"
+      "sha256": "40920794c4931433a833d5d8f1796b842fd91981f9373902e6100ace244c3b31"
     },
     {
       "path": "references/spatial.md",
@@ -67,25 +71,25 @@
     },
     {
       "path": "references/vector.md",
-      "sha256": "9922532c7a2910d781d1c2ae70571bc984d39dcff5934109cce9cb1f188e79af"
+      "sha256": "3b7218e26176fb067b77a2bb5b0d5f7baa2b861e7e9a273331317f3416d4516e"
     }
   ],
   "task_skills": [
     {
       "name": "relate-agent-memory",
-      "reviewed": "2026-11-12",
+      "reviewed": "2026-11-17",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "b39846b27b79756b4f65696f410244d8b399cf333da75f8ee75677ceef5f769b"
+          "sha256": "b0998ffaf3419c2701d70ce1ec165a85029553db47cc279cf53c39c43453a82b"
         },
         {
           "path": "references/bitemporal.md",
-          "sha256": "c7b41b0368e3ea53ed2ec72b3ad922058922bc593530a005ac97525ccf12c41a"
+          "sha256": "79d302f7d9480e5753d6ce7f6bcee21c83edf297e38bfb6e71bb1e8acbc038df"
         },
         {
           "path": "references/provenance.md",
-          "sha256": "9d869579b3421a57fb7d3a8cf92a8e860141f91f470d61916be562825b249a76"
+          "sha256": "66600910118a72ec7a1d73a950299e0db6abdb2ba71dfb74941fcfca899d7105"
         }
       ],
       "recipes": [
@@ -108,15 +112,15 @@
     },
     {
       "name": "relate-graphrag",
-      "reviewed": "2026-11-12",
+      "reviewed": "2026-11-17",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "0063a4cd2424dae779a31682085159af7bd3c9c63f294b391e26f121c29a14e7"
+          "sha256": "36d2a6a39ddbe328c3471aabee3e613aa37530d6bc7e7531ec29dd61e4be904f"
         },
         {
           "path": "references/search-forms.md",
-          "sha256": "15d495fc755bfc47bdb0436f61f54c0de0db2449fdb4715ce90dc8f4dbe4959b"
+          "sha256": "cc0d3a766c4c802339dafbc2ef40ce3192667ebcc404d07b230c09e692ebf6e8"
         }
       ],
       "recipes": [
@@ -129,15 +133,15 @@
     },
     {
       "name": "relate-migrate-from-vector-search",
-      "reviewed": "2026-11-12",
+      "reviewed": "2026-11-17",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "93a765e926f3c14cef0b35c7b2f90a3df1c42b177381663c2dd63f6ca223cce5"
+          "sha256": "1145098bc4461c683055d17d644e10b595b4846ba28126e0c4bbdebe6b65621d"
         },
         {
           "path": "references/verify.md",
-          "sha256": "c0160a76d419edc58f84c39178edd2e1c38d7799142d717ec3831003eae0cf91"
+          "sha256": "afd7d04f63044d8ea3bd30b53a9db23c5e6b95c3d9626247381a9917b928297b"
         }
       ],
       "recipes": [
@@ -155,15 +159,15 @@
     },
     {
       "name": "relate-query-tuning",
-      "reviewed": "2026-11-12",
+      "reviewed": "2026-11-17",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "b450cd4976d6cdbfc0de8eac68ec44ba01d1d8511643cdebc1345af21bc5fba1"
+          "sha256": "eff704e695a9ae5941f59fbcc5b350ad8a5eb9c58235923b6deeca2143a4de2b"
         },
         {
           "path": "references/notifications.md",
-          "sha256": "f2187e4247f2c8de3d696e6a73831f214a9c528504b6fef50b20958a9ebc95d0"
+          "sha256": "cdcbb7ea1175941deaa881203e54fd45229aa06be3aa7fea55959f2d4effd5c0"
         }
       ],
       "recipes": [
@@ -176,15 +180,15 @@
     },
     {
       "name": "relate-schema-design",
-      "reviewed": "2026-11-12",
+      "reviewed": "2026-11-17",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "dab5c51b770d278a7377cc3e157ed34b9df57a7acbd02ecc578fa66d07a8e119"
+          "sha256": "0d2126f5e0613af7753a84b0d1212f77105ac9cbb55c9206f4600a1d4e823ff6"
         },
         {
           "path": "references/discovery.md",
-          "sha256": "0b075d11ce44a2223bfcec81862cdf258c4d9f13824ece277fdef8c39b8a4307"
+          "sha256": "51cebbbb2496ed4b7d4c9a04b6a63ba894815e46872943f759dd25c4dd9acfff"
         }
       ],
       "recipes": [

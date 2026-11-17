@@ -49,7 +49,7 @@ On stderr, relate prints that the store is open read-only, then `auth: generated
 
 ## Run a statement
 
-`POST` a JSON body with `Content-Type: application/json` to `/db/neo4j/query/v2`. `neo4j` is the default namespace; `system` and `system_ontologies` are the other two.
+`POST` a JSON body with `Content-Type: application/json` to `/db/neo4j/query/v2`. `neo4j` is the default namespace, and `system` is the other; `system_ontologies` exists only when the server runs with `RELATE_PREVIEW=ontology`.
 
 ```bash
 curl -s -u "$(cat graph.rl.auth-token)" -H 'Content-Type: application/json' \
@@ -180,7 +180,7 @@ wait $server
 ```
 
 ```text
-{"query":"http://127.0.0.1:8842/db/{databaseName}/query/v2","transaction":"http://127.0.0.1:8842/db/{databaseName}/query/v2/tx","neo4j_version":"1.0.1","neo4j_edition":"community","auth_config":{"oidc_providers":[]}}
+{"query":"http://127.0.0.1:8842/db/{databaseName}/query/v2","transaction":"http://127.0.0.1:8842/db/{databaseName}/query/v2/tx","neo4j_version":"1.1.0","neo4j_edition":"community","auth_config":{"oidc_providers":[]}}
 {"data":{"fields":["name"],"values":[["Ada"],["Grace"]]},"bookmarks":[],"timings":{"elapsed_ms":0.608958,"execute_ms":0.41325,"lex_parse_ms":0.03216599999999999,"lower_ms":0.045292,"parse_ms":0.121875,"plan_ms":0.062041,"result_generation_ms":0.00025,"rewrite_ms":0.006167000000000001},"planCache":"miss"}
 200
 {"errors":[{"code":"42N18","message":"semantic error: WriteOnReadOnlyAccessDatabase: No write operations are allowed on this database. The database is in read-only mode on this Neo4j instance."}]}
@@ -199,7 +199,7 @@ The read returned Ada and Grace with `200`, the write was refused with `400` and
 
 **`400` with code `42N18` and `WriteOnReadOnlyAccessDatabase`.** The server opened the store `--read-only`. Restart it without `--read-only` to accept writes.
 
-**`404` with code `42N00` and `semantic error: DatabaseNotFound: Graph not found: <name>`.** The path names a namespace other than `neo4j`, `system` or `system_ontologies`.
+**`404` with code `42N00` and `semantic error: DatabaseNotFound: Graph not found: <name>`.** The path names something other than `neo4j` or `system`. `system_ontologies` is a namespace only when the server runs with `RELATE_PREVIEW=ontology`.
 
 ## Related
 

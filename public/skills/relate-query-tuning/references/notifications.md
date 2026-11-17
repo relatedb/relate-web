@@ -3,7 +3,7 @@
 `EXPLAIN` and `PROFILE` attach notifications to a plan; a plain run derives
 none. Each has a GQLSTATUS code, a severity, a category, a title, a
 description that names the labels, properties and counts involved, and a
-remedy. The descriptions below are quoted from runs on relate 1.0.1; the
+remedy. The descriptions below are quoted from runs on relate 1.1.0; the
 parts that name labels, properties and counts vary. The Cypher statements
 run in order on one in-memory store.
 
@@ -16,7 +16,7 @@ from <https://relatedb.ai/cookbook/dependency-blast-radius/index.md>.
 | GQLSTATUS | Title | Fires on | Example description | Remedy |
 | --- | --- | --- | --- | --- |
 | `03C91` | Missing index | An equality predicate on a label's property with no range index on that pair | `the equality predicate on name filters :Person without a range index on (:Person {name})` | `CREATE INDEX relate_Person__name FOR (n:Person) ON (n.name)` |
-| `03C90` | All nodes scan | A label-less node pattern while the store has a property index | `the scan matches every node; consider the property index (:Person(name))` | ``Name the label the scan intends (`MATCH (n:<Label>)`); on the index's label the scan becomes an index-backed lookup.`` |
+| `03C90` | All nodes scan | A label-less node pattern while the store has a property index | `the scan matches every node; add a label to narrow it` | ``Name the label the scan intends (`MATCH (n:<Label>)`); on the index's label the scan becomes an index-backed lookup.`` |
 | `03N90` | Cartesian product | Patterns in one `MATCH` that share no variable | `the MATCH patterns share no join anchor` | `Give the patterns a join anchor: reuse a node variable across them, or add a pattern that relates their endpoints; otherwise run them as separate queries.` |
 | `03N91` | Unbounded variable-length pattern | A variable-length pattern with no upper bound | `the variable-length pattern (p:Person)-[:KNOWS*1..]->(q) has no upper bound` | ``Bound the expansion (`[:R*1..5]`) where arbitrary length is not required, or add a selective endpoint/label predicate and a `LIMIT`.`` |
 | `03C92` | Eager aggregation | An aggregation whose input is estimated at 100,000 rows or more | `the aggregation buffers an estimated 100000 input rows, at or above the 100000-row eager threshold` | ``Reduce the rows reaching the aggregation with a selective label/property predicate or a `LIMIT` before it; profile again to confirm the buffered input shrank.`` |

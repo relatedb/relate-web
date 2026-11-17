@@ -1,7 +1,7 @@
 ---
 title: Use the Java client
 label: Java
-description: Add the com.relate:relate jar to a Maven or Gradle build, open stores in each mode, bind typed parameters, run transactions, and handle exceptions.
+description: Add the ai.relatedb:relate jar to a Maven or Gradle build, open stores in each mode, bind typed parameters, run transactions, and handle exceptions.
 order: 60
 surfaces: [java]
 prerequisites: [get-started/java]
@@ -18,11 +18,11 @@ This guide shows you how to use the relate Java :term[client]{id=client} in an a
 
 ## Add the client
 
-The artifact is `com.relate:relate` and the package is `com.relate`. The jars are attached to each release on the [releases page](https://github.com/relatedb/relate/releases), not published to Maven Central, so a build resolves them from the local Maven repository. Each jar carries its POM; install the plain jar with `mvn install:install-file -Dfile=relate-<release>.jar`, and a classifier jar with `-Dclassifier=<classifier>` added. The plain jar carries the engine for all five platforms, about 40 MB; in these blocks `<release>` is the release version:
+The artifact is `ai.relatedb:relate` and the package is `ai.relatedb`. The jars are attached to each release on the [releases page](https://github.com/relatedb/relate/releases), not published to Maven Central, so a build resolves them from the local Maven repository. Each jar carries its POM; install the plain jar with `mvn install:install-file -Dfile=relate-<release>.jar`, and a classifier jar with `-Dclassifier=<classifier>` added. The plain jar carries the engine for all five platforms, about 40 MB; in these blocks `<release>` is the release version:
 
 ```xml title="pom.xml"
 <dependency>
-  <groupId>com.relate</groupId>
+  <groupId>ai.relatedb</groupId>
   <artifactId>relate</artifactId>
   <version><release></version>
 </dependency>
@@ -30,7 +30,7 @@ The artifact is `com.relate:relate` and the package is `com.relate`. The jars ar
 
 ```kotlin title="build.gradle.kts"
 repositories { mavenLocal(); mavenCentral() }
-dependencies { implementation("com.relate:relate:<release>") }
+dependencies { implementation("ai.relatedb:relate:<release>") }
 ```
 
 For a smaller deployable, depend on one classifier jar instead, which carries one platform's engine. Depend on the plain jar or one classifier jar, never both:
@@ -43,7 +43,7 @@ For a smaller deployable, depend on one classifier jar instead, which carries on
 | `linux-x86_64` | Linux x86-64, glibc |
 | `windows-x86_64` | Windows x86-64 |
 
-The names follow the vocabulary of the `os-maven-plugin` build extension for Maven and of `com.google.osdetector` for Gradle. With the extension, `<classifier>${os.detected.classifier}</classifier>` picks the build host's; in a Gradle build that applies `com.google.osdetector`, `"com.relate:relate:<release>:${osdetector.classifier}"` does. A container image built for another platform names its classifier literally. [Project](/docs/reference/project#platforms) lists what each release publishes, and where.
+The names follow the vocabulary of the `os-maven-plugin` build extension for Maven and of `com.google.osdetector` for Gradle. With the extension, `<classifier>${os.detected.classifier}</classifier>` picks the build host's; in a Gradle build that applies `com.google.osdetector`, `"ai.relatedb:relate:<release>:${osdetector.classifier}"` does. A container image built for another platform names its classifier literally. [Project](/docs/reference/project#platforms) lists what each release publishes, and where.
 
 ## Load the native engine
 
@@ -78,8 +78,8 @@ On a read-only home directory or a `noexec` mount, pass `-Drelate.native.cache=<
 `Database` and `Database.Connection` are `AutoCloseable`. Close both, ideally with try-with-resources: until the database and its connections close, a file :term[store]{id=store} cannot be opened again in the same JVM. This program writes `team.rl`, closes it, and reads it back read-only:
 
 ```java run name=open
-import com.relate.ClientException;
-import com.relate.Database;
+import ai.relatedb.ClientException;
+import ai.relatedb.Database;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -125,9 +125,9 @@ A connection serves one thread at a time; its methods are `synchronized`, so con
 `conn.query(statement, params)` takes a `Map<String, ?>`, and each value binds as its natural Cypher type: `Integer` and `Long` as `INTEGER`, `LocalDate` as `DATE`, `VectorValue` as `VECTOR`, a `List` as `LIST`. A Java type outside the supported set throws `IllegalArgumentException` before the statement runs. Cells come back typed in the same way: nodes as the `Node` record, integers as `Long`, dates as `java.time` values.
 
 ```java run name=params
-import com.relate.Database;
-import com.relate.Node;
-import com.relate.VectorValue;
+import ai.relatedb.Database;
+import ai.relatedb.Node;
+import ai.relatedb.VectorValue;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -187,9 +187,9 @@ An element id comes back spelled exactly as `elementId()` returns it, so it roun
 Outside a transaction, each `query` commits on its own. `begin()` opens an explicit transaction on the connection; `commit()` applies its statements together and returns its :term[bookmark]{id=bookmark}, `"relate:<n>"`, or `null` when it wrote nothing, and `rollback()` discards them. A :term[conflict]{id=conflict}, another connection committing a change to the same node first, throws `TransientException` from `commit()`; it is the one exception worth retrying, and a failed commit ends the transaction. This program commits one change, rolls one back, and retries a unit of work that loses a conflict on its first attempt:
 
 ```java run name=transaction
-import com.relate.ClientException;
-import com.relate.Database;
-import com.relate.RelateException;
+import ai.relatedb.ClientException;
+import ai.relatedb.Database;
+import ai.relatedb.RelateException;
 import java.util.function.Consumer;
 
 public class Transactions {
@@ -273,8 +273,8 @@ The retry re-runs the whole unit of work, reads included, because the losing tra
 The Java `Result` has no mutation counters, column types, or timings. To learn how many nodes a write touched, return a count from the statement.
 
 ```java run name=metadata
-import com.relate.Database;
-import com.relate.Notification;
+import ai.relatedb.Database;
+import ai.relatedb.Notification;
 
 public class Metadata {
     static final String TEAM = """
@@ -331,9 +331,9 @@ Every failure the engine reports throws a subclass of `RelateException`, an unch
 Each carries `getCode()` (the Neo4j status code), `getGqlStatus()`, `getStage()` (`COMPILE`, `RUNTIME` or `INTERNAL`) and `isRetryable()`:
 
 ```java run name=errors
-import com.relate.ClientException;
-import com.relate.Database;
-import com.relate.RelateException;
+import ai.relatedb.ClientException;
+import ai.relatedb.Database;
+import ai.relatedb.RelateException;
 import java.util.Map;
 
 public class Errors {
@@ -383,7 +383,7 @@ public class Errors {
 Ask the engine which release the jar loaded:
 
 ```java run name=verify
-import com.relate.Database;
+import ai.relatedb.Database;
 
 public class Verify {
     public static void main(String[] args) {

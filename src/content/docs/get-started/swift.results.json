@@ -1,15 +1,15 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.1.0",
   "cells": {
     "version": {
       "kind": "text",
-      "text": "1.0.1",
+      "text": "1.1.0",
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "af909a4e6ac12916383a6d80f3a054a896cbb1224504f592e69e83d4b888d797"
+      "verified": "1.1.0",
+      "source_sha256": "6dec379e55dc825f3845133505819cd989f35b0a361eeca8311c56f990c078de"
     },
     "open": {
       "kind": "text",
@@ -17,8 +17,8 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "570794635345e53d82032b1f92e73b814c7d4f22a72d2beb6d5a0b5f98feda06"
+      "verified": "1.1.0",
+      "source_sha256": "318b0dac2cc38d5d218a6f9d40ec03da6078e26a4c406877c212afa9bd4c670f"
     },
     "create": {
       "kind": "text",
@@ -26,7 +26,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
+      "verified": "1.1.0",
       "source_sha256": "8a10292a0aa29f455d8c325d81020979c70470f73a1b771a2aa2850dd164cf7c"
     },
     "params": {
@@ -35,8 +35,8 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "b25625e3b970faafc7b641a4ba0341b5505e4bbc606e48ffe84d78de28005954"
+      "verified": "1.1.0",
+      "source_sha256": "03f2afa5b4e67d22b350b9782a36d85c45af258ecb6abc430f65c95e2a8a92db"
     },
     "transaction": {
       "kind": "text",
@@ -44,8 +44,8 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "e47aa0150452d0e57d4cd7a69df21878dcc55b58c57952db550b7f64e61aaa91"
+      "verified": "1.1.0",
+      "source_sha256": "5ada571c6d41506f0b9ba956213460e46aeabb686168cadf2e4ee7c1701d1a8f"
     },
     "metadata": {
       "kind": "text",
@@ -53,17 +53,17 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
+      "verified": "1.1.0",
       "source_sha256": "44835fba383498f1553c720ea28e0940564b8cfb490b4df8e7b59f37dfa32c35"
     },
     "error": {
       "kind": "text",
-      "text": "semantic error: ParameterMissing: Expected parameter(s): name\ngqlStatus: 42N02\ncode: Neo.ClientError.Statement.ParameterMissing\nstage: compile\nretryable: false\nmaintainer",
+      "text": "semantic error: ParameterMissing: Expected parameter(s): name\ngqlStatus: 42N02\ncode: Neo.ClientError.Statement.ParameterMissing\nstage: compile\nretryable: false\nmissing parameter: true\nmaintainer",
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "1b9b348aae8bf3b8aa57641efd5fd22521112d7f9fa0393599d0f4166e498356"
+      "verified": "1.1.0",
+      "source_sha256": "580305e153fc2ee77a7725cec9531d25b2cac4e22de1b312e68a2afcc0a5bf36"
     },
     "program": {
       "kind": "text",
@@ -71,8 +71,8 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "acd198e4dd6f39c03f299089976099d02364f03bb712ea6e17035108b0500a6d"
+      "verified": "1.1.0",
+      "source_sha256": "efce43174b7b981ae63ddd5491fd808903479e2ab749b38b2fd2d1d4512eeb38"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.1.0",
   "cells": {
     "open": {
       "kind": "text",
@@ -8,26 +8,26 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "8834fad409145028e70131580f67aecc3468b1e7030051dc9565e36ea121a817"
+      "verified": "1.1.0",
+      "source_sha256": "88e05878583b937bf4b74b5699200a24024fdecd7e81c6196fdf48310ddf59ce"
     },
     "params": {
       "kind": "text",
-      "text": "'Grace' [\"Person\"] since 2023\n'Ada' [\"Person\"] since 2024\njoined 2025-03-01 date\nfocus vector<FLOAT32>[0.25, 0.5, 1.0]\nby element id: 'Noor'",
+      "text": "Grace [\"Person\"] since 2023\nAda [\"Person\"] since 2024\n[\"Grace 2023\", \"Ada 2024\"]\njoined 2025-03-01 date\nreviewed 2026-01-01T00:00:00+00:00 true\nfocus vector<FLOAT32>[0.25, 0.5, 1.0]\ntags [\"core\", \"docs\"]\nby element id: Noor",
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "5dc46ebb451bb01e89808647db30dcaf54147547cf69b53e291cef630193a7f2"
+      "verified": "1.1.0",
+      "source_sha256": "cd8e0a83b8d1cd9fb67c2b193bbe829b250d96cdb8fc1a9e29f001336f33c980"
     },
     "transaction": {
       "kind": "text",
-      "text": "committed: relate:2\npeople: 3\nattempt 1: write-write conflict\nreviews: 11",
+      "text": "committed: relate:2\nrolled back\nattempts: 2\npeople: 3 reviews: 11",
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "7f0990828f393403d31667921bfb1644a965aff54932256a112b6a4b733024ec"
+      "verified": "1.1.0",
+      "source_sha256": "51d6e6ff319d0cbbf373fb32057b0c6b1e8086440657f9bfe82f6bd6e8f388c3"
     },
     "metadata": {
       "kind": "text",
@@ -35,17 +35,17 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
+      "verified": "1.1.0",
       "source_sha256": "bfdea663daf152e7509492c5ddea546baa2ba34aae49a2c26eb0eb83b778d0ee"
     },
     "errors": {
       "kind": "text",
-      "text": "message: semantic error: ParameterMissing: Expected parameter(s): name\ncode: Neo.ClientError.Statement.ParameterMissing\ngql_status: 42N02 stage: compile retryable: false\ndescription: Relate: [Neo.ClientError.Statement.ParameterMissing] semantic error: ParameterMissing: Expected parameter(s): name\nRelate decoding error: scalar() needs exactly one row and one column, got 1×2\n'maintainer'",
+      "text": "message: semantic error: ParameterMissing: Expected parameter(s): name\ncode: Neo.ClientError.Statement.ParameterMissing\ngql_status: 42N02 stage: compile retryable: false\nmissing parameter: true\ndescription: Relate: [Neo.ClientError.Statement.ParameterMissing] semantic error: ParameterMissing: Expected parameter(s): name\nRelate unexpected result: expected exactly one column, found 2 columns\npath: [\"role\"] expected: Int found: string\nmaintainer",
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "a7d92da44e54805b512798e9ee8df333268c90a26ea969c74be6024333d0c48d"
+      "verified": "1.1.0",
+      "source_sha256": "efc7504c18f18d11166d5b42bbb62cbd16cb434abf51a7f33aaabd2418515147"
     },
     "actor": {
       "kind": "text",
@@ -53,17 +53,26 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "d2bcebc0a621365277e7e3a905f6c57fdf1d08861f00a8b30d0af9d6da4334c9"
+      "verified": "1.1.0",
+      "source_sha256": "00b46401dd21151421ea7070c22030cfcc62769f42cb72562190e5502e5582ed"
     },
     "verify": {
       "kind": "text",
-      "text": "relate 1.0.1",
+      "text": "relate 1.1.0",
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "cede1403de4763c2ce41391f40f392fa40b73a8329a3a9708fc59c401c555264"
+      "verified": "1.1.0",
+      "source_sha256": "602087079d683917b11c3f9848c263e275160295c9d90b5e2869a11bbcd37dba"
+    },
+    "async": {
+      "kind": "text",
+      "text": "relate [\"Ada\", \"Grace\"]\nNoor: lead\nRelate misuse: a write statement ran in a read; nothing it changed is kept — use a write",
+      "table": null,
+      "graph": null,
+      "expectError": false,
+      "verified": "1.1.0",
+      "source_sha256": "74b81804bb6f78b5218f8874882e1fc9d5b99fa58e32e58adc0f5e06eea384d6"
     }
   }
 }

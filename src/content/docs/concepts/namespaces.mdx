@@ -1,41 +1,42 @@
 ---
 title: Namespaces
-description: Why every relate store has the same three fixed namespaces, what each holds, how USE routes a statement, and how an app keeps several graphs.
+description: Why every relate store has the same fixed namespaces, what each holds, how USE routes a statement, and how an app keeps several graphs.
 order: 60
 surfaces: [cypher, cli, python, bolt]
 related: [reference/cypher/differences-from-neo4j, reference/limitations, guides/cypher/ontology, reference/cli/flags, reference/server/bolt, concepts/where-relate-fits, reference/errors#engine-database-not-found]
 ---
 
-Can a relate store hold several databases, the way a Neo4j server does? No: every :term[store]{id=store} has the same three fixed :term[namespaces]{id=namespace}, `neo4j`, `system` and `system_ontologies`, and only `neo4j` holds your graph. There is no `CREATE DATABASE`. A `USE` clause or a session setting routes a statement to one of the three names, and any other name fails before the statement runs. An application that needs several graphs opens several stores, one per graph.
+Can a relate store hold several databases, the way a Neo4j server does? No: every :term[store]{id=store} has the same fixed :term[namespaces]{id=namespace}, `neo4j` and `system`, and only `neo4j` holds your graph. A third name, `system_ontologies`, exists only under the `ontology` preview feature and holds nothing a statement can read. There is no `CREATE DATABASE`. A `USE` clause or a session setting routes a statement to one of those names, and any other name fails before the statement runs. An application that needs several graphs opens several stores, one per graph.
 
 ## Three names, one graph
 
-A Neo4j server hosts many databases and a catalog of them, named `system`. relate runs inside your process and opens one store, so the store is the unit a graph lives in, and its catalog is fixed. It keeps the three names a Neo4j Community Edition 2026.09 server reports, so a tool built for Neo4j that lists databases or opens a `system` session finds the names it expects:
+A Neo4j server hosts many databases and a catalog of them, named `system`. relate runs inside your process and opens one store, so the store is the unit a graph lives in, and its catalog is fixed. It keeps the names a Neo4j Community Edition 2026.09 server reports, so a tool built for Neo4j that lists databases or opens a `system` session finds the names it expects. Two are always there; the third appears only when the process that opens the store sets `RELATE_PREVIEW=ontology`:
 
 | Namespace | Holds | What runs there |
 | --- | --- | --- |
 | `neo4j` | The graph: every node, relationship, index, and constraint | Every statement. The default for every session and the only namespace that holds data |
 | `system` | No graph data | `SHOW` commands, the supported database administration commands, and procedure calls in the shape `CALL`, `YIELD`, `RETURN` |
-| `system_ontologies` | Nothing queryable; listed for compatibility | Only the database administration commands, such as `SHOW DATABASES`, from a session set to it; a `USE system_ontologies` on one fails with [`UseClauseWithAdministrationCommand`](/docs/reference/errors#engine-use-on-administration-command). Every other statement fails, reads included |
+| `system_ontologies` | Nothing queryable. Visible only under `RELATE_PREVIEW=ontology`, where it is listed for compatibility | Under the opt-in: only the database administration commands, such as `SHOW DATABASES`, from a session set to it; a `USE system_ontologies` on one fails with [`UseClauseWithAdministrationCommand`](/docs/reference/errors#engine-use-on-administration-command), and every other statement fails, reads included. Without the opt-in: nothing, because the name is unknown |
 
-The store's :term[ontology]{id=ontology} document, where one is set, belongs to the `neo4j` graph and is read and written with the `db.ontology.*` procedures on `neo4j`, a preview feature ([Use an ontology](/docs/guides/cypher/ontology)). `system_ontologies` gives no view of it.
+The store's :term[ontology]{id=ontology} document, where one is set, belongs to the `neo4j` graph and is read and written with the `db.ontology.*` procedures on `neo4j`, a preview feature ([Use an ontology](/docs/guides/cypher/ontology)). `system_ontologies` gives no view of it. As of relate 1.0.2 the namespace is hidden unless the preview is on; 1.0.1 and earlier listed it on every store.
 
 ```mermaid
 flowchart LR
   accTitle: How a statement reaches a namespace
   accDescr {
     Each statement runs against the session namespace, neo4j unless the session chose another, or against the namespace its USE clause names.
-    neo4j holds the graph; system answers SHOW commands, administration commands and procedure calls; system_ontologies answers only the administration commands, and only from a session set to it.
+    neo4j holds the graph; system answers SHOW commands, administration commands and procedure calls.
+    system_ontologies exists only under RELATE_PREVIEW=ontology, where it answers only the administration commands, and only from a session set to it.
     Any other name fails with Graph not found before the statement runs.
   }
   S["Statement"] --> R{"USE clause or session namespace"}
   R -->|"neo4j (default)"| N["neo4j: the graph"]
   R -->|"system"| Y["system: SHOW, administration, CALL"]
-  R -->|"system_ontologies (session)"| O["system_ontologies: administration only"]
+  R -->|"system_ontologies (session, preview only)"| O["system_ontologies: administration only"]
   R -->|"any other name"| E["Graph not found, nothing runs"]
 ```
 
-`SHOW DATABASES` lists the three rows on every store, with `neo4j` as the default and home namespace:
+`SHOW DATABASES` lists the same rows on every store, with `neo4j` as the default and home namespace. The cells on this page run with no preview feature enabled, so it lists two:
 
 ```cypher run name=show
 SHOW DATABASES YIELD name, type, access, default, home
@@ -68,10 +69,18 @@ The restricted namespaces refuse what they cannot answer. `system` takes no `MAT
 USE system MATCH (n) RETURN count(n) AS n
 ```
 
-and `system_ontologies` refuses every statement except the administration commands:
+Without the `ontology` preview, `system_ontologies` is a name the store does not have. Under `RELATE_PREVIEW=ontology` the same statement fails with `semantic error: SemanticError: This database is not queryable. Use the db.ontology.* procedures on the user database 'neo4j' instead.`:
 
 ```cypher run name=match-ontologies expect=error
 USE system_ontologies MATCH (n) RETURN count(n) AS n
+```
+
+The database administration commands report on `system`, and relate routes them there from any session. Outside `system`, a `SHOW DATABASES` combines only with its own `YIELD` and one closing `RETURN`, as in the first cell on this page. A `WITH`, a `MATCH`, an `UNWIND`, a `UNION` or another `SHOW` command in the same statement makes it fail, as on a Neo4j server. Up to and including relate 1.0.1, these composed forms ran:
+
+```cypher run name=show-composed expect=error
+SHOW DATABASES YIELD name
+WITH name
+RETURN name
 ```
 
 One statement reads one graph. Two different `USE` targets in one statement, across the arms of a `UNION` or inside a `CALL` subquery, fail with `Multiple graphs in the same query not allowed here`: Neo4j allows that only on composite databases, which relate does not have.
@@ -80,7 +89,7 @@ One statement reads one graph. Two different `USE` targets in one statement, acr
 
 In a server, a database is the unit an operator creates, backs up, secures, and moves. In relate those jobs belong to the store, and a store is a directory or a file. Creating one is opening a new path; backing it up is `relate clone`; access control is file permissions, `--read-only`, and the credentials of `relate serve`; moving it is copying it. A second database inside the same store would add a catalog and a second set of every one of those jobs, with nothing gained over a second store.
 
-So relate follows Neo4j Community Edition for database administration and stops there: `SHOW DATABASES`, `SHOW DEFAULT DATABASE`, `SHOW HOME DATABASE` and `ALTER DATABASE … SET DEFAULT LANGUAGE CYPHER 5` or `CYPHER 25` run, and every other database administration command, `CREATE DATABASE` included, fails with `Unsupported administration command: <statement>`.
+So relate follows Neo4j Community Edition for database administration and stops there: `SHOW DATABASES`, `SHOW DEFAULT DATABASE`, `SHOW HOME DATABASE` and `ALTER DATABASE … SET DEFAULT LANGUAGE CYPHER 25` run, and every other administration command, `CREATE DATABASE` and `CREATE USER` included, fails with `Unsupported administration command: <statement>`.
 
 ## Several graphs in one application
 
@@ -122,5 +131,5 @@ The cost is that a cross-graph question is two statements. Neo4j's composite dat
 - [Limitations](/docs/reference/limitations): one graph per statement, and the administration commands that run.
 - [CLI flags](/docs/reference/cli/flags): `--namespace`.
 - [Bolt server](/docs/reference/server/bolt): how a driver's database name selects a namespace.
-- [Use an ontology](/docs/guides/cypher/ontology): the document `system_ontologies` does not expose.
+- [Use an ontology](/docs/guides/cypher/ontology): the document `system_ontologies` does not expose, and the preview that makes the name visible.
 - [Errors](/docs/reference/errors#engine-database-not-found): `Graph not found` and the other namespace errors, with their codes.

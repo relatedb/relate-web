@@ -1,0 +1,175 @@
+---
+title: relate feedback
+description: The relate feedback and relate agent-feedback commands, which run has which, the 30-day grant, the flags, what a report may hold, and the exit codes.
+order: 105
+surfaces: [cli]
+related: [reference/privacy-and-telemetry, reference/cli/agent-mode, reference/cli/telemetry, reference/cli/environment-variables, guides/agents/drive-relate-from-an-agent]
+---
+
+The `relate` CLI has two feedback commands, one for each kind of run, as of relate 1.0.2. `relate feedback` belongs to a run with :term[agent mode]{id=agent-mode} off: it prints a prefilled issue form for the relate repository and opens it in the browser, and it manages the grant that lets agents report. `relate agent-feedback` belongs to a run with agent mode on: it sends one structured report, and only while a person's grant is live. Neither command sends anything on its own decision: a person submits the issue form, and a person makes the grant.
+
+## Synopsis
+
+```text
+relate feedback [TEXT | enable | disable] [--category NAME] [--expected TEXT] [--observed TEXT]
+relate agent-feedback [--category NAME] --expected TEXT --observed TEXT [--command PATH] [--error-code CODE] [--model MODEL] [--request-id UUID]
+```
+
+| Run | Has | The other word |
+| --- | --- | --- |
+| Agent mode off | `relate feedback`, listed by `relate --help` | `relate agent-feedback` is an unknown command, exit code 2 |
+| Agent mode on | `relate agent-feedback`, listed by `relate --help` | `relate feedback` is an unknown command, exit code 2 |
+
+[Agent mode](/docs/reference/cli/agent-mode) is on with `--agent-mode`, with `RELATE_AGENT_MODE=1`, or under a detected agent harness with stdout not a terminal. `relate agent-context` lists both words in every run. Both commands are compiled into every build of the binary.
+
+## relate feedback
+
+| Form | Does | Prints on stdout |
+| --- | --- | --- |
+| `relate feedback <text>` | Builds a new-issue URL for `github.com/relatedb/relate` from the text and opens it in the default browser. The command makes no request; the issue exists only after the form is submitted in the browser. | The URL |
+| `relate feedback` | Prints the state of the grant, then the usage line | `feedback enabled until <time> (<destination>)`, or `feedback disabled (<reason>)` |
+| `relate feedback enable` | Records a grant: agents may send reports for 30 days. Requires a terminal. | `feedback enabled until <time>: agent reports go to <destination> for 30 days` |
+| `relate feedback disable` | Clears the grant | `feedback disabled` |
+
+A text of more than one line gives its first line as the issue title and the rest as the body. A text of one line is the body, and the title is its first 80 characters, cut back to a space. `enable` and `disable` are always actions: a report whose text is one of those words is passed with `--observed`.
+
+<Flags command="feedback" />
+
+`--category` prefixes the issue title as `[<name>]`.
+
+The `<reason>` of a disabled grant is one of:
+
+| Reason | Meaning |
+| --- | --- |
+| `DO_NOT_TRACK`, `RELATE_TELEMETRY` or `config file` | Usage metrics are off, and that layer decided it ([the layers](/docs/reference/cli/telemetry#which-layer-decides)). No report is sent while they are off, grant or not |
+| `not enabled` | No grant was ever recorded |
+| `declined` | A person answered no when asked |
+| `authorization expired` | The 30 days ran out |
+
+## The grant
+
+A grant is a person's decision, so `relate feedback enable` runs only on a terminal. It names the destination the reports go to, then writes the grant to the `feedback` object of `config.json` in the config directory, [the file `relate telemetry` writes](/docs/reference/cli/telemetry#where-the-setting-lives). A grant lasts 30 days.
+
+The CLI also asks for the grant itself, in one line on a terminal with yes as the default answer:
+
+| When | How often |
+| --- | --- |
+| The first `relate feedback` with no argument that finds no grant and no recorded answer | Once per install |
+| `relate skill install` and `relate upgrade`, as of relate 1.1.0 | Once per 30 days, while no grant is live |
+
+An empty answer, `y` or `yes` records the grant. Any other answer records a decline. With usage metrics off, the CLI never asks.
+
+## relate agent-feedback
+
+`relate agent-feedback` sends one report under the grant and never prompts. Without a live grant it refuses, with :term[exit code]{id=exit-code} 1 and `not_enabled` in the message. With a grant it prints one JSON document on stdout that states the outcome.
+
+<Flags command="agent-feedback" />
+
+The outcome document holds these keys:
+
+| Key | Holds |
+| --- | --- |
+| `outcome` | `sent`, `skipped`, `rejected`, `failed` or `unknown` |
+| `reason` | Why, in one word |
+| `request_id`, `report_id` | The ids of the request and of the report |
+| `elapsed_ms` | The time the send took |
+| `violations` | The rules a rejected report broke |
+| `dropped_fields` | The flags whose values were dropped |
+| `payload` | What was sent; present only when `outcome` is `sent` |
+| `receipt_path` | The local receipts file |
+
+### What a report may hold
+
+`--expected` and `--observed` are free text, and the CLI checks them before anything is sent. A report that holds any of the following is rejected whole, and its text is not recorded:
+
+- A URL, an email address, a host name or an IP address.
+- A file path or the name of a data file.
+- A secret.
+- Cypher, or pasted output.
+
+A link to these docs or to the relate repository by path (`relatedb.ai/<path>`, `github.com/relatedb/relate/<path>`), or to the Neo4j Cypher manual (`neo4j.com/docs/`), is allowed. Beside the flags' values, a sent report holds a schema version, the CLI version, the operating system and architecture, what invoked the run (`agent`, `script` or `human`) and the agent harness's label; the flags cannot set those. Every rejection and every send appends one line to `feedback-receipts.jsonl` in the config directory.
+
+With usage metrics off, a report under a live grant is not sent: the outcome is `skipped`, with exit code 0. [Privacy and telemetry](/docs/reference/privacy-and-telemetry#feedback-reports) lists the destination and every way to stop a report.
+
+## The hint line
+
+As of relate 1.1.0, a run with agent mode on that fails prints one more line on stderr, once, after its error:
+
+```text
+hint: agents can report Relate friction to its developers — draft it, ask the person, then run 'relate agent-feedback'
+```
+
+A run with agent mode off never prints it. The line is on stderr, so the error object on stdout is unchanged.
+
+## Errors and exit codes
+
+| Command | Exit code | When | Message on stderr |
+| --- | --- | --- | --- |
+| Either | [0](/docs/reference/cli/exit-codes-and-errors#exit-0) | An issue URL was printed, a state was printed, a grant was recorded or cleared, or a report ended `sent` or `skipped` | None |
+| `feedback` | [1](/docs/reference/cli/exit-codes-and-errors#exit-1) | `enable` without a terminal | `Error: feedback enable: refusing a terminal is required: the grant is a person's decision, not a script's` |
+| `agent-feedback` | 1 | No live grant | `Error: agent feedback is not enabled (not_enabled): the grant is a person's, made at a terminal with 'relate feedback enable' (30 days per grant), or answered at the install/upgrade ask` |
+| `agent-feedback` | 1 | A report ended `rejected`, `failed` or `unknown` | None; the outcome document on stdout says why |
+| `feedback` | [2](/docs/reference/cli/exit-codes-and-errors#exit-2) | An unknown category | `Error: '<name>' is not a category; use one of friction, unclear_error, unexpected_behavior, missing_capability` |
+| `feedback` | 2 | The text given twice | `Error: feedback takes the text either as its argument or with --observed, not both` |
+| `agent-feedback` | 2 | A required flag is missing | `Error: agent-feedback requires --expected` |
+| `feedback` | 2 | The word in a run with agent mode on | `Error: unknown command: feedback. this run's feedback surface is 'relate agent-feedback'; the grant is managed by a person at a terminal ('relate feedback enable')` |
+| `agent-feedback` | 2 | The word in a run with agent mode off | `Error: unknown command: agent-feedback. the person's feedback surface is 'relate feedback'; the agent surface is 'relate agent-feedback', and the grant is managed by a person at a terminal ('relate feedback enable')` |
+
+## Examples
+
+These examples run with `DO_NOT_TRACK=1` set, in a fresh home directory, so no command here sends anything or opens a browser. With usage metrics off, the state names the layer that turned them off:
+
+```bash verify
+relate feedback
+```
+
+```text
+feedback disabled (DO_NOT_TRACK)
+Usage: relate feedback [TEXT | enable | disable] [--category NAME] [--expected TEXT] [--observed TEXT]
+```
+
+`enable` refuses when stdin is not a terminal, and `disable` clears a grant whether or not one exists:
+
+```bash verify
+relate feedback enable < /dev/null
+echo "exit=$?"
+relate feedback disable
+```
+
+```text
+Error: feedback enable: refusing a terminal is required: the grant is a person's decision, not a script's
+exit=1
+feedback disabled
+```
+
+With agent mode on, the agent's command exists and refuses without a grant. The hint line follows the error:
+
+```bash verify
+RELATE_AGENT_MODE=1 relate agent-feedback --expected "the version" --observed "it printed help" --command info
+echo "exit=$?"
+```
+
+```text
+Error: agent feedback is not enabled (not_enabled): the grant is a person's, made at a terminal with 'relate feedback enable' (30 days per grant), or answered at the install/upgrade ask
+hint: agents can report Relate friction to its developers — draft it, ask the person, then run 'relate agent-feedback'
+exit=1
+```
+
+Each run has one of the two words. The other is an unknown command that names the right one:
+
+```bash verify
+relate agent-feedback --expected "the version" --observed "it printed help"
+echo "exit=$?"
+```
+
+```text
+Error: unknown command: agent-feedback. the person's feedback surface is 'relate feedback'; the agent surface is 'relate agent-feedback', and the grant is managed by a person at a terminal ('relate feedback enable')
+exit=2
+```
+
+## See also
+
+- [Privacy and telemetry](/docs/reference/privacy-and-telemetry): what the CLI sends, where, and every way to turn it off
+- [Agent mode](/docs/reference/cli/agent-mode): what turns agent mode on, and what else it changes
+- [`relate telemetry`](/docs/reference/cli/telemetry): the usage metrics setting that also stops feedback reports
+- [Environment variables](/docs/reference/cli/environment-variables): `RELATE_FEEDBACK_ENDPOINT` and `RELATE_FEEDBACK_TOKEN`, for development and testing

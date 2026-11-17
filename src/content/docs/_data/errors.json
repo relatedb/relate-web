@@ -1,6 +1,6 @@
 {
   "$schema_note": "Every error an agent can meet, for /docs/reference/errors and explain_error (DOCS-PLAN.md §2, §8 check 3d). `id` is a stable anchor (#<id>); renaming one needs a redirect. `message` is quoted character for character, from the binary where `recorded` holds a run of it (replayed by `npm run docs:cli-check`; see cli.json `recording`), otherwise from upstream; `<name>` marks a variable part and `…` an elision. null means the sources do not say. `verify` marks what the release binary cannot show.",
-  "verified": "1.0.1",
+  "verified": "1.1.0",
   "upstream": {
     "repo": "relatedb/relate",
     "commit": "5e77ee6706821065804a9b77eb66ffd2985d1ac4",
@@ -269,7 +269,7 @@
       "gql_status": null,
       "neo4j_code": "Neo.ClientError.General.TransactionOutOfMemoryError",
       "message": "capacity exceeded: used=… limit=…",
-      "cause": "A memory or capacity limit refused the work: the `--logical-graph-size-limit` cap, the per-allocation expression cap, or the 64 MiB per-record WAL payload cap.",
+      "cause": "A memory or capacity limit refused the work: the `--logical-graph-size-limit` cap, the per-allocation expression cap, or the 64 MiB per-commit WAL payload cap.",
       "remedy": "Raise the named limit, or commit the data in smaller transactions.",
       "python_class": "DataError",
       "http_status": 507,
@@ -619,13 +619,13 @@
       "gql_status": null,
       "neo4j_code": null,
       "message": "Error: invalid --namespace: unknown namespace '<name>' (expected neo4j, system or system_ontologies)",
-      "cause": "`--namespace` names something other than the three fixed namespaces.",
-      "remedy": "Use `neo4j`, `system` or `system_ontologies`.",
+      "cause": "`--namespace` names something other than `neo4j`, `system` and `system_ontologies`.",
+      "remedy": "Use `neo4j` or `system`. The flag accepts `system_ontologies` too, but the namespace exists only with `RELATE_PREVIEW=ontology` set.",
       "python_class": null,
       "http_status": null,
       "sources": [
         "docs/api/cli/spec.md § Query-engine flags",
-        "relate 1.0.0 (b02f283), release build"
+        "relate 1.1.0 (f529cbb), release build"
       ],
       "recorded": {
         "command": "relate --namespace graph \"RETURN 1 AS ok\"",
@@ -1290,20 +1290,20 @@
       "retryable": null,
       "gql_status": null,
       "neo4j_code": null,
-      "message": "warning: result truncated to 100 rows (the statement returned 250); pass --max-rows 0 for all rows",
+      "message": "warning: result truncated to 100 rows (the statement returned 250); pass --max-rows 0 for all rows, or page with SKIP/LIMIT",
       "cause": "Not an error. The row cap cut the printed rows (100 by default under a detected agent harness with stdout not a terminal). The counts in the message vary.",
-      "remedy": "Pass `--max-rows 0` for all rows, or bound the work with `LIMIT`.",
+      "remedy": "Pass `--max-rows 0` for all rows, page through the result with `SKIP` and `LIMIT`, or bound the work with `LIMIT` or an aggregate.",
       "python_class": null,
       "http_status": null,
       "sources": [
         "docs/api/cli/spec.md § Row cap",
-        "relate 1.0.0 (b02f283), release build"
+        "relate 1.1.0 (f529cbb), release build"
       ],
       "severity": "warning",
       "recorded": {
         "command": "CLAUDECODE=1 relate --mode envelope \"UNWIND range(1, 250) AS x RETURN x\"",
-        "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"x\"],\"notifications\":[],\"planCache\":\"miss\",\"rowCap\":{\"kept\":100,\"total\":250},\"rows\":[{\"x\":1},{\"x\":2},{\"x\":3},{\"x\":4},{\"x\":5},{\"x\":6},{\"x\":7},{\"x\":8},{\"x\":9},{\"x\":10},{\"x\":11},{\"x\":12},{\"x\":13},{\"x\":14},{\"x\":15},{\"x\":16},{\"x\":17},{\"x\":18},{\"x\":19},{\"x\":20},{\"x\":21},{\"x\":22},{\"x\":23},{\"x\":24},{\"x\":25},{\"x\":26},{\"x\":27},{\"x\":28},{\"x\":29},{\"x\":30},{\"x\":31},{\"x\":32},{\"x\":33},{\"x\":34},{\"x\":35},{\"x\":36},{\"x\":37},{\"x\":38},{\"x\":39},{\"x\":40},{\"x\":41},{\"x\":42},{\"x\":43},{\"x\":44},{\"x\":45},{\"x\":46},{\"x\":47},{\"x\":48},{\"x\":49},{\"x\":50},{\"x\":51},{\"x\":52},{\"x\":53},{\"x\":54},{\"x\":55},{\"x\":56},{\"x\":57},{\"x\":58},{\"x\":59},{\"x\":60},{\"x\":61},{\"x\":62},{\"x\":63},{\"x\":64},{\"x\":65},{\"x\":66},{\"x\":67},{\"x\":68},{\"x\":69},{\"x\":70},{\"x\":71},{\"x\":72},{\"x\":73},{\"x\":74},{\"x\":75},{\"x\":76},{\"x\":77},{\"x\":78},{\"x\":79},{\"x\":80},{\"x\":81},{\"x\":82},{\"x\":83},{\"x\":84},{\"x\":85},{\"x\":86},{\"x\":87},{\"x\":88},{\"x\":89},{\"x\":90},{\"x\":91},{\"x\":92},{\"x\":93},{\"x\":94},{\"x\":95},{\"x\":96},{\"x\":97},{\"x\":98},{\"x\":99},{\"x\":100}],\"timings\":{\"elapsed_ms\":0.40641700000000003,\"execute_ms\":0.27999999999999997,\"lex_parse_ms\":0.019542,\"lower_ms\":0.028166,\"parse_ms\":0.076416,\"plan_ms\":0.042833,\"result_generation_ms\":0.001041,\"rewrite_ms\":0.006625},\"truncated\":true}\n",
-        "stderr": "warning: result truncated to 100 rows (the statement returned 250); pass --max-rows 0 for all rows\n",
+        "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"x\"],\"notifications\":[],\"planCache\":\"miss\",\"rowCap\":{\"kept\":100,\"total\":250},\"rows\":[{\"x\":1},{\"x\":2},{\"x\":3},{\"x\":4},{\"x\":5},{\"x\":6},{\"x\":7},{\"x\":8},{\"x\":9},{\"x\":10},{\"x\":11},{\"x\":12},{\"x\":13},{\"x\":14},{\"x\":15},{\"x\":16},{\"x\":17},{\"x\":18},{\"x\":19},{\"x\":20},{\"x\":21},{\"x\":22},{\"x\":23},{\"x\":24},{\"x\":25},{\"x\":26},{\"x\":27},{\"x\":28},{\"x\":29},{\"x\":30},{\"x\":31},{\"x\":32},{\"x\":33},{\"x\":34},{\"x\":35},{\"x\":36},{\"x\":37},{\"x\":38},{\"x\":39},{\"x\":40},{\"x\":41},{\"x\":42},{\"x\":43},{\"x\":44},{\"x\":45},{\"x\":46},{\"x\":47},{\"x\":48},{\"x\":49},{\"x\":50},{\"x\":51},{\"x\":52},{\"x\":53},{\"x\":54},{\"x\":55},{\"x\":56},{\"x\":57},{\"x\":58},{\"x\":59},{\"x\":60},{\"x\":61},{\"x\":62},{\"x\":63},{\"x\":64},{\"x\":65},{\"x\":66},{\"x\":67},{\"x\":68},{\"x\":69},{\"x\":70},{\"x\":71},{\"x\":72},{\"x\":73},{\"x\":74},{\"x\":75},{\"x\":76},{\"x\":77},{\"x\":78},{\"x\":79},{\"x\":80},{\"x\":81},{\"x\":82},{\"x\":83},{\"x\":84},{\"x\":85},{\"x\":86},{\"x\":87},{\"x\":88},{\"x\":89},{\"x\":90},{\"x\":91},{\"x\":92},{\"x\":93},{\"x\":94},{\"x\":95},{\"x\":96},{\"x\":97},{\"x\":98},{\"x\":99},{\"x\":100}],\"timings\":{\"elapsed_ms\":0.45175,\"execute_ms\":0.306375,\"lex_parse_ms\":0.024666999999999998,\"lower_ms\":0.038792,\"parse_ms\":0.096667,\"plan_ms\":0.041791,\"result_generation_ms\":0.0011250000000000001,\"rewrite_ms\":0.006834},\"truncated\":true}\n",
+        "stderr": "warning: result truncated to 100 rows (the statement returned 250); pass --max-rows 0 for all rows, or page with SKIP/LIMIT\n",
         "exit": 0
       }
     },
@@ -2499,8 +2499,8 @@
       "gql_status": "42N00",
       "neo4j_code": "Neo.ClientError.Database.DatabaseNotFound",
       "message": "semantic error: DatabaseNotFound: Graph not found: <name>",
-      "cause": "A session namespace or a `USE` target is not one of `neo4j`, `system`, `system_ontologies`.",
-      "remedy": "Use one of the three fixed namespaces.",
+      "cause": "A session namespace or a `USE` target is not a namespace of the store: `neo4j`, `system` and, only with `RELATE_PREVIEW=ontology` set, `system_ontologies`.",
+      "remedy": "Use `neo4j` or `system`.",
       "python_class": "OperationalError",
       "http_status": 404,
       "note": "Bolt sends the live Community Edition wire status 42001 with a 42N00 cause.",
@@ -2512,7 +2512,7 @@
         "docs/api/c/spec.md",
         "docs/limitations.md",
         "surfaces/relate-cli/src/errors.rs",
-        "relate 1.0.0 (b02f283), release build"
+        "relate 1.1.0 (f529cbb), release build"
       ],
       "recorded": {
         "command": "relate --mode envelope \"USE archive RETURN 1 AS x\"",
@@ -2651,22 +2651,22 @@
       "retryable": false,
       "gql_status": null,
       "neo4j_code": "Neo.ClientError.General.TransactionOutOfMemoryError",
-      "message": "This statement tried to commit a single WAL record of at least <used>. This is a safety limit protecting against memory exhaustion — the per-record WAL payload cap is <limit>; commit the data in smaller transactions.",
-      "cause": "A single commit record is over the 64 MiB per-record WAL payload cap; nothing is written.",
-      "remedy": "Commit the data in smaller transactions.",
+      "message": "This statement tried to commit a single WAL record of at least <used>. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is <limit> (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).",
+      "cause": "One commit is over the 64 MiB per-commit WAL payload cap; nothing is written.",
+      "remedy": "Commit the data in smaller transactions: `CALL { … } IN TRANSACTIONS OF <n> ROWS`, or batches sent by the client.",
       "python_class": "DataError",
       "http_status": 507,
       "sources": [
         "docs/api/rust/errors.md",
         "docs/api/python/spec.md",
         "docs/api/bolt/spec.md",
-        "relate 1.0.0 (b02f283), release build"
+        "relate 1.1.0 (f529cbb), release build"
       ],
-      "note": "The message writes the 64 MiB (67,108,864-byte) cap as `64 MB`.",
+      "note": "Up to and including 1.0.1 the message wrote the 64 MiB (67,108,864-byte) cap as `64 MB`, called it the per-record cap, and named no remedy beyond smaller transactions.",
       "recorded": {
         "command": "relate --mode envelope \"WITH reduce(s = 'a', i IN range(1, 26) | s + s) AS s CREATE (:Blob {s: s})\"",
-        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"capacity\",\"message\":\"This statement tried to commit a single WAL record of at least 64 MB. This is a safety limit protecting against memory exhaustion — the per-record WAL payload cap is 64 MB; commit the data in smaller transactions.\",\"retryable\":false}}\n",
-        "stderr": "This statement tried to commit a single WAL record of at least 64 MB. This is a safety limit protecting against memory exhaustion — the per-record WAL payload cap is 64 MB; commit the data in smaller transactions.\n",
+        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"capacity\",\"message\":\"This statement tried to commit a single WAL record of at least 64 MiB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 64 MiB (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).\",\"retryable\":false}}\n",
+        "stderr": "This statement tried to commit a single WAL record of at least 64 MiB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 64 MiB (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).\n",
         "exit": 1
       }
     },
@@ -2730,7 +2730,7 @@
       "gql_status": "42N17",
       "neo4j_code": null,
       "message": "This database is not queryable. Use the db.ontology.* procedures on the user database 'neo4j' instead.",
-      "cause": "A statement other than an administration command was routed to `system_ontologies`, reads included.",
+      "cause": "With `RELATE_PREVIEW=ontology` set, a statement other than an administration command was routed to `system_ontologies`, reads included. Without the opt-in the namespace is unknown and the statement fails with `Graph not found: system_ontologies` instead.",
       "remedy": "Run `CALL db.ontology.get()` on `neo4j` with `RELATE_PREVIEW=ontology` set.",
       "python_class": "OperationalError",
       "http_status": null,
@@ -2740,14 +2740,15 @@
         "surfaces/relate-cli/src/skill/bundle/SKILL.md",
         "docs/limitations.md",
         "docs/api/c/spec.md",
-        "relate 1.0.0 (b02f283), release build"
+        "relate 1.1.0 (f529cbb), release build"
       ],
       "recorded": {
-        "command": "relate --mode envelope --namespace system_ontologies \"MATCH (n) RETURN n LIMIT 1\"",
+        "command": "RELATE_PREVIEW=ontology relate --mode envelope --namespace system_ontologies \"MATCH (n) RETURN n LIMIT 1\"",
         "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"semantic\",\"message\":\"semantic error: SemanticError: This database is not queryable. Use the db.ontology.* procedures on the user database 'neo4j' instead.\",\"retryable\":false}}\n",
         "stderr": "semantic error: SemanticError: This database is not queryable. Use the db.ontology.* procedures on the user database 'neo4j' instead.\n",
         "exit": 6
-      }
+      },
+      "note": "As of 1.0.2 the namespace is visible only with `RELATE_PREVIEW=ontology`; earlier releases listed it in every store."
     },
     {
       "id": "engine-system-ontologies-write",
@@ -2777,20 +2778,72 @@
       "gql_status": "51N27",
       "neo4j_code": null,
       "message": "Unsupported administration command: <statement>",
-      "cause": "A database administration command beyond `SHOW DATABASE[S]`, `SHOW DEFAULT/HOME DATABASE` and `ALTER DATABASE … SET DEFAULT LANGUAGE CYPHER 5|25`.",
-      "remedy": "A store has three fixed namespaces; there is nothing to create, drop or alias.",
+      "cause": "A database administration command beyond `SHOW DATABASE[S]`, `SHOW DEFAULT/HOME DATABASE` and `ALTER DATABASE … SET DEFAULT LANGUAGE CYPHER 25`, or a user, role or privilege command such as `CREATE USER`.",
+      "remedy": "A store's namespaces are fixed, and it has no users or roles; there is nothing to create, drop, alias or grant.",
       "python_class": "NotSupportedError",
       "http_status": 400,
       "sources": [
         "docs/limitations.md",
         "docs/api/http/spec.md",
         "docs/api/python/spec.md",
-        "relate 1.0.0 (b02f283), release build"
+        "relate 1.1.0 (f529cbb), release build"
       ],
       "recorded": {
         "command": "relate --mode envelope --namespace system \"CREATE DATABASE archive\"",
         "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"semantic\",\"message\":\"semantic error: UnsupportedAdministrationCommand: Unsupported administration command: CREATE DATABASE archive\",\"retryable\":false}}\n",
         "stderr": "semantic error: UnsupportedAdministrationCommand: Unsupported administration command: CREATE DATABASE archive\n",
+        "exit": 6
+      }
+    },
+    {
+      "id": "engine-unsupported-cypher-version",
+      "surface": "engine",
+      "code": "validation_error",
+      "kind": "syntax",
+      "exit_code": 6,
+      "retryable": false,
+      "gql_status": null,
+      "neo4j_code": null,
+      "message": "UnsupportedCypherVersion: <n> is not a valid option for cypher version. Valid options are: 25",
+      "cause": "A `CYPHER <n>` prefix other than `CYPHER 25`, `CYPHER 5` included. As of relate 1.0.2, Cypher 25 is the only version.",
+      "remedy": "Remove the prefix, or write `CYPHER 25`. A statement without a prefix runs as Cypher 25.",
+      "python_class": null,
+      "http_status": null,
+      "note": "`ALTER DATABASE <namespace> SET DEFAULT LANGUAGE CYPHER <n>` fails with the same message as a semantic error, kind `semantic`.",
+      "sources": [
+        "docs/reference/cypher-syntax.md",
+        "docs/api/cli/spec.md",
+        "relate 1.1.0 (f529cbb), release build"
+      ],
+      "recorded": {
+        "command": "relate --mode envelope \"CYPHER 5 RETURN 1 AS one\"",
+        "stdout": "{\"error\":{\"code\":\"validation_error\",\"column\":8,\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: UnsupportedCypherVersion: 5 is not a valid option for cypher version. Valid options are: 25   CYPHER 5 RETURN 1 AS one          ^\",\"retryable\":false,\"source\":\"CYPHER 5 RETURN 1 AS one\"}}\n",
+        "stderr": "syntax error: parse error: UnsupportedCypherVersion: 5 is not a valid option for cypher version. Valid options are: 25\n  CYPHER 5 RETURN 1 AS one\n         ^\n",
+        "exit": 6
+      }
+    },
+    {
+      "id": "engine-system-database-required",
+      "surface": "engine",
+      "code": "validation_error",
+      "kind": "semantic",
+      "exit_code": 6,
+      "retryable": false,
+      "gql_status": null,
+      "neo4j_code": null,
+      "message": "SystemDatabaseRequired: This is an administration command and it should be executed against the system database: SHOW DATABASES",
+      "cause": "Outside `system`, a `SHOW DATABASES` is combined with more than its own `YIELD` and one closing `RETURN`, such as a `WITH` or a `MATCH`. As of relate 1.0.2.",
+      "remedy": "Run the statement with `--namespace system`, or keep it to `SHOW DATABASES YIELD … RETURN …`.",
+      "python_class": null,
+      "http_status": null,
+      "sources": [
+        "docs/limitations.md",
+        "relate 1.1.0 (f529cbb), release build"
+      ],
+      "recorded": {
+        "command": "relate --mode envelope \"SHOW DATABASES YIELD name WITH name RETURN name\"",
+        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"semantic\",\"message\":\"semantic error: SystemDatabaseRequired: This is an administration command and it should be executed against the system database: SHOW DATABASES\",\"retryable\":false}}\n",
+        "stderr": "semantic error: SystemDatabaseRequired: This is an administration command and it should be executed against the system database: SHOW DATABASES\n",
         "exit": 6
       }
     },
@@ -4140,7 +4193,7 @@
       "recorded": {
         "command": "printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"check\",\"version\":\"0\"}}}' '{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}' '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"write_cypher\",\"arguments\":{\"query\":\"CREATE (:B)\"}}}' | relate serve --mcp stdio --database ./graph.rl --read-only",
         "setup": "relate --database ./graph.rl \"CREATE (:A)\"",
-        "stdout": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"capabilities\":{\"tools\":{}},\"protocolVersion\":\"2025-06-18\",\"serverInfo\":{\"name\":\"relate-mcp\",\"version\":\"1.0.1\"}}}\n{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"text\":\"unknown tool 'write_cypher'\",\"type\":\"text\"}],\"isError\":true}}\n",
+        "stdout": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"capabilities\":{\"tools\":{}},\"protocolVersion\":\"2025-06-18\",\"serverInfo\":{\"name\":\"relate-mcp\",\"version\":\"1.1.0\"}}}\n{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"text\":\"unknown tool 'write_cypher'\",\"type\":\"text\"}],\"isError\":true}}\n",
         "stderr": "serve: opened the store read-only — no writer lease and never creates the store; every write fails\nserve: MCP (stdio) serving on stdin/stdout (auth: none)\nserve: stdin closed, shutting down\n",
         "exit": 0
       }
@@ -5223,5 +5276,5 @@
       "engine-unsupported-administration-command"
     ]
   },
-  "recorded_with": "relate 1.0.1 (ef436ce), release build"
+  "recorded_with": "relate 1.1.0 (f529cbb), release build"
 }

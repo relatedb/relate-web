@@ -121,6 +121,16 @@ A selector keeps some of the paths between each pair of end nodes; a mode restri
 | `TRAIL` | A relationship |
 | `ACYCLIC` | A node, so it never returns to its start |
 
+A condition on the path, such as `length(p) >= 3` or a test of the relationship variable, is applied at one of two points:
+
+| Where the condition sits | Applied |
+| --- | --- |
+| In the `WHERE` of the `MATCH` clause, after a pattern under `ANY SHORTEST`, `ALL SHORTEST`, `SHORTEST <k>` or `SHORTEST <k> GROUPS` | After the selector. A selected path that fails it is dropped, and no longer path takes its place |
+| In the `WHERE` of the `MATCH` clause, after `shortestPath(…)` or `allShortestPaths(…)` | During the search, which returns the shortest path that passes |
+| Inside the pattern, as in `((a)-[r]-+(b) WHERE size(r) >= 3)`, or as a property map on the relationship | During the search, under every selector |
+
+Up to and including relate 1.0.1, the first row's condition was applied during the search for a variable-length pattern (`-[*]-`) under `ANY SHORTEST`, `ALL SHORTEST`, `SHORTEST 1` and `SHORTEST 1 GROUPS`, so a longer path that passed was returned.
+
 `shortestPath(<pattern>)` and `allShortestPaths(<pattern>)` are the older forms. In `MATCH p = shortestPath(…)` with no upper bound, the search has no hop cap. As an expression, `shortestPath(…)` with no upper bound finds paths of up to 32 hops and returns `null` for a longer one. Outside a `MATCH`, both end nodes must be variables bound earlier: `(a)-[:NEXT*]->(:Stop)` fails with `syntax error: InvalidPatternCharacter: A shortestPath(...) requires bound nodes when not part of a MATCH clause.`, and a property map on the relationship, `[:NEXT* {w: 1}]`, fails with `syntax error: InvalidPatternCharacter: unsupported use of properties: properties are not supported in the shortestPath() function`.
 
 ## Path variables
@@ -258,6 +268,22 @@ RETURN p, length(p) AS hops, collect(g) AS people
 ```
 
 Only a column of type `PATH` is highlighted: `people` is a list of paths too, and stays dimmed. Without a `PATH` column, every path in the rows is highlighted. Every graph view with a path in its result has the Highlight path button; these two cells start with it on.
+
+A `WHERE` after the pattern filters what a selector kept. `ANY SHORTEST` keeps the two-hop route, the condition drops it, and no row is left:
+
+```cypher run name=shortest-where
+MATCH p = ANY SHORTEST (:Person {name: 'Noor'})-[*]-(:Person {name: 'Grace'})
+WHERE length(p) >= 3
+RETURN [n IN nodes(p) | n.name] AS route, length(p) AS hops
+```
+
+After `shortestPath`, the same condition is part of the search, which returns the three-hop route:
+
+```cypher run name=shortest-path-where
+MATCH p = shortestPath((:Person {name: 'Noor'})-[*]-(:Person {name: 'Grace'}))
+WHERE length(p) >= 3
+RETURN [n IN nodes(p) | n.name] AS route, length(p) AS hops
+```
 
 `TRAIL` allows a path back to Ada around the Ada, Grace and relate triangle; `ACYCLIC` does not:
 

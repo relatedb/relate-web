@@ -90,7 +90,7 @@ A few rules decide what lands:
 - `content` is present only when the whole file fits in `--max-content-bytes` and its first 8 KiB hold no zero byte and are valid UTF-8. When bytes after the first 8 KiB are not valid UTF-8, `content` holds the text up to the first invalid byte. For other files the :term[property]{id=property} is absent, not null.
 - Symbolic links are never followed, and sockets, FIFOs, and device files are skipped.
 - Every :term[node]{id=node} is merged on `path`, so importing the same tree again leaves the counts unchanged. A file deleted since the last run keeps its node; import into a new store to drop it.
-- The whole import is one transaction. A failure rolls it back, and the store holds nothing from that run.
+- Each batch of rows commits on its own, as of fs-to-graph 0.14.0. A failed run can leave its earlier batches committed; running the same command again completes the import, because every node is merged on `path`. Up to 0.13.0 the whole import was one transaction, and a tree whose text went past 64 MiB failed at the commit with nothing written.
 
 ## Query the graph
 
@@ -177,8 +177,6 @@ relate --database ./tree.rl --read-only --mode table "MATCH (n) RETURN labels(n)
 The counts match the run's summary line: 4 files and 3 folders.
 
 ## If it goes wrong
-
-**`Error: This statement tried to commit a single WAL record of at least 64 MB. This is a safety limit protecting against memory exhaustion — the per-record WAL payload cap is 64 MB; commit the data in smaller transactions.`** (exit code 1). The import is one transaction, and the file text it writes went past the 64 MB limit on one write-ahead log record. Nothing from the run is committed. Store less text with a lower `--max-content-bytes` (or `0`), or leave out large folders with `--ignore-patterns`.
 
 **`Error: the extension child exited with 1: not a directory: team/README.md`** (exit code 1). `DIR` must be a folder.
 

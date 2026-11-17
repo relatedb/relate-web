@@ -20,9 +20,9 @@ relate serve --database PATH --http PORT [--host HOST] [--auth USER:PASSWORD] [-
 | Bind | `127.0.0.1:PORT`; `--host` changes the address, with no TLS on any address |
 | Statement route | `POST /db/<name>/query/v2`: one auto-commit statement |
 | Transaction routes | `POST /db/<name>/query/v2/tx` and the routes under it |
-| `<name>` | A :term[namespace]{id=namespace}: `neo4j`, `system` or `system_ontologies` |
+| `<name>` | A :term[namespace]{id=namespace}: `neo4j` or `system`, or `system_ontologies` when the server runs with `RELATE_PREVIEW=ontology` |
 | Authentication | HTTP Basic on every route but `GET /` and `OPTIONS`, from one credential shared with the other `relate serve` surfaces |
-| Request types | `application/json` (plain parameters) and `application/vnd.neo4j.query.v1.2` (typed parameters) |
+| Request types | `application/json` (plain parameters), and `application/vnd.neo4j.query` or a versioned form of it such as `application/vnd.neo4j.query.v1.2` (typed parameters) |
 | Response types | `application/json` (plain values) or `application/vnd.neo4j.query` (typed values), chosen by `Accept` |
 | Flags | On [relate serve](/docs/reference/cli/serve) and in [CLI flags](/docs/reference/cli/flags#serve-http) |
 
@@ -48,7 +48,7 @@ curl -s http://127.0.0.1:8851/
 ```
 
 ```json
-{"query":"http://127.0.0.1:8851/db/{databaseName}/query/v2","transaction":"http://127.0.0.1:8851/db/{databaseName}/query/v2/tx","neo4j_version":"1.0.1","neo4j_edition":"community","auth_config":{"oidc_providers":[]},"bolt_direct":"bolt://127.0.0.1:8852"}
+{"query":"http://127.0.0.1:8851/db/{databaseName}/query/v2","transaction":"http://127.0.0.1:8851/db/{databaseName}/query/v2/tx","neo4j_version":"1.1.0","neo4j_edition":"community","auth_config":{"oidc_providers":[]},"bolt_direct":"bolt://127.0.0.1:8852"}
 ```
 
 | Key | Value |
@@ -78,9 +78,9 @@ The request's `Content-Type` selects how `parameters` are read:
 | Request `Content-Type` | Parameters |
 | --- | --- |
 | `application/json` | Plain JSON values. An object shaped like `{"$type": …, "_value": …}` stays a map |
-| `application/vnd.neo4j.query.v1.2` | Plain JSON values, or typed values `{"$type": <type>, "_value": <value>}` as Neo4j's clients send them. A temporal value arrives as its ISO 8601 string (`date($p)` builds the typed value in Cypher), a point as its `{coordinates, crs}` map, a vector as its number list. An unknown `$type` is a 400, `unknown typed parameter $type "<type>"` |
+| `application/vnd.neo4j.query.v1.2`, another versioned form, or, as of relate 1.1.0, `application/vnd.neo4j.query` with no version | Plain JSON values, or typed values `{"$type": <type>, "_value": <value>}` as Neo4j's clients send them. A temporal value arrives as its ISO 8601 string (`date($p)` builds the typed value in Cypher), a point as its `{coordinates, crs}` map, a vector as its number list. An unknown `$type` is a 400, `unknown typed parameter $type "<type>"` |
 | None, `text/plain`, or a form type | 415, before the credential check |
-| Any other, `application/vnd.neo4j.query` included | 400, `content-type "<type>" is not a statement request type: application/json for plain parameters, or application/vnd.neo4j.query.v1.2 for typed envelope parameters` |
+| Any other | 400, `content-type "<type>" is not a statement request type: application/json for plain parameters, or application/vnd.neo4j.query (v1.0 alias) and its versioned family, including application/vnd.neo4j.query.v1.2, for typed envelope parameters`. Up to 1.0.2, `application/vnd.neo4j.query` with no version was refused this way |
 
 ## Response
 

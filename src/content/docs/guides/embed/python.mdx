@@ -34,7 +34,7 @@ pip install relate-db
 | `relate.connect("./team")` | A directory store | Created when missing; another process may read it with `read_only=True` while you write |
 | `relate.connect("./team.rl")` | A :term[single-file store]{id=single-file-store} | Created when missing; opens only while no other process writes it |
 | `relate.connect(path, read_only=True)` | An existing store, read-only | Loads once and refuses writes; a missing store is an error, never created |
-| `relate.connect(path, namespace="system")` | The same store, another namespace | `neo4j` (default), `system` or `system_ontologies` |
+| `relate.connect(path, namespace="system")` | The same store, another namespace | `neo4j` (default) or `system`; `system_ontologies` only under `RELATE_PREVIEW=ontology` |
 
 A new directory store writes its snapshot with the codec in `RELATE_SNAPSHOT_FORMAT` (`parquet` by default, `json` or `markdown`); an existing store keeps its own. The client has no codec argument. This program creates a directory store with the `json` codec, then reads it back through a read-only connection:
 

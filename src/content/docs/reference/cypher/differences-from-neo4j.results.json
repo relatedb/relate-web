@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.1.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -248,7 +248,7 @@
     },
     "namespaces": {
       "kind": "table",
-      "text": "| name                | defaultLanguage |\n|---------------------|-----------------|\n| \"neo4j\"             | \"CYPHER 25\"     |\n| \"system\"            | \"CYPHER 25\"     |\n| \"system_ontologies\" | \"CYPHER 25\"     |\n3 rows",
+      "text": "| name     | defaultLanguage |\n|----------|-----------------|\n| \"neo4j\"  | \"CYPHER 25\"     |\n| \"system\" | \"CYPHER 25\"     |\n2 rows",
       "table": {
         "columns": [
           "name",
@@ -266,13 +266,9 @@
           [
             "\"system\"",
             "\"CYPHER 25\""
-          ],
-          [
-            "\"system_ontologies\"",
-            "\"CYPHER 25\""
           ]
         ],
-        "summary": "3 rows"
+        "summary": "2 rows"
       },
       "graph": null,
       "envelope": {
@@ -296,10 +292,6 @@
           {
             "defaultLanguage": "CYPHER 25",
             "name": "system"
-          },
-          {
-            "defaultLanguage": "CYPHER 25",
-            "name": "system_ontologies"
           }
         ],
         "stats": {

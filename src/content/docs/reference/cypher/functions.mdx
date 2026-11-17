@@ -280,7 +280,7 @@ RETURN date({year: 2026, week: 45, dayOfWeek: 7}) AS from_week, date.truncate('m
 | Signature | Returns | Notes |
 | --- | --- | --- |
 | `point(input :: MAP) :: POINT` | A 2D or 3D point | The keys choose the coordinate system ([points](/docs/reference/cypher/types-and-values#points)) |
-| `point.distance(from :: POINT, to :: POINT) :: FLOAT` | The distance between two points in one coordinate system | Euclidean for Cartesian points; meters for WGS-84 points, on a sphere of radius 6,378,140 m. Points in two different systems give `null` |
+| `point.distance(from :: POINT, to :: POINT) :: FLOAT` | The distance between two points in one coordinate system | Euclidean for Cartesian points; meters for WGS-84 points, on a sphere of radius 6,378,140 m. Points in two different systems give `null`, and so does an argument that is not a point, where relate 1.0.1 and earlier failed with `type error: distance() requires two points` |
 | `point.withinBBox(point :: POINT, lowerLeft :: POINT, upperRight :: POINT) :: BOOLEAN` | Whether the point is inside the box | A `POINT INDEX` serves this filter and `point.distance(…) < <bound>` ([geospatial](/docs/guides/cypher/geospatial)) |
 
 ```cypher run name=spatial

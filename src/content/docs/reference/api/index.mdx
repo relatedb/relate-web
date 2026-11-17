@@ -19,7 +19,7 @@ relate is one engine with several front doors, and each front door is a :term[su
 | Browser | `@relate/relate-wasm` | `new RelateDb()` |
 | Rust | the `relate` crate | `Database::open(":memory:")` |
 | C | `librelate_ffi`, `relate.h` | `relate_database_open(":memory:", …)` |
-| Java | `com.relate:relate` | `Database.open(":memory:")` |
+| Java | `ai.relatedb:relate` | `Database.open(":memory:")` |
 | Go | `github.com/relatedb/relate/clients/go` | `relate.Open(":memory:")` |
 | Swift | `Relate` | `Database.inMemory()` |
 | Bolt, HTTP, MCP | `relate serve` | `relate serve --database :memory: --http <port>`; at least one of `--http`, `--bolt` or `--mcp` is required |

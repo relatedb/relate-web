@@ -230,9 +230,9 @@ function packageTab(v: string): Tab {
         key: 'java',
         label: 'Java',
         blocks: [
-          { p: `\`com.relate:relate\`, for Java 17 or later, with the native library bundled in the jar. The jars are on the [releases page](${RELEASES}), not on Maven Central. Download \`relate-${v}.jar\` and install it into your local Maven repository:` },
+          { p: `\`ai.relatedb:relate\`, for Java 17 or later, with the native library bundled in the jar. The jars are on the [releases page](${RELEASES}), not on Maven Central. Download \`relate-${v}.jar\` and install it into your local Maven repository:` },
           bash(`mvn install:install-file -Dfile=relate-${v}.jar`),
-          { p: 'The jar carries its POM, so a Maven or Gradle build (with `mavenLocal()`) resolves `com.relate:relate` and brings in its two dependencies, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`), from Maven Central.' },
+          { p: 'The jar carries its POM, so a Maven or Gradle build (with `mavenLocal()`) resolves `ai.relatedb:relate` and brings in its two dependencies, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`), from Maven Central.' },
         ],
       },
       {
@@ -240,8 +240,8 @@ function packageTab(v: string): Tab {
         label: 'Go',
         blocks: [
           { p: 'In a Go module (`go mod init <module>` creates one):' },
-          bash(`go get github.com/relatedb/relate/clients/go@${engine().commit ?? `<commit of v${v}>`}`),
-          { p: `\`${engine().commit ?? `<commit of v${v}>`}\` is the commit of relate ${v}: the module has no version tag of its own, so Go records the commit as a pseudo-version, and without \`@<commit>\` it takes the newest commit on the default branch.` },
+          bash(`go get github.com/relatedb/relate/clients/go@v${v}`),
+          { p: `\`v${v}\` is the relate release: each release tags the module with its own version.` },
           {
             p:
               `The module uses cgo and links \`librelate_ffi\`, from the \`${releaseNames(v).prefix}-ffi-<target>.tar.gz\` archive attached to each release` +

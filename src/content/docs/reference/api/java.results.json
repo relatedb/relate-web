@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.1.0",
   "cells": {
     "values": {
       "kind": "text",
@@ -8,8 +8,8 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
-      "source_sha256": "1442a081f276ae17e7d5550d5aca3856d015c78fdfa50500e88a331254323354"
+      "verified": "1.1.0",
+      "source_sha256": "5bf410cc4666c02939615d924db22c3e53827d16e2e9ad5425da8e6354e5e73b"
     }
   }
 }

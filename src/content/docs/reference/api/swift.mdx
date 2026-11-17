@@ -1,39 +1,63 @@
 ---
 title: Swift API
 label: Swift
-description: The public types and methods of the relate Swift package, the CypherValue cases, result metadata, errors, concurrency rules, and platforms.
+description: The public types and methods of the relate Swift package, its values and conversions, results, transactions, errors, async access, observation, and platforms.
 order: 90
 surfaces: [swift]
 related: [guides/embed/swift, get-started/swift, reference/api, reference/api/c, reference/errors, concepts/problems-relate-solves#embedded-graph-in-an-app]
 ---
 
-The Swift :term[client]{id=client} is the package `Relate`, from the repository `github.com/relatedb/relate`, for iOS 16 or later and macOS 13 or later in the Swift 6 language mode. It is a Swift layer over the relate C library, linked in as the static XCFramework `RelateFFI`, whose C application binary interface (C ABI) is version 2: values cross through the library's typed value walker and parameter builder, with no JSON. Every call is synchronous and throws `RelateError`. This page describes the package of relate 1.0.1.
+The Swift :term[client]{id=client} is the package `Relate`, from the repository `github.com/relatedb/relate`, for iOS 16 or later and macOS 13 or later in the Swift 6 language mode. It is a Swift layer over the relate C library, linked in as the static XCFramework `RelateFFI`, whose C application binary interface (C ABI) is version 2: values cross through the library's typed value walker and parameter builder, with no JSON. Calls on a `Connection` are synchronous; `Database` adds managed asynchronous reads and writes. A call that can fail only with the package's own error is declared `throws(RelateError)`. This page describes the package of relate 1.1.0.
 
 ## Synopsis
 
 ```swift
 import Relate
 
-public final class Database: @unchecked Sendable {
-    public init(path: String) throws
-    public init(readOnlyPath path: String) throws
-    public static func inMemory() throws -> Database
+public final class Database: Sendable {
+    public struct Options: Sendable, Hashable {
+        public var maxReaders: Int
+        public init(maxReaders: Int = 2)
+    }
+    public convenience init(path: String, options: Options = Options()) throws(RelateError)
+    public convenience init(readOnlyPath path: String, options: Options = Options()) throws(RelateError)
+    public convenience init(url: URL, readOnly: Bool = false, options: Options = Options()) throws(RelateError)
+    public static func inMemory(options: Options = Options()) throws(RelateError) -> Database
     public let path: String
     public let isReadOnly: Bool
-    public func connect() throws -> Connection
-    public func connect(namespace: String?) throws -> Connection
-    public func checkpoint() throws
+    public func connect() throws(RelateError) -> Connection
+    public func connect(namespace: DatabaseNamespace) throws(RelateError) -> Connection
+    public func checkpoint() throws(RelateError)
+
+    public func read<T: Sendable>(_ body: @escaping @Sendable (Transaction) throws -> T) async throws -> T
+    @discardableResult public func write<T: Sendable>(
+        retries: Int = 0, tags: Set<String> = [],
+        _ body: @escaping @Sendable (Transaction) throws -> T) async throws -> T
+    public func read(_ statement: Statement) async throws -> QueryResult
+    @discardableResult public func write(
+        _ statement: Statement, retries: Int = 0, tags: Set<String> = []) async throws -> QueryResult
+    @discardableResult public func write(
+        _ statements: [Statement], retries: Int = 0, tags: Set<String> = []) async throws -> [QueryResult]
+    public func checkpointInBackground() async throws
 }
 
 public final class Connection {
-    public let database: Database
+    public unowned let database: Database
     @discardableResult
-    public func query(_ cypher: String, _ parameters: [String: CypherValue] = [:]) throws -> QueryResult
-    public func setNamespace(_ name: String) throws
-    public func begin() throws
-    @discardableResult public func commit() throws -> String?
-    public func rollback() throws
-    @discardableResult public func transaction<T>(_ body: (Connection) throws -> T) throws -> T
+    public func query(_ cypher: String, _ parameters: [String: CypherValue] = [:]) throws(RelateError) -> QueryResult
+    @discardableResult
+    public func query(_ cypher: String, _ parameters: [String: any CypherValueConvertible]) throws(RelateError) -> QueryResult
+    @discardableResult public func run(_ statement: Statement) throws(RelateError) -> QueryResult
+    public func setNamespace(_ namespace: DatabaseNamespace) throws(RelateError)
+    public func begin() throws(RelateError)
+    @discardableResult public func commit() throws(RelateError) -> String?
+    public func rollback() throws(RelateError)
+    @discardableResult public func transaction<T>(
+        retries: Int = 0, tags: Set<String> = [], _ body: (Transaction) throws -> T) throws -> T
+    public func read<T>(_ body: (Transaction) throws -> T) throws -> T
+    @discardableResult public func runInTransaction(
+        _ statements: [Statement], retries: Int = 0, tags: Set<String> = []) throws(RelateError) -> [QueryResult]
+    public func isPoisoned() -> Bool
 }
 ```
 
@@ -42,43 +66,66 @@ public final class Connection {
 | Type | Kind | Holds |
 | --- | --- | --- |
 | `Database` | final class, `Sendable` | An open store |
+| `Database.Options` | struct | The settings of the managed asynchronous access |
 | `Connection` | final class, not `Sendable` | One session on a store |
-| `QueryResult` | struct, `Sendable` | One statement's columns, rows, and metadata |
+| `Transaction` | final class, not `Sendable` | The scope a transaction body runs statements in |
+| `Statement` | struct, `Sendable`, `Hashable` | Statement text with its parameters |
+| `QueryResult` | struct, `Sendable`, `Equatable` | One statement's columns, rows, and metadata; a collection of `Record` |
+| `Record` | struct, `Sendable`, `Hashable` | One row, read by position, by column name, or typed |
 | `QueryType` | enum, `String` raw values | `.read` `"r"`, `.write` `"w"`, `.readWrite` `"rw"`, `.schema` `"s"` |
-| `Namespace` | enum, `String` raw values | `.neo4j` `"neo4j"`, `.system` `"system"`, `.systemOntologies` `"system_ontologies"` |
+| `DatabaseNamespace` | enum, `String` raw values | `.neo4j` `"neo4j"`, `.system` `"system"`, `.systemOntologies` `"system_ontologies"` |
 | `QueryStats` | struct | The 11 mutation counters |
 | `CypherValue` | enum, `Sendable`, `Hashable` | One Cypher value, at any depth |
 | `CypherValueKind` | enum, `UInt32` raw values | The kind of a `CypherValue` |
-| `Notification` | struct | One planner notification |
-| `Severity`, `Category` | enums, `String` raw values | A notification's severity (`.information`, `.warning`) and category (`.performance`, `.unrecognized`, `.deprecation`, `.schema`, `.hint`); typed since 0.1.3, where 0.1.2 used plain strings |
+| `CypherValueConvertible` | protocol | A Swift type that converts to and from a `CypherValue` |
+| `CypherValueEncoder`, `CypherValueDecoder` | structs, `Sendable` | The bridges between `Codable` types and `CypherValue` |
+| `CypherKeyStrategy` | enum | How the two bridges name keys: `.useDefaultKeys` or `.snakeCase` |
+| `QueryNotification` | struct | One planner notification |
+| `NotificationSeverity`, `NotificationCategory` | enums, `String` raw values | A notification's severity (`.information`, `.warning`) and category (`.performance`, `.unrecognized`, `.deprecation`, `.schema`, `.hint`) |
 | `PlanDocument`, `PlanNode`, `PlanActual`, `PlanStart` | structs | The structured plan |
-| `RelateError` | enum, `LocalizedError` | Every error the package throws |
+| `RelateError` | enum, `LocalizedError`, `Equatable` | Every error the package throws |
 | `EngineError` | struct | The engine's classified error: `code`, `gqlStatus`, `stage`, `retryable`, `message` |
+| `ResultMismatch` | struct | What `RelateError.unexpectedResult` carries: `path`, `expected`, `found`, `reason` |
+| `QueryTrace` | struct, `Sendable` | One statement as it ran, reported to a trace handler |
+| `Commit` | struct, `Sendable`, `Hashable` | One committed write, reported by `commits()` |
+| `Migrator` | struct, `Sendable` | Schema statements and versioned migration steps |
+| `LiveQuery`, `LiveQueryState` | property wrapper and enum, where SwiftUI can be imported | A value read from the database and kept current in a view |
 
 ## Database
 
 | Member | Behavior |
 | --- | --- |
-| `init(path:)` | Opens `:memory:`, a directory store or a `.rl` store for writing; creates a missing store |
-| `init(readOnlyPath:)` | Loads an existing store once; refuses writes and checkpoints; a missing store is an error |
-| `inMemory()` | `Database(path: ":memory:")` |
+| `init(path:options:)` | Opens `:memory:`, a directory store or a `.rl` store for writing; creates a missing store |
+| `init(readOnlyPath:options:)` | Loads an existing store once; refuses writes and checkpoints; a missing store is an error |
+| `init(url:readOnly:options:)` | Opens the store at a file URL, for writing unless `readOnly` is `true`; a URL that is not a `file:` URL, or that names a host other than `localhost`, throws `.invalidParameter` |
+| `inMemory(options:)` | `Database(path: ":memory:")` |
+| `Options.maxReaders` | The most reader connections `read(_:)` opens; default 2; a value under 1 throws `.invalidParameter`: `a database needs at least one reader, got maxReaders <n>` |
 | `path`, `isReadOnly` | The path the database was opened with, and whether it is read-only |
 | `connect()` | A connection in the `neo4j` namespace |
-| `connect(namespace:)` | A connection in `neo4j`, `system` or `system_ontologies`, matched case-insensitively; `nil` selects `neo4j` |
+| `connect(namespace:)` | A connection in the given `DatabaseNamespace` |
 | `checkpoint()` | Writes a :term[checkpoint]{id=checkpoint}, folding the write-ahead log into a fresh snapshot of committed state; refused on a read-only database |
 
-A `Database` closes its :term[store]{id=store} when its last reference is released; there is no `close()`. Every `Connection` keeps its `database`, so the store outlives its connections. A failed open throws `.engine` with message `internal error`, code `Neo.DatabaseError.General.UnknownError`, GQLSTATUS `42000` and stage `.internal`, whether the store is locked by another writer or missing. An unknown namespace throws `semantic error: DatabaseNotFound: Graph not found: <name>`.
+[Managed asynchronous access](#managed-asynchronous-access) lists `read`, `write` and `checkpointInBackground()`; [Tracing and commits](#tracing-and-commits), [Live values](#live-values) and [Store provisioning](#store-provisioning) list the other members.
+
+A `Database` closes its :term[store]{id=store} when its last reference is released; there is no `close()`. Every `Connection` from `connect()` keeps its `database`, so the store outlives the `Database` object while such a connection lives. A failed open throws `.engine` with message `internal error`, code `Neo.DatabaseError.General.UnknownError`, GQLSTATUS `42000` and stage `.internal`, whether the store is locked by another writer or missing.
+
+The `system_ontologies` namespace exists only when the process that opens the store has `RELATE_PREVIEW=ontology` set. Without it, `connect(namespace: .systemOntologies)` throws `.engine` with code `Neo.ClientError.Database.DatabaseNotFound` and message `semantic error: DatabaseNotFound: Graph not found: system_ontologies`.
 
 ## Connection
 
 | Member | Behavior |
 | --- | --- |
-| `query(_:_:)` | Runs one statement; auto-commits outside an explicit transaction; an empty dictionary binds no parameters |
+| `query(_:_:)` | Runs one statement given as a `String`; auto-commits outside an explicit transaction; an empty dictionary binds no parameters |
+| `run(_:)` | Runs one `Statement` |
 | `setNamespace(_:)` | Changes the session namespace; refused inside a transaction |
 | `begin()` | Opens an explicit transaction; transactions do not nest |
 | `commit()` | Commits; returns the :term[bookmark]{id=bookmark} `"relate:<n>"`, or `nil` when the transaction wrote nothing |
 | `rollback()` | Discards the explicit transaction |
-| `transaction(_:)` | Begins, runs the body, and commits when it returns; when the body or the commit throws, rolls back and rethrows that error |
+| `transaction(retries:tags:_:)` | Begins, runs the body with a `Transaction`, and commits when it returns; when the body or the commit throws, rolls back and rethrows that error |
+| `read(_:)` | Begins, runs the body with a read-only `Transaction`, and always rolls back: every statement sees one snapshot and nothing commits; the result is not discardable |
+| `runInTransaction(_:retries:tags:)` | Runs the statements in one transaction and returns their results: all commit, or none do |
+| `isPoisoned()` | Probes the handle with `RETURN 1`: `true` when an engine panic poisoned this connection, and only a new connection recovers |
+| `database` | The database this connection was made from |
 
 A `Connection` disconnects when it is released. Its own refusals, each `.engine` with code `Neo.ClientError.Statement.SemanticError` and GQLSTATUS `42000`:
 
@@ -88,26 +135,99 @@ A `Connection` disconnects when it is released. Its own refusals, each `.engine`
 | `commit()` or `rollback()` with no transaction | `semantic error: no transaction` |
 | `setNamespace(_:)` inside a transaction | `semantic error: TransactionError: Cannot change the namespace while a transaction is open.` |
 
+## Transaction
+
+A `Transaction` is the scope that the body of `Connection.transaction`, `Connection.read`, `Database.read`, `Database.write` or a `Migrator` step receives. It runs statements; beginning, committing, rolling back and changing the namespace belong to the call that opened it.
+
+| Member | Behavior |
+| --- | --- |
+| `query(_:_:)` | Runs one statement given as a `String`, with the same two parameter forms as `Connection.query` |
+| `run(_:)` | Runs one `Statement` |
+| `run(_:)` with `[Statement]` | Runs the statements in order and returns their results, stopping at the first that throws |
+| `isReadOnly` | `true` in a `read` body |
+
+| Event | Outcome |
+| --- | --- |
+| The body returns | A write scope commits; a read scope rolls back |
+| The body throws | The transaction rolls back and the error is rethrown |
+| The commit throws | The transaction rolls back and the commit's error is rethrown |
+| `retries: n` and a failure whose `isRetryable` is `true`, from a statement or the commit | The transaction rolls back and the body runs again, up to `n` more times; with `n` under 1, never. What the body did outside the transaction is not undone |
+| `tags` | Travel with the commit to `Database.commits()` |
+| A statement that is not a read, in a read scope | `.misuse`: `a <type> statement ran in a read; nothing it changed is kept — use a write`, where `<type>` is `write`, `read-write` or `schema` |
+| A call after the body returned | `.misuse`: `this transaction has ended; its scope is the body it was passed to` |
+
+## Statement
+
+A `Statement` holds statement text and its parameters as one `Sendable`, `Hashable` value. `Connection.run`, `Transaction.run`, `Database.read`, `Database.write`, `Migrator` and `LiveQuery` take one.
+
+| Form | Result |
+| --- | --- |
+| `Statement(cypher, parameters)` | Text that names its own parameters (`$key`), with a `[String: CypherValue]` dictionary or, as a throwing initializer, a dictionary of Swift values |
+| A string literal | The literal as text, with no parameters |
+| `\(value)` in a literal | The value bound as a generated parameter, `$_p0`, `$_p1`, … in order of appearance; an optional's `nil` binds `null`. A literal with an interpolated value is written under `try` |
+| `\(identifier: name)` | A label, relationship type or property key in backticks, any backtick in it doubled |
+| `\(raw: text)` | Text spliced in as written |
+| `\(statement)` | Another `Statement`'s text in place, with its parameters |
+
+| Member | Returns |
+| --- | --- |
+| `cypher` | The text the engine receives, with each interpolated value replaced by its generated parameter |
+| `parameters` | Every parameter, the named ones and the generated ones |
+| `append(_:)` | Appends another statement's text and parameters; a named parameter bound to two different values throws `.invalidParameter`: `parameter '<name>' is bound to two different values`, and leaves the statement unchanged |
+| `Statement.quoted(identifier:)` | The identifier in backticks |
+| `description` | The rendered text, without parameter values |
+
+A generated name that the statement's own named parameters already use is skipped. `Connection.query` and `Transaction.query` take a `String`: an interpolated literal passed to them is an ordinary Swift string, and its values become part of the text.
+
 ## QueryResult
 
-A `QueryResult` is a plain value, copied out of the engine before `query` returns.
+A `QueryResult` is a plain value, copied out of the engine before the call returns. It is a random-access collection of `Record`, one per row, so `for record in result`, `result.first`, `result[0]` and `result.count` read its rows.
 
 | Member | Type | Holds |
 | --- | --- | --- |
 | `columns` | `[String]` | The column names, in `RETURN` order |
 | `rows` | `[[CypherValue]]` | One array per row, cells in column order |
-| `records` | `[[String: CypherValue]]` | The rows keyed by column name; for a repeated name, the last column's value |
-| `scalar()` | `CypherValue` | The one value of a one-row, one-column result; otherwise throws `.decoding` |
+| `records` | `[Record]` | The rows as records, the same ones iteration yields; as of 1.1.0, where earlier releases returned `[[String: CypherValue]]`, which `Record.dictionary` still gives |
+| `single()` | `Record` | The one record of a one-row result; otherwise throws `.unexpectedResult` |
+| `scalar()` | `CypherValue` | The one value of a one-row, one-column result; otherwise throws `.unexpectedResult` (`.decoding` before 1.1.0) |
+| `scalar(as:)` | `T` | The same value as a `CypherValueConvertible` type |
+| `decode(_:using:)` | `[T]` | Every record decoded as a `Decodable` type by column name |
+| `decode(_:column:using:)` | `[T]` | One column of every record decoded as a `Decodable` type |
 | `queryType` | `QueryType` | The plan-time classification; `EXPLAIN` and `PROFILE` report the wrapped statement's type |
-| `namespace` | `Namespace` | The statement's `USE` target, else the session namespace |
+| `namespace` | `DatabaseNamespace` | The statement's `USE` target, else the session namespace |
 | `bookmark` | `String?` | An auto-commit write's bookmark, `relate:<n>`; `nil` for a read, an `EXPLAIN`, a write whose counters are all zero (it changed nothing), and any statement inside an explicit transaction |
 | `stats` | `QueryStats` | The mutation counters; all zero for a read or an `EXPLAIN` |
-| `notifications` | `[Notification]` | Filled by `EXPLAIN` and `PROFILE`; empty on a plain run |
+| `notifications` | `[QueryNotification]` | Filled by `EXPLAIN` and `PROFILE`; empty on a plain run |
 | `plan` | `PlanDocument?` | The `relate.plan/v1` plan document under `EXPLAIN` or `PROFILE`; `nil` on a plain run |
 | `elapsedMs` | `Double` | The engine's parse, plan and execute time, in milliseconds |
 | `parseMs`, `planMs`, `executeMs` | `Double` | The phases of `elapsedMs`; their sum never exceeds it |
 
-A `QueryResult` has no column types. `QueryStats` has 11 `Int` properties: `nodesCreated`, `nodesDeleted`, `relationshipsCreated`, `relationshipsDeleted`, `propertiesSet`, `labelsAdded`, `labelsRemoved`, `indexesAdded`, `indexesRemoved`, `constraintsAdded`, `constraintsRemoved`. A bookmark's `<n>` grows across every connection of the store and orders as a number: as strings, `"relate:10"` sorts before `"relate:9"`.
+A `QueryResult` has no column types. It is `Equatable` over every member, timings included, so two runs of one statement rarely compare equal; `rows` compares what a statement returned. `QueryStats` has 11 `Int` properties: `nodesCreated`, `nodesDeleted`, `relationshipsCreated`, `relationshipsDeleted`, `propertiesSet`, `labelsAdded`, `labelsRemoved`, `indexesAdded`, `indexesRemoved`, `constraintsAdded`, `constraintsRemoved`. A bookmark's `<n>` grows across every connection of the store and orders as a number: as strings, `"relate:10"` sorts before `"relate:9"`.
+
+## Record
+
+A `Record` is one row of a result: a random-access collection of its `CypherValue`s in column order.
+
+| Member | Returns |
+| --- | --- |
+| `values` | The row's values, in column order |
+| `columns` | The result's column names, in order |
+| `record[position]` | The `CypherValue` at a column position |
+| `record[column]` | The `CypherValue` in the named column; `nil` when the result has no such column. A column holding `null` is `.null`, not `nil` |
+| `dictionary` | The record as a `[String: CypherValue]` dictionary |
+| `get(_:as:)` | The value in a column, named or by position, as a `CypherValueConvertible` type; throws `.unexpectedResult` |
+| `decode(_:using:)`, `decode(_:column:using:)` | The record, or the value in one column, as a `Decodable` type |
+
+`get(_:as:)`, `scalar(as:)` and the decoders convert strictly: an integer widens to a floating-point type and nothing else converts. A string is never parsed into a number, and `null` converts only to an `Optional`. The messages of `.unexpectedResult`, each after the prefix `Relate unexpected result: `:
+
+| Cause | Message |
+| --- | --- |
+| No such column | `<column>: expected a column named '<column>', found columns '<a>', '<b>'` |
+| A value of another kind | `<column>: expected <type>, found <kind>`, such as `role: expected Int, found string` |
+| An integer the type cannot hold | `<column>: expected Int8, found int (300 is out of range)` |
+| `single()` on other than one row | `expected exactly one record, found <n> records` |
+| `scalar()` on other than one column | `expected exactly one column, found <n> columns` |
+| A key a `Decodable` type needs and the record lacks | `<key>: expected a value, found no such key` |
 
 ## Values
 
@@ -134,7 +254,7 @@ Every cell, and every element of a list or map, is a `CypherValue` that keeps it
 | `.duration` | `DURATION` | `Duration`: `months`, `days`, `seconds`, `nanoseconds` |
 | `.vector` | `VECTOR` | `Vector`: `.floats(dtype:values:)` or `.ints(dtype:values:)` |
 
-`Vector.DType` has the cases `.integer8`, `.integer16`, `.integer32`, `.integer`, `.float16`, `.bfloat16`, `.float32` and `.float`, whose raw values are the engine's names (`INTEGER8` … `FLOAT`). UUIDs arrive as `.string`, byte arrays as a `.list` of `.int`. An :term[element id]{id=element-id} is the string `elementId()` returns, such as `4:rl-id:n0`; the `Int64` ids are the deprecated numeric ids `id()` returns. A value kind the package does not know throws `.decoding`.
+The payload structs are nested in `CypherValue`: `CypherValue.Date` and `CypherValue.Duration` are not `Foundation.Date` and `Swift.Duration`. `Vector.DType` has the cases `.integer8`, `.integer16`, `.integer32`, `.integer`, `.float16`, `.bfloat16`, `.float32` and `.float`, whose raw values are the engine's names (`INTEGER8` … `FLOAT`). UUIDs arrive as `.string`, byte arrays as a `.list` of `.int`. An :term[element id]{id=element-id} is the string `elementId()` returns, such as `4:rl-id:n0`; the `Int64` ids are the deprecated numeric ids `id()` returns. A value kind the package does not know throws `.decoding`.
 
 | Accessor | Returns |
 | --- | --- |
@@ -147,57 +267,241 @@ Every cell, and every element of a list or map, is a `CypherValue` that keeps it
 | `subscript(key:)` | A map entry, or a node or relationship property; `nil` otherwise |
 | `description` | A Cypher-like rendering for logs, map keys sorted; not a format to parse |
 
+## Swift types as values
+
+A type that conforms to `CypherValueConvertible` binds as a parameter, interpolates into a `Statement`, and is what `get(_:as:)` and `scalar(as:)` return. The protocol has two requirements, `cypherValue()` and `init(cypherValue:)`. The package conforms these types:
+
+| Swift type | As a parameter | Read from |
+| --- | --- | --- |
+| `CypherValue` | Itself | Any value |
+| `Bool` | `BOOLEAN` | `.bool` |
+| `String`, `Substring` | `STRING` | `.string` |
+| `Int`, `Int8`, `Int16`, `Int32`, `Int64`, `UInt`, `UInt8`, `UInt16`, `UInt32`, `UInt64` | `INTEGER`; a value over `Int64.max` throws `.invalidParameter` | `.int`; a value the type cannot hold throws `.unexpectedResult` |
+| `Double`, `Float` | `FLOAT` | `.float`, or an `.int` widened; `Float` takes the nearest value |
+| `Optional` of a conforming type | `nil` is `NULL` | `.null` is `nil` |
+| `Array` of a conforming type | `LIST`; a `[Float]` is a list, never a vector | `.list`, or a `.vector` as the list of its coordinates |
+| `[String: Value]` with a conforming `Value` | `MAP` | `.map`; a node or relationship is not a map |
+| A `RawRepresentable` type that declares the conformance | Its raw value | Its raw value; a value outside the type's raw values throws `.unexpectedResult` |
+| `Foundation.Date` | A `ZONED DATETIME` in UTC, to the microsecond | `.dateTime`, as the instant it names; a `.localDateTime` is refused |
+| `URL` | Its absolute string | A `.string` that is a URL |
+| `UUID` | Its lowercase string, the spelling of `randomUUID()` | A `.string` that is a UUID |
+| `Data` | A `LIST` of integers 0 to 255 | A `.list` of integers 0 to 255 |
+| `CLLocationCoordinate2D`, where Core Location can be imported | A 2D point with srid 4326 | A point with srid 4326 or 4979; a 3D point's height is dropped |
+| `CypherValue.Point`, `.Date`, `.Time`, `.LocalTime`, `.DateTime`, `.LocalDateTime`, `.Duration`, `.Vector` | Its own case | Its own case only |
+| `CypherValue.Node`, `.Relationship`, `.Path` | Refused with `.invalidParameter` | Its own case only |
+
+The payload structs have these conversions to and from platform types. Each initializer that checks its input throws `.invalidParameter`:
+
+| Member | Converts | Refuses |
+| --- | --- | --- |
+| `CypherValue(_:)` with a `Foundation.Date` | The instant to a UTC `.dateTime`, to the microsecond | A non-finite date; a year outside `CypherValue.Date.supportedYears`, -999,999,999 to 999,999,999 |
+| `CypherValue.DateTime(_:offsetSeconds:)`, `DateTime(_:in:)` with a `TimeZone` | The instant to a zoned datetime at a UTC offset, 0 by default, or at the zone's offset at that instant; no zone id is recorded | The same, and an offset beyond 18 hours either side of UTC |
+| `dateTime.foundationDate` | The instant the datetime names; `nil` when its components name none | |
+| `CypherValue.LocalDateTime(_:in:)`, `localDateTime.foundationDate(in:)` | The wall clock a date shows in a zone, and the instant at which the zone shows a wall clock: the earlier one in a daylight-saving overlap, `nil` in a gap | As `DateTime(_:in:)` |
+| `CypherValue.Date(_:in:)` | The calendar day a date falls on in a zone | As `DateTime(_:in:)` |
+| `CypherValue.Date(_:)` with `DateComponents` | A Gregorian year, month and day; era 0 counts years before the common era | A missing year, month or day; a calendar other than Gregorian or ISO 8601; an era other than 0 or 1, or an era year under 1; a day that does not exist; a year outside `supportedYears` |
+| `date.dateComponents`, `date.startOfDay(in:)` | The day as Gregorian `DateComponents`, and the instant it starts in a zone, `nil` when midnight falls in a daylight-saving gap | |
+| `CypherValue.Duration(_:)` with a `Swift.Duration` | A fixed-length duration to the nanosecond, with months and days zero | A duration beyond `Int64` seconds |
+| `duration.swiftDuration`, `duration.dateComponents` | The duration as a `Swift.Duration`, `nil` when it has a month or day part, and its four parts as `DateComponents` | |
+| `CypherValue.Point(latitude:longitude:height:)` | A point with srid 4326, or 4979 with a height in meters | A latitude outside -90 to 90, a longitude outside -180 to 180, a non-finite height |
+| `CypherValue.Point(x:y:z:)` | A Cartesian point with srid 7203, or 9157 with `z` | |
+| `point.crs`, `latitude`, `longitude`, `height` | The coordinate reference system as a `Point.CRS` (`.cartesian`, `.cartesian3D`, `.wgs84`, `.wgs84_3D`), and the geographic coordinates, `nil` on a Cartesian point | |
+| `CypherValue.Point(_:)` and `CypherValue(_:)` with a `CLLocationCoordinate2D`, `point.coordinate` | A 2D point with srid 4326, and back | As `Point(latitude:longitude:height:)` |
+| `CypherValue(vector:)`, `Vector.float32(_:)`, `Vector.float64(_:)` | A `[Float]` to a `FLOAT32` vector, a `[Double]` to a `FLOAT` vector | More than `Vector.maximumCount` (4,096) coordinates; a NaN or infinite coordinate |
+| `vector.dtype`, `count`, `float32Values`, `doubleValues` | The coordinate type, the number of coordinates, and a float-typed vector's coordinates, `nil` for an integer-typed one | |
+| `CypherValue.Vector(_:)` with an `MLShapedArray<Float>` or `MLMultiArray`, where Core ML can be imported | The array's scalars in row-major order: `float16` and `float32` to `FLOAT32`, `double` to `FLOAT`, `int32` to `INTEGER32` | Another element type, and the refusals of `Vector.float32(_:)` |
+
 ## Parameters
 
-`query(_:_:)` binds each dictionary entry as one value. `CypherValue` conforms to `ExpressibleByNilLiteral`, `…BooleanLiteral`, `…IntegerLiteral`, `…FloatLiteral`, `…StringLiteral`, `…ArrayLiteral` and `…DictionaryLiteral`, so `["n": 1, "tags": ["a"], "m": ["k": true]]` needs no wrapping. A variable binds through `CypherValue(_:)` for `Int`, `Double`, `String` and `Bool`; the struct payloads of the point, temporal, duration and vector cases have public initializers. Non-finite floats and every `Int64` value bind directly.
+`query(_:_:)` binds each dictionary entry as one value, in two forms. With `[String: CypherValue]`, a dictionary of literals needs no wrapping: `CypherValue` conforms to `ExpressibleByNilLiteral`, `…BooleanLiteral`, `…IntegerLiteral`, `…FloatLiteral`, `…StringLiteral`, `…ArrayLiteral` and `…DictionaryLiteral`, so `["n": 1, "tags": ["a"], "m": ["k": true]]` binds as written. With `[String: any CypherValueConvertible]`, each Swift value converts as [Swift types as values](#swift-types-as-values) lists; a dictionary of literals resolves to the first form. A `Statement` binds each interpolated value the same way. Non-finite floats and every `Int64` value bind directly.
 
 | Refusal | Error |
 | --- | --- |
 | A `.node`, `.relationship` or `.path` value | `.invalidParameter`: `nodes, relationships and paths cannot be passed as parameters; pass their element id or properties` |
+| An unsigned integer over `Int64.max` | `.invalidParameter`: `UInt64 value <n> does not fit a Cypher INTEGER (64-bit signed)` |
 | A statement, path, namespace, parameter name or map key holding a NUL byte | `.invalidParameter`: `<what> contains a NUL byte` |
 | A value the engine's builder refuses: an impossible date, an unknown zone, a srid that does not fit the dimensions | `.engine` with stage `.internal` |
 | A parameter the statement refers to and the dictionary lacks | `.engine`: `semantic error: ParameterMissing: Expected parameter(s): <names>` |
+
+## Codable models
+
+`CypherValueEncoder` turns an `Encodable` value into a `CypherValue`, and `CypherValueDecoder` reads a `Decodable` type from a record, a map, a node or a relationship.
+
+| Member | Behavior |
+| --- | --- |
+| `CypherValueEncoder(keyStrategy:).encode(_:)`, `CypherValue(encoding:keyStrategy:)` | A struct encodes as a map and an array as a list, so a model binds as one parameter, as in `SET n += $props`. A `nil` optional property is left out of the map. A failure throws `.invalidParameter`: `cannot encode <type>: <reason>` |
+| `CypherValueDecoder(keyStrategy:).decode(_:from:)` | Decodes one `CypherValue`, or one `Record` by column name |
+| `Record.decode`, `QueryResult.decode` | Decode a record, or every record, by column name; with `column:`, the node, relationship or map in that column by its keys. A type that decodes from a single value reads the one column of a one-column record |
+| `CypherKeyStrategy.useDefaultKeys` | A Swift property name is the key, as written |
+| `CypherKeyStrategy.snakeCase` | Encoding writes `readingStatus` as `reading_status` and `coverURL` as `cover_url`; decoding looks a property up under its own name first, then under its snake-case spelling |
+
+In both directions, a type that is `CypherValueConvertible` goes through that conversion, so a `Foundation.Date` property is a `ZONED DATETIME` and a `URL` a string. Decoding converts as strictly as `get(_:as:)` and throws `.unexpectedResult`, whose path runs from the column to the key or list position that did not decode.
 
 ## Errors
 
 | `RelateError` case | Thrown when | `description` |
 | --- | --- | --- |
 | `.engine(EngineError)` | The engine or the C boundary refused the call | `Relate: [<code>] <message>` |
-| `.invalidParameter(String)` | A parameter cannot cross the C boundary | `Relate invalid parameter: <message>` |
-| `.decoding(String)` | A result broke the C contract, such as a query type or namespace outside its enum (`ABI contract violated: query type '<value>'`), or `scalar()` met other than one row and one column | `Relate decoding error: <message>` |
+| `.invalidParameter(String)` | A value or a name cannot cross the C boundary, or a conversion refused its input | `Relate invalid parameter: <message>` |
+| `.unexpectedResult(ResultMismatch)` | A result did not have the shape or type asked for: `single()`, `scalar()`, `get(_:as:)` or a decode | `Relate unexpected result: <message>` |
+| `.misuse(String)` | A call outside the API's contract: a `Transaction` used after its body returned, a statement that is not a read in a read, a managed write, checkpoint or migration on a read-only database, a `Migrator` whose steps are out of order | `Relate misuse: <message>` |
+| `.decoding(String)` | A result broke the C contract, such as a query type or namespace outside its enum (`ABI contract violated: query type '<value>'`) | `Relate decoding error: <message>` |
 
-`error.message` is the message of any case and `error.engineError` the `EngineError` of the `.engine` case, else `nil`.
+`RelateError` is `Equatable` and `Sendable`. `error.message` is the message of any case, `error.engineError` the `EngineError` of the `.engine` case, else `nil`, and `error.isRetryable` that error's `retryable`, `false` for every other case. An exhaustive `switch` written for an earlier release needs the `.unexpectedResult` and `.misuse` cases, added in 1.1.0.
 
-| `EngineError` property | Holds |
+| `EngineError` member | Holds |
 | --- | --- |
 | `code` | The Neo4j status code, such as `Neo.ClientError.Statement.ArithmeticError` |
 | `gqlStatus` | The five-character GQLSTATUS, such as `22G03` |
 | `stage` | `.compile` (parse or plan), `.runtime` (execution) or `.internal` (the C boundary: a poisoned handle, a caught panic, a refused argument) |
 | `retryable` | `true` exactly when running the same work again can succeed: a write-write conflict (`Neo.TransientError.Transaction.Outdated`, message `write-write conflict`) or the retryable workspace cap |
 | `message` | The engine's message |
+| `classification` | The second segment of `code` as `.clientError`, `.transientError` or `.databaseError`; `nil` for a code of another shape |
+| `isSyntaxError` | `code` is `Neo.ClientError.Statement.SyntaxError` |
+| `isMissingParameter` | `code` is `Neo.ClientError.Statement.ParameterMissing` |
+| `isConstraintViolation` | `code` is `Neo.ClientError.Schema.ConstraintValidationFailed` |
+| `isWriteConflict` | `code` is `Neo.TransientError.Transaction.Outdated` |
 
-A statement failure throws from `query`; a conflict in an explicit transaction throws from `commit()`. After a `.internal` failure the handle may be poisoned: later calls throw `.internal` too, and only a new handle recovers. A write on a read-only database throws code `Neo.ClientError.Statement.SemanticError` with GQLSTATUS `42N18`. The [errors reference](/docs/reference/errors) lists the engine's messages.
+`EngineError.StatusCode` holds those four codes as constants. `ResultMismatch` has `path` (the column name, then any map keys and list positions under it; empty for a whole-result shape), `expected`, `found`, `reason` and `message`, the one-line text [Record](#record) lists.
+
+A statement failure throws from the call that ran it; a write-write conflict throws from the statement or from `commit()`. After a `.internal` failure the handle may be poisoned: later calls throw `.internal` too, `isPoisoned()` returns `true`, and only a new connection recovers. A write on a read-only database throws code `Neo.ClientError.Statement.SemanticError` with GQLSTATUS `42N18`. The [errors reference](/docs/reference/errors) lists the engine's messages.
 
 ## Notifications and plans
 
-`Notification` has the properties `code`, `gqlStatus`, `severity`, a `Severity` (`.information` or `.warning`, raw values `INFORMATION` and `WARNING`), `category`, a `Category` (`.performance`, `.unrecognized`, `.deprecation`, `.schema` or `.hint`, raw values the upper-case names), `title`, `description`, `remedy` and `operatorId`, an `Int64?` that is `nil` on a statement-scoped notification. A severity or category outside those cases, or a missing one, is a `.decoding` error that begins `ABI contract violated:` and names the key and the value.
+`QueryNotification` has the properties `code`, `gqlStatus`, `severity`, a `NotificationSeverity` (`.information` or `.warning`, raw values `INFORMATION` and `WARNING`), `category`, a `NotificationCategory` (`.performance`, `.unrecognized`, `.deprecation`, `.schema` or `.hint`, raw values the upper-case names), `title`, `description`, `remedy` and `operatorId`, an `Int64?` that is `nil` on a statement-scoped notification. A severity or category outside those cases, or a missing one, is a `.decoding` error that begins `ABI contract violated:` and names the key and the value.
 
 | Struct | Properties |
 | --- | --- |
 | `PlanDocument` | `schema` (`relate.plan/v1`), `profiled`, `statement: String?`, `root: PlanNode` |
-| `PlanNode` | `operator`, `details`, `identifiers`, `estimatedRows: Int64?`, `actual: PlanActual?`, `children`, `warnings: [Notification]` |
+| `PlanNode` | `operator`, `details`, `identifiers`, `estimatedRows: Int64?`, `actual: PlanActual?`, `children`, `warnings: [QueryNotification]` |
 | `PlanActual` | `rows`, `timeMs`, `dbHits`, `memoryBytes`, `hops`, `neighborWalks`, `nodeReads`, `start: PlanStart?`; `nil` on an `EXPLAIN` plan |
 | `PlanStart` | `element`, `backward`, `reason` |
+
+## Managed asynchronous access
+
+`Database` runs synchronous bodies off the caller's thread, on connections it opens and owns.
+
+| Member | Behavior |
+| --- | --- |
+| `read(_:)` with a body | Runs the body as `Connection.read` on a reader connection: one snapshot, always rolled back, a statement that is not a read refused with `.misuse` |
+| `read(_:)` with a `Statement` | Runs one statement as a read and returns its `QueryResult` |
+| `write(retries:tags:_:)` | Runs the body as one write transaction on the database's single writer connection: committed when the body returns, rolled back when it throws |
+| `write(_:retries:tags:)` with a `Statement` or `[Statement]` | Runs the statement, or the statements, in one write transaction: all commit, or none do |
+| `checkpointInBackground()` | Writes a checkpoint on the writer connection's queue, between writes |
+
+| Rule | Detail |
+| --- | --- |
+| Connections | One writer and at most `Options.maxReaders` readers, each opened on first use in the `neo4j` namespace and confined to its own serial queue |
+| Reads | Run concurrently with each other and with a write; a read beyond `maxReaders` waits its turn on the least busy reader |
+| Writes | Run one at a time, so they never conflict with each other; `retries` covers a conflict with a writer outside the pool, such as a connection from `connect()` |
+| Threads | The awaiting task suspends; the engine call blocks the connection's queue, not a thread of the cooperative pool |
+| Cancellation | A task cancelled before the body starts throws `CancellationError` and runs nothing; a statement already running is not interrupted |
+| Read-only database | `write` and `checkpointInBackground()` throw `.misuse`: `write on a database opened read-only`, `checkpoint on a database opened read-only` |
+| Sendability | The body is `@Sendable` and its result is `Sendable` |
+| A poisoned connection | After a `.internal` failure the pool probes the connection and replaces a poisoned one; the work that failed is rethrown, never run again |
+
+## Tracing and commits
+
+`setTraceHandler(_:)` sets, or with `nil` clears, a handler called once for every statement run on any connection of the database, its managed ones included. The handler runs synchronously on the thread that ran the statement, after it finished, and also receives failed statements. The probe of `isPoisoned()` is not traced.
+
+| `QueryTrace` property | Holds |
+| --- | --- |
+| `statement` | The statement text as the engine received it, including any literal spliced into it |
+| `parameterNames` | The names of the bound parameters, sorted; a trace carries no parameter values |
+| `rowCount` | Rows returned; zero when the statement failed |
+| `queryType` | The statement's `QueryType`; `nil` when it failed |
+| `elapsedMs`, `parseMs`, `planMs`, `executeMs` | The engine's time and its phases; zero when the statement failed |
+| `wallMs` | The whole call as the caller saw it: parameter binding, the engine and copying the result out |
+| `error` | The `RelateError` the statement threw, else `nil`; its message may quote a value the statement was given |
+
+Every statement is also an `os_signpost` interval named `statement`, with subsystem `ai.relatedb.relate` and category `Query`.
+
+`commits(bufferingPolicy:)` returns an `AsyncStream<Commit>` of the writes committed through this `Database` object: each auto-commit statement that changed the store and each explicit transaction that did.
+
+| Rule | Detail |
+| --- | --- |
+| `Commit` | `bookmark`; `stats`, the counters summed over the transaction's statements; `tags`, the set the writer passed, empty for an auto-commit statement |
+| Streams | Each call returns a new stream, which receives the commits made after it was created and ends when the store closes |
+| Buffering | `.unbounded` by default: events wait until consumed; `.bufferingNewest(n)` keeps the latest `n` |
+| Scope | In-process and per object: a write by another process, or through a second `Database` opened on the same store, is not reported |
+| Order | Commits from one connection arrive in commit order; two connections committing at the same moment may arrive in either order, and their bookmarks tell which came first |
+
+## Live values
+
+`values(tags:_:)` returns an `AsyncThrowingStream` of what a read body returns: the current value first, then a fresh one after a commit made through this `Database` object.
+
+| Rule | Detail |
+| --- | --- |
+| The body | Runs as `read(_:)`: one snapshot, nothing kept |
+| `tags: nil` | Every commit is followed by a read |
+| `tags` with a set | Only a commit that carries at least one of the tags is followed by a read; an auto-commit statement carries none |
+| An `Equatable` value | A read equal to the last value yielded yields nothing |
+| Coalescing | Commits that arrive while a read runs are followed by one read; a consumer that falls behind receives the latest value only |
+| End | A read that throws ends the stream with its error; the stream also ends when its consumer stops and when the store closes |
+
+`@LiveQuery`, where SwiftUI can be imported, is the same observation as a property of a view. It reads the database that `.relateDatabase(_:)` put in the environment (`EnvironmentValues.relateDatabase`).
+
+| Member | Behavior |
+| --- | --- |
+| `LiveQuery(_:tags:using:)` | The records of a `Statement`, each decoded as a `Decodable` element by column name; the property is an empty array until the first read returns |
+| `LiveQuery(initial:tags:id:_:)` | A value read by a closure that runs as `Database.read`; the observation starts again when `id` changes |
+| `wrappedValue` | The latest value read, or the initial value before the first read |
+| `projectedValue` | A `LiveQueryState`: `.loading`, `.live` or `.failed(any Error)`, with `isLoading`, `isLive` and `error` |
+
+The value type is `Sendable` and `Equatable`. The observation starts again when the statement or `id`, the tags, or the database in the environment changes. A query with no database in the environment, a statement whose interpolation throws, and a read that throws are `.failed`.
+
+## Store provisioning
+
+| Member | Behavior |
+| --- | --- |
+| `Database.defaultStoreURL(named:)` | The URL of `name` in the user's Application Support directory; on macOS, inside a folder named for the app's bundle identifier, or directly in that directory for a process without one. Creates the containing directory, not the store. A name that is empty, `.`, `..` or holds a `/` throws `.invalidParameter`: `a store name is one path component, got '<name>'` |
+| `Database.provision(at:from:protection:)` | Copies a seed store, a `.rl` file or a directory, to `target` when nothing is there, and returns `true`; returns `false` and touches nothing when `target` exists |
+
+`provision` stages the copy under a temporary name in the target's directory and renames it into place. A later call removes a temporary copy that an interrupted call left, once it was started more than ten minutes before. The copy is writable by its owner only, and on iOS gets `protection`, by default `FileProtectionType.completeUntilFirstUserAuthentication`. A seed that is a symbolic link is followed. A URL that is not a local `file:` URL throws `.invalidParameter`; a missing seed or a failed copy throws the file system's error.
+
+## Migrator
+
+A `Migrator` holds schema statements and versioned steps, and brings a store to the highest registered version.
+
+| Member | Behavior |
+| --- | --- |
+| `Migrator(versionLabel:)` | A migrator whose version node has the given label, `RelateMigration` by default |
+| `schema` | `[Statement]` run on every migration, each on its own, before the versioned steps; each must be safe to repeat, as `CREATE INDEX … IF NOT EXISTS` is |
+| `register(version:_:)` | Registers the step that brings a store to `version`, as a body that receives a `Transaction` or as `[Statement]`; versions are positive and registered in ascending order, each once |
+| `latestVersion` | The highest registered version; zero with no step |
+| `currentVersion(_:)` | The version the store records; zero when it has no version node |
+| `migrate(_:)` with a `Connection` | Runs `schema`, then every registered step over the store's version in ascending order, and returns `latestVersion` |
+| `migrate(_:)` with a `Database` | The same, asynchronously, on the database's writer connection |
+
+The version is the `version` property of the node `(:RelateMigration {key: 'schema_version'})` in the connection's namespace. A step and the record of its version commit in one transaction. Each refusal happens before anything runs, `schema` included:
+
+| Refusal | Error |
+| --- | --- |
+| A store at a version over `latestVersion` | `.misuse`: `the store is at schema version <n>, newer than this build's <m>` |
+| Steps registered out of order | `.misuse`: `migration versions are positive and registered in ascending order, each once: <version> was registered after <previous>` |
+| A read-only database | `.misuse`: `migrate on a database opened read-only` |
+| Several version nodes, or one without an integer version | `.unexpectedResult` |
 
 ## Concurrency
 
 | Rule | Detail |
 | --- | --- |
 | `Database` is `Sendable` | One database may be shared across tasks and actors |
-| `Connection` is not `Sendable` | The Swift 6 compiler refuses code that shares one between isolation domains; concurrent work opens more connections |
-| Calls block | Every call is synchronous while the engine runs |
+| `Connection` and `Transaction` are not `Sendable` | The Swift 6 compiler refuses code that shares one between isolation domains; concurrent work opens more connections or uses `Database.read` and `Database.write` |
+| `Statement`, `QueryResult`, `Record` and `CypherValue` are `Sendable` | They are plain values and may cross actors |
+| Calls on a connection block | Each is synchronous while the engine runs; `Database.read` and `Database.write` run them off the caller's thread |
 | Errors travel with the call | A call from any task reports its own error; nothing depends on the calling thread |
 | One writer per store | Only one process holds a store writable at a time |
+
+## Renamed and deprecated names
+
+| Name | Status | Replacement |
+| --- | --- | --- |
+| `Notification`, `Namespace` | Removed in 1.0.2 | `QueryNotification`, `DatabaseNamespace` |
+| `Severity`, `Category` | Deprecated type aliases since 1.0.2 | `NotificationSeverity`, `NotificationCategory` |
+| `connect(namespace:)` and `setNamespace(_:)` with a `String` | Deprecated since 1.1.0; an unknown name throws `semantic error: DatabaseNotFound: Graph not found: <name>` | The forms that take a `DatabaseNamespace` |
+| `QueryResult.records` as `[[String: CypherValue]]` | Returns `[Record]` as of 1.1.0; `record["name"]` reads the same | `Record.dictionary` for the dictionary |
+| A `transaction(_:)` body that receives the `Connection` | Receives a `Transaction` as of 1.1.0; a body that only runs statements compiles unchanged | `begin()`, `commit()` and `rollback()` on the connection, outside the body |
 
 ## Platforms and linking
 
@@ -208,6 +512,7 @@ A statement failure throws from `query`; a conflict in an explicit transaction t
 | Product | `.product(name: "Relate", package: "relate")` |
 | Binary target | `RelateFFI`, a static XCFramework with the slices `ios-arm64`, `ios-arm64_x86_64-simulator` and `macos-arm64_x86_64`, downloaded from the release the tag names |
 | Linked system libraries | `iconv`, `CoreFoundation` |
+| Conditional API | `@LiveQuery` where SwiftUI can be imported; the `CLLocationCoordinate2D` conversions where Core Location can; the `MLShapedArray` and `MLMultiArray` conversions where Core ML can |
 | Privacy manifest | `PrivacyInfo.xcprivacy`: no data collected, no tracking; the file-timestamp API reason `C617.1` |
 | `RELATE_LOCAL_XCFRAMEWORK=1` | Builds against `target/apple/RelateFFI.xcframework` in a source checkout instead of the release binary |
 
@@ -238,9 +543,41 @@ for (column, value) in zip(result.columns, result.rows[0]) {
 }
 ```
 
+This program writes two `Person` nodes from `Encodable` values in one transaction, renders a `Statement`, and reads the rows back typed and decoded:
+
+```swift run name=typed
+import Relate
+
+struct Person: Codable {
+    let name: String
+    let role: String?
+}
+
+let conn = try Database.inMemory().connect()
+let people = [Person(name: "Ada", role: "engineer"), Person(name: "Noor", role: nil)]
+try conn.transaction { tx in
+    for person in people {
+        try tx.run("CREATE (p:Person) SET p += \(try CypherValue(encoding: person))")
+    }
+}
+
+let statement: Statement = try """
+    MATCH (p:\(identifier: "Person")) WHERE p.name <> \("Lin")
+    RETURN p.name AS name, p.role AS role ORDER BY name \(raw: "LIMIT 5")
+    """
+print(statement.cypher)
+print(statement.parameters)
+
+let result = try conn.run(statement)
+for record in result {
+    print(try record.get("name", as: String.self), try record.get("role", as: String?.self) ?? "no role")
+}
+print(try result.decode(Person.self).count, "decoded")
+```
+
 ## See also
 
-- [Use the Swift package](/docs/guides/embed/swift): the dependency, open modes, parameters, transactions, errors and actors, task by task.
+- [Use the Swift package](/docs/guides/embed/swift): the dependency, open modes, parameters, transactions, errors, async access and actors, task by task.
 - [Embed relate in a Swift app](/docs/get-started/swift): the first program, step by step.
 - [API reference](/docs/reference/api): every surface and the capability matrix.
 - [C ABI](/docs/reference/api/c): the library under this package.

@@ -43,7 +43,7 @@ relate --mode envelope --max-rows 2 "UNWIND ['Ada', 'Grace', 'Noor'] AS name RET
 The first line is the warning on stderr; the envelope on stdout names both counts:
 
 ```text
-warning: result truncated to 2 rows (the statement returned 3); pass --max-rows 0 for all rows
+warning: result truncated to 2 rows (the statement returned 3); pass --max-rows 0 for all rows, or page with SKIP/LIMIT
 {"columnTypes":["STRING"],"columns":["name"],"notifications":[],"planCache":"miss","rowCap":{"kept":2,"total":3},"rows":[{"name":"Ada"},{"name":"Grace"}],"timings":{"elapsed_ms":0.678416,"execute_ms":0.5296660000000001,"lex_parse_ms":0.023083,"lower_ms":0.032458,"parse_ms":0.098,"plan_ms":0.041625,"result_generation_ms":0.00041600000000000003,"rewrite_ms":0.007083},"truncated":true}
 ```
 

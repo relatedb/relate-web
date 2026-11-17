@@ -1,7 +1,7 @@
 ---
 title: Embed relate in a Swift app
 label: Swift
-description: A first Swift program on the relate Swift package, which opens a store, passes parameters, runs transactions, reads result metadata, and catches a typed error.
+description: A first Swift program on the relate Swift package, which opens a store, passes Swift values as parameters, runs transactions, and catches a typed error.
 order: 90
 surfaces: [swift]
 related: [get-started/python, get-started/rust, get-started/java, get-started/go, reference/errors, concepts/transactions-and-concurrency, reference/storage/formats, reference/api/swift, guides/embed/swift, concepts/problems-relate-solves#embedded-graph-in-an-app]
@@ -26,7 +26,7 @@ swift package init --type executable
 In `Package.swift`, add the package to `dependencies` and the product to your executable target's `dependencies`:
 
 ```swift
-.package(url: "https://github.com/relatedb/relate", from: "1.0.1")
+.package(url: "https://github.com/relatedb/relate", from: "1.1.0")
 .product(name: "Relate", package: "relate")
 ```
 
@@ -37,10 +37,11 @@ import Relate
 
 let db = try Database(path: ":memory:")
 let conn = try db.connect()
-let result = try conn.query(
+let version = try conn.query(
     "CALL dbms.components() YIELD name, versions "
-        + "WHERE name = 'Relate' RETURN versions[0] AS version")
-print(result.rows[0][0].stringValue ?? "unknown")
+        + "WHERE name = 'Relate' RETURN versions[0] AS version"
+).scalar(as: String.self)
+print(version)
 ```
 
 Notice the version: the programs on this page were checked against that release, and their recorded output comes from it.
@@ -55,14 +56,14 @@ import Relate
 
 let memory = try Database(path: ":memory:")
 let conn = try memory.connect()
-let result = try conn.query("RETURN 'hello' AS greeting")
-print(result.rows[0][0].stringValue ?? "")
+let greeting = try conn.query("RETURN 'hello' AS greeting").scalar(as: String.self)
+print(greeting)
 
 _ = try Database(path: "./team.rl")
 print(FileManager.default.fileExists(atPath: "team.rl"))
 ```
 
-`Database(path:)` opens a store, `connect()` returns a connection on it, and `query(_:_:)` runs one statement and returns its whole result. Every call is synchronous and throws on failure, so each one takes `try`. A `Database` closes when its last reference is released, and each connection holds its database. Notice that `team.rl` now exists.
+`Database(path:)` opens a store, `connect()` returns a connection on it, and `query(_:_:)` runs one statement and returns its whole result. `scalar(as:)` reads a result of exactly one row and one column as a Swift type. Each of these calls is synchronous and throws on failure, so each one takes `try`. A `Database` closes when its last reference is released, and each connection holds its database. Notice that `team.rl` now exists.
 
 ## Create the graph
 
@@ -95,7 +96,7 @@ A write returns no rows, so we read its counters from `result.stats`. Five nodes
 
 ## Read it back with parameters
 
-A statement names each value it needs as `$name`, and `query(_:_:)` takes the values as a `[String: CypherValue]` dictionary. The statement text stays the same while the values change, and a value never becomes part of the Cypher.
+A statement names each value it needs as `$name`, and `query(_:_:)` takes the values as a dictionary of Swift values, such as strings, numbers, optionals, arrays and dates. The statement text stays the same while the values change, and a value never becomes part of the Cypher.
 
 ```swift run name=params
 import Relate
@@ -124,15 +125,15 @@ let conn = try db.connect()
 try conn.query(team)
 for project in ["relate", "opencypher-tck"] {
     print(project)
-    for row in try conn.query(teamOf, ["project": CypherValue(project)]).records {
-        let name = row["name"]?.stringValue ?? ""
-        let since = row["since"]?.intValue ?? 0
+    for record in try conn.query(teamOf, ["project": project]) {
+        let name = try record.get("name", as: String.self)
+        let since = try record.get("since", as: Int.self)
         print("  \(name) since \(since)")
     }
 }
 ```
 
-`records` gives each row as a dictionary keyed by the names in `RETURN`. Each value is a `CypherValue`, and `stringValue` and `intValue` read it as a Swift type, or `nil` when it is another kind. A literal needs no wrapping (`["project": "relate"]`), and a variable goes through `CypherValue(_:)`. Notice that Noor isn't listed: she maintains `relate` through a `MAINTAINS` relationship, and the pattern asks for `WORKS_ON`.
+A result is a collection of records, one per row. `get(_:as:)` reads a column, by the name `RETURN` gave it, as a Swift type. It throws when the column is missing or holds another kind of value, so a wrong guess never becomes a silent default. Each value is a `CypherValue` underneath, and `record["name"]` returns it as one. Notice that Noor isn't listed: she maintains `relate` through a `MAINTAINS` relationship, and the pattern asks for `WORKS_ON`.
 
 ## Change it in a transaction
 
@@ -155,7 +156,7 @@ let team = """
     """
 
 func count(_ conn: Connection, _ label: String) throws -> Int64 {
-    try conn.query("MATCH (n:\(label)) RETURN count(n) AS n").scalar().intValue ?? 0
+    try conn.query("MATCH (n:\(label)) RETURN count(n) AS n").scalar(as: Int64.self)
 }
 
 let db = try Database(path: ":memory:")
@@ -177,7 +178,7 @@ try conn.rollback()
 print("projects after rollback:", try count(conn, "Project"))
 ```
 
-Inside the transaction, the delete is visible: zero projects. After `rollback()`, both are back, and Lin, who was committed, stays. `commit()` returns a :term[bookmark]{id=bookmark}, the commit's place in the store's history as `relate:<n>`, or `nil` when the transaction wrote nothing. `scalar()` reads a result of exactly one row and one column. Each transaction starts with its own `begin()`.
+Inside the transaction, the delete is visible: zero projects. After `rollback()`, both are back, and Lin, who was committed, stays. `commit()` returns a :term[bookmark]{id=bookmark}, the commit's place in the store's history as `relate:<n>`, or `nil` when the transaction wrote nothing. Each transaction starts with its own `begin()`. `conn.transaction { tx in … }` wraps the same three calls around a closure: it commits when the closure returns and rolls back when it throws.
 
 ## Read result metadata
 
@@ -254,9 +255,10 @@ do {
     print("code:", e.code)
     print("stage:", e.stage)
     print("retryable:", e.retryable)
+    print("missing parameter:", e.isMissingParameter)
 }
 
-print(try conn.query(roleOf, ["name": "Noor"]).scalar().stringValue ?? "")
+print(try conn.query(roleOf, ["name": "Noor"]).scalar(as: String.self))
 ```
 
 The message says what's missing; the properties are what code branches on:
@@ -267,8 +269,9 @@ The message says what's missing; the properties are what code branches on:
 | `code` | `Neo.ClientError.Statement.ParameterMissing` | The Neo4j status code for the same error |
 | `stage` | `compile` | Where it was found: `.compile` before any work, `.runtime` while producing rows, `.internal` for a failure outside the statement, such as a locked store |
 | `retryable` | `false` | Whether running it again can succeed; `true` for a write-write conflict, never for a mistake in the statement |
+| `isMissingParameter` | `true` | One of four predicates on the code; the others are `isSyntaxError`, `isConstraintViolation` and `isWriteConflict` |
 
-The other two cases come from the client, not the engine: `.invalidParameter` for a value it refuses to bind, such as a node, and `.decoding` for a reply that breaks the engine's contract. The [errors reference](/docs/reference/errors#engine-parameter-missing) lists this message with its cause and remedy. With the value bound, the same statement finds Noor's role.
+The other four cases come from the client, not the engine. `.invalidParameter` is a value it refuses to bind, such as a node. `.unexpectedResult` is a result without the shape or type the code asked for, such as `get("name", as: Int.self)` on a string. `.misuse` is a call outside the API's contract, and `.decoding` is a reply that breaks the engine's contract. The [errors reference](/docs/reference/errors#engine-parameter-missing) lists this message with its cause and remedy. With the value bound, the same statement finds Noor's role.
 
 ## Put it together
 
@@ -298,7 +301,7 @@ let teamOf = """
     """
 
 func ensureTeam(_ conn: Connection) throws {
-    let people = try conn.query("MATCH (p:Person) RETURN count(p) AS n").scalar().intValue ?? 0
+    let people = try conn.query("MATCH (p:Person) RETURN count(p) AS n").scalar(as: Int.self)
     if people == 0 {
         try conn.query(team)
         print("created the team graph")
@@ -309,8 +312,10 @@ func ensureTeam(_ conn: Connection) throws {
 
 func report(_ conn: Connection, _ project: String) throws {
     print(project)
-    for row in try conn.query(teamOf, ["project": CypherValue(project)]).records {
-        print("  \(row["name"]?.stringValue ?? "") since \(row["since"]?.intValue ?? 0)")
+    for record in try conn.query(teamOf, ["project": project]) {
+        let name = try record.get("name", as: String.self)
+        let since = try record.get("since", as: Int.self)
+        print("  \(name) since \(since)")
     }
 }
 
@@ -337,7 +342,7 @@ To read the file with no chance of changing it, open it read-only: `Database(rea
 
 ## What you built
 
-You have a Swift program that keeps a graph of people and projects in `team.rl`, one file you can copy or archive. It reads with parameters, writes inside transactions, knows a read from a write by its query type, and reports errors by case and GQLSTATUS code. Ada, Grace, and Noor are waiting in that file for the next run.
+You have a Swift program that keeps a graph of people and projects in `team.rl`, one file you can copy or archive. It reads with parameters into Swift types, writes inside transactions, knows a read from a write by its query type, and reports errors by case and GQLSTATUS code. Ada, Grace, and Noor are waiting in that file for the next run.
 
 ## Next
 

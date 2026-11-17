@@ -86,12 +86,13 @@ const shownFrom = (statement: string, texts: string[], source: Shown['source'], 
   renders: new Map(),
 });
 
-/** What relate prints for `s` in `mode` with `cap`, rendered once per mode and cap. */
-function view(s: Shown, mode: Mode, cap: number | null): RunOutput {
+/** What relate prints for `s` in `mode`, under an agent harness or not, rendered once per mode and harness. */
+function view(s: Shown, mode: Mode, harness: boolean): RunOutput {
+  const cap = harness ? FACTS.agentCap : null;
   const key = `${mode}|${cap}`;
   let out = s.renders.get(key);
   if (!out) {
-    out = renderRun({ envelopes: s.envelopes, statements: splitStatements(s.statement).length, mode, cap }, FACTS);
+    out = renderRun({ envelopes: s.envelopes, statements: splitStatements(s.statement).length, mode, cap, agent: harness }, FACTS);
     s.renders.set(key, out);
   }
   return out;
@@ -203,7 +204,7 @@ export async function mount(ctx: ElementContext) {
     const command = line(0, commandLine(shown.statement, mode, harness ? FACTS.harnessVariable : null));
     let out: RunOutput;
     try {
-      out = view(shown, mode, cap);
+      out = view(shown, mode, harness);
     } catch (err) {
       // Never leave another mode's output under this tab.
       screen.replaceChildren(command, note(`the pane could not draw this output: ${(err as Error).message}`));
@@ -281,7 +282,7 @@ export async function mount(ctx: ElementContext) {
       const versionNote = version && version !== FACTS.version ? ` The engine in this tab reports ${version}; the CLI facts are relate ${FACTS.version}'s.` : '';
       const next = shownFrom(statement, r.text, 'live', liveLine({ version, ms: engineMs(r.envelopes) }), `${split}${versionNote}`.trim());
       // Rendered before it replaces what is shown: a run the pane cannot draw leaves the last one whole.
-      view(next, mode, harness ? FACTS.agentCap : null);
+      view(next, mode, harness);
       shown = next;
       screen.dataset.runs = String(Number(screen.dataset.runs ?? 0) + 1);
       draw();

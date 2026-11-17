@@ -105,10 +105,10 @@ Every store lists two lookup indexes before any `CREATE INDEX`: `index_460996c0`
 | `IF NOT EXISTS` | No error and no change when a constraint of that name exists |
 | A name another constraint uses | `semantic error: ConstraintAlreadyExists` |
 | A name an index uses | `semantic error: DuplicatedIndexName` |
-| The same rule under another name | `semantic error: EquivalentSchemaRuleAlreadyExists` |
+| The same rule under another name | `semantic error: EquivalentConstraintAlreadyExists` |
 | A uniqueness or key constraint on the label and properties of an existing range index | `semantic error: AlreadyExists: there already exists an index (:<Label> {<property>, …}). A constraint cannot be created until the index has been dropped.` A text index on the same property does not block it |
 | More than one property in `IS ::` or `IS TYPED` | `syntax error: InvalidConstraintSyntax: only single property IS TYPED constraints are supported` |
-| Existing data breaks the rule | The `CREATE CONSTRAINT` fails with the violation message and creates nothing |
+| Existing data breaks the rule | The `CREATE CONSTRAINT` creates nothing and fails with the [violation message](#constraint-violations) after a `ConstraintCreationFailed:` prefix: ``semantic error: ConstraintCreationFailed: ConstraintValidationFailed: `<name>` uniqueness`` |
 | A uniqueness constraint and a missing property | Allowed: uniqueness applies to entities that have the property |
 | `DROP CONSTRAINT` | Removes the constraint and the index it owns |
 | `DROP CONSTRAINT` on a missing name | `semantic error: ConstraintNotFound`; with `IF EXISTS`, nothing happens and no error is raised |

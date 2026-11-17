@@ -57,7 +57,7 @@ These limits have no flag or environment variable.
 | One file read by `LOAD CSV` | 8 MiB (8,388,608 bytes) | [`LOAD CSV file exceeds byte limit`](/docs/reference/errors#cli-load-csv-byte-limit), exit code 1 |
 | A store downloaded by `--load <url>` | 1 GiB, and 300 seconds | A message containing `the remote database exceeded the 1 GiB cap` |
 | One source fetched by `--fetch-params` | 64 MiB, and 60 seconds | A message containing `source exceeded the 64 MiB cap` |
-| Graphs in a store | 3 fixed namespaces: `neo4j`, `system`, `system_ontologies`; a statement runs against one | [`semantic error: DatabaseNotFound: Graph not found: <name>`](/docs/reference/errors#engine-database-not-found), exit code 6 |
+| Graphs in a store | 2 fixed namespaces, `neo4j` and `system`, and a third, `system_ontologies`, only under `RELATE_PREVIEW=ontology`; a statement runs against one | [`semantic error: DatabaseNotFound: Graph not found: <name>`](/docs/reference/errors#engine-database-not-found), exit code 6 |
 
 Every property value is subject to two limits on this page: the expression limit while a statement builds it, and the 64 MiB WAL record limit when it is committed, together with everything else in the same commit. A commit over 64 MiB is refused whole; splitting the write into smaller transactions clears it.
 
@@ -136,11 +136,11 @@ relate --mode envelope "WITH reduce(s = 'a', i IN range(1, 26) | s + s) AS s CRE
 ```
 
 ```text
-This statement tried to commit a single WAL record of at least 64 MB. This is a safety limit protecting against memory exhaustion — the per-record WAL payload cap is 64 MB; commit the data in smaller transactions.
-{"error":{"code":"fatal_error","exit_code":1,"kind":"capacity","message":"This statement tried to commit a single WAL record of at least 64 MB. This is a safety limit protecting against memory exhaustion — the per-record WAL payload cap is 64 MB; commit the data in smaller transactions.","retryable":false}}
+This statement tried to commit a single WAL record of at least 64 MiB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 64 MiB (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).
+{"error":{"code":"fatal_error","exit_code":1,"kind":"capacity","message":"This statement tried to commit a single WAL record of at least 64 MiB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 64 MiB (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).","retryable":false}}
 ```
 
-The message writes the 64 MiB limit as `64 MB`. A string of half that length commits:
+Nothing is written. A string of half that length commits:
 
 ```bash verify
 relate --mode envelope "WITH reduce(s = 'a', i IN range(1, 25) | s + s) AS s CREATE (:Blob {s: s}) RETURN size(s) AS characters"

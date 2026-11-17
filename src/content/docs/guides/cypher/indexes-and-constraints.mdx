@@ -143,7 +143,7 @@ relate --database ./team.rl "CREATE (ada:Person {name: 'Ada', role: 'engineer'})
        (ada)-[:KNOWS]->(grace)"
 ```
 
-Without an index, a lookup by name scans every `Project`, and the planner says which index would help:
+Without an index, the plan for a lookup by name is a scan of the `Project` label, and the planner says which index would help:
 
 ```bash verify
 relate --database ./team.rl --read-only --mode table "EXPLAIN MATCH (p:Project {name: 'relate'}) RETURN p.language AS language"
@@ -219,10 +219,12 @@ Three `ONLINE` indexes besides the two lookup indexes, one of them owned by `pro
 | Message | Cause | Remedy |
 | --- | --- | --- |
 | ``semantic error: ConstraintValidationFailed: `project_name` uniqueness`` (exit code 6) | A write repeats a unique value or key. | Use `MERGE` on the key, or change the value. |
-| ``semantic error: ConstraintValidationFailed: `<name>` requires properties`` | A write leaves out a required or key property, or the existing data lacks it when the constraint is created. | Set the property, or fill it in on the existing data first. |
+| ``semantic error: ConstraintValidationFailed: `<name>` requires properties`` | A write leaves out a required or key property. | Set the property in the same write. |
+| ``semantic error: ConstraintCreationFailed: ConstraintValidationFailed: `<name>` requires properties``, or the same prefix before `uniqueness` or `property type` | A `CREATE CONSTRAINT` whose rule the existing data already breaks. | Fix the existing data first, then create the constraint. |
 | ``semantic error: ConstraintValidationFailed: `<name>` property type`` | A value of another type than the constraint names. | Convert the value, such as `toInteger(row.since)`. |
 | `semantic error: IndexAlreadyExists` or `semantic error: ConstraintAlreadyExists` | The name is taken. | Add `IF NOT EXISTS`, or check `SHOW INDEXES` and `SHOW CONSTRAINTS`. |
-| `semantic error: EquivalentSchemaRuleAlreadyExists` | An index or constraint on the same label and properties exists under another name, such as a constraint's own index. | Keep the existing one. |
+| `semantic error: EquivalentSchemaRuleAlreadyExists` | An index on the same label and properties exists under another name, such as a constraint's own index. | Keep the existing one. |
+| `semantic error: EquivalentConstraintAlreadyExists` | A constraint with the same rule exists under another name. | Keep the existing one. |
 | `semantic error: AlreadyExists: there already exists an index (:Person {role}). A constraint cannot be created until the index has been dropped.` | A uniqueness constraint over properties that a range index already covers. | Drop the index, then create the constraint, which brings its own. |
 | `Unable to drop 'project_name': the index belongs to a constraint.` (exit code 1) | `DROP INDEX` on a constraint's index. | Drop the constraint. |
 | ``semantic error: NoSuchIndex: `<name>` `` or `semantic error: ConstraintNotFound` | The name does not exist. | Add `IF EXISTS`, or check the name with `SHOW`. |

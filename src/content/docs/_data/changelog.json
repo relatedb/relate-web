@@ -1,10 +1,290 @@
 {
   "$schema_note": "Release notes authored here (ADR-0002), one entry per release, newest first; rendered to /docs/reference/changelog/, its twin and /docs/changelog.json by src/lib/docs/generated/changelog.ts. Each item is one sentence of inline markdown ending with a period; `breaking: true` marks a change that can make working code or statements fail; `pages` lists the page ids (with an optional #anchor) that document it, linked once published. Facts come from upstream's release notes (public/releases.json) and are checked against the binary named in cli.json `recorded_with` where the CLI can show them. The verified engine version (_data/engine.json) must be an entry or an entry's `previous`: every twin links #since-<verified>.",
   "policy": [
-    "relate follows semantic versioning, and 1.0.0 is its first stable release. Before 1.0 anything could change in a release, a patch release included: 0.16.1 removed the `apoc.coll.sort` spelling and replaced the C ABI with an incompatible typed one. The 1.0.1 patch release also carries changes marked **Breaking** below.",
+    "relate follows semantic versioning, and 1.0.0 is its first stable release. Before 1.0 anything could change in a release, a patch release included: 0.16.1 removed the `apoc.coll.sort` spelling and replaced the C ABI with an incompatible typed one. The releases after 1.0 also carry changes marked **Breaking** below: the 1.0.1 and 1.0.2 patch releases, and the Swift client in 1.1.0.",
     "A change that can make working code or statements fail is marked **Breaking** in the entry of the release that ships it, under Changed or Removed, with its replacement when there is one. A feature that still works but is to be removed is listed under Deprecated in the release that deprecates it."
   ],
   "releases": [
+    {
+      "version": "1.1.0",
+      "date": "2026-11-17",
+      "published_at": "2026-11-17T15:11:40Z",
+      "previous": "1.0.2",
+      "summary": "Shortest-path queries with a filtered endpoint or a path count do less work, an equality lookup without a declared index no longer reads every node of the label, the Swift client gains Swift values as parameters, typed records, managed asynchronous access and live values, and a failed run in agent mode names `relate agent-feedback`.",
+      "added": [
+        {
+          "text": "The Swift client takes Swift values as parameters (strings, numbers, optionals, arrays, dates, raw-value enums), reads a result as `Record`s with typed accessors such as `record.get(\"title\", as: String.self)`, `single()` and `scalar(as:)`, and has `Statement`, whose string interpolation binds each value as a parameter.",
+          "pages": [
+            "reference/api/swift#swift-types-as-values",
+            "reference/api/swift#record",
+            "reference/api/swift#statement"
+          ]
+        },
+        {
+          "text": "The Swift client encodes an `Encodable` model as a map parameter and decodes rows, nodes and relationships into `Decodable` types with `result.decode(_:)`.",
+          "pages": [
+            "reference/api/swift#codable-models"
+          ]
+        },
+        {
+          "text": "The Swift client adds `transaction(retries:_:)`, which runs its body again after a retryable conflict, `Connection.read(_:)`, `runInTransaction(_:retries:)` and `isPoisoned()`.",
+          "pages": [
+            "reference/api/swift#connection",
+            "reference/api/swift#transaction"
+          ]
+        },
+        {
+          "text": "The Swift client adds managed asynchronous access, `try await db.read { … }` and `try await db.write { … }` on connections the database owns, with `Options.maxReaders` and `checkpointInBackground()`.",
+          "pages": [
+            "reference/api/swift#managed-asynchronous-access",
+            "guides/embed/swift"
+          ]
+        },
+        {
+          "text": "The Swift client adds `setTraceHandler`, a `commits()` stream, live values with `values(tags:_:)` and the SwiftUI `@LiveQuery`, `defaultStoreURL(named:)` and `provision(at:from:)` for an app's store, and `Migrator`.",
+          "pages": [
+            "reference/api/swift#tracing-and-commits",
+            "reference/api/swift#live-values",
+            "reference/api/swift#store-provisioning",
+            "reference/api/swift#migrator"
+          ]
+        },
+        {
+          "text": "The procedure `db.index.fulltext.listAvailableAnalyzers` runs and lists the 45 analyzer names; in 1.0.2 a call to it failed with `ProcedureNotFound`.",
+          "pages": [
+            "reference/cypher/procedures#index-procedures"
+          ]
+        },
+        {
+          "text": "With agent mode on, a failed run ends with one more stderr line, `hint: agents can report Relate friction to its developers — draft it, ask the person, then run 'relate agent-feedback'`, and `relate skill install` and `relate upgrade` ask a person at a terminal for the feedback grant once per 30 days.",
+          "pages": [
+            "reference/cli/feedback#the-hint-line",
+            "reference/cli/agent-mode#the-envelope"
+          ]
+        },
+        {
+          "text": "The HTTP Query API accepts `application/vnd.neo4j.query` with no version as a request type for typed parameters, where 1.0.2 answered 400.",
+          "pages": [
+            "reference/server/http#request"
+          ]
+        },
+        {
+          "text": "Each release attaches `THIRDPARTY-NOTICES.md`, which lists the third-party Rust crates built into the binaries, the C library, the Python wheels and the WebAssembly build, with their license texts.",
+          "pages": [
+            "reference/project#license"
+          ]
+        },
+        {
+          "text": "The `git-to-graph` extension, at 0.14.0, takes `--until VALUE`, an upper bound on the committer date that closes an import window with `--since`.",
+          "pages": [
+            "guides/extensions/git-to-graph#import-a-repository"
+          ]
+        }
+      ],
+      "changed": [
+        {
+          "text": "Swift: `QueryResult.records` returns `[Record]` instead of `[[String: CypherValue]]`, a `transaction` body receives a `Transaction` instead of the `Connection`, `RelateError` gains the cases `unexpectedResult` and `misuse`, and `scalar()` throws `unexpectedResult` instead of `decoding` for a result that is not one row and one column.",
+          "breaking": true,
+          "pages": [
+            "reference/api/swift#queryresult",
+            "reference/api/swift#transaction",
+            "reference/api/swift#errors"
+          ]
+        },
+        {
+          "text": "A shortest-path statement whose endpoint is filtered by a `WHERE` that no index serves lists the matching endpoints first and searches only for them, and `SHORTEST <k>`, `SHORTEST <k> GROUPS` and `ANY <k>` between two fixed endpoints walk one path length at a time; results are unchanged, and the engine's release notes report 16 s falling to 0.5 s for the first on a graph of 1.6 million nodes.",
+          "pages": [
+            "reference/cypher/patterns#path-selectors-and-modes"
+          ]
+        },
+        {
+          "text": "An equality lookup on a property with no declared index no longer reads every node of the label: on a label of 100,000 nodes, `PROFILE` reports 1 database hit where 1.0.2 reported 100,000.",
+          "pages": [
+            "reference/cypher/explain-and-profile#index-use-in-a-plan"
+          ]
+        },
+        {
+          "text": "Notification `03C90` reads `the scan matches every node; add a label to narrow it`, where 1.0.2 named a property index.",
+          "pages": [
+            "reference/cypher/notifications#performance"
+          ]
+        },
+        {
+          "text": "A `relate push --dry-run` plan prints `-` in the `policy` column of an entity that is not sent, an unkeyed or a dangling one, where 1.0.2 printed a policy name.",
+          "pages": [
+            "reference/cli/push#the-report"
+          ]
+        },
+        {
+          "text": "The MCP server answers a `tools/call` without a `name` with `invalid params: missing string \"name\"`.",
+          "pages": [
+            "reference/server/mcp#errors-and-refusals"
+          ]
+        },
+        {
+          "text": "`--version`, `--help` and the commands wait at exit, for at most 1 second, for a usage-metrics delivery already in progress, and the first run of a new CLI version waits for at most 10 seconds; a statement run never waits.",
+          "pages": [
+            "reference/privacy-and-telemetry#events"
+          ]
+        },
+        {
+          "text": "The `fs-to-graph` extension, at 0.14.0, commits each batch of rows on its own, so a tree whose text goes past 64 MiB imports, and a failed run keeps the batches it committed.",
+          "pages": [
+            "guides/extensions/fs-to-graph#the-graph-it-builds"
+          ]
+        }
+      ],
+      "deprecated": [
+        {
+          "text": "Swift: `connect(namespace:)` and `setNamespace(_:)` taking the namespace as a `String`; pass a `DatabaseNamespace`.",
+          "pages": [
+            "reference/api/swift#renamed-and-deprecated-names"
+          ]
+        }
+      ],
+      "fixed": [
+        {
+          "text": "`SHOW TRANSACTIONS` rejects an unknown `YIELD` column, and `TERMINATE TRANSACTIONS` validates its argument."
+        }
+      ]
+    },
+    {
+      "version": "1.0.2",
+      "date": "2026-11-16",
+      "published_at": "2026-11-16T10:25:04Z",
+      "previous": "1.0.1",
+      "summary": "Cypher 25 becomes the only Cypher version, the `system_ontologies` namespace moves behind the ontology preview opt-in, full-text queries read wildcard, fuzzy and boosted terms, the Java client moves to `ai.relatedb`, the Go module is tagged with each release, and the CLI gains `relate feedback`.",
+      "added": [
+        {
+          "text": "`relate feedback <text>` prints a prefilled new-issue URL for the relate repository and opens it in the browser, and `relate agent-feedback`, in a run with agent mode on, sends one structured report under a 30-day grant that a person makes with `relate feedback enable`.",
+          "pages": [
+            "reference/cli/feedback",
+            "reference/privacy-and-telemetry#feedback-reports"
+          ]
+        },
+        {
+          "text": "A full-text query reads wildcard terms (`tor*`, `t?rn`), fuzzy terms (`wal~1`) and boosts (`wal^2`), and an index created with the `standard-folding` analyzer folds accents, so `muller` matches `Müller`.",
+          "pages": [
+            "reference/cypher/search#full-text-matching",
+            "guides/cypher/full-text-and-hybrid-search"
+          ]
+        },
+        {
+          "text": "Notifications `03N61` and `03N62` report an `OPTIONAL CALL` of a procedure or a subquery that returns no columns, where `OPTIONAL` changes nothing.",
+          "pages": [
+            "reference/cypher/notifications#performance"
+          ]
+        },
+        {
+          "text": "Each release tags the Go module `clients/go/v<version>`, so `go get github.com/relatedb/relate/clients/go@v1.0.2` resolves the release, and the module carries its own copy of `relate.h`, so a build sets `CGO_LDFLAGS` only.",
+          "pages": [
+            "guides/embed/go#add-the-client",
+            "reference/project#platforms"
+          ]
+        },
+        {
+          "text": "The Go client exports `ErrClosed`: a second `Close()` does nothing, and every other call on a closed `Database` or `Connection` returns it.",
+          "pages": [
+            "reference/api/go#database"
+          ]
+        },
+        {
+          "text": "The Swift client adds `Database(url:readOnly:)`, `connect(namespace:)` and `setNamespace(_:)` taking a `DatabaseNamespace`, error predicates on `EngineError` such as `isConstraintViolation`, and `RelateError.isRetryable`, and declares `throws(RelateError)` on the calls that can fail only with it.",
+          "pages": [
+            "reference/api/swift#database",
+            "reference/api/swift#errors"
+          ]
+        }
+      ],
+      "changed": [
+        {
+          "text": "A `CYPHER 5` prefix fails with `syntax error: parse error: UnsupportedCypherVersion: 5 is not a valid option for cypher version. Valid options are: 25`, where 1.0.1 ran the statement as Cypher 5; `CYPHER 25` is accepted and changes nothing, and `ALTER DATABASE … SET DEFAULT LANGUAGE` accepts only `CYPHER 25`.",
+          "breaking": true,
+          "pages": [
+            "reference/cypher/cypher-versions#version-prefix",
+            "reference/errors#engine-unsupported-cypher-version"
+          ]
+        },
+        {
+          "text": "The `system_ontologies` namespace exists only with `RELATE_PREVIEW=ontology` set: without it `SHOW DATABASES` lists `neo4j` and `system`, and `USE system_ontologies`, `--namespace system_ontologies` and a client connect to it fail with `semantic error: DatabaseNotFound: Graph not found: system_ontologies`.",
+          "breaking": true,
+          "pages": [
+            "concepts/namespaces#three-names-one-graph",
+            "reference/errors#engine-database-not-found"
+          ]
+        },
+        {
+          "text": "Outside the `system` namespace, a `SHOW DATABASES` combined with more than its own `YIELD` and one closing `RETURN` fails with `semantic error: SystemDatabaseRequired: This is an administration command and it should be executed against the system database: SHOW DATABASES`.",
+          "breaking": true,
+          "pages": [
+            "concepts/namespaces#how-a-statement-picks-its-namespace",
+            "reference/errors#engine-system-database-required"
+          ]
+        },
+        {
+          "text": "A condition on the path in the `WHERE` of a `MATCH`, such as `length(p) >= 3`, is applied after `ANY SHORTEST`, `ALL SHORTEST`, `SHORTEST 1` and `SHORTEST 1 GROUPS` select, so a selected path that fails it is dropped and no longer path takes its place; `shortestPath()`, `allShortestPaths()` and a condition inside the pattern are unchanged.",
+          "breaking": true,
+          "pages": [
+            "reference/cypher/patterns#path-selectors-and-modes"
+          ]
+        },
+        {
+          "text": "In a full-text query `*`, `?`, `~` and `^` are operators, so a term that held one of them as text matches differently, a malformed suffix such as `wal^x` is a syntax error, and a query of more than 1,024 clauses fails with `syntax error: Invalid fulltext query: more than 1024 clauses`.",
+          "breaking": true,
+          "pages": [
+            "reference/cypher/search#full-text-matching"
+          ]
+        },
+        {
+          "text": "The Java client is the artifact `ai.relatedb:relate` with the package `ai.relatedb`, where 1.0.1 had `com.relate:relate` and `com.relate`: imports and build coordinates change, and the jar is still a release download, not on Maven Central.",
+          "breaking": true,
+          "pages": [
+            "guides/embed/java#add-the-client",
+            "reference/api/java"
+          ]
+        },
+        {
+          "text": "The Swift client renames `Notification` to `QueryNotification` and `Namespace` to `DatabaseNamespace`, with no alias for the old names; `Severity` and `Category` become `NotificationSeverity` and `NotificationCategory`, with deprecated aliases.",
+          "breaking": true,
+          "pages": [
+            "reference/api/swift#renamed-and-deprecated-names"
+          ]
+        },
+        {
+          "text": "A user, role or privilege command such as `CREATE USER` fails with `semantic error: UnsupportedAdministrationCommand: Unsupported administration command: <statement>`, a constraint that existing data breaks fails with a `ConstraintCreationFailed:` prefix, and a constraint equal to an existing one fails with `EquivalentConstraintAlreadyExists`.",
+          "pages": [
+            "reference/cypher/schema-clauses#constraints",
+            "reference/errors#engine-unsupported-administration-command"
+          ]
+        },
+        {
+          "text": "`point.distance` returns `null` when an argument is not a point.",
+          "pages": [
+            "reference/cypher/functions#spatial-functions"
+          ]
+        },
+        {
+          "text": "The row cap warning ends with `, or page with SKIP/LIMIT`: `warning: result truncated to 100 rows (the statement returned 250); pass --max-rows 0 for all rows, or page with SKIP/LIMIT`.",
+          "pages": [
+            "reference/cli/agent-mode#the-row-cap",
+            "reference/errors#cli-row-cap-warning"
+          ]
+        },
+        {
+          "text": "The refusal of a commit over the WAL payload cap names the cap as 64 MiB and per commit, and names the remedies: `CALL { … } IN TRANSACTIONS OF n ROWS`, or batches sent by the client.",
+          "pages": [
+            "reference/storage/limits-and-sizing",
+            "reference/errors#engine-wal-payload-cap"
+          ]
+        },
+        {
+          "text": "A Bolt message is limited by the size it decodes to, 64 MiB once the session is open and 1 MiB before, where 1.0.1 counted 262,144 decoded values; a message over the limit still fails only its own request.",
+          "pages": [
+            "reference/server/bolt#limits"
+          ]
+        }
+      ]
+    },
     {
       "version": "1.0.1",
       "date": "2026-11-12",

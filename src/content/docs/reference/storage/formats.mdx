@@ -71,7 +71,7 @@ WORKS_ON:
 ---
 ```
 
-`relate clone --to-snapshot-format <codec>` copies a store into a new store in another codec; the source is not written. In relate 1.0.1 a `markdown` store clones into a `.rl` file only with `--to-snapshot-format parquet` or `json` ([`relate clone`](/docs/reference/cli/clone#markdown-into-a-rl-file)).
+`relate clone --to-snapshot-format <codec>` copies a store into a new store in another codec; the source is not written. In relate 1.1.0 a `markdown` store clones into a `.rl` file only with `--to-snapshot-format parquet` or `json` ([`relate clone`](/docs/reference/cli/clone#markdown-into-a-rl-file)).
 
 ### Parquet data files
 
@@ -176,10 +176,10 @@ for store in items items-json items.rl items-clone.rl; do printf '%s: ' "$store"
 ```
 
 ```text
-items: total bytes: 2270050
+items: total bytes: 2279459
 items-json: total bytes: 9245067
-items.rl: total bytes: 18640896
-items-clone.rl: total bytes: 2293760
+items.rl: total bytes: 18653184
+items-clone.rl: total bytes: 2306048
 ```
 
 | Layout | Size characteristic |

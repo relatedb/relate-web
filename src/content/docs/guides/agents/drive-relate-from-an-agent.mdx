@@ -34,7 +34,7 @@ Exit codes:
   7  timeout: a statement exceeded --timeout
 ```
 
-Before them it lists the twelve commands and every query-run flag; the [agent quickstart](/docs/get-started/agent-quickstart#read-the-briefing) shows the whole output.
+Before them it lists the 14 commands and every query-run flag; the [agent quickstart](/docs/get-started/agent-quickstart#read-the-briefing) shows the whole output.
 
 ## Create the example graph
 
@@ -194,7 +194,7 @@ CLAUDECODE=1 relate --mode envelope --max-rows 2 'UNWIND range(1, 250) AS x RETU
 ```
 
 ```text
-warning: result truncated to 2 rows (the statement returned 250); pass --max-rows 0 for all rows
+warning: result truncated to 2 rows (the statement returned 250); pass --max-rows 0 for all rows, or page with SKIP/LIMIT
 {"columnTypes":["INTEGER"],"columns":["x"],"notifications":[],"planCache":"miss","rowCap":{"kept":2,"total":250},"rows":[{"x":1},{"x":2}],"timings":{"elapsed_ms":0.494834,"execute_ms":0.344042,"lex_parse_ms":0.023459,"lower_ms":0.038375,"parse_ms":0.095,"plan_ms":0.047416,"result_generation_ms":0.001209,"rewrite_ms":0.007292},"truncated":true}
 ```
 
@@ -279,7 +279,7 @@ exit=0
 
 - **`semantic error: ParameterMissing: Expected parameter(s): <name>`** (exit code 6): the statement uses `$<name>` and no `--param` or `--fetch-params` binds it. Pass `--param <name>=<value>` ([errors reference](/docs/reference/errors#engine-parameter-missing)).
 - **A syntax error whose `source` has a gap where `$<name>` was** (exit code 6): the statement was in double quotes, so the shell replaced `$<name>` with an empty string before relate saw it. With the parameter inside a map, the message starts `syntax error: parse error: unexpected token "}" (RightBrace)`. Single-quote the statement.
-- **`warning: result truncated to 100 rows (the statement returned <n>); pass --max-rows 0 for all rows`** (exit code 0): the row cap cut the output. Pass `--max-rows 0`, or bound the statement with `LIMIT` or an aggregate ([errors reference](/docs/reference/errors#cli-row-cap-warning)).
+- **`warning: result truncated to 100 rows (the statement returned <n>); pass --max-rows 0 for all rows, or page with SKIP/LIMIT`** (exit code 0): the row cap cut the output. Pass `--max-rows 0`, page with `SKIP` and `LIMIT`, or bound the statement with `LIMIT` or an aggregate ([errors reference](/docs/reference/errors#cli-row-cap-warning)).
 - **`Failed to open Relate: storage locked: <path>`** on stderr, with the error object message `storage locked: <path>` (exit code 5, `retryable: false`): another process has the store open. Wait for it to exit; a directory store can also be opened `--read-only` beside its writer ([errors reference](/docs/reference/errors#cli-conflict-locked)).
 
 ## Related
