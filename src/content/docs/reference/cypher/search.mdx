@@ -92,16 +92,21 @@ An unknown key fails with `semantic error: InvalidInputValue`. A property whose 
 
 | Behavior | Value |
 | --- | --- |
-| Terms | Lowercase alphanumeric words; matching ignores case. Accented letters are not folded: `cafe` does not match `café` |
+| Terms | Lowercase alphanumeric words; matching ignores case. Accented letters stay as written unless the index folds them: without folding, `cafe` does not match `café` |
+| Accent folding | An index created with `` `fulltext.analyzer`: 'standard-folding' `` folds its stored words and the terms of every query on it to ASCII: diacritics drop, and `ß`, `æ`, `œ`, `ø`, `ł` and `þ` become `ss`, `ae`, `oe`, `o`, `l` and `th`. On it `muller`, `müller` and `MÜLL*` all match `Müller`. Greek and Cyrillic letters are not folded |
 | Stemming and stop words | None by default: `graphs` does not match `graph`, and `the` is a term |
 | Several words in the query | Each word is a term, and a match on any term returns the entity |
 | Operators | `AND`, `OR` and `NOT` in capitals, and `&&` and `\|\|`, combine terms; parentheses group them. A lowercase `and` is a term. A query of `NOT` clauses alone matches nothing |
 | One property | `<property>:<term>` matches the term in that indexed property only |
-| Phrases, wildcards, fuzzy terms, boosts | Not read: the words of a quoted phrase match as separate terms, `tor*` and `tset~` match nothing, and `+`, `-`, `!` and `^<n>` change no result |
+| Wildcards | `*` stands for any run of characters, none included, and `?` for exactly one; a wildcard may lead the term, and `\` makes the next character literal. `tor*` matches `torn`. The term is lowercased, and folded on a folding index; it is never stemmed. Each property holding a matching word adds 1.0 to the score, whatever the word. `*` alone, or `<property>:*`, matches every entity with a word in the property. Limit: a wildcard term of more than 256 characters fails with `syntax error: Invalid fulltext query: a wildcard term holds <n> characters, over the limit of 256` |
+| Fuzzy terms | `<term>~` matches words within 2 edits of the term and `<term>~1` within 1; an edit adds, removes or changes one character, or swaps two neighbors. A whole number above 2 counts as 2. `<term>~<x>` with `x` less than 1 is a minimum similarity: the edit bound is `(1 - x)` times the term's length, rounded down, at most 2. A match scores its BM25 times `1 - edits / min(term length, word length)`. Limit: a fuzzy term matches at most the 50 closest words of a property. Fuzzy terms are lowercased and never folded. `wal~1.5` fails with `syntax error: Invalid fulltext query term 'wal~1.5': a fuzzy distance of 1 or more must be a whole number` |
+| Boosts | `<term>^<n>` multiplies the term's score by `n`, a number of 0 or more, and never changes which entities match; `^0` keeps the match with a score of 0. It follows a wildcard or a fuzzy suffix: `text:wal~1^2`. `wal^`, `wal^x` and `wal^-1` fail with ``syntax error: Invalid fulltext query term '<term>': a `^` boost needs a non-negative number`` |
+| Phrases and prefix operators | Not read: the words of a quoted phrase match as separate terms, and `+`, `-` and `!` before a word change no result |
+| Query size | Limit: a query of more than 1,024 clauses fails with `syntax error: Invalid fulltext query: more than 1024 clauses` |
 | Score | BM25, summed over each matching property and term: a term that few entities hold counts for more, and a match in a short text counts for more than one in a long text. Calibrated against Neo4j's full-text scores; not normalized, so it ranks results within one search only |
 | Order of equal scores | No documented order; the examples on this page sort on a second key |
-| `WITH ANALYZER <name>` | The analyzer of the query string. `english` drops English stop words and stems the query's words, so `graphs` searches for `graph`; every other analyzer name splits the query like the default. `null` keeps the default. An unknown name fails with `semantic error: Invalid input '<name>' for analyzer name. Expected to be arabic, armenian, …` |
-| The index's `fulltext.analyzer` option | Accepted and listed by `SHOW INDEXES`; the indexed text is always split by the default analyzer, so the stored words keep their written form |
+| `WITH ANALYZER <name>` | The analyzer of the query string. `english` drops English stop words and stems the query's words, so `graphs` searches for `graph`; `standard-folding` folds the query's terms to ASCII; every other analyzer name splits the query like the default. The analyzer never changes the stored words: on an index without folding, the query `café` is folded to `cafe` and misses a stored `café`. `null` keeps the default. An unknown name fails with `semantic error: Invalid input '<name>' for analyzer name. Expected to be arabic, armenian, …` |
+| The index's `fulltext.analyzer` option | Listed by `SHOW INDEXES`; the default is `standard-no-stop-words`. `standard-folding` folds the stored words. Under every other name the stored words keep their written form, with no stemming and no stop words. `CALL db.index.fulltext.listAvailableAnalyzers()` lists the 45 names; another name fails with `semantic error: Invalid input for analyzer name: String("<name>")` |
 
 ## Procedures
 
@@ -197,6 +202,35 @@ MATCH (p:Person)
 SEARCH p IN (FULLTEXT INDEX person_bio FOR 'docs tests' LIMIT 3) SCORE AS score
 RETURN p.name AS name, score
 ORDER BY score DESC, name
+```
+
+A wildcard, a single-character wildcard, a fuzzy term with one letter wrong, and a boosted term:
+
+```cypher run name=fulltext-forms
+UNWIND ['stor*', 't?sts', 'conformence~', 'docs^2 green'] AS q
+CALL (q) {
+  MATCH (p:Person)
+  SEARCH p IN (FULLTEXT INDEX person_bio FOR q LIMIT 3) SCORE AS score
+  WITH p, score ORDER BY score DESC, p.name
+  RETURN collect(p.name) AS names
+}
+RETURN q AS query, names
+```
+
+An index with the `standard-folding` analyzer, over two places this cell adds. With or without the accent, in a term or a wildcard, the query finds both:
+
+```cypher run name=folding
+CREATE (:Place {name: 'Café Lumen'}), (:Place {name: 'Cafe Orbit'});
+CREATE FULLTEXT INDEX place_name FOR (p:Place) ON EACH [p.name]
+  OPTIONS {indexConfig: {`fulltext.analyzer`: 'standard-folding'}};
+UNWIND ['cafe', 'café', 'CAF*'] AS q
+CALL (q) {
+  MATCH (p:Place)
+  SEARCH p IN (FULLTEXT INDEX place_name FOR q LIMIT 3) SCORE AS score
+  WITH p ORDER BY p.name
+  RETURN collect(p.name) AS names
+}
+RETURN q AS query, names
 ```
 
 The intersection form of hybrid search: the nearest two by vector, kept only if their bio mentions the docs:

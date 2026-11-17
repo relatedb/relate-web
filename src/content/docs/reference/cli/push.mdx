@@ -89,7 +89,7 @@ Relationships follow `--rel-mode`:
 
 ## The report
 
-Push prints one row per entity, then a summary line. The `skipped` column adds up the four reasons: unkeyed, policy, remote-newer and dangling. `warn` counts the `--updated-at` pairs that could not be compared. A dry run also prints each entity's statement shape and ends with `dry run: <n> entities, <m> rows planned; nothing was sent`.
+Push prints one row per entity, then a summary line. The `skipped` column adds up the four reasons: unkeyed, policy, remote-newer and dangling. `warn` counts the `--updated-at` pairs that could not be compared. As of relate 1.1.0 the `policy` column holds `-` for an entity that is not sent, an unkeyed or a dangling one. A dry run also prints each entity's statement shape and ends with `dry run: <n> entities, <m> rows planned; nothing was sent`.
 
 `--json` prints the same report as one JSON object:
 
@@ -192,11 +192,11 @@ relate push --to neo4j.env --database ./team.rl --dry-run
 
 ```text
 entity                                      total  created  updated  skipped  warn  merge key  policy  batches
-Person (unkeyed)                                3        0        0        3     0             add           0
-Project (unkeyed)                               2        0        0        2     0             add           0
-(Person)-[:KNOWS]->(Person) (unkeyed)           1        0        0        1     0             add           0
-(Person)-[:MAINTAINS]->(Project) (unkeyed)      1        0        0        1     0             add           0
-(Person)-[:WORKS_ON]->(Project) (unkeyed)       3        0        0        3     0             add           0
+Person (unkeyed)                                3        0        0        3     0             -             0
+Project (unkeyed)                               2        0        0        2     0             -             0
+(Person)-[:KNOWS]->(Person) (unkeyed)           1        0        0        1     0             -             0
+(Person)-[:MAINTAINS]->(Project) (unkeyed)      1        0        0        1     0             -             0
+(Person)-[:WORKS_ON]->(Project) (unkeyed)       3        0        0        3     0             -             0
 dry run: 5 entities, 10 rows planned; nothing was sent
 ```
 
@@ -233,7 +233,7 @@ relate push --to neo4j.env --database ./team.rl --dry-run --labels Person
 entity                       total  created  updated  skipped  warn  merge key  policy  batches
 Person                           3        3        0        0     0  name       add           1
 (Person)-[:KNOWS]->(Person)      1        1        0        0     0             add           1
-(dangling)                       4        0        0        4     0             skip          0
+(dangling)                       4        0        0        4     0             -             0
 Person: UNWIND $rows AS row MERGE (n:`Person` {`name`: row.key.`name`}) SET n += row.props
 (Person)-[:KNOWS]->(Person): UNWIND $rows AS row MATCH (a:`Person` {`name`: row.start.`name`}) MATCH (b:`Person` {`name`: row.end.`name`}) MERGE (a)-[r:`KNOWS`]->(b) SET r += row.props
 dry run: 3 entities, 8 rows planned; nothing was sent

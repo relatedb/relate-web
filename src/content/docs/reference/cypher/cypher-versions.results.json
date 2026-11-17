@@ -1,10 +1,10 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.1.0",
   "cells": {
     "languages": {
       "kind": "table",
-      "text": "| name                | defaultLanguage |\n|---------------------|-----------------|\n| \"neo4j\"             | \"CYPHER 25\"     |\n| \"system\"            | \"CYPHER 25\"     |\n| \"system_ontologies\" | \"CYPHER 25\"     |\n3 rows",
+      "text": "| name     | defaultLanguage |\n|----------|-----------------|\n| \"neo4j\"  | \"CYPHER 25\"     |\n| \"system\" | \"CYPHER 25\"     |\n2 rows",
       "table": {
         "columns": [
           "name",
@@ -22,13 +22,9 @@
           [
             "\"system\"",
             "\"CYPHER 25\""
-          ],
-          [
-            "\"system_ontologies\"",
-            "\"CYPHER 25\""
           ]
         ],
-        "summary": "3 rows"
+        "summary": "2 rows"
       },
       "graph": null,
       "envelope": {
@@ -52,10 +48,6 @@
           {
             "defaultLanguage": "CYPHER 25",
             "name": "system"
-          },
-          {
-            "defaultLanguage": "CYPHER 25",
-            "name": "system_ontologies"
           }
         ],
         "stats": {
@@ -126,12 +118,12 @@
     },
     "prefix-5": {
       "kind": "table",
-      "text": "error: syntax error: SyntaxError: UnsupportedLanguageFeature: string interpolation (s'...') is only available in Cypher 25",
+      "text": "error: syntax error: parse error: UnsupportedCypherVersion: 5 is not a valid option for cypher version. Valid options are: 25\n  CYPHER 5 RETURN 1 AS one\n         ^",
       "table": null,
       "graph": null,
       "envelope": {
         "columns": [],
-        "error": "syntax error: SyntaxError: UnsupportedLanguageFeature: string interpolation (s'...') is only available in Cypher 25",
+        "error": "syntax error: parse error: UnsupportedCypherVersion: 5 is not a valid option for cypher version. Valid options are: 25\n  CYPHER 5 RETURN 1 AS one\n         ^",
         "rows": [],
         "stats": {}
       },
@@ -139,12 +131,12 @@
     },
     "prefix-4": {
       "kind": "table",
-      "text": "error: syntax error: parse error: SyntaxError: 22N10 invalid pre-parser option value: \"4\" is not a valid cypher version\n  CYPHER 4 RETURN 1 AS one\n         ^",
+      "text": "error: syntax error: parse error: UnsupportedCypherVersion: 4 is not a valid option for cypher version. Valid options are: 25\n  CYPHER 4 RETURN 1 AS one\n         ^",
       "table": null,
       "graph": null,
       "envelope": {
         "columns": [],
-        "error": "syntax error: parse error: SyntaxError: 22N10 invalid pre-parser option value: \"4\" is not a valid cypher version\n  CYPHER 4 RETURN 1 AS one\n         ^",
+        "error": "syntax error: parse error: UnsupportedCypherVersion: 4 is not a valid option for cypher version. Valid options are: 25\n  CYPHER 4 RETURN 1 AS one\n         ^",
         "rows": [],
         "stats": {}
       },
@@ -152,7 +144,7 @@
     },
     "set-default": {
       "kind": "table",
-      "text": "| name    | defaultLanguage |\n|---------|-----------------|\n| \"neo4j\" | \"CYPHER 5\"      |\n1 row",
+      "text": "| name    | defaultLanguage |\n|---------|-----------------|\n| \"neo4j\" | \"CYPHER 25\"     |\n1 row",
       "table": {
         "columns": [
           "name",
@@ -165,7 +157,7 @@
         "rows": [
           [
             "\"neo4j\"",
-            "\"CYPHER 5\""
+            "\"CYPHER 25\""
           ]
         ],
         "summary": "1 row"
@@ -186,7 +178,7 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "defaultLanguage": "CYPHER 5",
+            "defaultLanguage": "CYPHER 25",
             "name": "neo4j"
           }
         ],
@@ -206,55 +198,18 @@
       },
       "expectError": false
     },
-    "default-unchanged": {
+    "set-default-5": {
       "kind": "table",
-      "text": "| label    |\n|----------|\n| \"2 hops\" |\n1 row",
-      "table": {
-        "columns": [
-          "label"
-        ],
-        "numeric": [
-          false
-        ],
-        "rows": [
-          [
-            "\"2 hops\""
-          ]
-        ],
-        "summary": "1 row"
-      },
+      "text": "error: semantic error: UnsupportedCypherVersion: 5 is not a valid option for cypher version. Valid options are: 25",
+      "table": null,
       "graph": null,
       "envelope": {
-        "columnTypes": [
-          "STRING"
-        ],
-        "columns": [
-          "label"
-        ],
-        "error": null,
-        "notifications": [],
-        "plan": null,
-        "plan_cache": "bypassed",
-        "rows": [
-          {
-            "label": "2 hops"
-          }
-        ],
-        "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
-          "nodes_created": 0,
-          "nodes_deleted": 0,
-          "properties_set": 0,
-          "relationships_created": 0,
-          "relationships_deleted": 0
-        }
+        "columns": [],
+        "error": "semantic error: UnsupportedCypherVersion: 5 is not a valid option for cypher version. Valid options are: 25",
+        "rows": [],
+        "stats": {}
       },
-      "expectError": false
+      "expectError": true
     },
     "preview-off": {
       "kind": "table",

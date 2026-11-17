@@ -200,7 +200,7 @@ relate --database ./work.rl --read-only --mode envelope "MATCH (n:Note) RETURN c
 
 **`--load` exits 2 with an error that begins `Error: --safe refuses a remote --load source`.** Safe mode does not load remote stores. Download the file, check its SHA-256, and load the local copy.
 
-**Results stop at 100 rows with `warning: result truncated to 100 rows (the statement returned <n>); pass --max-rows 0 for all rows`.** relate detected the harness and capped the output. Pass `--max-rows 0`, or `--max-rows <n>`, when the agent needs more.
+**Results stop at 100 rows with `warning: result truncated to 100 rows (the statement returned <n>); pass --max-rows 0 for all rows, or page with SKIP/LIMIT`.** relate detected the harness and capped the output. Pass `--max-rows 0`, or `--max-rows <n>`, when the agent needs more.
 
 ## Related
 

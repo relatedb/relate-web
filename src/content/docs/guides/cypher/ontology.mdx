@@ -158,14 +158,14 @@ Descriptions, aliases, `one_of` lists and the other descriptive fields are never
 
 ## Know where the document lives
 
-The document belongs to the `neo4j` :term[namespace]{id=namespace}, the graph that holds user data. `SHOW DATABASES` also lists `system_ontologies`, which no statement can query, reads included:
+The document belongs to the `neo4j` :term[namespace]{id=namespace}, the graph that holds user data. With `RELATE_PREVIEW=ontology` set, `SHOW DATABASES` also lists `system_ontologies`, which no statement can query, reads included. Without the opt-in, as in this command, the name is unknown:
 
 ```bash verify
 relate --database ./team.rl --read-only --namespace system_ontologies --mode table "MATCH (n) RETURN count(n) AS nodes"
 ```
 
 ```text
-semantic error: SemanticError: This database is not queryable. Use the db.ontology.* procedures on the user database 'neo4j' instead.
+semantic error: DatabaseNotFound: Graph not found: system_ontologies
 ```
 
 The procedures are the only way to the document. [Namespaces](/docs/concepts/namespaces) explains the three fixed graphs of a store.
@@ -211,6 +211,6 @@ Before the drop, the `get` output and the `ConstraintValidationFailed` refusal s
 ## Related
 
 - [Procedures](/docs/reference/cypher/procedures): the `db.ontology.*` signatures, the document shape, and the transaction rules.
-- [Namespaces](/docs/concepts/namespaces): `neo4j`, `system` and `system_ontologies`.
+- [Namespaces](/docs/concepts/namespaces): `neo4j`, `system` and, under the preview, `system_ontologies`.
 - [Text to Cypher](/docs/guides/agents/text-to-cypher): give a model the schema before it writes a statement.
 - [Indexes and constraints](/docs/guides/cypher/indexes-and-constraints): the constraints a graph type adds, and how to list them.

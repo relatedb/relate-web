@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.1.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -134,7 +134,7 @@
     },
     "terms": {
       "kind": "table",
-      "text": "| query           | ids                            |\n|-----------------|--------------------------------|\n| \"wal\"           | [\"n6\", \"n1\"]                   |\n| \"replay\"        | []                             |\n| \"replays\"       | [\"n5\", \"n1\"]                   |\n| \"test\"          | []                             |\n| \"the\"           | [\"n5\", \"n3\", \"n2\", \"n6\", \"n1\"] |\n| \"pull-request\"  | [\"n3\"]                         |\n| \"\\\"torn tail\\\"\" | [\"n1\"]                         |\n| \"tor*\"          | []                             |\n8 rows",
+      "text": "| query           | ids                            |\n|-----------------|--------------------------------|\n| \"wal\"           | [\"n6\", \"n1\"]                   |\n| \"replay\"        | []                             |\n| \"replays\"       | [\"n5\", \"n1\"]                   |\n| \"test\"          | []                             |\n| \"the\"           | [\"n5\", \"n3\", \"n2\", \"n6\", \"n1\"] |\n| \"pull-request\"  | [\"n3\"]                         |\n| \"\\\"torn tail\\\"\" | [\"n1\"]                         |\n7 rows",
       "table": {
         "columns": [
           "query",
@@ -172,13 +172,9 @@
           [
             "\"\\\"torn tail\\\"\"",
             "[\"n1\"]"
-          ],
-          [
-            "\"tor*\"",
-            "[]"
           ]
         ],
-        "summary": "8 rows"
+        "summary": "7 rows"
       },
       "graph": null,
       "envelope": {
@@ -238,10 +234,169 @@
               "n1"
             ],
             "query": "\"torn tail\""
+          }
+        ],
+        "stats": {
+          "constraints_added": 0,
+          "constraints_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "nodes_created": 0,
+          "nodes_deleted": 0,
+          "properties_set": 0,
+          "relationships_created": 0,
+          "relationships_deleted": 0
+        }
+      },
+      "expectError": false
+    },
+    "wildcard-fuzzy": {
+      "kind": "table",
+      "text": "| query         | ids          |\n|---------------|--------------|\n| \"tor*\"        | [\"n1\"]       |\n| \"t?il\"        | [\"n1\"]       |\n| \"replay~\"     | [\"n1\", \"n5\"] |\n| \"checkpont~1\" | [\"n2\"]       |\n| \"test*\"       | [\"n6\"]       |\n5 rows",
+      "table": {
+        "columns": [
+          "query",
+          "ids"
+        ],
+        "numeric": [
+          false,
+          false
+        ],
+        "rows": [
+          [
+            "\"tor*\"",
+            "[\"n1\"]"
+          ],
+          [
+            "\"t?il\"",
+            "[\"n1\"]"
+          ],
+          [
+            "\"replay~\"",
+            "[\"n1\", \"n5\"]"
+          ],
+          [
+            "\"checkpont~1\"",
+            "[\"n2\"]"
+          ],
+          [
+            "\"test*\"",
+            "[\"n6\"]"
+          ]
+        ],
+        "summary": "5 rows"
+      },
+      "graph": null,
+      "envelope": {
+        "columnTypes": [
+          "STRING",
+          "LIST"
+        ],
+        "columns": [
+          "query",
+          "ids"
+        ],
+        "error": null,
+        "notifications": [],
+        "plan": null,
+        "plan_cache": "miss",
+        "rows": [
+          {
+            "ids": [
+              "n1"
+            ],
+            "query": "tor*"
           },
           {
-            "ids": [],
-            "query": "tor*"
+            "ids": [
+              "n1"
+            ],
+            "query": "t?il"
+          },
+          {
+            "ids": [
+              "n1",
+              "n5"
+            ],
+            "query": "replay~"
+          },
+          {
+            "ids": [
+              "n2"
+            ],
+            "query": "checkpont~1"
+          },
+          {
+            "ids": [
+              "n6"
+            ],
+            "query": "test*"
+          }
+        ],
+        "stats": {
+          "constraints_added": 0,
+          "constraints_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "nodes_created": 0,
+          "nodes_deleted": 0,
+          "properties_set": 0,
+          "relationships_created": 0,
+          "relationships_deleted": 0
+        }
+      },
+      "expectError": false
+    },
+    "boost": {
+      "kind": "table",
+      "text": "| id   | score |\n|------|-------|\n| \"n6\" | 2.05  |\n| \"n1\" | 1.24  |\n2 rows",
+      "table": {
+        "columns": [
+          "id",
+          "score"
+        ],
+        "numeric": [
+          false,
+          true
+        ],
+        "rows": [
+          [
+            "\"n6\"",
+            "2.05"
+          ],
+          [
+            "\"n1\"",
+            "1.24"
+          ]
+        ],
+        "summary": "2 rows"
+      },
+      "graph": null,
+      "envelope": {
+        "columnTypes": [
+          "STRING",
+          "FLOAT"
+        ],
+        "columns": [
+          "id",
+          "score"
+        ],
+        "error": null,
+        "notifications": [],
+        "plan": null,
+        "plan_cache": "miss",
+        "rows": [
+          {
+            "id": "n6",
+            "score": 2.05
+          },
+          {
+            "id": "n1",
+            "score": 1.24
           }
         ],
         "stats": {

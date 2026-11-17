@@ -566,7 +566,7 @@ print(db.execute("MATCH (p:Person) RETURN p.name AS name").data[0]["name"])
 | ```` ```python run ```` | `sample.py` | `RELATE_PY`; `RELATE_PY_<NAME>` with `env=<name>` | `relate` and the venv's frameworks |
 | ```` ```js run ```` | `sample.cjs`, or `sample.mjs` with an `import` or `export` statement | `RELATE_NODE`, `NODE_PATH` | `@relate/relate` and the installed frameworks |
 | ```` ```rust run ```` | `main.rs` | `cargo build --release --locked --offline` from the template in `RELATE_RUST_PROJECT` | `use relate::…` and the standard library |
-| ```` ```java run ```` | `Main.java` | `java <file>` (a single-file source program) on `RELATE_JAVA_CLASSPATH` | `com.relate.*` and the JDK |
+| ```` ```java run ```` | `Main.java` | `java <file>` (a single-file source program) on `RELATE_JAVA_CLASSPATH` | `ai.relatedb.*` and the JDK |
 | ```` ```go run ```` | `main.go` | `go build` in a module that replaces the client with `RELATE_GO_CLIENT`; `GOPROXY=off` | `relate "github.com/relatedb/relate/clients/go"` and the standard library |
 | ```` ```swift run ```` | `main.swift` | `swift build` of a package that depends on `.product(name: "Relate", package: "relate")` | `import Relate` |
 | ```` ```c run ```` | `sample.c` | `RELATE_CC` with `relate.h`, linked with `-lrelate_ffi` | `relate.h` and the C library |
@@ -786,7 +786,7 @@ To allow writes, remove `--read-only`.
 
 Only shipped behavior, verified against the relate binary the data files
 name (`recorded_with`) or the WASM build the site ships (`AGENTS.md`). That
-binary is a published release (today v1.0.1), installed through
+binary is a published release (today v1.1.0), installed through
 `install.sh`; each release re-records everything (`AGENTS.md` §4). Quote
 error messages, flags and JSON keys character for character. The one part of
 an output that changes from run to run, a timing value (the number after a

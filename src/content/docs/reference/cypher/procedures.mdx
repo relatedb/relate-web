@@ -6,7 +6,7 @@ surfaces: [cypher, cli]
 related: [reference/cypher/functions, reference/cypher/search, guides/cypher/ontology, reference/cypher/explain-and-profile, concepts/problems-relate-solves#text-to-cypher]
 ---
 
-A procedure is a built-in routine that `CALL` runs; it returns rows with named columns that `YIELD` picks. relate has 22 callable procedures that `SHOW PROCEDURES` lists, four ontology procedures behind a preview opt-in, and two callable procedures it does not list. `SHOW PROCEDURES` returns 31 rows by default; the other 9 are catalog entries kept for tools that read Neo4j's catalog, and a `CALL` to one fails with `syntax error: ProcedureNotFound: <name>`. The cells run on relate's WebAssembly (WASM) build, and the `bash verify` blocks on the CLI.
+A procedure is a built-in routine that `CALL` runs; it returns rows with named columns that `YIELD` picks. relate has 23 callable procedures that `SHOW PROCEDURES` lists, four ontology procedures behind a preview opt-in, and two callable procedures it does not list. `SHOW PROCEDURES` returns 31 rows by default; the other 8 are catalog entries kept for tools that read Neo4j's catalog, and a `CALL` to one fails with `syntax error: ProcedureNotFound: <name>`. The cells run on relate's WebAssembly (WASM) build, and the `bash verify` blocks on the CLI.
 
 ## Synopsis
 
@@ -78,7 +78,7 @@ RETURN [n IN nodes | n.name] AS labels, [r IN relationships | r.name] AS types
 
 ## Index procedures
 
-The query procedures search a :term[vector index]{id=vector-index} or a full-text index, created with `CREATE VECTOR INDEX` or `CREATE FULLTEXT INDEX` ([search](/docs/reference/cypher/search)). The `SEARCH` clause replaces them, and all four are deprecated.
+The query procedures search a :term[vector index]{id=vector-index} or a full-text index, created with `CREATE VECTOR INDEX` or `CREATE FULLTEXT INDEX` ([search](/docs/reference/cypher/search)). The `SEARCH` clause replaces them, and all four are deprecated. `db.index.fulltext.listAvailableAnalyzers` and `db.awaitIndexes` are not.
 
 | Signature | `YIELD` columns | Notes |
 | --- | --- | --- |
@@ -86,6 +86,7 @@ The query procedures search a :term[vector index]{id=vector-index} or a full-tex
 | `db.index.vector.queryRelationships(indexName :: STRING, numberOfNearestNeighbours :: INTEGER, query :: LIST<FLOAT>) :: (relationship :: RELATIONSHIP, score :: FLOAT)` | `relationship`, `score` | The same over a relationship vector index |
 | `db.index.fulltext.queryNodes(indexName :: STRING, query :: STRING) :: (node :: NODE, score :: FLOAT)` | `node`, `score` | Matching nodes, highest score first, with the query syntax and scores of a full-text `SEARCH` |
 | `db.index.fulltext.queryRelationships(indexName :: STRING, query :: STRING) :: (relationship :: RELATIONSHIP, score :: FLOAT)` | `relationship`, `score` | The same over a relationship full-text index |
+| `db.index.fulltext.listAvailableAnalyzers() :: (analyzer :: STRING, description :: STRING, stopwords :: LIST<STRING>)` | `analyzer`, `description`, `stopwords` | 45 rows, one per analyzer name that `fulltext.analyzer` and `WITH ANALYZER` accept. `stopwords` holds the 33 English stop words for `english` and is empty for every other name. Up to and including relate 1.0.2, a `CALL` failed with `ProcedureNotFound` |
 | `db.awaitIndexes(timeOutSeconds = 300 :: INTEGER)` | — | Returns at once with no rows; `SHOW INDEXES` reports every index `ONLINE` |
 
 ```cypher run name=create-indexes
@@ -107,6 +108,15 @@ RETURN node.name AS name, round(score, 4) AS score
 ```cypher run name=fulltext-query
 CALL db.index.fulltext.queryNodes('person_role', 'maintainer') YIELD node, score
 RETURN node.name AS name, score
+```
+
+Three of the analyzer names, with the number of stop words each applies:
+
+```cypher run name=analyzers
+CALL db.index.fulltext.listAvailableAnalyzers() YIELD analyzer, stopwords
+WHERE analyzer IN ['english', 'standard-folding', 'standard-no-stop-words']
+RETURN analyzer, size(stopwords) AS stopWords
+ORDER BY analyzer
 ```
 
 The same vector search as a `SEARCH` clause:
@@ -206,14 +216,14 @@ relate --database ./team.rl --read-only --mode jsonl "SHOW CURRENT GRAPH TYPE"
 
 ## Catalog-only entries
 
-`SHOW PROCEDURES` lists these 9 names so that tools built for Neo4j find the rows they expect. None of them runs: each `CALL` fails with `syntax error: ProcedureNotFound: <name>`.
+`SHOW PROCEDURES` lists these 8 names so that tools built for Neo4j find the rows they expect. None of them runs: each `CALL` fails with `syntax error: ProcedureNotFound: <name>`.
 
 | Group | Names |
 | --- | --- |
-| Indexes and tokens | `db.awaitIndex`, `db.index.fulltext.awaitEventuallyConsistentIndexRefresh`, `db.index.fulltext.listAvailableAnalyzers`, `db.prepareForReplanning`, `db.createProperty`, `db.createRelationshipType` |
+| Indexes and tokens | `db.awaitIndex`, `db.index.fulltext.awaitEventuallyConsistentIndexRefresh`, `db.prepareForReplanning`, `db.createProperty`, `db.createRelationshipType` |
 | Database operations | `db.checkpoint`, `db.clearQueryCaches`, `db.listLocks` |
 
-Releases up to and including 0.1.2 listed 57 more catalog entries, for change data capture, server configuration and connections, clustering and routing, fleet management, usage statistics, index resampling and the vector-property setters. relate 1.0.1 lists only what an embedded engine can answer, and a `CALL` to one of those names fails the same way.
+Releases up to and including 0.1.2 listed 57 more catalog entries, for change data capture, server configuration and connections, clustering and routing, fleet management, usage statistics, index resampling and the vector-property setters. Later releases list only what an embedded engine can answer, and a `CALL` to one of those names fails the same way.
 
 ```cypher run name=catalog-only expect=error
 CALL db.checkpoint()

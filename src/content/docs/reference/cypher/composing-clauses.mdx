@@ -101,13 +101,13 @@ A write before `CALL { … } IN TRANSACTIONS` in the same statement fails with `
 
 ## USE
 
-A store has three fixed namespaces: `neo4j` holds the graph, `system` answers administration commands, and `system_ontologies` is listed but not queryable. A statement without `USE` runs against the session namespace, `neo4j` unless `--namespace` says otherwise ([namespaces](/docs/concepts/namespaces)).
+The namespaces are fixed: `neo4j` holds the graph and `system` answers administration commands. A third, `system_ontologies`, is visible only under `RELATE_PREVIEW=ontology`, and is not queryable. A statement without `USE` runs against the session namespace, `neo4j` unless `--namespace` says otherwise ([namespaces](/docs/concepts/namespaces)).
 
 | Form | Result |
 | --- | --- |
 | `USE neo4j <query>` | Runs against the graph |
 | `USE system <query>` | Runs a procedure call or `SHOW DATABASES`; `SHOW INDEXES` and `SHOW CONSTRAINTS` fail with `syntax error: InvalidClauseComposition: NotAllowedOnSystemDatabase: SHOW INDEXES and SHOW CONSTRAINTS are per-database catalogs and are not available on the system database`, and a `MATCH` fails with `semantic error: SemanticError: The following unsupported clauses were used: MATCH.` followed by the clauses `system` supports |
-| `USE system_ontologies <query>` | `semantic error: SemanticError: This database is not queryable. Use the db.ontology.* procedures on the user database 'neo4j' instead.` |
+| `USE system_ontologies <query>` | `semantic error: DatabaseNotFound: Graph not found: system_ontologies`. Under `RELATE_PREVIEW=ontology`: `semantic error: SemanticError: This database is not queryable. Use the db.ontology.* procedures on the user database 'neo4j' instead.` |
 | `USE <other name>` | `semantic error: DatabaseNotFound: Graph not found: <name>` |
 | `USE` in two `UNION` branches naming different namespaces | `semantic error: SemanticError: Multiple graphs in the same query not allowed here. This feature is only available on composite databases. Attempted to access graph <name>` |
 | `USE graph.byName(…)` | `semantic error: SemanticError: Dynamic graph lookup not allowed here. This feature is only available on composite databases. Attempted to access graph graph.byName(<argument>)` |
@@ -251,5 +251,5 @@ ELSE RETURN name, 'builds' AS duty
 - [Reading clauses](/docs/reference/cypher/reading-clauses): `MATCH`, `WITH`, `RETURN` and the rest of a single query.
 - [Writing clauses](/docs/reference/cypher/writing-clauses): what runs inside a writing subquery.
 - [Procedures](/docs/reference/cypher/procedures): the built-in procedures `CALL` runs.
-- [Namespaces](/docs/concepts/namespaces): the three namespaces `USE` can name.
+- [Namespaces](/docs/concepts/namespaces): the namespaces `USE` can name.
 - [Transactions and concurrency](/docs/concepts/transactions-and-concurrency): how statements and explicit transactions commit.

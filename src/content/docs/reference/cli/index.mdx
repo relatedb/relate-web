@@ -27,7 +27,7 @@ relate query [STATEMENT] [--database PATH]
 
 ## Commands
 
-The twelve commands of the binary these pages are verified against, in the order `relate --help` prints them. The second column is the binary's own one-line summary.
+The commands of the binary these pages are verified against, in the order `relate --help` prints them. A run lists one of the two feedback commands: `feedback` with agent mode off, `agent-feedback` with it on. The second column is the binary's own one-line summary.
 
 | Command | Summary from `relate --help` | Its flags | Guide |
 | --- | --- | --- | --- |
@@ -39,6 +39,8 @@ The twelve commands of the binary these pages are verified against, in the order
 | [`skill`](/docs/reference/cli/skill) | Install, inspect, or remove the embedded agent skill bundle | [`relate skill`](/docs/reference/cli/flags#relate-skill) | [Install the agent skill](/docs/guides/agents/install-the-skill) |
 | [`upgrade`](/docs/reference/cli/upgrade) | Update the relate binary (alias: update) | [`relate upgrade`](/docs/reference/cli/flags#relate-upgrade) | — |
 | [`telemetry`](/docs/reference/cli/telemetry) | Manage anonymous usage metrics (on, off, status) | none | [Privacy and telemetry](/docs/reference/privacy-and-telemetry) |
+| [`feedback`](/docs/reference/cli/feedback) | File a GitHub issue about CLI friction, or manage the agent grant (enable, disable) | [`relate feedback`](/docs/reference/cli/flags#relate-feedback) | [Privacy and telemetry](/docs/reference/privacy-and-telemetry#feedback-reports) |
+| [`agent-feedback`](/docs/reference/cli/feedback#relate-agent-feedback) | Send one consented feedback report (agent surface) | [`relate agent-feedback`](/docs/reference/cli/flags#relate-agent-feedback) | [Drive relate from an agent](/docs/guides/agents/drive-relate-from-an-agent) |
 | [`run`](/docs/reference/cli/run) | Run an installed extension action into a store the host owns | [`relate run`](/docs/reference/cli/flags#relate-run) | [Install and run an extension](/docs/guides/extensions/install-and-run) |
 | [`serve`](/docs/reference/cli/serve) | Host the HTTP Query API and MCP surfaces on a database | [`relate serve`](/docs/reference/cli/flags#relate-serve) | [Connect over MCP](/docs/guides/agents/connect-over-mcp) |
 | [`agent-context`](/docs/reference/cli/agent-context) | Print the compact agent briefing (commands, flags, exit codes) | none | [Agent mode](/docs/reference/cli/agent-mode#the-agent-context-briefing) |
@@ -59,6 +61,8 @@ relate skill install|remove|list|check [--agent NAME] [--force]
 relate upgrade [--yes] [--check]
 relate update  [--yes] [--check]  (alias of upgrade)
 relate telemetry on|off|status
+relate feedback [TEXT | enable | disable] [--category NAME] [--expected TEXT] [--observed TEXT]
+relate agent-feedback [--category NAME] --expected TEXT --observed TEXT [--command PATH] [--error-code CODE] [--model MODEL] [--request-id UUID]
 relate run <name> [flags]
 relate serve --database PATH [--host HOST] [--http PORT] [--origin ORIGIN] [--mcp PORT|stdio] [--bolt PORT [--bolt-identity STRING] [--ws-allow-origin ORIGIN] [--ws-max-connections N]] [--read-only[=FRESHNESS]] [--load SOURCE] [--auth USER:PASSWORD] [--concurrent-logical-workspace-limit SIZE] [--max-traversal-depth N] [--expression-memory-limit SIZE] [--safe | --no-safe] [--logical-graph-size-limit SIZE] [--durability-mode MODE]
 relate agent-context [COMMAND]
@@ -133,7 +137,7 @@ relate --version
 ```
 
 ```text
-Relate v1.0.1
+Relate v1.1.0
 License: Apache 2.0 (binary)
 ```
 

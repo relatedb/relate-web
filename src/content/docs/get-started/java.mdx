@@ -1,7 +1,7 @@
 ---
 title: Embed relate in a Java app
 label: Java
-description: A first Java program on the com.relate:relate client, which opens a store, passes parameters, runs transactions, reads result metadata, and catches errors.
+description: A first Java program on the ai.relatedb:relate client, which opens a store, passes parameters, runs transactions, reads result metadata, and catches errors.
 order: 70
 surfaces: [java]
 related: [get-started/python, get-started/rust, get-started/go, get-started/swift, reference/errors, concepts/transactions-and-concurrency, reference/storage/formats, reference/api/java, guides/embed/java, concepts/problems-relate-solves#embedded-graph-in-an-app]
@@ -16,17 +16,17 @@ By the end of this page, you'll have a Java program that keeps a small graph of 
 
 ## Install the client
 
-The Java :term[client]{id=client} is the Maven artifact `com.relate:relate`, with the package `com.relate`. Its jar bundles the native engine for macOS (arm64 and x86-64), Linux (arm64 and x86-64, glibc), and Windows (x86-64), and loads the right one through JNA (Java Native Access) with no library path to set. The jars are attached to each release on the [releases page](https://github.com/relatedb/relate/releases); they are not on Maven Central. Download `relate-<release>.jar` (`<release>` is the release version, such as `1.0.1`) and install it into your local Maven repository:
+The Java :term[client]{id=client} is the Maven artifact `ai.relatedb:relate`, with the package `ai.relatedb`. Its jar bundles the native engine for macOS (arm64 and x86-64), Linux (arm64 and x86-64, glibc), and Windows (x86-64), and loads the right one through JNA (Java Native Access) with no library path to set. The jars are attached to each release on the [releases page](https://github.com/relatedb/relate/releases); they are not on Maven Central. Download `relate-<release>.jar` (`<release>` is the release version, such as `1.0.1`) and install it into your local Maven repository:
 
 ```bash
 mvn install:install-file -Dfile=relate-<release>.jar
 ```
 
-The jar carries its own POM, so Maven installs it as `com.relate:relate:<release>`. The client needs two libraries that the jar does not include, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`); the POM names both, so the coordinate brings them in from Maven Central. In Maven:
+The jar carries its own POM, so Maven installs it as `ai.relatedb:relate:<release>`. The client needs two libraries that the jar does not include, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`); the POM names both, so the coordinate brings them in from Maven Central. In Maven:
 
 ```xml
 <dependency>
-  <groupId>com.relate</groupId>
+  <groupId>ai.relatedb</groupId>
   <artifactId>relate</artifactId>
   <version><release></version>
 </dependency>
@@ -36,13 +36,13 @@ In Gradle (Kotlin DSL):
 
 ```kotlin
 repositories { mavenLocal(); mavenCentral() }
-dependencies { implementation("com.relate:relate:<release>") }
+dependencies { implementation("ai.relatedb:relate:<release>") }
 ```
 
 Each program on this page is one source file, run with `java` on a classpath that holds the client jar, JNA, and jackson-databind (your build's runtime classpath). The client has no version constant of its own, so this program asks the engine which release it is:
 
 ```java run name=version
-import com.relate.Database;
+import ai.relatedb.Database;
 
 public class Version {
     public static void main(String[] args) {
@@ -66,7 +66,7 @@ A :term[store]{id=store} is where relate keeps a graph. `:memory:` is a store th
 ```java run name=open
 import java.io.File;
 
-import com.relate.Database;
+import ai.relatedb.Database;
 
 public class Open {
     public static void main(String[] args) {
@@ -90,7 +90,7 @@ public class Open {
 Our graph is three people and two projects: who works on what, since when, and who maintains `relate`. One `CREATE` statement writes all of it. The rest of this page uses the same statement, as `TEAM`, on an in-memory store, so each program runs on its own.
 
 ```java run name=create
-import com.relate.Database;
+import ai.relatedb.Database;
 
 public class Create {
     static final String TEAM = """
@@ -129,7 +129,7 @@ A statement names each value it needs as `$name`, and `query()` takes the values
 import java.util.List;
 import java.util.Map;
 
-import com.relate.Database;
+import ai.relatedb.Database;
 
 public class Params {
     static final String TEAM = """
@@ -175,7 +175,7 @@ Each row is a `List<Object>` in the order of the `RETURN` columns, and each valu
 A connection commits each statement on its own until you call `begin()`. From then on, every statement is part of one transaction, `commit()` keeps it, and `rollback()` throws it away. This program adds Lin to the team and commits, then deletes every project and rolls back.
 
 ```java run name=transaction
-import com.relate.Database;
+import ai.relatedb.Database;
 
 public class Transaction {
     static final String TEAM = """
@@ -227,7 +227,7 @@ A `Result` describes itself as well as holding rows: the column names, what kind
 ```java run name=metadata
 import java.util.Map;
 
-import com.relate.Database;
+import ai.relatedb.Database;
 
 public class Metadata {
     static final String TEAM = """
@@ -267,17 +267,17 @@ public class Metadata {
 }
 ```
 
-A result has no list of column types: each value carries its own Java type. A node arrives as a `com.relate.Node` record with its labels and properties. `getQueryType()` is `r` for a read and `w` for a write that returns no columns. `getBookmark()` is set on a write that committed on its own, and `null` for a read.
+A result has no list of column types: each value carries its own Java type. A node arrives as a `ai.relatedb.Node` record with its labels and properties. `getQueryType()` is `r` for a read and `w` for a write that returns no columns. `getBookmark()` is set on a write that committed on its own, and `null` for a read.
 
 ## Catch an error
 
-Every error the engine reports throws a subclass of `com.relate.RelateException`, an unchecked exception, and the subclass says what kind of problem it is. A mistake in the statement throws `ClientException`. A statement that uses `$name` without a value is rejected before it runs:
+Every error the engine reports throws a subclass of `ai.relatedb.RelateException`, an unchecked exception, and the subclass says what kind of problem it is. A mistake in the statement throws `ClientException`. A statement that uses `$name` without a value is rejected before it runs:
 
 ```java run name=error
 import java.util.Map;
 
-import com.relate.ClientException;
-import com.relate.Database;
+import ai.relatedb.ClientException;
+import ai.relatedb.Database;
 
 public class Errors {
     static final String TEAM = """
@@ -337,8 +337,8 @@ The other subclasses are `TransientException`, thrown exactly when `isRetryable(
 import java.util.List;
 import java.util.Map;
 
-import com.relate.Database;
-import com.relate.RelateException;
+import ai.relatedb.Database;
+import ai.relatedb.RelateException;
 
 public class Team {
     static final String TEAM = """

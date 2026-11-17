@@ -63,10 +63,10 @@ The score is BM25, the relevance score Neo4j's full-text index gives: each match
 
 ## Know how text becomes terms
 
-The index lowercases text and splits it into words of letters and digits. A query goes through the same split, and its operators are read ([Combine words with operators](#combine-words-with-operators)); nothing else happens to either. This cell runs one search per query string and lists the notes each one finds:
+The index lowercases text and splits it into words of letters and digits. A query goes through the same split, once its operators ([Combine words with operators](#combine-words-with-operators)) and its wildcard, fuzzy and boost suffixes ([Match part of a word, a typo, or an accent](#match-part-of-a-word-a-typo-or-an-accent)) are read; nothing else happens to either. This cell runs one search per query string and lists the notes each one finds:
 
 ```cypher run name=terms
-UNWIND ['wal', 'replay', 'replays', 'test', 'the', 'pull-request', '"torn tail"', 'tor*'] AS q
+UNWIND ['wal', 'replay', 'replays', 'test', 'the', 'pull-request', '"torn tail"'] AS q
 CALL (q) {
   MATCH (n:Note)
   SEARCH n IN (FULLTEXT INDEX note_text FOR q LIMIT 10) SCORE AS score
@@ -82,13 +82,53 @@ RETURN q AS query, ids
 | `the` | No stop words: common words are terms like any other |
 | `pull-request` | Punctuation splits words: the query is the two terms `pull` and `request` |
 | `"torn tail"` | No phrase search: quotes are dropped, and the two words match separately |
-| `tor*` | No wildcards: the query is the term `tor`, which no note holds |
 
-Accented letters are letters, and nothing folds them: `cafe` does not match `café`. To match word variants, store a normalized copy of the text in a second indexed property and search that. `WITH ANALYZER 'english'` after the query stems the query's words and drops English stop words, but the indexed text keeps its written form: with it, `replays` searches for `replay` and `tests` for `test`, which no note holds.
+`WITH ANALYZER 'english'` after the query stems the query's words and drops English stop words, but the indexed text keeps its written form: with it, `replays` searches for `replay` and `tests` for `test`, which no note holds. To match word variants, use a wildcard or a fuzzy term ([Match part of a word, a typo, or an accent](#match-part-of-a-word-a-typo-or-an-accent)), or store a normalized copy of the text in a second indexed property and search that.
 
 ## Combine words with operators
 
 The words of a query are alternatives: any note holding one of them matches. `AND`, `OR` and `NOT`, written in capitals, are operators, and parentheses group them. `wal AND tests` matches only `n6`, and `wal NOT tests` only `n1`. A lowercase `and` is one more term. `&&` and `||` work as `AND` and `OR`; `+`, `-` and `!` before a word change nothing. `text:wal` matches `wal` in the `text` property only, which matters for an index over several properties. The [search reference](/docs/reference/cypher/search#full-text-matching) lists every rule.
+
+## Match part of a word, a typo, or an accent
+
+A term can carry a wildcard, a fuzzy suffix, or a boost:
+
+| Form | Matches |
+| --- | --- |
+| `tor*`, `t?il`, `*ail` | `*` stands for any run of characters, none included, and `?` for exactly one, so all three match `torn` or `tail` |
+| `replay~`, `checkpont~1` | Words within two edits of the term, or within the number after `~`: a character added, removed, changed, or swapped with its neighbor |
+| `wal^3` | What `wal` matches, with that term's score multiplied by 3 |
+
+```cypher run name=wildcard-fuzzy
+UNWIND ['tor*', 't?il', 'replay~', 'checkpont~1', 'test*'] AS q
+CALL (q) {
+  MATCH (n:Note)
+  SEARCH n IN (FULLTEXT INDEX note_text FOR q LIMIT 10) SCORE AS score
+  WITH n ORDER BY n.id
+  RETURN collect(n.id) AS ids
+}
+RETURN q AS query, ids
+```
+
+`replay~` finds the two notes that hold `replays`, one edit away, and `test*` finds `tests`: the two forms that exact terms missed. A wildcard match scores 1.0 per property, and a fuzzy match scores less the further the word is from the term, so neither score compares with an exact term's.
+
+A boost changes the order, never the matches. `n1` holds only `wal`; with that term tripled, its score rises from about `0.41` to about `1.24`:
+
+```cypher run name=boost
+MATCH (n:Note)
+SEARCH n IN (FULLTEXT INDEX note_text FOR 'wal^3 tests' LIMIT 5) SCORE AS score
+RETURN n.id AS id, round(score, 2) AS score
+ORDER BY score DESC, id
+```
+
+Accented letters are letters: on this index, `cafe` does not match `café`. If you want both spellings to match, create the index with the `standard-folding` analyzer, which folds accents in the stored text and in every query:
+
+```cypher
+CREATE FULLTEXT INDEX place_name FOR (p:Place) ON EACH [p.name]
+OPTIONS {indexConfig: {`fulltext.analyzer`: 'standard-folding'}}
+```
+
+The [search reference](/docs/reference/cypher/search#full-text-matching) runs that index, and lists the limits: a fuzzy term matches at most the 50 closest words, a wildcard term holds at most 256 characters, and a query at most 1,024 clauses.
 
 ## Page through and narrow the results
 
@@ -197,7 +237,8 @@ Two `ONLINE` indexes and three fused rows mean both searches serve the statement
 | ``syntax error: parse error: expected LIMIT, got ")" (RightParen)`` | The search has no `LIMIT`. | Add `LIMIT <k>` inside the parentheses. |
 | `syntax error: UndefinedVariable: variable 'score' not defined` | The query reads `score` without `SCORE AS`. | Add `SCORE AS score` after the closing parenthesis. |
 | `IndexDoesNotExist: <name>` or `WrongIndexType: <name>` | The index name is misspelled, or names a vector index after `FULLTEXT INDEX`. | Check the name and type in `SHOW INDEXES`. |
-| No rows for a word the text holds in another form | The index has no stemming and no accent folding; `WITH ANALYZER 'english'` stems the query's words only. | Search for the form the text holds, or index a normalized copy. |
+| No rows for a word the text holds in another form | The index has no stemming, and folds accents only with the `standard-folding` analyzer; `WITH ANALYZER 'english'` stems the query's words only. | Search with a wildcard (`test*`) or a fuzzy term (`replay~`), or for the form the text holds. |
+| ``syntax error: Invalid fulltext query term '<term>': a `^` boost needs a non-negative number``, or `… a fuzzy distance of 1 or more must be a whole number` | A `^` or `~` in the query string that is not a boost or a fuzzy suffix, often from text a person typed. | Remove the character from the string before searching, or write the suffix as `^2` or `~1`. |
 | A query with `and` or `not` returns more notes, not fewer | Lowercase `and` and `not` are terms, and a query's terms are alternatives. | Write the operators in capitals: `wal AND tests`. |
 
 ## Related

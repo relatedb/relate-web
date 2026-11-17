@@ -69,7 +69,9 @@ export function digestFacts(cli: Record<string, any>, errors: Record<string, any
   const m = /^(.*?)(\d+)(.*?)(\d+)(.*)$/.exec(warning);
   if (!m) throw new Error(`cli.json's max-rows message has no counts: ${warning}`);
   const capWarning = `${m[1]}{kept}${m[3]}{total}${m[5]}`;
-  const agentMode = cli.agent_mode as { detection_variables: string[] };
+  const agentMode = cli.agent_mode as { detection_variables: string[]; messages?: string[] };
+  const agentHint = (agentMode.messages ?? []).find((x) => x.startsWith('hint: '));
+  if (!agentHint) throw new Error('cli.json agent_mode.messages holds no `hint: …` line');
   if (!agentMode.detection_variables.includes(harnessVariable)) throw new Error(`${harnessVariable} is not one of agent_mode.detection_variables`);
 
   const entries = [...(errors.cli as ErrorEntry[]), ...(errors.engine as ErrorEntry[])];
@@ -124,6 +126,7 @@ export function digestFacts(cli: Record<string, any>, errors: Record<string, any
     harnessVariable,
     harnessVariables: agentMode.detection_variables,
     capWarning,
+    agentHint,
     exitCodes: (cli.exit_codes as { exit: number; code: string; meaning: string; reserved: boolean }[])
       .filter((x) => !x.reserved)
       .map(({ exit, code, meaning }) => ({ exit, code, meaning })),

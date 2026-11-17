@@ -64,8 +64,8 @@ function engine(statement: string, writable = false): string[] {
 }
 
 /** What the renderers print for a run, as the two streams' bytes, timing values masked (ADR-0054): the engine's and the binary's runs time differently. */
-function render(statement: string, mode: Mode, cap: number | null, writable = false) {
-  const out = renderRun({ envelopes: engine(statement, writable), statements: splitStatements(statement).length, mode, cap }, facts);
+function render(statement: string, mode: Mode, cap: number | null, writable = false, agent = false) {
+  const out = renderRun({ envelopes: engine(statement, writable), statements: splitStatements(statement).length, mode, cap, agent }, facts);
   const stream = (fd: 1 | 2) => maskTimings(out.lines.filter((l) => l.fd === fd).map((l) => `${l.text}\n`).join(''));
   return { stdout: stream(1), stderr: stream(2), exit: out.exit };
 }
@@ -91,7 +91,7 @@ for (const c of fixtures.cases) {
       for (const harness of [false, true]) {
         const recorded = c.runs[runKey(mode, harness)];
         const want = { ...recorded, stdout: maskTimings(recorded.stdout), stderr: maskTimings(recorded.stderr) };
-        const have = render(c.statement, mode, harness ? facts.agentCap : null, c.writable);
+        const have = render(c.statement, mode, harness ? facts.agentCap : null, c.writable, harness);
         const at = `${c.name}, --mode ${mode}${harness ? `, ${facts.harnessVariable}=1` : ''}`;
         assert.equal(have.exit, want.exit, `${at}: exit code`);
         for (const stream of ['stdout', 'stderr'] as const) {
@@ -141,7 +141,7 @@ function words(command: string): string[] | null {
  * [--mode M | --jsonl | --toon] [--max-rows N] <statement>`, no store and no
  * setup. Returns how the terminal would run it, or null.
  */
-function terminalRun(rec: Record<string, unknown>): { statement: string; mode: Mode; cap: number | null; writable: boolean } | null {
+function terminalRun(rec: Record<string, unknown>): { statement: string; mode: Mode; cap: number | null; writable: boolean; agent: boolean } | null {
   if (rec.setup || rec.hold || typeof rec.command !== 'string') return null;
   const w = words(rec.command);
   if (!w) return null;
@@ -168,7 +168,7 @@ function terminalRun(rec: Record<string, unknown>): { statement: string; mode: M
   // Without --mode a piped run prints jsonl, or toon under a harness (agent mode).
   mode ??= harness ? 'toon' : 'jsonl';
   if (cap === null && harness && !rec.command.includes('--max-rows')) cap = facts.agentCap;
-  return { statement: w[0], mode, cap, writable };
+  return { statement: w[0], mode, cap, writable, agent: harness };
 }
 
 function recordings(value: unknown, out: Record<string, unknown>[] = []): Record<string, unknown>[] {
@@ -198,7 +198,7 @@ test('every query run recorded in cli.json and errors.json that the terminal can
       engineGaps.push(`${rec.command}: ${wasmError}`);
       continue;
     }
-    const have = render(run.statement, run.mode, run.cap, run.writable);
+    const have = render(run.statement, run.mode, run.cap, run.writable, run.agent);
     assert.equal(have.stdout, maskTimings(String(rec.stdout)), `${rec.command}: stdout`);
     // The one known gap (see the fixtures): the note relate prints for a write that changed nothing.
     if (rec.stderr === `${zeroEffect}\n` && have.stderr === '') gaps.push(rec.command as string);
@@ -222,7 +222,7 @@ test('each engine difference the pane names still differs as it says, and the pa
     const prefix = d.binary.replace(/…$/, '');
     assert.ok(c.runs.table.stderr.startsWith(prefix), `${d.fixture}: the binary's stderr does not start with "${prefix}"`);
     assert.match(c.runs.envelope.stdout, new RegExp(`"kind":"${d.kind}"`), `${d.fixture}: the binary's kind is not ${d.kind}`);
-    const out = renderRun({ envelopes: engine(c.statement), statements: 1, mode: 'table', cap: null }, facts);
+    const out = renderRun({ envelopes: engine(c.statement), statements: 1, mode: 'table', cap: null, agent: false }, facts);
     assert.ok(out.gaps.some((g) => g.includes(d.binary) && g.includes(d.kind)), `${d.fixture}: the pane does not name the difference`);
   }
 });
@@ -231,13 +231,13 @@ test('a large result renders without a spread over its rows, and parsed envelope
   const n = 200_000;
   const text = `{"columnTypes":["INTEGER"],"columns":["x"],"error":null,"notifications":[],"plan":null,"rows":[${Array.from({ length: n }, (_, i) => `{"x":${i + 1}}`).join(',')}],"stats":{}}`;
   for (const mode of MODES) {
-    const out = renderRun({ envelopes: [text], statements: 1, mode, cap: null }, facts);
+    const out = renderRun({ envelopes: [text], statements: 1, mode, cap: null, agent: false }, facts);
     assert.equal(out.exit, 0);
     assert.ok(out.lines.length >= (mode === 'envelope' ? 1 : n), `${mode}: ${out.lines.length} lines`);
   }
   const small = engine("UNWIND ['Ada', 'Grace'] AS name RETURN name");
-  const viaText = renderRun({ envelopes: small, statements: 1, mode: 'table', cap: null }, facts);
-  const viaParsed = renderRun({ envelopes: small.map(readEnvelope), statements: 1, mode: 'table', cap: null }, facts);
+  const viaText = renderRun({ envelopes: small, statements: 1, mode: 'table', cap: null, agent: false }, facts);
+  const viaParsed = renderRun({ envelopes: small.map(readEnvelope), statements: 1, mode: 'table', cap: null, agent: false }, facts);
   assert.deepEqual(viaParsed, viaText);
 });
 

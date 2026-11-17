@@ -6,7 +6,7 @@ surfaces: [cypher, cli, bolt, http, mcp]
 related: [reference/cypher/explain-and-profile, guides/cypher/tune-a-query, reference/errors#notifications, reference/cypher/differences-from-neo4j]
 ---
 
-A :term[notification]{id=notification} is advice the planner attaches to a statement's result: a missing index, a pattern that multiplies rows, a name the store does not know, a deprecated form. On the CLI, the clients and the WASM build, relate derives notifications only for a statement prefixed with `EXPLAIN` or `PROFILE`; a plain run returns an empty list. The [MCP](/docs/reference/server/mcp) `read_cypher` and `write_cypher` tools return the plan-time notifications of every statement without a prefix (never `03C93`), and refuse an `EXPLAIN` or `PROFILE` prefix with a syntax error: the server plans every statement as `EXPLAIN <statement>`. A notification never fails the statement. This page lists all 27 kinds the engine defines. It quotes the text of the 24 triggered on the CLI and marks the three that could not be triggered.
+A :term[notification]{id=notification} is advice the planner attaches to a statement's result: a missing index, a pattern that multiplies rows, a name the store does not know, a deprecated form. On the CLI, the clients and the WASM build, relate derives notifications only for a statement prefixed with `EXPLAIN` or `PROFILE`; a plain run returns an empty list. The [MCP](/docs/reference/server/mcp) `read_cypher` and `write_cypher` tools return the plan-time notifications of every statement without a prefix (never `03C93`), and refuse an `EXPLAIN` or `PROFILE` prefix with a syntax error: the server plans every statement as `EXPLAIN <statement>`. A notification never fails the statement. This page lists all 30 kinds the engine defines. It quotes the text of the 26 triggered on the CLI and marks the four that could not be triggered.
 
 ## Synopsis
 
@@ -42,13 +42,15 @@ Each notification has these fields, under these keys in the :term[envelope]{id=e
 | --- | --- | --- | --- | --- | --- | --- |
 | `03N90` | Cartesian product | `Neo.ClientNotification.Statement.CartesianProduct` | `INFORMATION` | Patterns in one `MATCH` that share no variable | `the MATCH patterns share no join anchor` | `Give the patterns a join anchor: reuse a node variable across them, or add a pattern that relates their endpoints; otherwise run them as separate queries.` |
 | `03N91` | Unbounded variable-length pattern | `Neo.ClientNotification.Statement.UnboundedVariableLengthPattern` | `INFORMATION` | A variable-length relationship with no upper bound, `[*]` or `[*1..]` | `the variable-length pattern <pattern> has no upper bound` | ``Bound the expansion (`[:R*1..5]`) where arbitrary length is not required, or add a selective endpoint/label predicate and a `LIMIT`.`` |
-| `03C90` | All nodes scan | `Relate.Notification.Statement.AllNodesScan` | `INFORMATION` | A node pattern with no label while the store has a property index | `the scan matches every node; consider the property index (:<Label>(<property>))` | ``Name the label the scan intends (`MATCH (n:<Label>)`); on the index's label the scan becomes an index-backed lookup.`` |
+| `03C90` | All nodes scan | `Relate.Notification.Statement.AllNodesScan` | `INFORMATION` | A node pattern with no label while the store has a property index | `the scan matches every node; add a label to narrow it` | ``Name the label the scan intends (`MATCH (n:<Label>)`); on the index's label the scan becomes an index-backed lookup.`` |
 | `03C91` | Missing index | `Relate.Notification.Statement.MissingIndex` | `INFORMATION` | An equality on a label's property with no range index on the pair | `the equality predicate on <property> filters :<Label> without a range index on (:<Label> {<property>})` | `CREATE INDEX relate_<Label>__<property> FOR (n:<Label>) ON (n.<property>)` |
 | `03C92` | Eager aggregation | `Relate.Notification.Statement.EagerAggregation` | `INFORMATION` | An aggregation whose input is estimated at 100,000 rows or more | `the aggregation buffers an estimated <n> input rows, at or above the 100000-row eager threshold` | ``Reduce the rows reaching the aggregation with a selective label/property predicate or a `LIMIT` before it; profile again to confirm the buffered input shrank.`` |
 | `03C93` | Estimation miss | `Relate.Notification.Statement.EstimationMiss` | `INFORMATION` | `PROFILE` only: an operator whose estimate is 10 times its actual rows or more | `estimated rows 10x or more above the actual rows` | `Rework the operator's input so the estimate can see the filter (add the selective predicate at the scan, or reorder the join); the estimate is a planner assumption, not a runtime fact.` |
 | `03C94` | Label disjunction scan | `Relate.Notification.Statement.LabelDisjunctionScan` | `INFORMATION` | An equality on a property of a label disjunction, `MATCH (p) WHERE (p:Model OR p:Source) AND p.id = 1` or `MATCH (p:Model\|Source) WHERE p.id = 1`, that no range index on each label's property serves | `the disjunction scan answers per label; consider the property index (:<Label>(<property>), …)` | `Create a range index on each disjunct label's filtered property: the disjunction then serves as per-label keyed lookups instead of per-label scans.` |
 | `03N95` | Queries using dynamic properties will use neither index seeks nor index scans for those properties | `Neo.ClientNotification.Statement.DynamicProperty` | `INFORMATION` | A property read with a computed key, `n[key]`, on a label that has an index | `Using a dynamic property makes it impossible to use an index lookup for this query (indexed label is: (:<Label>))` | `Use a static property so index lookups stay possible.` |
 | `03N92` | Exhaustive shortest path | `Neo.ClientNotification.Statement.ExhaustiveShortestPath` | `INFORMATION` | A `shortestPath` whose `WHERE` tests the path's length or quantifies over its relationships | `The query runs with exhaustive shortest path due to an existential predicate; separate the predicate from the MATCH with WITH where possible.` | ``Separate the existential predicate from the `MATCH` with `WITH` where possible.`` |
+| `03N61` | Redundant optional procedure | `Neo.ClientNotification.Statement.RedundantOptionalProcedure` | `INFORMATION` | An `OPTIONAL CALL` of a procedure that declares no return columns, such as `db.awaitIndexes()` | ``The use of `OPTIONAL` is redundant as `CALL <procedure>` is a void procedure.`` | ``Drop `OPTIONAL`: the procedure declares no return columns, so the call yields the same single row either way.`` |
+| `03N62` | Redundant optional subquery | `Neo.ClientNotification.Statement.RedundantOptionalSubquery` | `INFORMATION` | An `OPTIONAL CALL (…) { … }` whose body returns no columns, such as one that only writes | ``The use of `OPTIONAL` is redundant as `CALL` is a unit subquery.`` | ``Drop `OPTIONAL`: the subquery projects no columns, so the call yields the same single row either way.`` |
 
 ## Unrecognized names
 
@@ -139,7 +141,7 @@ Id 1: INFORMATION 03N90 Neo.ClientNotification.Statement.CartesianProduct: the M
 Notifications:
 Id 1: INFORMATION 03N91 Neo.ClientNotification.Statement.UnboundedVariableLengthPattern: the variable-length pattern (p:Person)-[:KNOWS*1..]->(q:Person) has no upper bound Remedy: Bound the expansion (`[:R*1..5]`) where arbitrary length is not required, or add a selective endpoint/label predicate and a `LIMIT`.
 Notifications:
-Id 1: INFORMATION 03C90 Relate.Notification.Statement.AllNodesScan: the scan matches every node; consider the property index (:Person(name)) Remedy: Name the label the scan intends (`MATCH (n:<Label>)`); on the index's label the scan becomes an index-backed lookup.
+Id 1: INFORMATION 03C90 Relate.Notification.Statement.AllNodesScan: the scan matches every node; add a label to narrow it Remedy: Name the label the scan intends (`MATCH (n:<Label>)`); on the index's label the scan becomes an index-backed lookup.
 Notifications:
 Id 1: INFORMATION 03C91 Relate.Notification.Statement.MissingIndex: the equality predicate on role filters :Person without a range index on (:Person {role}) Remedy: CREATE INDEX relate_Person__role FOR (n:Person) ON (n.role)
 Notifications:
@@ -154,6 +156,20 @@ Notifications:
 INFORMATION 03N95 Neo.ClientNotification.Statement.DynamicProperty: Using a dynamic property makes it impossible to use an index lookup for this query (indexed label is: (:Person)) Remedy: Use a static property so index lookups stay possible.
 Notifications:
 INFORMATION 03N92 Neo.ClientNotification.Statement.ExhaustiveShortestPath: The query runs with exhaustive shortest path due to an existential predicate; separate the predicate from the MATCH with WITH where possible. Remedy: Separate the existential predicate from the `MATCH` with `WITH` where possible.
+```
+
+The two redundant `OPTIONAL` notifications, `03N61` and `03N62`:
+
+```bash verify
+relate --database ./team.rl --read-only --mode markdown "EXPLAIN OPTIONAL CALL db.awaitIndexes()"
+relate --database ./team.rl --read-only --mode markdown "EXPLAIN MATCH (p:Person) OPTIONAL CALL (p) { SET p.seen = true } RETURN p.name"
+```
+
+```text
+Notifications:
+INFORMATION 03N61 Neo.ClientNotification.Statement.RedundantOptionalProcedure: The use of `OPTIONAL` is redundant as `CALL db.awaitIndexes()` is a void procedure. Remedy: Drop `OPTIONAL`: the procedure declares no return columns, so the call yields the same single row either way.
+Notifications:
+INFORMATION 03N62 Neo.ClientNotification.Statement.RedundantOptionalSubquery: The use of `OPTIONAL` is redundant as `CALL` is a unit subquery. Remedy: Drop `OPTIONAL`: the subquery projects no columns, so the call yields the same single row either way.
 ```
 
 ### Unrecognized name examples

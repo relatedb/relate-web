@@ -44,6 +44,8 @@ export interface TerminalFacts {
   harnessVariables: string[];
   /** The stderr warning of a cut result, with `{kept}` and `{total}` for the counts. */
   capWarning: string;
+  /** The stderr line a failed run adds with agent mode on (relate 1.1.0), from cli.json `agent_mode.messages`. */
+  agentHint: string;
   /** The exit code table, without the reserved rows. */
   exitCodes: { exit: number; code: string; meaning: string }[];
   /** Per error kind: its class, exit code and whether a retry can help (errors.json `cli-<code>-<kind>`). */
@@ -699,6 +701,8 @@ export interface RunInput {
   mode: Mode;
   /** The row cap, or null for none. */
   cap: number | null;
+  /** Whether agent mode is on: a failed run then ends with the hint line on stderr. */
+  agent: boolean;
 }
 
 /** What relate prints for a run, in one mode: stdout and stderr lines in the order it writes them, and the exit code. */
@@ -716,6 +720,7 @@ export function renderRun(input: RunInput, facts: TerminalFacts): RunOutput {
       for (const l of errorStderr(env.error)) lines.push({ fd: 2, text: l });
       if (progress) lines.push({ fd: 2, text: progressLine(progress) });
       if (json) lines.push({ fd: 1, text: errorObject(env.error, cls, progress) });
+      if (input.agent) lines.push({ fd: 2, text: facts.agentHint });
       return { lines, exit: cls.exit, error: cls, gaps };
     }
     if (env.hasPlan) {

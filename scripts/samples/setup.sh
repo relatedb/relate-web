@@ -6,8 +6,10 @@
 # release the docs are pinned to (ADR-0062): relate-db from PyPI,
 # @relate/relate from npm and the relate crate from crates.io. The rest are
 # built from an upstream checkout at that release's tag: the C library, the
-# Java jar (com.relate:relate is not on Maven Central), the Go module (it has
-# no module tag) and the Swift package's XCFramework.
+# Java jar (ai.relatedb:relate is not on Maven Central), the Go module (its
+# clients/go/v<version> tag is on the release's commit; the samples build it
+# through a replace directive, with no proxy) and the Swift package's
+# XCFramework.
 #
 #   bash scripts/samples/setup.sh --upstream <path to the relate checkout>
 #   source "${XDG_CACHE_HOME:-$HOME/.cache}/relate-web-samples/env.sh"
@@ -523,10 +525,10 @@ if [ "$do_java" = 1 ]; then
   done
   [ -f "$client_jar" ] || die "Maven produced no client jar in $out/java/client/target"
   java_cp="$client_jar:$(cat "$out/java/runtime.classpath")"
-  # Samples may use com.relate.* and the JDK only: no test-scoped jar.
+  # Samples may use ai.relatedb.* and the JDK only: no test-scoped jar.
   case "$java_cp" in *junit* | *opentest4j* | *apiguardian*) die "the runtime classpath holds test dependencies: $java_cp" ;; esac
   jar_version="$(basename "$client_jar" .jar)"
-  end_step "java: ${jar_version#relate-} jar of com.relate:relate on $("$java_bin" -version 2>&1 | head -1)"
+  end_step "java: ${jar_version#relate-} jar of ai.relatedb:relate on $("$java_bin" -version 2>&1 | head -1)"
 fi
 
 # --- Go ---------------------------------------------------------------------

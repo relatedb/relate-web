@@ -1,14 +1,14 @@
 ---
 title: Use the Swift package
 label: Swift
-description: Add the relate Swift package to an iOS or macOS target, open stores in each mode, bind typed values, run transactions, and own connections from actors.
+description: Add the relate Swift package to an iOS or macOS target, open stores in each mode, bind Swift values, run transactions, and read and write from async code.
 order: 80
 surfaces: [swift]
 prerequisites: [get-started/swift]
 related: [reference/api/swift, get-started/swift, reference/errors, concepts/transactions-and-concurrency, guides/storage/choose-a-store-layout, concepts/problems-relate-solves#embedded-graph-in-an-app]
 ---
 
-This guide shows you how to use the `Relate` Swift package in an iOS or macOS app: the package dependency, which store to open and how, how values cross as `CypherValue`, how to group writes and retry a conflict, what a result reports about itself, how to branch on an error, and how to own a connection from an actor. The package links the engine into your app as a static XCFramework, so there is no server and no network. Every program on this page writes to a store it creates, using the team graph from the [Swift tutorial](/docs/get-started/swift).
+This guide shows you how to use the `Relate` Swift package in an iOS or macOS app: the package dependency, which store to open and how, how Swift values go in as parameters and come back typed, how to group writes and retry a conflict, what a result reports about itself, how to branch on an error, and how to read and write from async code. The package links the engine into your app as a static XCFramework, so there is no server and no network. Every program on this page writes to a store it creates, using the team graph from the [Swift tutorial](/docs/get-started/swift).
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ let package = Package(
     name: "TeamApp",
     platforms: [.iOS(.v16), .macOS(.v13)],
     dependencies: [
-        .package(url: "https://github.com/relatedb/relate", from: "1.0.1"),
+        .package(url: "https://github.com/relatedb/relate", from: "1.1.0"),
     ],
     targets: [
         .executableTarget(
@@ -42,7 +42,7 @@ The package compiles in the Swift 6 language mode. Its binary target, `RelateFFI
 
 ## Open a store
 
-`Database(path:)` opens a store for writing and creates it when it is missing; `Database(readOnlyPath:)` loads an existing one once. The path decides the layout:
+`Database(path:)` opens a store for writing and creates it when it is missing; `Database(readOnlyPath:)` loads an existing one once. `Database(url:readOnly:)` does either from a file URL. The path decides the layout:
 
 | Call | Opens | Notes |
 | --- | --- | --- |
@@ -50,9 +50,10 @@ The package compiles in the Swift 6 language mode. Its binary target, `RelateFFI
 | `Database(path: "./team")` | A directory store | Created when missing; another process may read it with `readOnlyPath:` while you write |
 | `Database(path: "./team.rl")` | A single-file store | Created when missing; opens only while no other process writes it |
 | `Database(readOnlyPath: path)` | An existing store, :term[read-only]{id=read-only} | Refuses writes and `checkpoint()`; a missing store is an error, never created |
-| `db.connect(namespace: "system")` | A connection in another namespace | `connect()` uses `neo4j`; names match case-insensitively |
+| `Database(url: url)`, `Database(url: url, readOnly: true)` | The store at a file URL, writable or read-only | A URL that is not a local `file:` URL throws `.invalidParameter` |
+| `db.connect(namespace: .system)` | A connection in another namespace | `connect()` uses `.neo4j`; the namespace is a `DatabaseNamespace` |
 
-There is no `close()`. A `Database` closes when its last reference is released, and every `Connection` holds a reference to its database, so a :term[store]{id=store} stays open while any connection lives. This program writes `team.rl`, releases it, and reads it back read-only:
+There is no `close()`. A `Database` closes when its last reference is released, and every `Connection` from `connect()` holds a reference to its database, so a :term[store]{id=store} stays open while any connection lives. This program writes `team.rl`, releases it, and reads it back read-only through a file URL:
 
 ```swift run name=open
 import Foundation
@@ -77,12 +78,12 @@ do {
 }
 print("team.rl exists:", FileManager.default.fileExists(atPath: "team.rl"))
 
-let reader = try Database(readOnlyPath: "./team.rl")
+let reader = try Database(url: URL(fileURLWithPath: "team.rl"), readOnly: true)
 let conn = try reader.connect()
-print("people:", try conn.query("MATCH (p:Person) RETURN count(p) AS people").scalar())
+print("people:", try conn.query("MATCH (p:Person) RETURN count(p) AS people").scalar(as: Int.self))
 do {
     try conn.query("CREATE (:Person {name: 'Lin'})")
-} catch let error as RelateError {
+} catch {
     if let engine = error.engineError {
         print("refused:", engine.gqlStatus, engine.code)
     }
@@ -91,9 +92,24 @@ do {
 
 ## Bind parameters and read typed values
 
-`conn.query(statement, parameters)` takes each :term[parameter]{id=parameter} in a `[String: CypherValue]` dictionary. `CypherValue` conforms to the literal protocols, so literals need no wrapping; a variable goes in with `CypherValue(x)` for `Int`, `Double`, `String` and `Bool`, or with an enum case and its struct for a date, time, point, duration, or vector. Every cell comes back as a `CypherValue`, read with accessors such as `stringValue`, `intValue`, `nodeValue` and `dateValue`, or by column name through `result.records`:
+A :term[parameter]{id=parameter} goes in as a Swift value, and a column comes back as one. There are three ways to bind:
+
+| Call | Binds |
+| --- | --- |
+| `conn.query(statement, ["name": name])` | Each entry of a dictionary of Swift values to the `$name` the statement text uses |
+| `conn.query(statement, ["name": "Noor", "since": 2024])` | The same, from a dictionary of literals, which are `CypherValue`s |
+| `try conn.run("MATCH (p {name: \(name)}) …")` | Each interpolated value of a `Statement` literal, as a generated parameter (`$_p0`, `$_p1`, …) |
+
+Strings, integers, `Double`, `Bool`, optionals (`nil` is `null`), arrays, string-keyed dictionaries, `Foundation.Date`, `URL`, `UUID`, `Data` and the `CypherValue` structs for dates, times, durations, points and vectors all bind. A `[Float]` binds as a list; `CypherValue(vector:)` makes it a vector.
+
+:::warning
+Interpolation binds only in a `Statement`, which `run(_:)` takes. `query(_:_:)` takes a `String`, so the same literal passed to `query` is an ordinary Swift string and its values become part of the Cypher text.
+:::
+
+A result is a collection of `Record`s. `record.get("since", as: Int.self)` reads a column as a Swift type and throws `RelateError.unexpectedResult` when the column is missing or holds another kind; ask for an `Optional` to accept `null`. `result.decode(Member.self)` reads every record into a `Decodable` type by column name. `record["since"]` returns the `CypherValue` itself.
 
 ```swift run name=params
+import Foundation
 import Relate
 
 let team = """
@@ -109,41 +125,51 @@ let team = """
            (ada)-[:KNOWS]->(grace)
     """
 
+struct Member: Decodable {
+    let name: String
+    let since: Int
+}
+
 let conn = try Database.inMemory().connect()
 try conn.query(team)
 
 let project = "relate"
 let members = try conn.query("""
     MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: $project})
-    RETURN p, w.since AS since ORDER BY since
-    """, ["project": CypherValue(project)])
-for record in members.records {
-    let person = record["p"]!.nodeValue!
-    print(person.properties["name"]!, person.labels, "since", record["since"]!.intValue!)
+    RETURN p, p.name AS name, w.since AS since ORDER BY since
+    """, ["project": project])
+for record in members {
+    let person = try record.get("p", as: CypherValue.Node.self)
+    print(try record.get("name", as: String.self), person.labels, "since", try record.get("since", as: Int.self))
 }
+print(try members.decode(Member.self).map { "\($0.name) \($0.since)" })
 
-let noor = try conn.query("""
-    MATCH (p:Person {name: $name})
-    SET p.joined = $joined, p.focus = $focus
-    RETURN p.joined AS joined, p.focus AS focus, elementId(p) AS id
-    """, [
-        "name": "Noor",
-        "joined": .date(.init(year: 2025, month: 3, day: 1)),
-        "focus": .vector(.floats(dtype: .float32, values: [0.25, 0.5, 1])),
-    ])
-let row = noor.records[0]
-print("joined", row["joined"]!, row["joined"]!.kind)
-print("focus", row["focus"]!)
+let name = "Noor"
+let joined = CypherValue.Date(year: 2025, month: 3, day: 1)
+let reviewed = Date(timeIntervalSince1970: 1_767_225_600)
+let focus = try CypherValue(vector: [0.25, 0.5, 1] as [Float])
+let noor = try conn.run("""
+    MATCH (p:Person {name: \(name)})
+    SET p.joined = \(joined), p.reviewed = \(reviewed), p.focus = \(focus), p.tags = \(["core", "docs"])
+    RETURN p.joined AS joined, p.reviewed AS reviewed, p.focus AS focus, p.tags AS tags, elementId(p) AS id
+    """).single()
+print("joined", noor["joined"]!, noor["joined"]!.kind)
+print("reviewed", noor["reviewed"]!, try noor.get("reviewed", as: Date.self) == reviewed)
+print("focus", noor["focus"]!)
+print("tags", try noor.get("tags", as: [String].self))
 
-let byId = try conn.query("MATCH (p) WHERE elementId(p) = $id RETURN p.name AS name", ["id": row["id"]!])
-print("by element id:", try byId.scalar())
+let id = try noor.get("id", as: String.self)
+let byId = try conn.query("MATCH (p) WHERE elementId(p) = $id RETURN p.name AS name", ["id": id])
+print("by element id:", try byId.scalar(as: String.self))
 ```
 
-An element id round-trips through a parameter. A node, relationship or path value is refused as a parameter with `RelateError.invalidParameter`; pass its element id or its properties instead. The [Swift API](/docs/reference/api/swift#values) lists every `CypherValue` case.
+A `Foundation.Date` binds as a UTC `ZONED DATETIME`, to the microsecond, and reads back as the same instant. An element id round-trips through a parameter. A node, relationship or path value is refused as a parameter with `RelateError.invalidParameter`; pass its element id or its properties instead. The [Swift API](/docs/reference/api/swift#values) lists every `CypherValue` case, and [Swift types as values](/docs/reference/api/swift#swift-types-as-values) every conversion.
 
 ## Group writes in a transaction
 
-Outside a transaction, each `query` commits on its own. `conn.transaction { … }` runs its body in an explicit :term[transaction]{id=transaction}, commits when the body returns and rolls back, then rethrows, when it throws. `begin()`, `commit()` and `rollback()` do the same by hand, and `commit()` returns the :term[bookmark]{id=bookmark}, `"relate:<n>"`, or `nil` when the transaction wrote nothing. When another connection commits a change to the same node first, the commit throws an `.engine` error whose `retryable` is true: re-run the whole unit of work. This program commits one change, rolls one back, and retries a unit of work that loses a conflict on its first attempt:
+Outside a transaction, each `query` commits on its own. `conn.transaction { tx in … }` runs its body in an explicit :term[transaction]{id=transaction}, commits when the body returns and rolls back, then rethrows, when it throws. The body receives a `Transaction`, which runs statements and nothing else. `begin()`, `commit()` and `rollback()` do the same by hand, and `commit()` returns the :term[bookmark]{id=bookmark}, `"relate:<n>"`, or `nil` when the transaction wrote nothing.
+
+When another connection commits a change to the same node first, the statement or the commit throws an `.engine` error whose `retryable` is true. `conn.transaction(retries: 2) { … }` rolls back and runs the body again on such a failure, up to two more times, so the body must be safe to run more than once. `conn.read { tx in … }` runs its body on one snapshot and always rolls back; a statement that is not a read throws `RelateError.misuse`. This program commits one change by hand, rolls one back, retries a unit of work that loses a conflict on its first attempt, and reads two counts from one snapshot:
 
 ```swift run name=transaction
 import Relate
@@ -161,17 +187,7 @@ let team = """
            (ada)-[:KNOWS]->(grace)
     """
 
-func withRetry(_ conn: Connection, _ body: (Connection, Int) throws -> Void) throws {
-    var attempt = 1
-    while true {
-        do {
-            return try conn.transaction { try body($0, attempt) }
-        } catch let error as RelateError where error.engineError?.retryable == true && attempt < 3 {
-            print("attempt \(attempt): \(error.message)")
-            attempt += 1
-        }
-    }
-}
+struct Abandon: Error {}
 
 let db = try Database.inMemory()
 let conn = try db.connect()
@@ -186,33 +202,47 @@ try conn.query("""
 try conn.query("MATCH (n:Person {name: 'Noor'}) SET n.role = 'engineer'")
 print("committed:", try conn.commit() ?? "nothing")
 
-try conn.begin()
-try conn.query("MATCH (a:Person {name: 'Ada'}) DETACH DELETE a")
-try conn.rollback()
-print("people:", try conn.query("MATCH (p:Person) RETURN count(p)").scalar())
+do {
+    try conn.transaction { tx in
+        try tx.query("MATCH (a:Person {name: 'Ada'}) DETACH DELETE a")
+        throw Abandon()
+    }
+} catch is Abandon {
+    print("rolled back")
+}
 
-try withRetry(conn) { tx, attempt in
+var attempts = 0
+try conn.transaction(retries: 2) { tx in
+    attempts += 1
     try tx.query("MATCH (p:Project {name: 'relate'}) SET p.reviews = coalesce(p.reviews, 0) + 1")
-    if attempt == 1 {
+    if attempts == 1 {
         try other.query("MATCH (p:Project {name: 'relate'}) SET p.reviews = 10")
     }
 }
-print("reviews:", try conn.query("MATCH (p:Project {name: 'relate'}) RETURN p.reviews").scalar())
+print("attempts:", attempts)
+
+let (people, reviews) = try conn.read { tx in
+    (
+        try tx.query("MATCH (p:Person) RETURN count(p)").scalar(as: Int.self),
+        try tx.query("MATCH (p:Project {name: 'relate'}) RETURN p.reviews").scalar(as: Int.self)
+    )
+}
+print("people:", people, "reviews:", reviews)
 ```
 
-Compare bookmarks by their number, never as strings: `"relate:10"` sorts before `"relate:9"`. An auto-commit write carries its bookmark in `result.bookmark`. [Transactions and concurrency](/docs/concepts/transactions-and-concurrency) explains what a transaction isolates.
+Compare bookmarks by their number, never as strings: `"relate:10"` sorts before `"relate:9"`. An auto-commit write carries its bookmark in `result.bookmark`. `conn.runInTransaction(_:retries:)` runs a list of `Statement`s so that all commit or none do. [Transactions and concurrency](/docs/concepts/transactions-and-concurrency) explains what a transaction isolates.
 
 ## Read result metadata
 
-A `QueryResult` is a `Sendable` value, copied out of the engine before `query` returns. Beside `columns`, `rows` and `records` it carries:
+A `QueryResult` is a `Sendable` value, copied out of the engine before `query` returns. It is a collection of `Record`s, and beside `columns` and `rows` it carries:
 
 | Property | Value |
 | --- | --- |
 | `queryType` | `.read` (`"r"`), `.write` (`"w"`), `.readWrite` (`"rw"`) or `.schema` (`"s"`) |
-| `namespace` | The namespace the statement ran in: its `USE` target, else the connection's |
+| `namespace` | The namespace the statement ran in, a `DatabaseNamespace`: its `USE` target, else the connection's |
 | `bookmark` | An auto-commit write's bookmark, `relate:<n>`; the [Swift API](/docs/reference/api/swift#queryresult) lists when it is `nil` |
 | `stats` | The 11 mutation counters, zeros included |
-| `notifications` | The planner's notifications, filled by `EXPLAIN` and `PROFILE`; empty on a plain run |
+| `notifications` | The planner's notifications, each a `QueryNotification`, filled by `EXPLAIN` and `PROFILE`; empty on a plain run |
 | `plan` | The plan document under `EXPLAIN` or `PROFILE`, else `nil` |
 | `elapsedMs`, `parseMs`, `planMs`, `executeMs` | The engine's time for the statement and its split by phase, in milliseconds |
 
@@ -262,15 +292,17 @@ The timings differ on every run, so the program checks only that the phases fit 
 
 ## Handle errors
 
-Every call throws `RelateError`, an enum with three cases:
+Every error the package throws is a `RelateError`, an enum with five cases. `query`, `run`, `begin`, `commit` and the other calls that can fail only that way declare it as a typed error: in a `do` block that makes only those calls, `error` in the `catch` is a `RelateError` with no cast.
 
 | Case | Thrown when |
 | --- | --- |
 | `.engine(EngineError)` | The engine or the C boundary refused the call |
-| `.invalidParameter(String)` | The package cannot pass a value or a name to the engine: a node, relationship or path value, or a statement, path, namespace, parameter name, map key or datetime zone holding a NUL byte |
-| `.decoding(String)` | A result broke the C contract, or `scalar()` met other than one row and one column |
+| `.invalidParameter(String)` | The package cannot pass a value or a name to the engine: a node, relationship or path value, an integer over `Int64.max`, a latitude off the globe, or a statement, path, namespace, parameter name, map key or datetime zone holding a NUL byte |
+| `.unexpectedResult(ResultMismatch)` | A result did not have the shape or type the code asked for: `single()`, `scalar()`, `get(_:as:)` or `decode(_:)` |
+| `.misuse(String)` | A call outside the API's contract: a statement that is not a read inside `read`, a `Transaction` used after its body returned, a managed write on a read-only database |
+| `.decoding(String)` | A result broke the C contract |
 
-`EngineError` carries `code` (the Neo4j status code), `gqlStatus`, `stage` (`.compile`, `.runtime` or `.internal`), `retryable` and `message`. `error.engineError` returns it for the `.engine` case:
+`EngineError` carries `code` (the Neo4j status code), `gqlStatus`, `stage` (`.compile`, `.runtime` or `.internal`), `retryable` and `message`, and four predicates on the code: `isSyntaxError`, `isMissingParameter`, `isConstraintViolation` and `isWriteConflict`. `error.engineError` returns it for the `.engine` case, and `error.isRetryable` is its `retryable`, `false` for every other case:
 
 ```swift run name=errors
 import Relate
@@ -294,29 +326,83 @@ try conn.query(team)
 
 do {
     try conn.query(roleOf)
-} catch let error as RelateError {
-    if case .engine(let e) = error {
+} catch {
+    if let e = error.engineError {
         print("message:", e.message)
         print("code:", e.code)
         print("gql_status:", e.gqlStatus, "stage:", e.stage, "retryable:", e.retryable)
+        print("missing parameter:", e.isMissingParameter)
     }
     print("description:", error)
 }
 
 do {
     _ = try conn.query("RETURN 1 AS a, 2 AS b").scalar()
-} catch let error as RelateError {
+} catch {
     print(error)
 }
 
-print(try conn.query(roleOf, ["name": "Noor"]).scalar())
+do {
+    _ = try conn.query(roleOf, ["name": "Noor"]).single().get("role", as: Int.self)
+} catch RelateError.unexpectedResult(let mismatch) {
+    print("path:", mismatch.path, "expected:", mismatch.expected, "found:", mismatch.found)
+}
+
+print(try conn.query(roleOf, ["name": "Noor"]).scalar(as: String.self))
 ```
 
-`String(describing:)` on a `RelateError` gives `Relate: [<code>] <message>` for an engine error. After a `.internal` stage failure the handle may be unusable: release it and open a new one. The [errors reference](/docs/reference/errors#engine-parameter-missing) lists every engine message with its cause and codes.
+`String(describing:)` on a `RelateError` gives `Relate: [<code>] <message>` for an engine error. After a `.internal` stage failure the handle may be unusable: `conn.isPoisoned()` probes it, and on `true` you release the connection and open a new one. The [errors reference](/docs/reference/errors#engine-parameter-missing) lists every engine message with its cause and codes.
+
+## Read and write from async code
+
+`try await db.read { tx in … }` and `try await db.write { tx in … }` run a synchronous body off the caller's thread, on connections the database opens and owns: one writer, and up to `Database.Options.maxReaders` readers (2 by default). A `read` body sees one snapshot and keeps nothing. A `write` body is one transaction, committed when it returns and rolled back when it throws, and writes made this way run one at a time. Both take a single `Statement` in place of a body:
+
+```swift run name=async
+import Relate
+
+let team = """
+    CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
+           (grace:Person {name: 'Grace', role: 'engineer'}),
+           (noor:Person {name: 'Noor', role: 'maintainer'}),
+           (relate:Project {name: 'relate', language: 'Rust'}),
+           (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),
+           (ada)-[:WORKS_ON {since: 2024}]->(relate),
+           (grace)-[:WORKS_ON {since: 2023}]->(relate),
+           (grace)-[:WORKS_ON {since: 2022}]->(tck),
+           (noor)-[:MAINTAINS]->(relate),
+           (ada)-[:KNOWS]->(grace)
+    """
+
+let db = try Database.inMemory()
+try await db.write(Statement(team))
+
+let project = "relate"
+let names = try await db.read { tx in
+    try tx.run("""
+        MATCH (p:Person)-[:WORKS_ON]->(:Project {name: \(project)})
+        RETURN p.name AS name ORDER BY name
+        """).map { try $0.get("name", as: String.self) }
+}
+print(project, names)
+
+try await db.write { tx in
+    try tx.run("MATCH (p:Person {name: \("Noor")}) SET p.role = \("lead")")
+}
+let role = try await db.read("MATCH (p:Person {name: 'Noor'}) RETURN p.role AS role")
+print("Noor:", try role.scalar(as: String.self))
+
+do {
+    _ = try await db.read { tx in try tx.query("CREATE (:Person {name: 'Lin'})") }
+} catch {
+    print(error)
+}
+```
+
+The managed connections use the `neo4j` namespace. `db.write(retries:tags:_:)` retries a conflict with a writer outside the pool, such as a connection from `connect()`. The [Swift API](/docs/reference/api/swift#managed-asynchronous-access) lists these calls with `checkpointInBackground()`, the commit stream and the live values built on them.
 
 ## Own a connection from an actor
 
-`Database` is `Sendable`: share one across tasks and actors. `Connection` is not, and the Swift 6 compiler refuses code that shares one between isolation domains, so each connection lives in one actor; open another connection for concurrent work. Calls are synchronous and block while the engine runs, so make them from a background actor, never the main actor:
+When code needs a connection of its own, for `begin()` and `commit()` by hand or for another namespace, keep it in an actor. `Database` is `Sendable`: share one across tasks and actors. `Connection` is not, and the Swift 6 compiler refuses code that shares one between isolation domains, so each connection lives in one actor; open another connection for concurrent work. Calls on a connection are synchronous and block while the engine runs, so make them from a background actor, never the main actor:
 
 ```swift run name=actor
 import Relate
@@ -345,8 +431,8 @@ actor TeamStore {
         let result = try conn.query("""
             MATCH (:Person {name: $name})-[:WORKS_ON]->(p:Project)
             RETURN p.name AS project ORDER BY project
-            """, ["name": CypherValue(name)])
-        return result.rows.compactMap { $0[0].stringValue }
+            """, ["name": name])
+        return try result.map { try $0.get("project", as: String.self) }
     }
 }
 
@@ -359,7 +445,7 @@ print("Grace:", try await grace)
 print("Ada:", try await ada)
 ```
 
-In an iOS app, keep the store in Application Support rather than Documents. If the app writes while the device is locked, give the directory `FileProtectionType.completeUntilFirstUserAuthentication`. Call `checkpoint()` after a bulk load, so the next launch opens from a snapshot instead of replaying the write-ahead log. An app and its extensions that share a store keep it in their App Group container, and only one process holds it writable at a time.
+In an iOS app, keep the store in Application Support rather than Documents: `Database.defaultStoreURL(named:)` returns a URL there and creates the directory. To start from a store shipped in the app bundle, `Database.provision(at:from:)` copies it to that URL when nothing is there yet. If the app writes while the device is locked, give the directory `FileProtectionType.completeUntilFirstUserAuthentication`, which `provision` sets on its copy by default. Call `checkpoint()`, or `await db.checkpointInBackground()`, after a bulk load, so the next launch opens from a snapshot instead of replaying the write-ahead log. An app and its extensions that share a store keep it in their App Group container, and only one process holds it writable at a time.
 
 ## Verify
 
@@ -369,8 +455,9 @@ Ask the engine which release the app linked:
 import Relate
 
 let conn = try Database.inMemory().connect()
-let version = try conn.query("CALL dbms.components() YIELD name, versions WHERE name = 'Relate' RETURN versions[0] AS version").scalar()
-print("relate", version.stringValue!)
+let version = try conn.query("CALL dbms.components() YIELD name, versions WHERE name = 'Relate' RETURN versions[0] AS version")
+    .scalar(as: String.self)
+print("relate", version)
 ```
 
 A version means the package resolved its binary target, linked the engine, and ran a statement through it.
@@ -379,9 +466,11 @@ A version means the package resolved its binary target, linked the engine, and r
 
 | Error | Cause | Remedy |
 | --- | --- | --- |
-| `Relate: [Neo.DatabaseError.General.UnknownError] internal error` from `Database(path:)` or `Database(readOnlyPath:)` | Another process or a live `Database` in this one holds the store for writing, or `readOnlyPath:` named a path with no store | Release the other writer, open a directory store read-only beside its writer, or fix the path |
-| `Relate: [Neo.ClientError.Statement.SemanticError] semantic error: WriteOnReadOnlyAccessDatabase: …` (`42N18`) | A write or `checkpoint()` on a database opened with `readOnlyPath:` | Open with `Database(path:)` for writes |
+| `Relate: [Neo.DatabaseError.General.UnknownError] internal error` from `Database(path:)`, `Database(readOnlyPath:)` or `Database(url:readOnly:)` | Another process or a live `Database` in this one holds the store for writing, or a read-only open named a path with no store | Release the other writer, open a directory store read-only beside its writer, or fix the path |
+| `Relate: [Neo.ClientError.Statement.SemanticError] semantic error: WriteOnReadOnlyAccessDatabase: …` (`42N18`) | A write or `checkpoint()` on a database opened read-only | Open with `Database(path:)` for writes |
 | `Relate invalid parameter: nodes, relationships and paths cannot be passed as parameters; pass their element id or properties` | A `.node`, `.relationship` or `.path` value in `parameters` | Pass `elementId` or the properties |
+| `Relate unexpected result: <column>: expected <type>, found <kind>` | `get(_:as:)`, `scalar(as:)` or `decode(_:)` asked for a type the value does not hold | Ask for the stored type, or for an `Optional` when the value can be `null` |
+| `Relate misuse: a <kind> statement ran in a read; nothing it changed is kept — use a write` | A write or schema statement inside `conn.read` or `db.read` | Run it with `transaction` or `db.write` |
 | `error: sending 'conn' risks causing data races` (at compile time) | A `Connection` passed to another actor or task is used again where it came from | Keep the connection inside one actor, as in [Own a connection from an actor](#own-a-connection-from-an-actor) |
 
 ## Related

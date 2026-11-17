@@ -5,6 +5,8 @@
 #
 #   public/install.sh              the newest stable core release (vX.Y.Z)'s
 #   public/releases.json           install.sh and releases.json assets
+#   public/install.ps1             the same release's Windows installer, when
+#                                  the release attaches one (relate 1.0.2 on)
 #   public/extensions.json         the signed pair on the newest stable extension
 #   public/extensions.json.sig     release (tags relate-extensions-*)
 #
@@ -13,14 +15,16 @@
 # The checked-in copies are the seed for local work and for the time before
 # the first release; a deploy overwrites them.
 #
-#   bash scripts/fetch-discovery.sh                  # all four files
+#   bash scripts/fetch-discovery.sh                  # all five files
 #   bash scripts/fetch-discovery.sh --repo OWNER/NAME --dest public
 #
 # What it does when something is missing:
 #   - no stable core release yet            -> keep the seed files, say so (exit 0)
 #   - no extension release carries the pair -> keep the seed pair, say so (exit 0)
+#   - the newest core release has no install.ps1 -> keep the seed copy, say so (exit 0)
 #   - a release exists but lacks its files, a file is not valid JSON, releases.json
-#     does not list that release as latest, install.sh pins no SIGNING_KEY, or the
+#     does not list that release as latest, install.sh pins no SIGNING_KEY,
+#     install.ps1 pins another key than install.sh's, or the
 #     extensions.json signature does not verify (SSHSIG namespace relate-release,
 #     key pinned in install.sh) -> fail (exit 1) and touch nothing. A failed
 #     deploy leaves the live site as it was; the next dispatch retries.
@@ -80,10 +84,13 @@ has_assets() { # TAG ASSET...
 }
 json_ok() { node -e 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))' "$1" 2>/dev/null; }
 signing_key() { sed -n "s/^SIGNING_KEY='\(.*\)'$/\1/p" "$1"; }
+# The key install.ps1 pins: `$RelateSigningKey = '<key>'`.
+ps1_signing_key() { sed -n "s/^\$RelateSigningKey = '\(.*\)'[[:space:]]*$/\1/p" "$1" | head -n 1; }
 
 # ---- core: install.sh + releases.json
 core_tag="$(newest '^v[0-9]+\\.[0-9]+\\.[0-9]+$' | head -n 1)"
 install_src="$dest/install.sh"
+ps1_src=""
 if [ -z "$core_tag" ]; then
   log "no stable core release yet: install.sh and releases.json left as checked in"
 else
@@ -97,6 +104,19 @@ else
   [ -n "$(signing_key "$work/core/install.sh")" ] || fail "install.sh from $core_tag pins no SIGNING_KEY"
   install_src="$work/core/install.sh"
   log "core: install.sh and releases.json from $core_tag"
+  # The Windows installer rides the same release. It verifies downloads against
+  # the key it pins, so a copy that pins another key than install.sh's is refused.
+  if has_assets "$core_tag" install.ps1; then
+    gh release download "$core_tag" -R "$repo" --pattern install.ps1 --dir "$work/core" --clobber >/dev/null ||
+      fail "could not download install.ps1 from $core_tag"
+    [ -s "$work/core/install.ps1" ] || fail "install.ps1 from $core_tag is empty"
+    [ "$(ps1_signing_key "$work/core/install.ps1")" = "$(signing_key "$work/core/install.sh")" ] ||
+      fail "install.ps1 from $core_tag does not pin the SIGNING_KEY install.sh pins"
+    ps1_src="$work/core/install.ps1"
+    log "core: install.ps1 from $core_tag, pinning install.sh's signing key"
+  else
+    log "core: $core_tag has no install.ps1 asset: left as checked in"
+  fi
 fi
 
 # ---- extensions: the signed pair
@@ -122,5 +142,6 @@ fi
 
 # ---- write, only now
 [ -z "$core_tag" ] || cp "$work/core/install.sh" "$work/core/releases.json" "$dest/"
+[ -z "$ps1_src" ] || cp "$ps1_src" "$dest/"
 [ -z "$ext_tag" ] || cp "$work/ext/extensions.json" "$work/ext/extensions.json.sig" "$dest/"
 summary

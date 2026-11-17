@@ -1,6 +1,6 @@
 {
-  "version": "1.0.1",
-  "recordedWith": "relate 1.0.1 (ef436ce), release build",
+  "version": "1.1.0",
+  "recordedWith": "relate 1.1.0 (f529cbb), release build",
   "agentCap": 100,
   "harnessVariable": "CLAUDECODE",
   "harnessVariables": [
@@ -20,7 +20,8 @@
     "GOOSE_PROVIDER",
     "CURSOR_AGENT"
   ],
-  "capWarning": "warning: result truncated to {kept} rows (the statement returned {total}); pass --max-rows 0 for all rows",
+  "capWarning": "warning: result truncated to {kept} rows (the statement returned {total}); pass --max-rows 0 for all rows, or page with SKIP/LIMIT",
+  "agentHint": "hint: agents can report Relate friction to its developers — draft it, ask the person, then run 'relate agent-feedback'",
   "exitCodes": [
     {
       "exit": 0,
@@ -169,6 +170,22 @@
       "retryable": false
     },
     {
+      "id": "engine-wal-payload-cap",
+      "pattern": "^This statement tried to commit a single WAL record of at least 64 MiB\\. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 64 MiB \\(ADR-0086\\); commit the data in smaller transactions \\(CALL \\{ [\\s\\S]+? \\} IN TRANSACTIONS OF n ROWS, or client-side batches\\)\\.$",
+      "kind": "capacity",
+      "code": "fatal_error",
+      "exit": 1,
+      "retryable": false
+    },
+    {
+      "id": "engine-wal-payload-cap",
+      "pattern": "^This statement tried to commit a single WAL record of at least [\\s\\S]+?\\. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is [\\s\\S]+? \\(ADR-0086\\); commit the data in smaller transactions \\(CALL \\{ [\\s\\S]+? \\} IN TRANSACTIONS OF n ROWS, or client-side batches\\)\\.$",
+      "kind": "capacity",
+      "code": "fatal_error",
+      "exit": 1,
+      "retryable": false
+    },
+    {
       "id": "engine-traversal-depth-exceeded",
       "pattern": "^syntax error: TraversalDepthExceeded: This query allows paths up to 600 hops\\. This is a safety limit protecting against excessive traversal \\(not a database limit\\) — lower the path bound, or raise it with --max-traversal-depth \\(up to 2000\\)\\.$",
       "kind": "syntax",
@@ -209,22 +226,6 @@
       "retryable": false
     },
     {
-      "id": "engine-wal-payload-cap",
-      "pattern": "^This statement tried to commit a single WAL record of at least 64 MB\\. This is a safety limit protecting against memory exhaustion — the per-record WAL payload cap is 64 MB; commit the data in smaller transactions\\.$",
-      "kind": "capacity",
-      "code": "fatal_error",
-      "exit": 1,
-      "retryable": false
-    },
-    {
-      "id": "engine-wal-payload-cap",
-      "pattern": "^This statement tried to commit a single WAL record of at least [\\s\\S]+?\\. This is a safety limit protecting against memory exhaustion — the per-record WAL payload cap is [\\s\\S]+?; commit the data in smaller transactions\\.$",
-      "kind": "capacity",
-      "code": "fatal_error",
-      "exit": 1,
-      "retryable": false
-    },
-    {
       "id": "engine-use-on-administration-command",
       "pattern": "^syntax error: UseClauseWithAdministrationCommand: The `USE` clause is not required for administration commands\\. Retry your query without the `USE` clause, and it will be routed automatically\\.$",
       "kind": "syntax",
@@ -252,6 +253,14 @@
       "id": "engine-composite-only-function",
       "pattern": "^semantic error: SemanticError: Dynamic graph lookup not allowed here\\. This feature is only available on composite databases\\. Attempted to access graph graph\\.names\\(\\)$",
       "kind": "semantic",
+      "code": "validation_error",
+      "exit": 6,
+      "retryable": false
+    },
+    {
+      "id": "engine-unsupported-cypher-version",
+      "pattern": "^syntax error: parse error: UnsupportedCypherVersion: 5 is not a valid option for cypher version\\. Valid options are: 25   CYPHER 5 RETURN 1 AS one          \\^$",
+      "kind": "syntax",
       "code": "validation_error",
       "exit": 6,
       "retryable": false
@@ -297,6 +306,14 @@
       "retryable": false
     },
     {
+      "id": "engine-system-database-required",
+      "pattern": "^semantic error: SystemDatabaseRequired: This is an administration command and it should be executed against the system database: SHOW DATABASES$",
+      "kind": "semantic",
+      "code": "validation_error",
+      "exit": 6,
+      "retryable": false
+    },
+    {
       "id": "engine-nested-evaluation-budget",
       "pattern": "^NestedEvaluationBudgetExceeded: nested evaluation exceeds 100000 passes per statement; nested subqueries compound per level \\(security budget\\)\\.$",
       "kind": "execution",
@@ -326,6 +343,14 @@
       "kind": "semantic",
       "code": "fatal_error",
       "exit": 1,
+      "retryable": false
+    },
+    {
+      "id": "engine-system-database-required",
+      "pattern": "^SystemDatabaseRequired: This is an administration command and it should be executed against the system database: SHOW DATABASES$",
+      "kind": "semantic",
+      "code": "validation_error",
+      "exit": 6,
       "retryable": false
     },
     {
@@ -412,6 +437,14 @@
       "id": "engine-ontology-user-database-only",
       "pattern": "^semantic error: SemanticError: Ontologies can only be stored for the user database 'neo4j'\\.$",
       "kind": "semantic",
+      "code": "validation_error",
+      "exit": 6,
+      "retryable": false
+    },
+    {
+      "id": "engine-unsupported-cypher-version",
+      "pattern": "^UnsupportedCypherVersion: [\\s\\S]+? is not a valid option for cypher version\\. Valid options are: 25$",
+      "kind": "syntax",
       "code": "validation_error",
       "exit": 6,
       "retryable": false

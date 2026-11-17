@@ -511,7 +511,7 @@ CREATE CONSTRAINT step_ts IF NOT EXISTS FOR ()-[r:STEP]-() REQUIRE r.ts IS :: IN
 ```
 
 ```table
-error: semantic error: ConstraintValidationFailed: `step_ts` property type
+error: semantic error: ConstraintCreationFailed: ConstraintValidationFailed: `step_ts` property type
 ```
 
 The migration rewrites every datetime `ts` as epoch milliseconds. Only

@@ -93,7 +93,7 @@ In the output, `<version>` is that version number. The other assets are `relate-
 | Windows CLI binary | None; the release workflow has no Authenticode step |
 | C libraries (`relate-ffi-<target>.tar.gz`; `cypherlite-ffi-<target>.tar.gz` up to and including 0.16.1) | None |
 | Python wheels and source distribution | None on the release assets. On PyPI, each `relate-db` file carries a PEP 740 attestation from trusted publishing: the `publish-registries.yml` workflow of `relatedb/relate`, in its `release` environment |
-| Java jars | None; `com.relate:relate` is published as release assets only, not to Maven Central |
+| Java jars | None; `ai.relatedb:relate` is published as release assets only, not to Maven Central |
 | Swift package | SwiftPM checks the release's `RelateFFI.xcframework.zip` (`CypherLiteFFI.xcframework.zip` up to and including 0.16.1) against the checksum in the tagged `Package.swift` |
 | npm packages | npm provenance (SLSA provenance v1) through trusted publishing, from the `publish-registries.yml` workflow of `relatedb/relate`; `npm audit signatures` checks it |
 | Rust crates | None; published to crates.io through trusted publishing from the GitHub Actions of `relatedb/relate` |

@@ -73,7 +73,7 @@ base=https://relatedb.ai/skills/relate
 dest=.claude/skills/relate
 mkdir -p "$dest/references"
 curl -sSfL "$base/SKILL.md" -o "$dest/SKILL.md"
-for f in agent-safety client-c client-extensions client-go client-java client-javascript client-python client-swift client-wasm operations pull push run-git-to-graph spatial vector; do
+for f in agent-safety client-c client-cli client-extensions client-go client-java client-javascript client-python client-swift client-wasm operations pull push run-git-to-graph spatial vector; do
   curl -sSfL "$base/references/$f.md" -o "$dest/references/$f.md"
 done
 ```

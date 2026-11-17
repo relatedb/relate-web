@@ -34,7 +34,7 @@ RELATE_MAX_ROWS=1 relate --mode jsonl --max-rows 0 "UNWIND [1, 2, 3] AS x RETURN
 ```
 
 ```text
-warning: result truncated to 1 rows (the statement returned 3); pass --max-rows 0 for all rows
+warning: result truncated to 1 rows (the statement returned 3); pass --max-rows 0 for all rows, or page with SKIP/LIMIT
 {"x":1}
 {"rowCap":{"kept":1,"total":3}}
 {"x":1}
@@ -160,7 +160,7 @@ DO_NOT_TRACK=1 RELATE_TELEMETRY=1 relate telemetry status
 disabled (DO_NOT_TRACK)
 ```
 
-Two more variables exist for development and testing: `RELATE_MIXPANEL_ENDPOINT` replaces the `/track` URL (an `https://` URL, or `http://` for a loopback host only; a rejected value turns metrics off for the run with one warning on stderr), and `RELATE_MIXPANEL_TOKEN` replaces the project token. Since relate 0.1.0 an exit writes its events to the spool instead of waiting for a delivery, so `RELATE_TELEMETRY_FLUSH_MS` is gone. Each event's `invoker` property is `agent` when `CLAUDECODE`, `CURSOR_AGENT`, `GEMINI_CLI` or `OPENCODE` is set, else `ci` when `CI` is set to a value other than empty, `0` or `false`, else `human`. The [privacy and telemetry page](/docs/reference/privacy-and-telemetry#turning-usage-metrics-off) lists every event and property.
+Two more variables exist for development and testing: `RELATE_MIXPANEL_ENDPOINT` replaces the `/track` URL (an `https://` URL, or `http://` for a loopback host only; a rejected value turns metrics off for the run with one warning on stderr), and `RELATE_MIXPANEL_TOKEN` replaces the project token. `RELATE_FEEDBACK_ENDPOINT` and `RELATE_FEEDBACK_TOKEN` do the same for the reports of [`relate agent-feedback`](/docs/reference/cli/feedback#relate-agent-feedback). Since relate 0.1.0 an exit writes its events to the spool instead of waiting for a delivery, so `RELATE_TELEMETRY_FLUSH_MS` is gone. Each event's `invoker` property is `agent` when `CLAUDECODE`, `CURSOR_AGENT`, `GEMINI_CLI` or `OPENCODE` is set, else `ci` when `CI` is set to a value other than empty, `0` or `false`, else `human`. The [privacy and telemetry page](/docs/reference/privacy-and-telemetry#turning-usage-metrics-off) lists every event and property.
 
 ## Paths and terminal
 

@@ -2,14 +2,14 @@
 
 The public website for **relate**, the embedded Cypher graph database, at [relatedb.ai](https://relatedb.ai): the home page, the documentation, the cookbook and the in-browser playground. It is a static [Astro](https://astro.build) site that ships the engine's WASM build and runs every example against it at build time.
 
-The docs track relate 1.0.1. relate 1.0.0 was the first stable release and the first on PyPI (`relate-db`), npm (`@relate/relate`, `@relate/relate-wasm`) and crates.io (`relate`); the relate repository and this one are public. [`LAUNCH.md`](LAUNCH.md) tracks what is still open.
+The docs track relate 1.1.0. relate 1.0.0 was the first stable release and the first on PyPI (`relate-db`), npm (`@relate/relate`, `@relate/relate-wasm`) and crates.io (`relate`); the relate repository and this one are public. [`LAUNCH.md`](LAUNCH.md) tracks what is still open.
 
 ## What is here
 
 | Path on the site | Source | What it is |
 |---|---|---|
 | `/` | `src/pages/index.astro` | The home page |
-| `/docs/` | `src/content/docs/`, `src/lib/docs/`, `src/pages/docs/` | The documentation: 142 pages, each with a markdown twin (`<page>.md`), `llms.txt`, a docs graph (`graph.cypher`, `graph.json`, `<page>.graph.md`), the glossary, the capability catalog and the interactive elements (plan viewer, agent-mode terminal, vector and geospatial explorers, MCP tryout, live schema, the docs graph itself) |
+| `/docs/` | `src/content/docs/`, `src/lib/docs/`, `src/pages/docs/` | The documentation: 143 pages, each with a markdown twin (`<page>.md`), `llms.txt`, a docs graph (`graph.cypher`, `graph.json`, `<page>.graph.md`), the glossary, the capability catalog and the interactive elements (plan viewer, agent-mode terminal, vector and geospatial explorers, MCP tryout, live schema, the docs graph itself) |
 | `/cookbook/` | `src/content/cookbook/`, `src/lib/cookbook/` | Recipes whose every Cypher step runs on the WASM engine, with recorded results, diagrams and a hand-off to the playground |
 | `/playground/` | `playground/` | The full-screen Cypher playground, its own Vite and React package |
 | `/skill.md`, `/skills/`, `/.well-known/` | `public/skills/`, `src/pages/.well-known/` | The relate agent skill (synced from upstream) and five task skills authored here, with discovery indexes |

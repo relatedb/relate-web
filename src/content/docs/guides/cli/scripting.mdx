@@ -249,7 +249,7 @@ relate --database ./team.rl --read-only --mode envelope -c "MATCH (:Person {name
 | The `relate` help text, and exit code 0, instead of results | A script was redirected into `relate` without the word `query` | Run `relate query --database <path> --mode envelope < <script>` |
 | `Error: invalid --param value: parameter <name>: …`, exit code 2 | A `--param` value that starts like JSON (a digit, `-`, `"`, `[` or `{`) doesn't parse; a date such as `2026-11-07` counts | Quote the whole argument in single quotes and fix the JSON, or JSON-quote a string: `'since="2026-11-07"'` |
 | `Failed to open Relate: storage locked: <path>`, exit code 5 | Another process holds the store | Wait for it to exit, or read with `--read-only` (a directory store can be read beside its writer; a `.rl` file only while no writer holds it) |
-| `warning: result truncated to 100 rows (the statement returned <total>); pass --max-rows 0 for all rows` | With agent mode on (a detected agent harness, for example), a piped statement prints at most 100 rows, and the envelope says `"truncated":true` | Pass `--max-rows 0` to print every row, or bound the result with `LIMIT` |
+| `warning: result truncated to 100 rows (the statement returned <total>); pass --max-rows 0 for all rows, or page with SKIP/LIMIT` | With agent mode on (a detected agent harness, for example), a piped statement prints at most 100 rows, and the envelope says `"truncated":true` | Pass `--max-rows 0` to print every row, or bound the result with `LIMIT` |
 | `note: write statement changed nothing; the graph is unchanged` on stderr | Not an error: a write matched nothing, often a `MATCH` with no rows | Check the `MATCH`; the exit code stays 0 |
 
 ## Related

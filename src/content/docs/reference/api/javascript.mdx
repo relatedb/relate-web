@@ -7,7 +7,7 @@ surfaces: [node]
 related: [guides/embed/node, get-started/node, reference/errors, reference/api/python, concepts/problems-relate-solves#embedded-graph-in-an-app]
 ---
 
-The relate Node.js :term[client]{id=client} is the `@relate/relate` package: it loads the engine as a native library (`librelate_ffi`, the C ABI version 2) and runs it in the calling process against a :term[store]{id=store}. `query()` is synchronous and `queryAsync()` returns a Promise of the same result. The package ships TypeScript types in `index.d.ts`; the signatures on this page are read from those types and the package source, and checked against `@relate/relate` 1.0.1 on Node.js 26; the package requires Node.js 18 or later.
+The relate Node.js :term[client]{id=client} is the `@relate/relate` package: it loads the engine as a native library (`librelate_ffi`, the C ABI version 2) and runs it in the calling process against a :term[store]{id=store}. `query()` is synchronous and `queryAsync()` returns a Promise of the same result. The package ships TypeScript types in `index.d.ts`; the signatures on this page are read from those types and the package source, and checked against `@relate/relate` 1.1.0 on Node.js 26; the package requires Node.js 18 or later.
 
 ## Synopsis
 
@@ -52,7 +52,7 @@ The types file also exports the TypeScript types `QueryType`, `Namespace`, `Int6
 | Member | Returns | Behavior |
 | --- | --- | --- |
 | `Database.open(uri: string, options?: { readOnly?: boolean })` | `Database` | Opens a store; see [Open options](#open-options) |
-| `db.connect(namespace?: string)` | `Connection` | A new connection; `"neo4j"` (default), `"system"` or `"system_ontologies"`, in any case |
+| `db.connect(namespace?: string)` | `Connection` | A new connection; `"neo4j"` (default) or `"system"`, or `"system_ontologies"` under `RELATE_PREVIEW=ontology`, in any case |
 | `db.checkpoint()` | `void` | Writes the current state to the snapshot |
 
 There is no close method. Each statement is durable when `query()` returns; the store stays open until the process exits.

@@ -10,7 +10,7 @@ related: ["graph-type", "preview-feature", "namespace", "schema-folder"]
 
 An ontology is a JSON or YAML document in the Ontology Graph Spec format that describes the graph's node and relationship types, their properties, and their constraints. A store holds at most one, for the `neo4j` namespace, stored as written. The `db.ontology.*` procedures manage it: `set` validates and stores a document, `get` returns it or `null`, `drop` removes it, and `apply` turns it into the store's :term[graph type]{id=graph-type}, after which writes that break it fail.
 
-The procedures need the `ontology` :term[preview feature]{id=preview-feature}; without `RELATE_PREVIEW=ontology` every call fails with the preview message. The `system_ontologies` namespace is listed by `SHOW DATABASES` but not queryable.
+The procedures need the `ontology` :term[preview feature]{id=preview-feature}; without `RELATE_PREVIEW=ontology` every call fails with the preview message. With the opt-in, `SHOW DATABASES` also lists the `system_ontologies` namespace, which is not queryable; without it, the name is unknown.
 
 ```bash
 RELATE_PREVIEW=ontology relate --database ./team.rl --read-only "CALL db.ontology.get()"

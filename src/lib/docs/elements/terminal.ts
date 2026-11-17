@@ -84,7 +84,7 @@ export default {
     const harness = input.attributes.harness === 'on';
     const cap = harness ? facts.agentCap : null;
     const parts: string[] = [];
-    const first = renderRun({ envelopes: [text], statements: 1, mode: 'envelope', cap }, facts);
+    const first = renderRun({ envelopes: [text], statements: 1, mode: 'envelope', cap, agent: harness }, facts);
     parts.push(
       `The statement as relate ${facts.version} prints it in four of its output modes${harness ? ` under an agent harness (\`${facts.harnessVariable}=1\`)` : ''}, ` +
         `rendered from this page's recorded result by the terminal's renderers, which match the relate ${facts.version} binary byte for byte on the recorded runs, timing values aside. ` +
@@ -99,7 +99,7 @@ export default {
     // What the renderers know they cannot match for this recording (an engine wording difference, a plan), said once.
     if (first.gaps.length) parts.push(`Not as relate prints it: ${first.gaps.join('; ')}.`);
     for (const mode of MODES as readonly Mode[]) {
-      const out = renderRun({ envelopes: [text], statements: 1, mode, cap }, facts);
+      const out = renderRun({ envelopes: [text], statements: 1, mode, cap, agent: harness }, facts);
       parts.push(`\`--mode ${mode}\` prints ${streams(out.lines)}:`);
       parts.push(['```bash', commandLine(statement, mode, harness ? facts.harnessVariable : null), '```'].join('\n'));
       if (out.lines.length) parts.push(['```text', ...out.lines.map((l) => l.text), '```'].join('\n'));

@@ -6,13 +6,13 @@ surfaces: [cli, python, node, browser, bolt, http, mcp, agents]
 related: [reference/security, reference/project, reference/cli/flags, guides/agents/run-in-a-sandbox, concepts/security-and-trust]
 ---
 
-The `relate` CLI binary sends anonymous usage metrics to Mixpanel. They are on by default, and `DO_NOT_TRACK=1`, `RELATE_TELEMETRY=0`, or `relate telemetry off` turns them off. The events carry command shapes and a random install ID; query text, :term[store]{id=store} paths, and :term[parameter]{id=parameter} values are never collected, because the code that builds an event has no field to hold them. The client libraries, the WebAssembly build, the C library, and the served :term[surfaces]{id=surface} never send usage metrics. The docs and cookbook pages and the home page load Google Tag Manager from `googletagmanager.com` for page-view measurement, and only after you accept the banner: until then, and if you reject, nothing is requested from Google. Your choice is kept in your browser's local storage, and the "Cookie settings" link in the footer reopens it. The playground does not load it, and neither does a preview build. Beyond that these pages load nothing from a third party with the page. One recipe downloads an embedding model from Hugging Face, and only when the reader presses the button that states its size.
+The `relate` CLI binary sends anonymous usage metrics to Mixpanel. They are on by default, and `DO_NOT_TRACK=1`, `RELATE_TELEMETRY=0`, or `relate telemetry off` turns them off. An agent's feedback report is sent only under a 30-day grant a person made, and never while usage metrics are off. The events carry command shapes and a random install ID; query text, :term[store]{id=store} paths, and :term[parameter]{id=parameter} values are never collected, because the code that builds an event has no field to hold them. The client libraries, the WebAssembly build, the C library, and the served :term[surfaces]{id=surface} never send usage metrics. The docs and cookbook pages and the home page load Google Tag Manager from `googletagmanager.com` for page-view measurement, and only after you accept the banner: until then, and if you reject, nothing is requested from Google. Your choice is kept in your browser's local storage, and the "Cookie settings" link in the footer reopens it. The playground does not load it, and neither does a preview build. Beyond that these pages load nothing from a third party with the page. One recipe downloads an embedding model from Hugging Face, and only when the reader presses the button that states its size.
 
 ## Synopsis
 
 | Surface | Sends usage metrics | Network access it starts on its own |
 | --- | --- | --- |
-| `relate` CLI (release binary) | Yes, unless turned off | Only the usage metrics. `relate upgrade`, `relate extension install`, `--load <url>`, `--fetch-params`, `pull`, and `push` reach the addresses they are given or document, and only when run |
+| `relate` CLI (release binary) | Yes, unless turned off | Only the usage metrics, and a [feedback report](#feedback-reports) an agent sends under a person's grant. `relate upgrade`, `relate extension install`, `--load <url>`, `--fetch-params`, `pull`, and `push` reach the addresses they are given or document, and only when run |
 | `relate serve` (HTTP, :term[MCP]{id=mcp}, Bolt) | One `RELATE-CLI_COMMAND` event when the server exits; statements it serves send nothing | Only that one usage metrics event, unless turned off |
 | Python, Node.js, Java, Go, Swift, and Rust clients, and the C library | Never | None |
 | WebAssembly (WASM) build | Never | None |
@@ -56,11 +56,12 @@ Every event also carries these properties:
 | Topic | Behavior |
 | --- | --- |
 | Never collected | Query text, store paths, and parameter values. The event types have no fields for them, so adding one would be a compile error, not a policy change. |
-| Install ID | A random UUID, generated once and kept in `state.json` in the config directory. No hardware or operating-system identifier is read. |
+| Install ID | A random UUID, generated once and kept in `state.json` in the config directory. No hardware or operating-system identifier is read. `state.json` also holds the CLI version of the last run and the end of the 15-minute window after a failed delivery. |
 | Files | `state.json` (the install ID and the notice flag), `config.json` (the setting `relate telemetry` writes) and the spool, one `telemetry-spool-<uuid>.jsonl` file per run that recorded events, all mode `0600` on Unix, in `$XDG_CONFIG_HOME/relate/` when that is set to an absolute path, else `~/.config/relate/`; on Windows, `%APPDATA%\relate`, else `%USERPROFILE%\.config\relate` |
-| Delivery | A run sends nothing while it works. At exit it appends its events to its own spool file, a local write with no network wait. The next run with usage metrics on sends the spooled files in the background, as `POST https://api.mixpanel.com/track` with a 2-second HTTP timeout, and deletes each file once delivered; a file that fails stays for a later run. The spool is bounded: past its limits, events and files are dropped. |
+| Delivery | At exit a run appends its events to its own spool file, a local write. A later run with usage metrics on sends the spooled files in the background while it works, oldest first, as `POST https://api.mixpanel.com/track?ip=0` with a 2-second HTTP timeout, and deletes each file once delivered; a file that fails stays for a later run. The spool holds at most 64 files: past that, the newest are dropped. |
+| Waiting at exit | As of relate 1.1.0. A statement run never waits for a delivery. `--version`, `--help` and the commands wait at exit for a delivery already in progress, for at most 1 second. The first run of a new CLI version waits for at most 1 second plus 150 ms per spooled file, 10 seconds at most. After a wait that fails or runs out, no run waits for 15 minutes. |
 | Failure | Every :term[telemetry]{id=telemetry} error is ignored: nothing is printed, and exit codes do not change. |
-| Recipient | A Mixpanel project shared with another command-line tool; its operator is not named here yet. The `RELATE-CLI_` prefix keeps relate's events apart. The CLI does not set Mixpanel's `ip` parameter, so Mixpanel's own handling of the request's IP address applies. |
+| Recipient | A Mixpanel project shared with another command-line tool; its operator is not named here yet. The `RELATE-CLI_` prefix keeps relate's events apart. Each request sets Mixpanel's `ip` parameter to `0`. |
 
 ## Turning usage metrics off
 
@@ -97,6 +98,29 @@ The environment variables that control usage metrics, including the ones for dev
 
 `RELATE_MIXPANEL_ENDPOINT` accepts an `https://` URL, or an `http://` URL on a loopback host; any other value turns usage metrics off for that run, with one warning on stderr. Unset, the endpoint is `https://api.mixpanel.com/track`.
 
+## Feedback reports
+
+As of relate 1.0.2 the CLI has two feedback commands, and neither sends anything on its own decision. The [`relate feedback` reference](/docs/reference/cli/feedback) has their flags and errors.
+
+| Command | What leaves the machine | When |
+| --- | --- | --- |
+| `relate feedback <text>`, in a run with agent mode off | Nothing from the command. It prints a new-issue URL for `github.com/relatedb/relate` that holds the text, and opens it in the default browser | The issue exists only after a person submits the form in the browser |
+| `relate agent-feedback`, in a run with agent mode on | One `RELATE-CLI_AGENT_FEEDBACK` event to the Mixpanel project the usage metrics go to: the category, the expected and observed text, the optional command, error code and model label, a request id, the CLI version, the operating system and architecture, what invoked the run and the agent harness's label | Only while a grant is live and usage metrics are on |
+
+| Topic | Behavior |
+| --- | --- |
+| The grant | A person makes it on a terminal, with `relate feedback enable` or by answering yes when the CLI asks. It lasts 30 days, and `relate feedback disable` clears it. It is the `feedback` object of `config.json` |
+| The ask | One line on a terminal, with yes as the default answer: once per install at the first `relate feedback` with no argument, and, as of relate 1.1.0, once per 30 days at `relate skill install` and `relate upgrade` while no grant is live. Never asked while usage metrics are off |
+| Without a grant | `relate agent-feedback` refuses with exit code 1 and sends nothing |
+| With usage metrics off | No report is sent, grant or not: `DO_NOT_TRACK=1`, `RELATE_TELEMETRY=0` and `relate telemetry off` each stop it |
+| What a report may not hold | A URL, an email address, a host name, an IP address, a file path, a data file's name, a secret, Cypher, or pasted output. A report that holds one is rejected whole, before any request |
+| Receipts | Every rejection and every send appends one line to `feedback-receipts.jsonl` in the config directory |
+| The hint | As of relate 1.1.0, with agent mode on, a failed run prints `hint: agents can report Relate friction to its developers — draft it, ask the person, then run 'relate agent-feedback'` on stderr. The line sends nothing |
+
+The environment variables for development and testing:
+
+<EnvVars usedBy="agent feedback" />
+
 ## What never phones home
 
 | Surface | Why |
@@ -105,7 +129,7 @@ The environment variables that control usage metrics, including the ones for dev
 | The C library (`relate-ffi`) | Same |
 | The WASM build (`@relate/relate-wasm`, and the engine on these pages) | Same |
 | Statements served by `relate serve` over HTTP, MCP, or Bolt | The server process sends one `RELATE-CLI_COMMAND` event when it exits, unless usage metrics are off; no event is sent per connection or statement |
-| `agent` and `minimal` CLI builds | Built without the usage metrics code: no events, no notice, no telemetry config or state files. The `agent` build still reaches the network when `pull`, `push`, `--fetch-params`, `--load <url>`, or `extension install` is run; `minimal` has none of these |
+| `agent` and `minimal` CLI builds | Built without the usage metrics code: no events, no notice, no telemetry config or state files. Both hold the two feedback commands. The `agent` build still reaches the network when `pull`, `push`, `--fetch-params`, `--load <url>`, or `extension install` is run; `minimal` has none of these |
 
 ## What the relatedb.ai site loads
 

@@ -59,7 +59,7 @@
     {
       "id": "java",
       "label": "Java",
-      "what": "the `com.relate:relate` artifact, over the C ABI"
+      "what": "the `ai.relatedb:relate` artifact, over the C ABI"
     },
     {
       "id": "go",

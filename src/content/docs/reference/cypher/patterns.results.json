@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.1.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -1748,6 +1748,102 @@
                   }
                 }
               ]
+            ]
+          }
+        ],
+        "stats": {
+          "constraints_added": 0,
+          "constraints_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "nodes_created": 0,
+          "nodes_deleted": 0,
+          "properties_set": 0,
+          "relationships_created": 0,
+          "relationships_deleted": 0
+        }
+      },
+      "expectError": false
+    },
+    "shortest-where": {
+      "kind": "table",
+      "text": "| route | hops |\n|-------|------|\n0 rows",
+      "table": null,
+      "graph": null,
+      "envelope": {
+        "columnTypes": [
+          "ANY",
+          "ANY"
+        ],
+        "columns": [
+          "route",
+          "hops"
+        ],
+        "error": null,
+        "notifications": [],
+        "plan": null,
+        "plan_cache": "miss",
+        "rows": [],
+        "stats": {
+          "constraints_added": 0,
+          "constraints_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "nodes_created": 0,
+          "nodes_deleted": 0,
+          "properties_set": 0,
+          "relationships_created": 0,
+          "relationships_deleted": 0
+        }
+      },
+      "expectError": false
+    },
+    "shortest-path-where": {
+      "kind": "table",
+      "text": "| route                              | hops |\n|------------------------------------|------|\n| [\"Noor\", \"relate\", \"Ada\", \"Grace\"] | 3    |\n1 row",
+      "table": {
+        "columns": [
+          "route",
+          "hops"
+        ],
+        "numeric": [
+          false,
+          true
+        ],
+        "rows": [
+          [
+            "[\"Noor\", \"relate\", \"Ada\", \"Grace\"]",
+            "3"
+          ]
+        ],
+        "summary": "1 row"
+      },
+      "graph": null,
+      "envelope": {
+        "columnTypes": [
+          "LIST",
+          "INTEGER"
+        ],
+        "columns": [
+          "route",
+          "hops"
+        ],
+        "error": null,
+        "notifications": [],
+        "plan": null,
+        "plan_cache": "miss",
+        "rows": [
+          {
+            "hops": 3,
+            "route": [
+              "Noor",
+              "relate",
+              "Ada",
+              "Grace"
             ]
           }
         ],

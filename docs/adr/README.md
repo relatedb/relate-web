@@ -143,3 +143,4 @@ Copy `template.md`.
 | [0063](0063-google-tag-manager-on-page-views.md) | Google Tag Manager measures page views, behind a consent banner | Proposed |
 | [0064](0064-windows-install-block-until-upstream-installer.md) | Windows gets a verified PowerShell install block until upstream ships an installer | Proposed |
 | [0065](0065-home-promo-banner-in-a-fixed-colour.md) | The home hero carries one promo banner in its own fixed colour | Proposed |
+| [0066](0066-serve-upstream-windows-installer.md) | The site serves upstream's Windows installer beside install.sh | Proposed |

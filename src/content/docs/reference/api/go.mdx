@@ -7,7 +7,7 @@ surfaces: [go]
 related: [guides/embed/go, get-started/go, reference/api, reference/api/c, reference/errors, concepts/problems-relate-solves#embedded-graph-in-an-app]
 ---
 
-The Go :term[client]{id=client} is the module `github.com/relatedb/relate/clients/go`, package `relate`, for Go 1.22 or later. It is cgo code over the relate C library, `librelate_ffi`, whose C application binary interface (C ABI) is version 2: values cross through the library's typed value walker and parameter builder, with no JSON. Every call is synchronous. This page lists the package's exported identifiers as `go doc` reports them for relate 1.0.1.
+The Go :term[client]{id=client} is the module `github.com/relatedb/relate/clients/go`, package `relate`, for Go 1.22 or later. It is cgo code over the relate C library, `librelate_ffi`, whose C application binary interface (C ABI) is version 2: values cross through the library's typed value walker and parameter builder, with no JSON. Every call is synchronous. This page lists the package's exported identifiers as `go doc` reports them for relate 1.1.0.
 
 ## Synopsis
 
@@ -42,6 +42,7 @@ func (c *Connection) Close()
 | `QueryType` | `string` type | `QueryTypeRead` `"r"`, `QueryTypeWrite` `"w"`, `QueryTypeReadWrite` `"rw"`, `QueryTypeSchema` `"s"` |
 | `Namespace` | `string` type | `NamespaceNeo4j` `"neo4j"`, `NamespaceSystem` `"system"`, `NamespaceSystemOntologies` `"system_ontologies"` |
 | `Error` | struct | `Code`, `GQLStatus`, `Stage`, `Retryable`, `Message`; `Error()` returns `Message` |
+| `ErrClosed` | `error` value | What every call on a closed `Database` or `Connection` returns, as of relate 1.0.2; `errors.Is(err, relate.ErrClosed)` matches it, and its message is `relate: handle is closed` |
 | `Stage` | `string` type | `StageCompile` `"compile"`, `StageRuntime` `"runtime"`, `StageInternal` `"internal"` |
 | `Node`, `Relationship`, `Path` | struct, struct, `[]any` | Graph values |
 | `Point`, `Vector` | struct | Spatial and vector values |
@@ -57,9 +58,9 @@ func (c *Connection) Close()
 | `Open(uri)` | Opens `:memory:`, a directory store or a `.rl` store for writing; creates a missing store |
 | `OpenReadOnly(uri)` | Loads an existing store once; refuses writes and checkpoints; a missing store is an error |
 | `Connect()` | A connection in the `neo4j` namespace |
-| `ConnectNamespace(name)` | A connection in `neo4j`, `system` or `system_ontologies`, matched case-insensitively |
+| `ConnectNamespace(name)` | A connection in `neo4j` or `system`, matched case-insensitively; `system_ontologies` exists only with `RELATE_PREVIEW=ontology` set |
 | `Checkpoint()` | Writes a :term[checkpoint]{id=checkpoint}, folding the write-ahead log into a fresh snapshot of committed state; refused on a read-only database |
-| `Close()` | Frees the native handle |
+| `Close()` | Frees the native handle. A second `Close()` does nothing; any other call on the closed database returns `ErrClosed` |
 
 A failed `Open` or `OpenReadOnly` returns a `*Error` with message `internal error`, code `Neo.DatabaseError.General.UnknownError`, GQLSTATUS `42000` and stage `internal`, whether the store is locked by another writer or missing. An unknown namespace returns `semantic error: DatabaseNotFound: Graph not found: <name>`.
 
@@ -75,7 +76,7 @@ A failed `Open` or `OpenReadOnly` returns a `*Error` with message `internal erro
 | `Begin()` | Opens an explicit :term[transaction]{id=transaction}; transactions do not nest |
 | `Commit()` | Commits; returns the :term[bookmark]{id=bookmark} `"relate:<n>"`, or `""` when the transaction wrote nothing; a failure returns `""` and the error and ends the transaction |
 | `Rollback()` | Discards the explicit transaction |
-| `Close()` | Disconnects; an open transaction rolls back |
+| `Close()` | Disconnects; an open transaction rolls back. A second `Close()` does nothing; any other call on the closed connection returns `ErrClosed` |
 
 A statement failure returns a nil `*Result` and the `*Error`. A connection's own refusals, each with code `Neo.ClientError.Statement.SemanticError` and GQLSTATUS `42000`:
 

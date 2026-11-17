@@ -1,10 +1,10 @@
 {
   "format": 1,
-  "verified": "1.0.1",
+  "verified": "1.1.0",
   "cells": {
     "show": {
       "kind": "table",
-      "text": "| name                | type       | access       | default | home  |\n|---------------------|------------|--------------|---------|-------|\n| \"neo4j\"             | \"standard\" | \"read-write\" | true    | true  |\n| \"system\"            | \"system\"   | \"read-write\" | false   | false |\n| \"system_ontologies\" | \"standard\" | \"read-only\"  | false   | false |\n3 rows",
+      "text": "| name     | type       | access       | default | home  |\n|----------|------------|--------------|---------|-------|\n| \"neo4j\"  | \"standard\" | \"read-write\" | true    | true  |\n| \"system\" | \"system\"   | \"read-write\" | false   | false |\n2 rows",
       "table": {
         "columns": [
           "name",
@@ -34,16 +34,9 @@
             "\"read-write\"",
             "false",
             "false"
-          ],
-          [
-            "\"system_ontologies\"",
-            "\"standard\"",
-            "\"read-only\"",
-            "false",
-            "false"
           ]
         ],
-        "summary": "3 rows"
+        "summary": "2 rows"
       },
       "graph": null,
       "envelope": {
@@ -79,13 +72,6 @@
             "home": false,
             "name": "system",
             "type": "system"
-          },
-          {
-            "access": "read-only",
-            "default": false,
-            "home": false,
-            "name": "system_ontologies",
-            "type": "standard"
           }
         ],
         "stats": {
@@ -106,7 +92,7 @@
     },
     "use-system": {
       "kind": "table",
-      "text": "| name           | versions           |\n|----------------|--------------------|\n| \"Neo4j Kernel\" | [\"2026.10-relate\"] |\n| \"Cypher\"       | [\"5\", \"25\"]        |\n| \"Relate\"       | [\"1.0.1\"]          |\n3 rows",
+      "text": "| name           | versions           |\n|----------------|--------------------|\n| \"Neo4j Kernel\" | [\"2026.10-relate\"] |\n| \"Cypher\"       | [\"5\", \"25\"]        |\n| \"Relate\"       | [\"1.1.0\"]          |\n3 rows",
       "table": {
         "columns": [
           "name",
@@ -127,7 +113,7 @@
           ],
           [
             "\"Relate\"",
-            "[\"1.0.1\"]"
+            "[\"1.1.0\"]"
           ]
         ],
         "summary": "3 rows"
@@ -163,7 +149,7 @@
           {
             "name": "Relate",
             "versions": [
-              "1.0.1"
+              "1.1.0"
             ]
           }
         ],
@@ -211,12 +197,25 @@
     },
     "match-ontologies": {
       "kind": "table",
-      "text": "error: semantic error: SemanticError: This database is not queryable. Use the db.ontology.* procedures on the user database 'neo4j' instead.",
+      "text": "error: semantic error: DatabaseNotFound: Graph not found: system_ontologies",
       "table": null,
       "graph": null,
       "envelope": {
         "columns": [],
-        "error": "semantic error: SemanticError: This database is not queryable. Use the db.ontology.* procedures on the user database 'neo4j' instead.",
+        "error": "semantic error: DatabaseNotFound: Graph not found: system_ontologies",
+        "rows": [],
+        "stats": {}
+      },
+      "expectError": true
+    },
+    "show-composed": {
+      "kind": "table",
+      "text": "error: semantic error: SystemDatabaseRequired: This is an administration command and it should be executed against the system database: SHOW DATABASES",
+      "table": null,
+      "graph": null,
+      "envelope": {
+        "columns": [],
+        "error": "semantic error: SystemDatabaseRequired: This is an administration command and it should be executed against the system database: SHOW DATABASES",
         "rows": [],
         "stats": {}
       },
@@ -224,11 +223,11 @@
     },
     "two-stores": {
       "kind": "text",
-      "text": "team: [{'label': 'Person', 'n': 1}]\ndeps: [{'label': 'Version', 'n': 1}]\nsystem ['neo4j', 'system', 'system_ontologies']\nOperationalError semantic error: DatabaseNotFound: Graph not found: movies",
+      "text": "team: [{'label': 'Person', 'n': 1}]\ndeps: [{'label': 'Version', 'n': 1}]\nsystem ['neo4j', 'system']\nOperationalError semantic error: DatabaseNotFound: Graph not found: movies",
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.0.1",
+      "verified": "1.1.0",
       "source_sha256": "a2e13f27cf08d78dda7fce87ccda06553fd8109be6289dd7cefccd82f35bfdaf"
     }
   }

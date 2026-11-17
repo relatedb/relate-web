@@ -21,15 +21,14 @@ The Go :term[client]{id=client} is the module `github.com/relatedb/relate/client
 ```bash
 mkdir team && cd team
 go mod init team
-go get github.com/relatedb/relate/clients/go@ef436ce
+go get github.com/relatedb/relate/clients/go@v1.1.0
 ```
 
-`ef436ce` is the commit of relate 1.0.1. The module has no version tag of its own, so Go records the commit as a pseudo-version, `v0.0.0-20261112130637-ef436ce10a54`; without `@<commit>`, `go get` takes the newest commit on the default branch, which can be ahead of the release's C library.
+`v1.1.0` is the relate release: as of relate 1.0.2 every release tags the module with its own version, so `go.mod` records `v1.1.0`. Keep the module and the C library on the same release.
 
-The module uses cgo and links the engine's C library, `librelate_ffi`. Each release attaches it as `relate-ffi-<target>.tar.gz` (`cypherlite-ffi-<target>.tar.gz` up to and including 0.16.1), holding the library and its header in `include/relate.h`. Unpack it into a directory and point cgo at that directory when you build, and the dynamic loader at it when you run:
+The module uses cgo and links the engine's C library, `librelate_ffi`. Each release attaches it as `relate-ffi-<target>.tar.gz` (`cypherlite-ffi-<target>.tar.gz` up to and including 0.16.1), holding the library and its header. The module carries its own copy of the header, so cgo needs only the library. Unpack the archive into a directory and point the linker at that directory when you build, and the dynamic loader at it when you run:
 
 ```bash
-export CGO_CFLAGS="-I<dir>/include"
 export CGO_LDFLAGS="-L<dir> -lrelate_ffi"
 export DYLD_LIBRARY_PATH="<dir>"   # macOS; on Linux, LD_LIBRARY_PATH
 ```

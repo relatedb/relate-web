@@ -843,7 +843,7 @@ export const VERSION_PROBES: Record<SampleLang, string> = {
     let result = conn.query(${JSON.stringify(VERSION_QUERY)}).expect("query");
     println!("{}", result.rows[0][0].as_string().expect("a string"));
 }`,
-  java: `import com.relate.Database;
+  java: `import ai.relatedb.Database;
 
 public class Main {
     public static void main(String[] args) {

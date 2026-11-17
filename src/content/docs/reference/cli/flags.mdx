@@ -83,7 +83,7 @@ An explicit mode always overrides the default. `--json`, `--csv`, `--jsonl`, `--
 | --- | --- |
 | `--load SOURCE` | Loads a store from a local `.rl` file, a directory, or an `https` URL to a `.rl` file. Into `:memory:`, the store opens read-only and the source is released after the load. Into a `--database` path that does not exist yet, the source is copied there and the store opens normally. A URL is fetched to a private temporary copy that is not kept. |
 | `--read-only[=snapshot\|live]` | Opens an existing store without writing, checkpointing or migrating it; every write exits 6. `snapshot`, the default, freezes the state at open; `live` follows a directory store's WAL and is refused for `.rl` and `:memory:`. A directory store can be open read-only beside its writer; a `.rl` store only while no writer holds it. |
-| `--namespace NAME` | The namespace a statement without `USE` targets: `neo4j` (default), `system` or `system_ontologies`. |
+| `--namespace NAME` | The namespace a statement without `USE` targets: `neo4j` (default) or `system`; `system_ontologies` exists only with `RELATE_PREVIEW=ontology` set. |
 | `--wal-dir DIR` | The WAL directory of a directory store, default `<DATABASE>/wal`. |
 | `--snapshot-format F` | The :term[codec]{id=codec} of an empty directory store: `parquet` (default), `json` or `markdown`. `parquet` writes one typed column per common property key ([Storage formats](/docs/reference/storage/formats#parquet-data-files)). An existing store keeps its recorded codec; naming a different one exits 1 with `storage error: snapshot codec mismatch: directory is <codec>, requested <codec>`. Also accepted by `relate serve`. |
 | `--markdown-body-properties LIST` | The properties a `markdown` store writes as note bodies; default `body`. |
@@ -183,6 +183,18 @@ The [`relate skill` reference](/docs/reference/cli/skill) has the agent director
 The [`relate upgrade` reference](/docs/reference/cli/upgrade) has what it checks and replaces, and its errors.
 
 <Flags command="upgrade" />
+
+### `relate feedback`
+
+The [`relate feedback` reference](/docs/reference/cli/feedback) has the grant, the issue form and the errors. The command exists in a run with agent mode off.
+
+<Flags command="feedback" />
+
+### `relate agent-feedback`
+
+The [`relate agent-feedback` reference](/docs/reference/cli/feedback#relate-agent-feedback) has the outcome document and what a report may hold. The command exists in a run with agent mode on.
+
+<Flags command="agent-feedback" />
 
 ### `relate run`
 

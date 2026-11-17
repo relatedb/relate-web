@@ -6,17 +6,17 @@ surfaces: [cypher, cli]
 related: [reference/cypher/differences-from-neo4j, reference/cypher/search, reference/limitations, concepts/cypher-dialect, reference/cypher/cypher-versions, reference/cypher/functions, reference/cypher/procedures]
 ---
 
-relate runs :term[openCypher]{id=opencypher}, plus a large part of Neo4j's Cypher 25 and its extensions aligned with GQL, the ISO graph query language. Statements run as Cypher 25 unless a `CYPHER 5` prefix says otherwise. Preview features stay off until `RELATE_PREVIEW` names them. Cypher for servers and clusters, such as users, roles and composite databases, is out of scope for an engine that runs inside one process.
+relate runs :term[openCypher]{id=opencypher}, plus a large part of Neo4j's Cypher 25 and its extensions aligned with GQL, the ISO graph query language. Every statement runs as Cypher 25; a `CYPHER 25` prefix is accepted, and any other version is refused. Preview features stay off until `RELATE_PREVIEW` names them. Cypher for servers and clusters, such as users, roles and composite databases, is out of scope for an engine that runs inside one process.
 
 ## Synopsis
 
 ```text
-[CYPHER 5 | CYPHER 25] [EXPLAIN | PROFILE] <statement>
+[CYPHER 25] [EXPLAIN | PROFILE] <statement>
 ```
 
 | Setting | Default | Values |
 | --- | --- | --- |
-| Language version | `CYPHER 25` for every :term[namespace]{id=namespace}, as `SHOW DATABASES` reports in `defaultLanguage` | A `CYPHER 5` or `CYPHER 25` prefix on one statement. `ALTER DATABASE <name> SET DEFAULT LANGUAGE CYPHER 5` changes only what `SHOW DATABASES` reports ([Cypher versions](/docs/reference/cypher/cypher-versions#default-language)) |
+| Language version | `CYPHER 25` for every :term[namespace]{id=namespace}, as `SHOW DATABASES` reports in `defaultLanguage` | `CYPHER 25` only: the prefix on a statement changes nothing, and any other version number fails, in a prefix and in `ALTER DATABASE <name> SET DEFAULT LANGUAGE` ([Cypher versions](/docs/reference/cypher/cypher-versions#default-language)) |
 | Preview features | None enabled | `RELATE_PREVIEW=<feature>[,<feature>…]` in the environment of the process that opens the store |
 | Plan prefixes | None | `EXPLAIN` plans without running; `PROFILE` runs and measures ([tune a query](/docs/guides/cypher/tune-a-query)) |
 
@@ -81,8 +81,8 @@ A :term[preview feature]{id=preview-feature} ships in the engine and stays off u
 | Area | relate | Alternative |
 | --- | --- | --- |
 | Users, roles, and privileges | Not implemented | File permissions on the store, `--read-only`, and `relate serve --auth` on a served store |
-| Several databases | Three fixed namespaces per store: `neo4j` for data, `system`, and `system_ontologies` (listed, not queryable) | One store per graph |
-| Database administration | Only `SHOW DATABASE[S]`, `SHOW DEFAULT DATABASE`, `SHOW HOME DATABASE` and `ALTER DATABASE … SET DEFAULT LANGUAGE`; anything else fails with `semantic error: UnsupportedAdministrationCommand: Unsupported administration command: <statement>` | — |
+| Several databases | Fixed namespaces per store: `neo4j` for data and `system`, plus `system_ontologies` under `RELATE_PREVIEW=ontology` (listed, not queryable) | One store per graph |
+| Database administration | Only `SHOW DATABASE[S]`, `SHOW DEFAULT DATABASE`, `SHOW HOME DATABASE` and `ALTER DATABASE … SET DEFAULT LANGUAGE CYPHER 25`; anything else, the user, role and privilege commands included, fails with `semantic error: UnsupportedAdministrationCommand: Unsupported administration command: <statement>` | — |
 | Composite, remote and sharded databases; clustering | Not implemented | — |
 | Queries across graphs | A statement runs against one graph | Query each store and join the results in your code |
 | APOC and Graph Data Science libraries | Not included | The built-in functions and procedures; [differences from Neo4j](/docs/reference/cypher/differences-from-neo4j) lists the replacements |

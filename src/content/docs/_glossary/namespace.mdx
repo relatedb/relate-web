@@ -1,14 +1,14 @@
 ---
 id: namespace
 term: "namespace"
-short: "One of the three fixed graphs in every store: `neo4j` for user data, `system` for administration, and `system_ontologies`, listed but not queryable."
+short: "One of the fixed graphs in every store: `neo4j` for user data and `system` for administration, plus `system_ontologies` under the ontology preview."
 aliases: []
 context: storage
 see: reference/limitations
 related: ["store", "ontology"]
 ---
 
-A store holds exactly three namespaces, and the set is fixed: no statement creates or drops one. `neo4j` holds the user graph and is where a statement runs unless it says otherwise. `system` answers administration statements such as `SHOW DATABASES`. `system_ontologies` is listed by `SHOW DATABASES` but not queryable.
+A store's namespaces are fixed: no statement creates or drops one. `neo4j` holds the user graph and is where a statement runs unless it says otherwise. `system` answers administration statements such as `SHOW DATABASES`. A third, `system_ontologies`, is visible only when the process that opens the store sets `RELATE_PREVIEW=ontology`: it is then listed by `SHOW DATABASES` but not queryable, and without the opt-in the name is unknown.
 
 A statement picks a namespace with `USE neo4j` or `USE system`; any other graph name fails before the statement runs. On the CLI, `--namespace` sets the namespace for the session. Each namespace records its default Cypher version, which `SHOW DATABASES` reports as `defaultLanguage`.
 

@@ -75,7 +75,7 @@ ORDER BY years DESC
 
 The rest of the set includes `NEXT` to chain statements, `COUNT { }` and `COLLECT { }` subqueries, `CALL (x) { }` scope clauses, `CALL { } IN TRANSACTIONS`, dynamic labels with `$(…)`, the vector and UUID types, graph types, and the `SEARCH` clause over vector and full-text indexes. The [Cypher overview](/docs/reference/cypher/overview) lists them all.
 
-Where the proposals, Cypher 5 and Cypher 25 disagree, relate's target is Cypher 25 as Neo4j runs it. That is also why the retired TCK pin carried deviations: a few 2024.3 scenarios expect behavior that Cypher 25 changed on purpose. A statement can still ask for a version with a `CYPHER 5` or `CYPHER 25` prefix ([Cypher versions](/docs/reference/cypher/cypher-versions) has what each prefix changes). The default is recorded per :term[namespace]{id=namespace} in the :term[store]{id=store}, and `SHOW DATABASES` reports it:
+Where the proposals, Cypher 5 and Cypher 25 disagree, relate's target is Cypher 25 as Neo4j runs it. That is also why the retired TCK pin carried deviations: a few 2024.3 scenarios expect behavior that Cypher 25 changed on purpose. Cypher 25 is the only version relate runs: a `CYPHER 25` prefix is accepted and changes nothing, and any other version number, `CYPHER 5` included, is refused ([Cypher versions](/docs/reference/cypher/cypher-versions) has the messages). The language is recorded per :term[namespace]{id=namespace} in the :term[store]{id=store}, and `SHOW DATABASES` reports it:
 
 ```cypher run name=version
 SHOW DATABASES YIELD name, defaultLanguage
@@ -106,7 +106,7 @@ The opt-in exists because a preview's shape can still change. Keeping it off by 
 
 ## Where relate departs from Neo4j, and why
 
-Most departures come from relate being an embedded, single-process engine. Server features have nothing to act on: there is one user graph per store, no users or roles, and no cluster. So a store holds three fixed namespaces: `neo4j` for data, `system`, and `system_ontologies`, which is listed but not queryable. `USE` routes a statement to `neo4j` or `system`. Any other graph name fails before the statement runs:
+Most departures come from relate being an embedded, single-process engine. Server features have nothing to act on: there is one user graph per store, no users or roles, and no cluster. So a store holds fixed namespaces: `neo4j` for data and `system`, plus `system_ontologies`, which is visible only under the `ontology` preview and is not queryable. `USE` routes a statement to `neo4j` or `system`. Any other graph name fails before the statement runs:
 
 ```cypher run name=use-other expect=error
 USE friends
