@@ -409,11 +409,18 @@ function recipeSlugs(): string[] {
 }
 
 const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
-/** The text of an HTML fragment: tags dropped, entities decoded, whitespace collapsed. */
+/**
+ * The text of an HTML fragment: tags dropped, entities decoded, whitespace
+ * collapsed. The tags are dropped until none is left, so text that only
+ * becomes a tag once another is removed (`<scr<b>ipt>`) is not read as text.
+ */
 function htmlText(html: string): string {
-  return html
-    .replace(/<(script|style|svg|template)\b[\s\S]*?<\/\1>/g, ' ')
-    .replace(/<[^>]+>/g, '')
+  let text = html;
+  for (let last = ''; last !== text; ) {
+    last = text;
+    text = text.replace(/<(script|style|svg|template)\b[\s\S]*?<\/\1>/g, ' ').replace(/<[^>]+>/g, '');
+  }
+  return text
     .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e: string) => (e[0] === '#' ? String.fromCodePoint(e[1].toLowerCase() === 'x' ? parseInt(e.slice(2), 16) : Number(e.slice(1))) : (ENTITIES[e] ?? m)))
     .replace(/\s+/g, ' ')
     .trim();

@@ -123,10 +123,19 @@ export interface HomeTwinOptions {
   setupPrompt: string;
 }
 
-/** Table cell text: a pipe would end the cell. */
-const cell = (s: string) => s.replace(/\|/g, '\\|');
-/** Prose in a cell: `<target>` would read as a tag. */
-const prose = (s: string) => cell(s).replace(/</g, '\\<');
+/** Prose as markdown: a backslash stays a backslash, and `<target>` does not read as a tag. */
+const prose = (s: string) => s.replace(/\\/g, '\\\\').replace(/</g, '\\<');
+
+/**
+ * A command as a code span, in which nothing is escaped: the fence is one
+ * backtick longer than the longest run inside, padded when the command
+ * starts or ends with one.
+ */
+function codeSpan(s: string): string {
+  const fence = '`'.repeat(Math.max(0, ...[...s.matchAll(/`+/g)].map((m) => m[0].length)) + 1);
+  const pad = s.startsWith('`') || s.endsWith('`') ? ' ' : '';
+  return `${fence}${pad}${s}${pad}${fence}`;
+}
 
 /** A docs page path as its twin's URL (`/docs/<id>/` → `<origin>/docs/<id>.md`); any other path as it is. */
 function markdownUrl(origin: string, href: string): string {
@@ -157,9 +166,7 @@ export function homeTwin({ origin, verified, tabs, setupPrompt }: HomeTwinOption
     '',
     `The install commands the page's first panel gives, verified against relate ${verified}:`,
     '',
-    '| For | Command | Note | Guide |',
-    '| --- | --- | --- | --- |',
-    ...tabs.filter((t) => t.cmd).map((t) => `| ${cell(t.label)} | \`${cell(t.cmd!)}\` | ${prose(t.note)} | ${markdownUrl(origin, t.docs)} |`),
+    ...tabs.filter((t) => t.cmd).map((t) => `- **${prose(t.label)}**: ${codeSpan(t.cmd!)}\n  ${prose(t.note)} Guide: ${markdownUrl(origin, t.docs)}`),
     '',
   ];
   for (const s of HOME_SECTIONS) {
