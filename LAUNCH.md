@@ -98,7 +98,7 @@ GitHub token.
 - [ ] No console errors; the playground (`/playground/`) reaches "ready" and runs a sample query
 - [ ] No remaining `cypherlite` / `neo4j-labs` / "labs" branding strings: `curl -s https://relatedb.ai/ https://relatedb.ai/llms.txt | grep -ci cypherlite` → `0`
 - [ ] Every link on the page resolves (run `lychee` against the live URL); no 404s to repos/releases/packages
-- [ ] `curl -s https://relatedb.ai/robots.txt` allows `/` and names the sitemap; `curl -s https://relatedb.ai/ | grep -o 'content="index, follow"'` matches; `/404` still says `noindex`; `llms.txt` served as text
+- [ ] `curl -s https://relatedb.ai/robots.txt` allows `/`, names the sitemap and carries the `Content-Signal` line (ADR-0070); `curl -s https://relatedb.ai/ | grep -o 'content="index, follow"'` matches; `/404` still says `noindex`; `llms.txt` served as text
 - [ ] Share cards: paste the home page, a docs page and a recipe into the Facebook Sharing Debugger, LinkedIn Post Inspector and the X card validator (the card is `public/og/default.png`); validate the JSON-LD in Google's Rich Results Test and the Schema.org validator
 - [ ] Light/dark theme, mobile width, cli/agentic toggle, copy buttons all work
 - [ ] Version shown on the page matches the latest release tag

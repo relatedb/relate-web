@@ -145,6 +145,30 @@ export const jsonLdText = (data: JsonLd) => JSON.stringify(data).replaceAll('<',
 /** The body of `/robots.txt` for the build. */
 export function robotsTxt(): string {
   return indexable()
-    ? `User-agent: *\nAllow: /\n\nSitemap: ${CANONICAL_ORIGIN}/sitemap.xml\n`
+    ? `${CONTENT_SIGNALS_NOTE}\nUser-agent: *\nContent-Signal: ${contentSignal()}\nAllow: /\n\nSitemap: ${CANONICAL_ORIGIN}/sitemap.xml\n`
     : 'User-agent: *\nDisallow: /\n';
 }
+
+/**
+ * What the site's content may be used for once it is fetched, as Content
+ * Signals (contentsignals.org; draft-romm-aipref-contentsignals), in the
+ * order `robots.txt` gives them (ADR-0070). All three are `yes`: the site is
+ * the documentation of an open-source project and is written to be read by
+ * agents. A preview build disallows every path instead, and declares none.
+ */
+export const CONTENT_SIGNALS = [
+  ['search', 'yes'],
+  ['ai-input', 'yes'],
+  ['ai-train', 'yes'],
+] as const satisfies readonly (readonly [string, 'yes' | 'no'])[];
+
+/** The value of the `Content-Signal` line: `search=yes, ai-input=yes, ai-train=yes`. */
+export const contentSignal = () => CONTENT_SIGNALS.map(([name, value]) => `${name}=${value}`).join(', ');
+
+/** The comment `robots.txt` opens with: what each signal means, for a person who reads the file. */
+const CONTENT_SIGNALS_NOTE = [
+  '# Content Signals (https://contentsignals.org/): what this site\'s content may be used for.',
+  '#   search    a search index, and results that link back to the page',
+  '#   ai-input  an AI model reads the page to answer a question (retrieval, grounding)',
+  '#   ai-train  training or fine-tuning an AI model',
+].join('\n');

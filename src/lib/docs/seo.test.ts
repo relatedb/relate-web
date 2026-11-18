@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { afterEach, describe, test } from 'node:test';
 
-import { absolute, articleGraph, canonicalPath, homeGraph, indexable, jsonLdText, robotsTxt } from '../seo.ts';
+import { absolute, articleGraph, canonicalPath, CONTENT_SIGNALS, contentSignal, homeGraph, indexable, jsonLdText, robotsTxt } from '../seo.ts';
 
 afterEach(() => {
   delete process.env.PUBLIC_INDEXABLE;
@@ -19,9 +19,29 @@ describe('indexing switch', () => {
   });
 
   test('robots.txt follows it', () => {
-    assert.equal(robotsTxt(), 'User-agent: *\nAllow: /\n\nSitemap: https://relatedb.ai/sitemap.xml\n');
+    const lines = robotsTxt().split('\n').filter((l) => !l.startsWith('#'));
+    assert.equal(lines.join('\n'), 'User-agent: *\nContent-Signal: search=yes, ai-input=yes, ai-train=yes\nAllow: /\n\nSitemap: https://relatedb.ai/sitemap.xml\n');
     process.env.PUBLIC_INDEXABLE = 'false';
     assert.equal(robotsTxt(), 'User-agent: *\nDisallow: /\n');
+  });
+
+  test('robots.txt declares the three content signals, once, in the group for every crawler (ADR-0070)', () => {
+    const txt = robotsTxt();
+    const lines = txt.split('\n');
+    const signal = lines.filter((l) => /^content-signal:/i.test(l));
+    assert.equal(signal.length, 1);
+    assert.equal(signal[0], `Content-Signal: ${contentSignal()}`);
+    assert.deepEqual(CONTENT_SIGNALS.map(([name]) => name).sort(), ['ai-input', 'ai-train', 'search']);
+    for (const [, value] of CONTENT_SIGNALS) assert.match(value, /^(yes|no)$/);
+    // In the `User-agent: *` group: after its first line, before the blank line that ends it.
+    const group = lines.slice(lines.indexOf('User-agent: *'), lines.indexOf(''));
+    assert.ok(group.includes(signal[0]));
+    // Every line a crawler does not parse is a comment, and the comment names each signal.
+    for (const [name] of CONTENT_SIGNALS) assert.ok(lines.some((l) => l.startsWith('#') && l.includes(name)), name);
+    assert.ok(lines.every((l) => l === '' || /^(#|User-agent:|Content-Signal:|Allow:|Sitemap:)/.test(l)));
+    // A preview build disallows every path and declares no signal.
+    process.env.PUBLIC_INDEXABLE = 'false';
+    assert.doesNotMatch(robotsTxt(), /content-signal/i);
   });
 });
 
