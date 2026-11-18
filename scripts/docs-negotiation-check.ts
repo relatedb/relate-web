@@ -24,11 +24,15 @@
 // page's twin, percent-encoded traversal) never answered with markdown, the
 // skill and llms.txt files and the largest data block a twin links
 // (/docs/<page>/data/<name>.json, application/json) served untouched through the agent-path log
-// (functions/_middleware.ts), and a path outside /docs. Without the server
+// (functions/_middleware.ts), and a path outside /docs. The home page's Link
+// headers (public/_headers, ADR-0068) are checked too: GET and HEAD on /
+// carry exactly the values the built _headers file gives it, on the HTML
+// file byte for byte, and a page beside it carries none. Without the server
 // it also checks that every heading and glossary entry id on every built
 // docs page resolves as a ?section= anchor (the layout's "Related" list and
 // the landing page, whose twin is a different document, are reported, not
-// failed).
+// failed), and that every Link target is a file the build serves, one of
+// them the file the home page's own <link rel="describedby"> names.
 //
 // wrangler is fetched by npx at the pinned WRANGLER version (override with
 // WRANGLER_VERSION), the version deploy-cf.yml deploys with, so the function
@@ -299,8 +303,69 @@ async function serverCases(base: string): Promise<void> {
     if (res.headers.has('x-markdown-tokens')) p.push('the Function answered outside /docs');
     const diff = sameBytes(bytes, new Uint8Array(readFileSync(join(DIST, 'cookbook/index.html'))));
     if (diff) p.push(`body ${diff}`);
+    if (res.headers.has('link')) p.push(`a Link header outside the home page: ${res.headers.get('link')}`);
     expect('GET /cookbook/ with Accept: text/markdown is untouched', p);
   }
+  {
+    // The home page's Link headers (ADR-0068): what _headers gives `/`, on the static HTML.
+    const want = homeLinkValues();
+    const htmlBytes = new Uint8Array(readFileSync(join(DIST, 'index.html')));
+    for (const method of ['GET', 'HEAD']) {
+      const { res, bytes } = await get(base, '/', BROWSER, method);
+      const p: string[] = [];
+      if (res.status !== 200) p.push(`status ${res.status}`);
+      const got = (res.headers.get('link') ?? '').split(/,\s*(?=<)/).filter(Boolean);
+      if (got.join('\n') !== want.join('\n')) p.push(`Link ${JSON.stringify(got)}, expected ${JSON.stringify(want)}`);
+      const diff = method === 'GET' ? sameBytes(bytes, htmlBytes) : bytes.byteLength ? `HEAD returned ${bytes.byteLength} body bytes` : null;
+      if (diff) p.push(`body ${diff}`);
+      expect(`${method} / carries the Link headers of _headers, on the HTML`, p);
+    }
+  }
+}
+
+/** The Link values the built _headers file sets on `/` (public/_headers, ADR-0068), in file order. */
+function homeLinkValues(): string[] {
+  const file = join(DIST, '_headers');
+  if (!existsSync(file)) return [];
+  const out: string[] = [];
+  let path = '';
+  for (const line of readFileSync(file, 'utf8').split('\n')) {
+    if (!line.trim() || line.trimStart().startsWith('#')) continue;
+    if (!/^\s/.test(line)) path = line.trim();
+    else if (path === '/') {
+      const value = /^\s+Link:\s*(.+?)\s*$/i.exec(line)?.[1];
+      if (value) out.push(value);
+    }
+  }
+  return out;
+}
+
+/**
+ * The home page's Link headers name files the build serves, with a relation
+ * type each, and the file the page's own `<link rel="describedby">` names is
+ * one of them, under the same relation.
+ */
+function homeLinkTargets(): void {
+  console.log('home page Link headers (the built _headers file, without the server)');
+  const values = homeLinkValues();
+  if (!values.length) return bad('/_headers', 'no Link header for / (public/_headers, ADR-0068)');
+  const links: { target: string; rel: string }[] = [];
+  for (const value of values) {
+    const m = /^<(\/[^>]*)>((?:\s*;\s*[a-z]+="[^"]*")+)$/.exec(value);
+    const rel = m && /;\s*rel="([^"]+)"/.exec(m[2])?.[1];
+    if (!m || !rel) {
+      bad(value, 'not <a site path>; rel="…" with quoted parameters');
+      continue;
+    }
+    links.push({ target: m[1], rel });
+    const file = join(DIST, m[1].endsWith('/') ? `${m[1]}index.html` : m[1]);
+    expect(`${m[1]} (rel="${rel}") is a built file`, existsSync(file) && statSync(file).isFile() ? [] : [`no ${relative(DIST, file)} in ${DIST}`]);
+  }
+  const head = /<link rel="describedby" href="([^"]+)"/.exec(readFileSync(join(DIST, 'index.html'), 'utf8'))?.[1];
+  expect(
+    'the home page\'s <link rel="describedby"> is one of them',
+    head && links.some((l) => l.rel === 'describedby' && l.target === head) ? [] : [`the head names ${JSON.stringify(head ?? null)}; the headers name ${links.filter((l) => l.rel === 'describedby').map((l) => l.target).join(', ') || 'none'}`],
+  );
 }
 
 function walkFiles(dir: string, out: string[] = []): string[] {
@@ -352,6 +417,7 @@ async function main(): Promise<number> {
     return 0;
   }
   anchorCoverage();
+  homeLinkTargets();
 
   const scratch = mkdtempSync(join(tmpdir(), 'relate-negotiation-'));
   let child: ChildProcess | null = null;

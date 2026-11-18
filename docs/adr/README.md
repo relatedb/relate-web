@@ -145,3 +145,4 @@ Copy `template.md`.
 | [0065](0065-home-promo-banner-in-a-fixed-colour.md) | The home hero carries one promo banner in its own fixed colour | Proposed |
 | [0066](0066-serve-upstream-windows-installer.md) | The site serves upstream's Windows installer beside install.sh | Proposed |
 | [0067](0067-windows-installs-with-upstreams-one-liner.md) | Windows installs with upstream's one-line installer, and CI runs it | Proposed |
+| [0068](0068-home-page-link-headers.md) | The home page names the agent entry points in Link headers | Proposed |
