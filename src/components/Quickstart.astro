@@ -2,15 +2,9 @@
 // Home "Quickstart": four steps that tick off in turn beside a prompt to paste into an agent.
 // The steps, the status label and the copy button are the only script. The prompt is the setup prompt every
 // copy-for-agent button shares (setupPrompt, ADR-0060); its commands are the docs' (get-started/agent-quickstart).
-import { setupPrompt } from './docs/install.ts';
+import { QUICKSTART_STEPS as steps, setupPrompt } from '../lib/home/content.ts';
 
 const PROMPT = setupPrompt();
-const steps = [
-  { h: 'Install the agent skill', p: 'One command, for the agents you already use.', tag: 'agent skill', href: '/docs/guides/agents/install-the-skill/', say: 'Installing the agent skill' },
-  { h: 'Pick a storage format', p: 'In memory, a directory, or one .rl file.', tag: 'memory / directory / .rl', href: '/docs/guides/storage/choose-a-store-layout/', say: 'Picking a storage format' },
-  { h: 'Create data', p: 'Write Cypher, load a CSV, or mirror from Aura.', tag: 'Cypher / CSV / Aura', href: '/docs/get-started/first-graph/', say: 'Adding your data' },
-  { h: 'Query it', p: 'Tables for you, JSON for your agent.', tag: 'table / JSON', href: '/docs/guides/cli/output-formats/', say: 'Running your query' },
-];
 
 // A step marker: a ring, a spinner arc while the step runs, a solid brand check circle when it is done.
 const marker =

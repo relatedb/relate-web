@@ -16,7 +16,7 @@ import { engine, ROOT } from './content.ts';
 import { landingTwin } from './landing.ts';
 
 /** The files whose copy-for-agent buttons copy the setup prompt. */
-const SURFACES = ['src/components/Hero.astro', 'src/components/Quickstart.astro', 'src/pages/docs/index.astro', 'src/pages/docs/index.md.ts'];
+const SURFACES = ['src/components/Hero.astro', 'src/components/Quickstart.astro', 'src/pages/index.md.ts', 'src/pages/docs/index.astro', 'src/pages/docs/index.md.ts'];
 
 test('the setup prompt installs the CLI, then the skill, then asks for the data', () => {
   const p = setupPrompt();

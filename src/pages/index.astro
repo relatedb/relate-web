@@ -17,11 +17,12 @@ import SeoHead from '../components/SeoHead.astro';
 import Gtm from '../components/Gtm.astro';
 import ConsentBanner from '../components/ConsentBanner.astro';
 import engine from '../content/docs/_data/engine.json';
+import { HOME_DESCRIPTION, HOME_TITLE } from '../lib/home/content.ts';
 import { homeGraph } from '../lib/seo.ts';
 import '../styles/base.css';
 
-const title = 'relate — the agent-native graph database';
-const description = 'relate is an open-source embedded database for AI agents. Give your agents a place to keep their data and see how it all connects. No signup. No server to deploy.';
+const title = HOME_TITLE;
+const description = HOME_DESCRIPTION;
 ---
 <!doctype html>
 <html lang="en">
@@ -32,7 +33,7 @@ const description = 'relate is an open-source embedded database for AI agents. G
     <meta name="description" content={description} />
     <link rel="preload" href="/fonts/relate-sans.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/relate-mono.woff2" as="font" type="font/woff2" crossorigin />
-    <SeoHead title={title} description={description} path="/" describedby="/llms.txt" jsonld={[homeGraph(engine, description)]} />
+    <SeoHead title={title} description={description} path="/" twinHref="/index.md" describedby="/llms.txt" jsonld={[homeGraph(engine, description)]} />
     <script is:inline>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
     <Gtm />
   </head>

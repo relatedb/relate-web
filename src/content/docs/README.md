@@ -892,9 +892,13 @@ like every other built JSON file), is served as built. A root middleware,
 `functions/_middleware.ts`, logs each fetch of a twin, a data file, an
 `llms.txt` or the skill; `public/_routes.json` limits
 the paths that invoke a function to those and `/docs/*`. GitHub Pages, the
-interim host, runs neither. Outside the functions, `public/_headers` gives
-the home page `Link` headers that name `/llms.txt`, the agent skills index
-and `/docs/` (ADR-0068); the same check holds them.
+interim host, runs neither. `public/_headers` gives the home page `Link`
+headers that name its markdown twin, `/llms.txt`, the agent skills index
+and `/docs/` (ADR-0068); the same check holds them. The home page and the
+cookbook negotiate too, under the same Accept rule and without
+`?section=`: `/` answers with `/index.md`, `/cookbook/` with
+`/cookbook/llms.txt`, a recipe with its `index.md` (ADR-0069,
+`src/lib/docs/page-negotiation.ts`).
 
 
 ## Capability catalog

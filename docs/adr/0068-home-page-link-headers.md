@@ -66,3 +66,9 @@ The headers are on the home page only.
 - If the site ever serves an API, an `api-catalog` link is added then, with the catalog.
 - `AGENTS.md` lists the file with the other host files, and the negotiation workflow runs when it
   or the home page changes.
+
+## Later references
+
+- Amended by ADR-0069: a function now runs on the home page, to answer `Accept: text/markdown`
+  with the page's twin. The static headers still reach the HTML answer, and they also name the
+  twin as the page's markdown alternate.

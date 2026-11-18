@@ -54,6 +54,6 @@ Checks that need a relate binary or the client toolchains (`docs:cli-check`, `do
 
 ## Deploys
 
-GitHub Pages is the interim host (`deploy-pages.yml`); everything on the site is static and works there. Cloudflare Pages (`deploy-cf.yml`) adds the Pages Functions for markdown content negotiation (`Accept: text/markdown`, `?section=`) and deploys the docs MCP Worker; it needs the account secrets listed in `LAUNCH.md`.
+GitHub Pages is the interim host (`deploy-pages.yml`); everything on the site is static and works there. Cloudflare Pages (`deploy-cf.yml`) adds the Pages Functions for markdown content negotiation on the docs, the home page and the cookbook (`Accept: text/markdown`; `?section=` on the docs) and deploys the docs MCP Worker; it needs the account secrets listed in `LAUNCH.md`.
 
 The engine itself is developed in the upstream relate repository. This repository copies its WASM build, skill bundle and release metadata, and authors everything else.

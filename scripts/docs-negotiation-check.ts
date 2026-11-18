@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Checks the docs content negotiation (functions/docs/_middleware.ts, the
-// Cloudflare Pages Function; ADR-0005, ADR-0012) against a built site. Runs
-// on Node directly, like scripts/docs.ts.
+// Checks the content negotiation (the Cloudflare Pages Functions in
+// functions/: docs/_middleware.ts for the docs, ADR-0005, ADR-0012; index.ts
+// and cookbook/_middleware.ts for the home page and the cookbook, ADR-0069)
+// against a built site. Runs on Node directly, like scripts/docs.ts.
 //
 //   node scripts/docs-negotiation-check.ts [--dist <dir>]   (npm run docs:negotiation-check)
 //
@@ -24,15 +25,23 @@
 // page's twin, percent-encoded traversal) never answered with markdown, the
 // skill and llms.txt files and the largest data block a twin links
 // (/docs/<page>/data/<name>.json, application/json) served untouched through the agent-path log
-// (functions/_middleware.ts), and a path outside /docs. The home page's Link
+// (functions/_middleware.ts), and a page with no markdown form (/blog/). The
+// home page, the cookbook index and the first recipe get the same cases as a
+// docs page, less ?section=: markdown to a markdown Accept (the bytes of
+// /index.md, /cookbook/llms.txt and /cookbook/<slug>/index.md, with the
+// canonical Link), the HTML to a browser, the file URLs untouched, and no
+// markdown on a cookbook path that is not a page. The home page's Link
 // headers (public/_headers, ADR-0068) are checked too: GET and HEAD on /
 // carry exactly the values the built _headers file gives it, on the HTML
 // file byte for byte, and a page beside it carries none. Without the server
 // it also checks that every heading and glossary entry id on every built
 // docs page resolves as a ?section= anchor (the layout's "Related" list and
 // the landing page, whose twin is a different document, are reported, not
-// failed), and that every Link target is a file the build serves, one of
-// them the file the home page's own <link rel="describedby"> names.
+// failed), that every Link target is a file the build serves, one of
+// them the file the home page's own <link rel="describedby"> names, and that
+// the home page's twin is the page's markdown form: the page's H2 and H3
+// headings in order, every paragraph the twin takes from the page on the
+// page, every site URL it gives a built file (src/lib/home/twin.ts).
 //
 // wrangler is fetched by npx at the pinned WRANGLER version (override with
 // WRANGLER_VERSION), the version deploy-cf.yml deploys with, so the function
@@ -46,7 +55,8 @@ import { tmpdir } from 'node:os';
 import { join, relative, resolve, sep } from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { estimateTokens, sectionAnchors, sliceSection, TERMS_HEADING } from '../src/lib/docs/negotiation.ts';
+import { estimateTokens, sectionAnchors, SITE_ORIGIN, sliceSection, TERMS_HEADING } from '../src/lib/docs/negotiation.ts';
+import { homeClaims } from '../src/lib/home/twin.ts';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const WRANGLER = `wrangler@${process.env.WRANGLER_VERSION ?? '4.158.0'}`;
@@ -297,14 +307,82 @@ async function serverCases(base: string): Promise<void> {
     }
   }
   {
-    const { res, bytes } = await get(base, '/cookbook/', MARKDOWN);
+    // A page with no markdown form: no function runs on it.
+    const { res, bytes } = await get(base, '/blog/', MARKDOWN);
     const p: string[] = [];
     if (res.status !== 200) p.push(`status ${res.status}`);
-    if (res.headers.has('x-markdown-tokens')) p.push('the Function answered outside /docs');
-    const diff = sameBytes(bytes, new Uint8Array(readFileSync(join(DIST, 'cookbook/index.html'))));
+    if (res.headers.has('x-markdown-tokens')) p.push('a Function answered a page with no markdown form');
+    const diff = sameBytes(bytes, new Uint8Array(readFileSync(join(DIST, 'blog/index.html'))));
     if (diff) p.push(`body ${diff}`);
     if (res.headers.has('link')) p.push(`a Link header outside the home page: ${res.headers.get('link')}`);
-    expect('GET /cookbook/ with Accept: text/markdown is untouched', p);
+    expect('GET /blog/ with Accept: text/markdown is untouched', p);
+  }
+
+  // The home page and the cookbook (ADR-0069): the page's markdown file to a markdown Accept, the HTML to a browser.
+  const slug = recipeSlugs()[0];
+  const sitePages: { url: string; twin: string; html: string }[] = [
+    { url: '/', twin: 'index.md', html: 'index.html' },
+    { url: '/cookbook/', twin: 'cookbook/llms.txt', html: 'cookbook/index.html' },
+  ];
+  if (slug) sitePages.push({ url: `/cookbook/${slug}/`, twin: `cookbook/${slug}/index.md`, html: `cookbook/${slug}/index.html` });
+  else bad('a recipe is built', 'no /cookbook/<slug>/index.md in dist/');
+  for (const { url, twin, html } of sitePages) {
+    console.log(url);
+    if (!existsSync(join(DIST, twin))) {
+      bad(`${url} has a markdown file`, `no ${twin} in ${DIST}`);
+      continue;
+    }
+    const twinBytes = new Uint8Array(readFileSync(join(DIST, twin)));
+    const twinText = dec.decode(twinBytes);
+    const htmlBytes = new Uint8Array(readFileSync(join(DIST, html)));
+    const canonical = `<${SITE_ORIGIN}${url}>; rel="canonical"`;
+    for (const [name, accept] of [['Accept: text/markdown', MARKDOWN], [`Accept: ${RANKED}`, RANKED]] as const) {
+      const { res, bytes } = await get(base, url, accept);
+      const p = headerProblems(res, twinText);
+      if (res.headers.get('link') !== canonical) p.push(`link ${JSON.stringify(res.headers.get('link'))}, expected ${JSON.stringify(canonical)}`);
+      const diff = sameBytes(bytes, twinBytes);
+      if (diff) p.push(`body ${diff}`);
+      expect(`GET ${url} with ${name} is /${twin}`, p);
+    }
+    {
+      const { res, bytes } = await get(base, url, MARKDOWN, 'HEAD');
+      const p = headerProblems(res, twinText);
+      if (bytes.byteLength) p.push(`HEAD returned ${bytes.byteLength} body bytes`);
+      if (res.headers.get('content-length') !== String(twinBytes.byteLength)) p.push(`content-length ${res.headers.get('content-length')}, expected ${twinBytes.byteLength}`);
+      expect(`HEAD ${url} with Accept: text/markdown`, p);
+    }
+    for (const [name, accept] of [["a browser's Accept", BROWSER], ['Accept: */*', '*/*'], ['no Accept', '']] as const) {
+      const { res, bytes } = await get(base, url, accept);
+      const p: string[] = [];
+      if (res.status !== 200) p.push(`status ${res.status}`);
+      if (!res.headers.get('content-type')?.startsWith('text/html')) p.push(`content-type ${res.headers.get('content-type')}`);
+      if (res.headers.has('x-markdown-tokens')) p.push('x-markdown-tokens on the HTML');
+      if (!/(^|,)\s*accept\s*(,|$)/i.test(res.headers.get('vary') ?? '')) p.push(`vary ${JSON.stringify(res.headers.get('vary'))}, expected Accept`);
+      const diff = sameBytes(bytes, htmlBytes);
+      if (diff) p.push(`body ${diff}`);
+      expect(`GET ${url} with ${name} is the HTML, with Vary: Accept`, p);
+    }
+    {
+      const { res, bytes } = await get(base, `/${twin}`, MARKDOWN);
+      const p: string[] = [];
+      if (res.status !== 200) p.push(`status ${res.status}`);
+      if (res.headers.has('x-markdown-tokens')) p.push('the Function answered the file URL');
+      const diff = sameBytes(bytes, twinBytes);
+      if (diff) p.push(`body ${diff}`);
+      expect(`GET /${twin} is the static file, untouched`, p);
+    }
+  }
+  // Not pages: a recipe that does not exist, percent-encoded traversal, and the files beside a recipe.
+  for (const path of ['/cookbook/no-such-recipe/', '/cookbook/%2E%2E%2Fskill/', '/cookbook/..%2Fdocs/', ...(slug ? [`/cookbook/${slug}/results.json`, `/cookbook/${slug}/recipe.json`] : [])]) {
+    const { res } = await get(base, path, MARKDOWN);
+    const p: string[] = [];
+    if (res.headers.get('content-type')?.startsWith(MARKDOWN)) p.push('answered with markdown');
+    if (res.headers.has('x-markdown-tokens')) p.push('the Function answered it');
+    expect(`GET ${path} with Accept: text/markdown is not a markdown answer`, p);
+  }
+  {
+    const { res } = await get(base, '/', MARKDOWN, 'POST');
+    expect('POST / with Accept: text/markdown is not a markdown answer', res.headers.has('x-markdown-tokens') ? ['the Function answered a POST with markdown'] : []);
   }
   {
     // The home page's Link headers (ADR-0068): what _headers gives `/`, on the static HTML.
@@ -321,6 +399,69 @@ async function serverCases(base: string): Promise<void> {
       expect(`${method} / carries the Link headers of _headers, on the HTML`, p);
     }
   }
+}
+
+/** The recipes the build serves: every /cookbook/<slug>/ with a markdown file, in name order. */
+function recipeSlugs(): string[] {
+  const dir = join(DIST, 'cookbook');
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir).filter((e) => existsSync(join(dir, e, 'index.md'))).sort();
+}
+
+const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
+/** The text of an HTML fragment: tags dropped, entities decoded, whitespace collapsed. */
+function htmlText(html: string): string {
+  return html
+    .replace(/<(script|style|svg|template)\b[\s\S]*?<\/\1>/g, ' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e: string) => (e[0] === '#' ? String.fromCodePoint(e[1].toLowerCase() === 'x' ? parseInt(e.slice(2), 16) : Number(e.slice(1))) : (ENTITIES[e] ?? m)))
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * The home page's twin (/index.md, ADR-0069) is the page's markdown form:
+ * the page's H2 and H3 headings are the twin's `##` and `###` headings, in
+ * order; every heading and paragraph the twin takes from the page
+ * (homeClaims) is on the page; every site URL the twin gives is a file the
+ * build serves; and the page's head names the twin as its markdown alternate.
+ */
+function homeTwinMatchesPage(): void {
+  console.log('home page twin (the built /index.md against the built page, without the server)');
+  const twinFile = join(DIST, 'index.md');
+  if (!existsSync(twinFile)) return bad('/index.md', `not built (src/pages/index.md.ts, ADR-0069)`);
+  const twin = readFileSync(twinFile, 'utf8');
+  const page = readFileSync(join(DIST, 'index.html'), 'utf8');
+  const main = /<main\b[^>]*>([\s\S]*)<\/main>/.exec(page)?.[1] ?? '';
+
+  const pageHeadings = [...main.matchAll(/<h([23])\b[^>]*>([\s\S]*?)<\/h\1>/g)].map((m) => `${'#'.repeat(Number(m[1]))} ${htmlText(m[2])}`);
+  const twinHeadings = twin.replace(/^```[\s\S]*?^```$/gm, '').split('\n').filter((l) => /^#{2,3} /.test(l));
+  const firstDiff = pageHeadings.findIndex((h, i) => h !== twinHeadings[i]);
+  expect(
+    `the twin's headings are the page's ${pageHeadings.length} H2 and H3 headings, in order`,
+    pageHeadings.length && firstDiff < 0 && twinHeadings.length === pageHeadings.length
+      ? []
+      : [firstDiff >= 0 ? `heading ${firstDiff + 1}: the page has ${JSON.stringify(pageHeadings[firstDiff])}, the twin ${JSON.stringify(twinHeadings[firstDiff] ?? null)}` : `the page has ${pageHeadings.length}, the twin ${twinHeadings.length}`],
+  );
+
+  const text = htmlText(main);
+  const claims = homeClaims();
+  const missing = [...claims.headings, ...claims.text].filter((c) => !text.includes(c.replace(/\s+/g, ' ')));
+  expect(`the ${claims.headings.length + claims.text.length} headings and paragraphs the twin takes from the page are on the page`, missing.map((c) => `not on the page: ${JSON.stringify(c)}`));
+
+  const dead: string[] = [];
+  for (const [url] of twin.matchAll(/https:\/\/relatedb\.ai\/[^\s)`"|]*/g)) {
+    const path = new URL(url.replace(/[.,;:]+$/, '')).pathname;
+    if (path.startsWith('/playground/')) continue; // its own package, built into dist/ after the site
+    const file = join(DIST, path.endsWith('/') ? `${path}index.html` : path);
+    if (!(existsSync(file) && statSync(file).isFile()) && !dead.includes(path)) dead.push(path);
+  }
+  expect('every site URL in the twin is a built file', dead.map((d) => `no ${d} in ${DIST}`));
+
+  expect(
+    'the home page\'s head names /index.md as its markdown alternate',
+    /<link rel="alternate" type="text\/markdown" href="\/index\.md"/.test(page) ? [] : ['no <link rel="alternate" type="text/markdown" href="/index.md">'],
+  );
 }
 
 /** The Link values the built _headers file sets on `/` (public/_headers, ADR-0068), in file order. */
@@ -418,6 +559,7 @@ async function main(): Promise<number> {
   }
   anchorCoverage();
   homeLinkTargets();
+  homeTwinMatchesPage();
 
   const scratch = mkdtempSync(join(tmpdir(), 'relate-negotiation-'));
   let child: ChildProcess | null = null;
