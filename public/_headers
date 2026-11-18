@@ -1,0 +1,11 @@
+# Response headers for the Cloudflare host (ADR-0012, ADR-0068). GitHub Pages,
+# the interim host, ignores this file.
+#
+# The home page names the agent entry points in Link headers (RFC 8288), so a
+# client that reads only the response headers finds them. Each target is a
+# file the build serves, and /llms.txt is the one the page's own
+# <link rel="describedby"> names; docs:negotiation-check holds both.
+/
+  Link: </llms.txt>; rel="describedby"; type="text/plain"
+  Link: </.well-known/agent-skills/index.json>; rel="describedby"; type="application/json"
+  Link: </docs/>; rel="service-doc"; type="text/html"

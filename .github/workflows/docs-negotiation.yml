@@ -2,8 +2,9 @@
 # (DOCS-PLAN.md §8 check 3c; ADR-0012): builds the site, then runs
 # docs:negotiation-check (scripts/docs-negotiation-check.ts) under `wrangler
 # pages dev`: Accept: text/markdown returns the twin, ?section= one section,
-# browsers the HTML, and no URL that is not a page answers with markdown. It
-# needs no Cloudflare account, login or secret.
+# browsers the HTML, and no URL that is not a page answers with markdown; and
+# the home page's Link headers (public/_headers, ADR-0068). It needs no
+# Cloudflare account, login or secret.
 #
 # Runs on a paths filter, so it is not a required status check (AGENTS.md
 # lists the required one, cookbook.yml). A failure prints the case and what
@@ -23,6 +24,8 @@ on:
       - "public/skill.md"
       - "public/llms.txt"
       - "public/_routes.json"
+      - "public/_headers"
+      - "src/pages/index.astro"
       - "src/pages/docs/**"
       - "src/pages/.well-known/**"
       - "src/components/docs/**"
@@ -41,6 +44,8 @@ on:
       - "public/skill.md"
       - "public/llms.txt"
       - "public/_routes.json"
+      - "public/_headers"
+      - "src/pages/index.astro"
       - "src/pages/docs/**"
       - "src/pages/.well-known/**"
       - "src/components/docs/**"
