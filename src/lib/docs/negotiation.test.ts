@@ -5,7 +5,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { agentPathKind, agentPathLine, estimateTokens, headingPlainText, htmlHeadings, isOwnTwin, parseTwin, prefersMarkdown, sectionAnchors, sectionTerms, sliceSection, twinPathFor } from './negotiation.ts';
+import { CANONICAL_ORIGIN } from '../cookbook/links.ts';
+import { agentPathKind, agentPathLine, estimateTokens, headingPlainText, htmlHeadings, isOwnTwin, pageTwinFor, parseTwin, prefersMarkdown, sectionAnchors, sectionTerms, SITE_ORIGIN, sliceSection, twinPathFor } from './negotiation.ts';
 
 const FRONT = '---\ntitle: Example\ncanonical_url: https://relatedb.ai/docs/guides/example/\n---';
 const TWIN = `${FRONT}
@@ -104,6 +105,18 @@ test('isOwnTwin: a twin answers only the URL its canonical_url names', () => {
   assert.equal(isOwnTwin('/docs/x/', 'not a url'), false);
 });
 
+test('pageTwinFor maps the home page and the cookbook pages to their markdown files, and nothing else', () => {
+  assert.deepEqual(pageTwinFor('/'), { twin: '/index.md', canonical: '/' });
+  assert.deepEqual(pageTwinFor('/cookbook'), { twin: '/cookbook/llms.txt', canonical: '/cookbook/' });
+  assert.deepEqual(pageTwinFor('/cookbook/'), { twin: '/cookbook/llms.txt', canonical: '/cookbook/' });
+  assert.deepEqual(pageTwinFor('/cookbook/agent-memory/'), { twin: '/cookbook/agent-memory/index.md', canonical: '/cookbook/agent-memory/' });
+  assert.deepEqual(pageTwinFor('/cookbook/agent-memory'), { twin: '/cookbook/agent-memory/index.md', canonical: '/cookbook/agent-memory/' });
+  for (const path of ['//', '/index.md', '/index.html', '/blog/', '/playground/', '/docs/', '/cookbooks/', '/cookbook/llms.txt', '/cookbook/agent-memory/index.md', '/cookbook/agent-memory/results.json', '/cookbook/agent-memory/data/', '/cookbook//', '/cookbook/%2E%2E%2Fskill/', '/cookbook/..%2Fx/', '/cookbook/Agent-Memory/', '/cookbook/a_b/']) {
+    assert.equal(pageTwinFor(path), null, path);
+  }
+  assert.equal(SITE_ORIGIN, CANONICAL_ORIGIN);
+});
+
 test('agentPathKind names the skill, the llms.txt files, the twins and the data blocks they link, and nothing else', () => {
   assert.equal(agentPathKind('/docs/guides/cypher/vector-search/data/notes.json'), 'data');
   assert.equal(agentPathKind('/docs/capabilities.json'), null);
@@ -116,6 +129,11 @@ test('agentPathKind names the skill, the llms.txt files, the twins and the data 
   assert.equal(agentPathKind('/docs/get-started/install.md'), 'twin');
   assert.equal(agentPathKind('/docs/get-started/install/'), null);
   assert.equal(agentPathKind('/cookbook/'), null);
+  assert.equal(agentPathKind('/'), null);
+  assert.equal(agentPathKind('/index.md'), 'twin');
+  assert.equal(agentPathKind('/cookbook/llms.txt'), 'llms');
+  assert.equal(agentPathKind('/cookbook/agent-memory/index.md'), 'twin');
+  assert.equal(agentPathKind('/cookbook/agent-memory/results.json'), null);
   assert.equal(agentPathKind('/.well-known/security.txt'), null);
   const line = agentPathLine('skill', `/skills/${'x'.repeat(300)}`, 200, 'u'.repeat(300));
   assert.equal(line.path.length, 200);

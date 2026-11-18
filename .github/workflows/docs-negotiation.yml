@@ -1,7 +1,8 @@
 # Checks the Cloudflare Pages Functions in functions/ locally under workerd
 # (DOCS-PLAN.md §8 check 3c; ADR-0012): builds the site, then runs
 # docs:negotiation-check (scripts/docs-negotiation-check.ts) under `wrangler
-# pages dev`: Accept: text/markdown returns the twin, ?section= one section,
+# pages dev`: Accept: text/markdown returns the twin (on the docs, the home
+# page and the cookbook, ADR-0069), ?section= one section,
 # browsers the HTML, and no URL that is not a page answers with markdown; and
 # the home page's Link headers (public/_headers, ADR-0068). It needs no
 # Cloudflare account, login or secret.
@@ -26,6 +27,12 @@ on:
       - "public/_routes.json"
       - "public/_headers"
       - "src/pages/index.astro"
+      - "src/pages/index.md.ts"
+      - "src/components/*.astro"
+      - "src/lib/home/**"
+      - "src/content/cookbook/**"
+      - "src/lib/cookbook/**"
+      - "src/pages/cookbook/**"
       - "src/pages/docs/**"
       - "src/pages/.well-known/**"
       - "src/components/docs/**"
@@ -46,6 +53,12 @@ on:
       - "public/_routes.json"
       - "public/_headers"
       - "src/pages/index.astro"
+      - "src/pages/index.md.ts"
+      - "src/components/*.astro"
+      - "src/lib/home/**"
+      - "src/content/cookbook/**"
+      - "src/lib/cookbook/**"
+      - "src/pages/cookbook/**"
       - "src/pages/docs/**"
       - "src/pages/.well-known/**"
       - "src/components/docs/**"

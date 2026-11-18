@@ -72,10 +72,13 @@ test('the setup prompt and the AGENTS.md block give the line that runs from any 
 });
 
 test('the home hero, the docs landing and llms.txt carry the lines from the one source', () => {
-  for (const file of ['src/components/Hero.astro', 'src/pages/docs/index.astro']) {
+  // The hero's tabs are data the page and its markdown twin both read (src/lib/home/content.ts, ADR-0069).
+  for (const file of ['src/lib/home/content.ts', 'src/pages/docs/index.astro']) {
     const source = read(file);
     assert.ok(source.includes('WINDOWS_INSTALL_COMMAND'), `${file} takes the line from install.ts`);
     assert.ok(!source.includes('install.ps1'), `${file} does not spell the URL itself`);
   }
+  assert.ok(read('src/components/Hero.astro').includes('installTabs('), 'the hero renders those tabs');
+  assert.ok(!read('src/components/Hero.astro').includes('install.ps1'), 'the hero does not spell the URL itself');
   assert.ok(read('public/llms.txt').includes(WINDOWS_INSTALL_COMMAND_ANY_SHELL), 'llms.txt gives the line');
 });

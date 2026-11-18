@@ -102,19 +102,55 @@ export function isOwnTwin(pathname: string, canonicalUrl: string | null): boolea
 }
 
 // ---------------------------------------------------------------------------
+// Pages outside the docs (ADR-0069)
+
+/**
+ * The site's public origin, for the canonical link on a markdown answer. It
+ * is src/lib/cookbook/links.ts's CANONICAL_ORIGIN (which imports Node, so the
+ * Worker cannot); negotiation.test.ts holds the two equal.
+ */
+export const SITE_ORIGIN = 'https://relatedb.ai';
+
+/** The shape of a recipe slug (src/content/cookbook/README.md). */
+const RECIPE_SLUG = /^[a-z0-9][a-z0-9-]*$/;
+
+/**
+ * The markdown form of a page outside the docs, or null when the path has
+ * none: `/` is `/index.md` (the home page's twin), `/cookbook/` is
+ * `/cookbook/llms.txt` (the recipe index, which is markdown), and
+ * `/cookbook/<slug>/` is `/cookbook/<slug>/index.md` (the recipe file). The
+ * one trailing slash is optional on the cookbook paths. `canonical` is the
+ * page's path, for the Link header. As in `twinPathFor`, a segment that is
+ * not a slug (a dot, `%`, an empty segment) names no page, and the caller
+ * answers with markdown only when the file at `twin` exists.
+ */
+export function pageTwinFor(pathname: string): { twin: string; canonical: string } | null {
+  if (pathname === '/') return { twin: '/index.md', canonical: '/' };
+  const trimmed = pathname.replace(/\/$/, '');
+  if (trimmed === '/cookbook') return { twin: '/cookbook/llms.txt', canonical: '/cookbook/' };
+  if (!trimmed.startsWith('/cookbook/')) return null;
+  const slug = trimmed.slice('/cookbook/'.length);
+  if (!RECIPE_SLUG.test(slug)) return null;
+  return { twin: `/cookbook/${slug}/index.md`, canonical: `/cookbook/${slug}/` };
+}
+
+// ---------------------------------------------------------------------------
 // The agent-path log (DOCS-PLAN.md §5 "Measurement from day one")
 
 /**
  * What a static path an agent reads is, for the log line, or null: the
  * skill (`/skill.md`, `/skills/…`, the `/.well-known/` skill indexes), an
- * `llms.txt` (the root's or the docs'), a docs twin (`/docs/….md`), or a
+ * `llms.txt` (the root's, the docs' or the cookbook's), a twin (`/docs/….md`,
+ * the home page's `/index.md`, a recipe's `/cookbook/<slug>/index.md`), or a
  * data block a twin links (`/docs/<page>/data/<name>.json`).
- * Negotiated markdown answers are logged by functions/docs/_middleware.ts.
+ * Negotiated markdown answers are logged by the function that gives them
+ * (functions/docs/_middleware.ts, and src/lib/docs/page-negotiation.ts for
+ * the home page and the cookbook).
  */
 export function agentPathKind(pathname: string): 'skill' | 'llms' | 'twin' | 'data' | null {
   if (/^\/(skill\.md|skills\/.+|\.well-known\/(agent-skills|skills)\/.+)$/.test(pathname)) return 'skill';
-  if (/^\/(docs\/)?llms(-full)?\.txt$/.test(pathname)) return 'llms';
-  if (/^\/docs\/.+\.md$/.test(pathname)) return 'twin';
+  if (/^\/(docs\/)?llms(-full)?\.txt$/.test(pathname) || pathname === '/cookbook/llms.txt') return 'llms';
+  if (/^\/docs\/.+\.md$/.test(pathname) || pathname === '/index.md' || /^\/cookbook\/[a-z0-9][a-z0-9-]*\/index\.md$/.test(pathname)) return 'twin';
   // A data block a twin links instead of carrying (src/lib/docs/data-blocks.ts, ADR-0049).
   if (/^\/docs\/.+\/data\/[A-Za-z0-9_-]+\.json$/.test(pathname)) return 'data';
   return null;

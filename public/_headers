@@ -5,7 +5,10 @@
 # client that reads only the response headers finds them. Each target is a
 # file the build serves, and /llms.txt is the one the page's own
 # <link rel="describedby"> names; docs:negotiation-check holds both.
+# /index.md is the page as markdown, which `/` also answers to
+# `Accept: text/markdown` (ADR-0069); these headers are on the HTML answer.
 /
+  Link: </index.md>; rel="alternate"; type="text/markdown"
   Link: </llms.txt>; rel="describedby"; type="text/plain"
   Link: </.well-known/agent-skills/index.json>; rel="describedby"; type="application/json"
   Link: </docs/>; rel="service-doc"; type="text/html"

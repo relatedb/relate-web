@@ -84,3 +84,8 @@ script file under that directory.
 - The landing page's twin is a different document from its HTML, so the
   landing's HTML ids do not resolve as sections; the check reports them.
 - `npm run docs:negotiation-check` enforces these rules on a build.
+
+## Later references
+
+- Amended by ADR-0069: the home page and the cookbook pages negotiate under
+  the same rules, so a function also runs on `/` and under `/cookbook`.
