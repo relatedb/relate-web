@@ -71,7 +71,7 @@ export const HOME_SECTIONS: HomeSection[] = [
       { h: 'MCP endpoint', p: 'Lets agents that speak MCP connect without glue code.' },
       { h: 'Command line', p: 'Create, load and query a database right from the shell.' },
       { h: 'Libraries', p: 'Embed relate in your own application, in your language.' },
-      { h: 'Your language, one library', p: 'The same relate in Rust, Python, JavaScript, WebAssembly, Go, Java, Swift and C. Pick the one your application is written in.' },
+      { h: 'Your language, one library', p: 'The same relate in Rust, Python, JavaScript, WebAssembly, Go, Java, .NET, Swift and C. Pick the one your application is written in.' },
       { h: 'No server to run', p: 'relate starts when your application does and stops when it stops. Nothing to host, nothing to keep running.' },
     ],
   },
