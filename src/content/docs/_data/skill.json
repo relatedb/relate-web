@@ -1,13 +1,13 @@
 {
   "source": "surfaces/relate-cli/src/skill/bundle",
-  "commit": "f529cbb512f69e7175f83c192af9707777ef57f4",
-  "synced": "2026-11-17",
-  "version": "1.1.0",
+  "commit": "e0ea5364737f4b005190d13f59802eac311422bb",
+  "synced": "2026-11-20",
+  "version": "1.2.0",
   "files": [
     {
       "path": "SKILL.md",
-      "sha256": "36f7048e9dc8339b86572c2cfbda06abf5afad46e9d771ebbe0d5f52aab2ded8",
-      "upstream_sha256": "2a33393844a45ea710deabeb0171554cbf97d0e3f516e1bbfdba649f0d848357"
+      "sha256": "762dc534924c1cfb76a80663da956a8ed21e41d357fbe1cc5f66e8f6f4861455",
+      "upstream_sha256": "c595ae253d779d5f063c0a2163c3a838d92b93108ef2bee9b60786f942c87b3e"
     },
     {
       "path": "references/agent-safety.md",
@@ -20,6 +20,10 @@
     {
       "path": "references/client-cli.md",
       "sha256": "fa886a5eec869d07f52a96737e4fd41c9c0f10033162add3c7d4618cd81efd35"
+    },
+    {
+      "path": "references/client-dotnet.md",
+      "sha256": "76da89c312dce884c21b313a8a0600900643cf8c94f03499729acd4acbfd074f"
     },
     {
       "path": "references/client-extensions.md",
@@ -39,7 +43,7 @@
     },
     {
       "path": "references/client-python.md",
-      "sha256": "8e8134575f392ff68c2e850c55791440c545190610aecd102afd850adb31906c"
+      "sha256": "2d492eaa04b332f12490f71e6d20214561a67b253206f18da33b5ec14a8ad6e9"
     },
     {
       "path": "references/client-swift.md",
@@ -77,19 +81,19 @@
   "task_skills": [
     {
       "name": "relate-agent-memory",
-      "reviewed": "2026-11-17",
+      "reviewed": "2026-11-20",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "b0998ffaf3419c2701d70ce1ec165a85029553db47cc279cf53c39c43453a82b"
+          "sha256": "97e0edb6b2b36ecadd6dc41aa25a3c46817dad32dc11d9787dbbacc93ac77368"
         },
         {
           "path": "references/bitemporal.md",
-          "sha256": "79d302f7d9480e5753d6ce7f6bcee21c83edf297e38bfb6e71bb1e8acbc038df"
+          "sha256": "8d5b45b792f4400ef70a7e3fc522f934680502c10f7a2dac5dc8b820d19e3341"
         },
         {
           "path": "references/provenance.md",
-          "sha256": "66600910118a72ec7a1d73a950299e0db6abdb2ba71dfb74941fcfca899d7105"
+          "sha256": "81bc38c7dda9c47c76caa828172f47758f3ec653ee9053b7beca79f195d56741"
         }
       ],
       "recipes": [
@@ -112,15 +116,15 @@
     },
     {
       "name": "relate-graphrag",
-      "reviewed": "2026-11-17",
+      "reviewed": "2026-11-20",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "36d2a6a39ddbe328c3471aabee3e613aa37530d6bc7e7531ec29dd61e4be904f"
+          "sha256": "4a7901e6447224252cb1dac986380d9327109e3f6afdbeca44a85234de40f946"
         },
         {
           "path": "references/search-forms.md",
-          "sha256": "cc0d3a766c4c802339dafbc2ef40ce3192667ebcc404d07b230c09e692ebf6e8"
+          "sha256": "42da13b9c2ff57897cc53d7facbb7325e20b43ec869e79e7c2135550faccc937"
         }
       ],
       "recipes": [
@@ -133,15 +137,15 @@
     },
     {
       "name": "relate-migrate-from-vector-search",
-      "reviewed": "2026-11-17",
+      "reviewed": "2026-11-20",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "1145098bc4461c683055d17d644e10b595b4846ba28126e0c4bbdebe6b65621d"
+          "sha256": "af32cbe0524e51bfdabfcc67dd1567792bfdcc40fbbe61e9fb8442f39be1d6b8"
         },
         {
           "path": "references/verify.md",
-          "sha256": "afd7d04f63044d8ea3bd30b53a9db23c5e6b95c3d9626247381a9917b928297b"
+          "sha256": "a0f78a89a13a927d87eb61e1596d13166616f8703ab22aa35e2bd44223a11cde"
         }
       ],
       "recipes": [
@@ -159,15 +163,15 @@
     },
     {
       "name": "relate-query-tuning",
-      "reviewed": "2026-11-17",
+      "reviewed": "2026-11-20",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "eff704e695a9ae5941f59fbcc5b350ad8a5eb9c58235923b6deeca2143a4de2b"
+          "sha256": "a7b050b5d070752fd35542dcf2395de211bcc1e96f41472bcd98e136c18fb668"
         },
         {
           "path": "references/notifications.md",
-          "sha256": "cdcbb7ea1175941deaa881203e54fd45229aa06be3aa7fea55959f2d4effd5c0"
+          "sha256": "f291bb6c1a31df2f0154a60416984bf632b24bbce7569dd901dbfa95de3ae3a6"
         }
       ],
       "recipes": [
@@ -180,15 +184,15 @@
     },
     {
       "name": "relate-schema-design",
-      "reviewed": "2026-11-17",
+      "reviewed": "2026-11-20",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "0d2126f5e0613af7753a84b0d1212f77105ac9cbb55c9206f4600a1d4e823ff6"
+          "sha256": "3d2f27a23b7782fcf7d7efa86838b4bb645b69166d7ab5358214217890583a84"
         },
         {
           "path": "references/discovery.md",
-          "sha256": "51cebbbb2496ed4b7d4c9a04b6a63ba894815e46872943f759dd25c4dd9acfff"
+          "sha256": "2abe339b1032385ba12dc5577333b9808c9fa67e683f7dba7549057524b80d5d"
         }
       ],
       "recipes": [

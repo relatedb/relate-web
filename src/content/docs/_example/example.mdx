@@ -182,7 +182,7 @@ print("people:", result.data[0]["people"])
 db.close()
 ```
 
-The compiled clients take the same fence with their language: `rust run`, `java run`, `go run`, `swift run` and `c run`. Each of these five programs builds the team graph in memory and prints how many people it holds:
+The compiled clients take the same fence with their language: `rust run`, `java run`, `csharp run`, `go run`, `swift run` and `c run`. Each of these six programs builds the team graph in memory and prints how many people it holds:
 
 ```rust run title="main.rs"
 use relate::Database;
@@ -235,6 +235,28 @@ public class Team {
         }
     }
 }
+```
+
+```csharp run title="Program.cs"
+using Relate.Net;
+
+const string Team = """
+    CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
+           (grace:Person {name: 'Grace', role: 'engineer'}),
+           (noor:Person {name: 'Noor', role: 'maintainer'}),
+           (relate:Project {name: 'relate', language: 'Rust'}),
+           (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),
+           (ada)-[:WORKS_ON {since: 2024}]->(relate),
+           (grace)-[:WORKS_ON {since: 2023}]->(relate),
+           (grace)-[:WORKS_ON {since: 2022}]->(tck),
+           (noor)-[:MAINTAINS]->(relate),
+           (ada)-[:KNOWS]->(grace)
+    """;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+conn.Query(Team);
+Console.WriteLine($"people: {conn.Query("MATCH (p:Person) RETURN count(p) AS people").Scalar<long>()}");
 ```
 
 ```go run title="main.go"

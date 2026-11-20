@@ -7,7 +7,7 @@ surfaces: [rust]
 related: [guides/embed/rust, get-started/rust, reference/api/c, reference/errors, reference/storage/formats, concepts/problems-relate-solves#embedded-graph-in-an-app]
 ---
 
-The `relate` crate is the engine as a Rust library: a `Database` opens a :term[store]{id=store}, a `Connection` runs statements on it, and each statement returns a `QueryResult` of `Value` rows or a `relate::Error`. This page lists what the crate exports at its root (every name is `relate::<name>`), as of relate 1.1.0. The C application binary interface (ABI) and the Python client are built on the same `Database`. The guide [Use the Rust crate](/docs/guides/embed/rust) covers the same API with runnable programs.
+The `relate` crate is the engine as a Rust library: a `Database` opens a :term[store]{id=store}, a `Connection` runs statements on it, and each statement returns a `QueryResult` of `Value` rows or a `relate::Error`. This page lists what the crate exports at its root (every name is `relate::<name>`), as of relate 1.2.0. The C application binary interface (ABI) and the Python client are built on the same `Database`. The guide [Use the Rust crate](/docs/guides/embed/rust) covers the same API with runnable programs.
 
 ## Synopsis
 
@@ -30,7 +30,7 @@ relate::error_info(&Error) -> ErrorInfo
 
 ## Cargo features
 
-The crate is `relate` on crates.io, at version 1.1.0, with `rust-version` 1.88 and edition 2021: `cargo add relate` adds it. The crates it depends on, such as `relate-core`, are published beside it at the same version.
+The crate is `relate` on crates.io, at version 1.2.0, with `rust-version` 1.88 and edition 2021: `cargo add relate` adds it. The crates it depends on, such as `relate-core`, are published beside it at the same version.
 
 | Feature | Default | Effect |
 | --- | --- | --- |
@@ -205,9 +205,10 @@ The `gql_status` shown for `Syntax`, `Semantic` and `Execution` is the default: 
 
 | Type | Holds |
 | --- | --- |
-| `PlanNode` | `operator`, `details`, `identifiers`, `children`, `estimated_rows`, `id`, `warnings`, `metrics` under `PROFILE`, `statement_echo` (the wrapped statement without its `EXPLAIN` or `PROFILE` keyword), `token_estimate` (the plan's peak logical workspace, `None` unless admission is on), and `pattern_engine` (on a `MATCH` operator, the `PatternEngine` mode `RELATE_PATTERN_ENGINE` sets at open: `Auto`, `Nfa` or `Walk`; `None` elsewhere); `to_value()` gives the tree as a `Value` |
+| `PlanNode` | `operator`, `details`, `identifiers`, `children`, `estimated_rows`, `id`, `warnings`, `metrics` under `PROFILE`, `statement_echo` (the wrapped statement without its `EXPLAIN` or `PROFILE` keyword), `token_estimate` (the plan's peak logical workspace, `None` unless admission is on), `pattern_engine` (on a `MATCH` operator, the `PatternEngine` mode `RELATE_PATTERN_ENGINE` sets at open: `Auto`, `Nfa` or `Walk`; `None` elsewhere), and `fused` (a `FusedChild` on a display-only step under an index-seek `MATCH`, `None` on every operator that runs); `to_value()` gives the tree as a `Value` |
 | `ClauseMetrics` | One operator's `PROFILE` figures: `rows`, `db_hits`, `memory_bytes`, `expression_built_bytes`, `time_ns`, `reads`, `start`, `kernel` (the `KernelRung` that served the clause's `MATCH` walk: `Chain { hops }`, `HubStar`, `FrontierNfa` or `Walker`; `None` without a `MATCH` walk), `phases`, `batched` (whether the clause ran as batch operators), `zone_skips` (batch filter evaluations skipped by chunk min/max metadata), `frontier` (the breadth-first frontier's counts of relationships visited, levels completed and endpoints accepted) and `frontier_decline` (why a frontier run fell back, when it did) |
 | `PlanWarning` | A typed warning on one operator, such as a Cartesian product, or a row count 10 or more times its estimate under `PROFILE` |
+| `FusedChild` | A display-only step's link to the operator it belongs to: `parent` (that operator's `id`) and `metrics`, a `FusedChildMetrics` of `seek_ns` and `node_reads` on the seek step under `PROFILE`, `None` on a hop step and under `EXPLAIN` |
 | `PlanArtifacts` | A result's plan tree with the notifications derived from it |
 | `Notification` | `kind()`, `code()` (`Neo.ClientNotification.*` for a kind with a Neo4j counterpart, `Relate.Notification.*` for an engine-own kind), `gql_status()`, `severity()`, `category()`, `title()`, `description()`, `remedy()`, `operator_id()`; `NotificationKind`, `NotificationSeverity` and `NotificationCategory` are its vocabularies |
 
@@ -230,7 +231,7 @@ Upstream documents these entry points for network transports, which report plann
 | Cancellation | `CancelToken` (`new()`, `cancel()`, `is_cancelled()`; clones share one flag) |
 | Graph values | `Node`, `Relationship`, `Path`, `PropertyMap`, `Temporal` |
 | Error parts | `ErrorInfo`, `ErrorStage`, `ArithmeticFailure`, `CapacityKind`, `client_message`, `log_internal_original`, `INTERNAL_ERROR_INFO`, `INTERNAL_MESSAGE` (`internal error`, the text the trust boundaries substitute for an internal error) |
-| Storage | `SnapshotCodecKind`, `MarkdownBodyProperties`, `WalRecord`, `CdcSlot`, `cypher_to_value`, `value_to_cypher` |
+| Storage | `SnapshotCodecKind`, `MarkdownBodyProperties`, `WalRecord`, `CdcSlot`, `cypher_to_value`, `value_to_cypher`, `plan_value_to_cypher` (the same conversion for a plan tree, under its own depth budget, `MAX_PLAN_WIRE_DEPTH` (1000) container levels, in place of `MAX_VALUE_DEPTH`) |
 | Limits | `MAX_TRAVERSAL_DEPTH` (500), `MAX_TRAVERSAL_DEPTH_CEILING` (2000), `MAX_VALUE_DEPTH`, `DEFAULT_CHECKPOINT_INTERVAL_SECS` (300), `QUERY_WORKER_STACK_BYTES`, `parse_memory_limit`, `parse_expression_memory_limit`, `parse_positive_memory_limit`, `require_positive_memory_limit`, `require_traversal_depth`, `traversal_depth_exceeded_message`, `value_depth_exceeded`, `next_depth` |
 | Settings | `durability_mode_from_setting`, `expression_limit_from_setting`, `workspace_limit_from_setting`, `reject_cypherlite_env` (fails when a retired `CYPHERLITE_*` variable is set, naming its `RELATE_*` replacement) |
 | Surface helpers | `execute_wire`, `run_script_wire`, `query_result_to_wire`, `query_result_to_cypher_rows`, `query_stats_to_wire`, `plan_wire_json`, `timing_stamp_ms`, `params_from_json`, `params_from_value`, `params_from_map`, `binding_error_metadata`: the shared conversions the other surfaces build their envelopes and parameters with |
@@ -296,7 +297,7 @@ fn main() -> relate::Result<()> {
 ## See also
 
 - [Use the Rust crate](/docs/guides/embed/rust): the same API, task by task, with runnable programs.
-- [C ABI](/docs/reference/api/c): the library the Node.js, Java, Go and Swift clients wrap, over this crate.
+- [C ABI](/docs/reference/api/c): the library the Node.js, Java, .NET, Go and Swift clients wrap, over this crate.
 - [Errors](/docs/reference/errors): every message with its cause and remedy.
 - [Storage formats](/docs/reference/storage/formats): what each store layout and codec writes to disk.
 - [Choose a durability mode](/docs/guides/operate/durability-modes): the loss window of each `DurabilityMode`.

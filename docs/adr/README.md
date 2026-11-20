@@ -148,3 +148,5 @@ Copy `template.md`.
 | [0068](0068-home-page-link-headers.md) | The home page names the agent entry points in Link headers | Proposed |
 | [0069](0069-home-and-cookbook-answer-markdown.md) | The home page and the cookbook answer Accept: text/markdown | Proposed |
 | [0070](0070-content-signals-in-robots-txt.md) | robots.txt declares content signals, and all three say yes | Proposed |
+| [0071](0071-java-samples-from-maven-central.md) | The Java samples install ai.relatedb:relate from Maven Central | Proposed |
+| [0072](0072-dotnet-joins-the-client-languages.md) | .NET joins the docs' client languages, its samples built from the release tag | Proposed |

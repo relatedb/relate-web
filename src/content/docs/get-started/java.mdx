@@ -16,13 +16,7 @@ By the end of this page, you'll have a Java program that keeps a small graph of 
 
 ## Install the client
 
-The Java :term[client]{id=client} is the Maven artifact `ai.relatedb:relate`, with the package `ai.relatedb`. Its jar bundles the native engine for macOS (arm64 and x86-64), Linux (arm64 and x86-64, glibc), and Windows (x86-64), and loads the right one through JNA (Java Native Access) with no library path to set. The jars are attached to each release on the [releases page](https://github.com/relatedb/relate/releases); they are not on Maven Central. Download `relate-<release>.jar` (`<release>` is the release version, such as `1.0.1`) and install it into your local Maven repository:
-
-```bash
-mvn install:install-file -Dfile=relate-<release>.jar
-```
-
-The jar carries its own POM, so Maven installs it as `ai.relatedb:relate:<release>`. The client needs two libraries that the jar does not include, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`); the POM names both, so the coordinate brings them in from Maven Central. In Maven:
+The Java :term[client]{id=client} is the Maven artifact `ai.relatedb:relate` on Maven Central, with the package `ai.relatedb`. Its jar bundles the native engine for macOS (arm64 and x86-64), Linux (arm64 and x86-64, glibc), and Windows (x86-64), and loads the right one through JNA (Java Native Access) with no library path to set. Every release from 1.2.0 on is published there; in the blocks that follow, `<release>` is the release version, such as `1.2.0`. The client needs two libraries that the jar does not include, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`); its POM names both, so the one dependency brings them in. In Maven:
 
 ```xml
 <dependency>
@@ -35,7 +29,7 @@ The jar carries its own POM, so Maven installs it as `ai.relatedb:relate:<releas
 In Gradle (Kotlin DSL):
 
 ```kotlin
-repositories { mavenLocal(); mavenCentral() }
+repositories { mavenCentral() }
 dependencies { implementation("ai.relatedb:relate:<release>") }
 ```
 

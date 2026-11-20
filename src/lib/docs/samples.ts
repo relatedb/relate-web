@@ -1,13 +1,13 @@
 // Verified language samples (DOCS-PLAN.md §6 "Language samples are verified
 // from phase 1"): a ```python run, ```js run, ```rust run, ```java run,
-// ```go run, ```swift run or ```c run fence on a docs page is a program that
+// ```csharp run, ```go run, ```swift run or ```c run fence on a docs page is a program that
 // runs against a local build of the relate client for that language, and its
 // standard output is recorded in the page's results sidecar, so the page and
 // its twin show output that a real run produced, and drift fails a check.
 //
 // The authoring contract:
 //
-//   ```<lang> run [name=<id>] [title="<file>"]        <lang>: python js rust java go swift c
+//   ```<lang> run [name=<id>] [title="<file>"]        <lang>: python js rust java csharp go swift c
 //   ```python run [name=<id>] [title="<file>"] [env=<name>]
 //
 //   - The sample's id is `name=<id>` (letters, digits, `-`, `_`), or
@@ -21,9 +21,9 @@
 //     program is written to (the page shows the name above the block);
 //     otherwise it is SAMPLE_FILES' default: `sample.py`; `sample.cjs` or,
 //     when the JavaScript has an `import` or `export` statement,
-//     `sample.mjs`; `main.rs`; `Main.java`; `main.go`; `main.swift`;
-//     `sample.c`. The extension must be the language's (.py; .js .cjs .mjs;
-//     .rs; .java; .go; .swift; .c).
+//     `sample.mjs`; `main.rs`; `Main.java`; `Program.cs`; `main.go`;
+//     `main.swift`; `sample.c`. The extension must be the language's (.py;
+//     .js .cjs .mjs; .rs; .java; .cs; .go; .swift; .c).
 //   - A compiled sample is built in a second temporary directory and the
 //     program runs in the first, which starts empty:
 //       rust   a binary crate with the one file as its root (`[[bin]] path`),
@@ -36,6 +36,12 @@
 //       java   run as a single-file source program (`java <file>`, compiled
 //              in memory) with RELATE_JAVA_CLASSPATH; the file name need not
 //              match the class, and the first class declared holds `main`
+//       csharp a console project (net8.0, implicit usings, nullable on)
+//              whose one source file is the sample and which references
+//              the client's Relate.Net.csproj (RELATE_DOTNET_CLIENT), built
+//              with `dotnet build -c Release` against RELATE_LIB and run with
+//              `dotnet <the built dll>`; top-level statements, or a class with
+//              `Main`; the program can use Relate.Net and the BCL only
 //       go     a module `relatesample` that requires the client
 //              (github.com/relatedb/relate/clients/go, imported as
 //              `relate "github.com/relatedb/relate/clients/go"`) through a
@@ -68,11 +74,12 @@
 //
 // `verified` on the entry is the version of relate that produced it: for
 // Python and Node.js the client package's version (relate-db,
-// @relate/relate), and for Rust, Java, Go, Swift and C the engine version the
-// client reports (`CALL dbms.components()`, component `Relate`), because those
-// clients carry no release version the runner can read (the Go module has no
-// tag and runs behind a replace directive, the Swift package has none, the
-// Rust crate exports no version constant, the Java and C builds come from the
+// @relate/relate), and for Rust, Java, .NET, Go, Swift and C the engine
+// version the client reports (`CALL dbms.components()`, component `Relate`),
+// because those clients carry no release version the runner can read (the Go
+// module has no tag and runs behind a replace directive, the Swift package has
+// none, the Rust crate and the Java client export no version constant, the
+// .NET client's project says 1.1.1-local, and the C build comes from the
 // checkout). `source_sha256` is the SHA-256
 // of the program that produced it (sampleSourceHash: language, `env`, title
 // and code, line endings and trailing spaces normalized), so a sample edited
@@ -81,9 +88,9 @@
 // as written, then a ```text block holding `text`.
 //
 // The runner needs the clients (scripts/samples/setup.sh, whose header
-// describes each variable): Python, Node.js and Rust installed from their
-// registries at the docs' release, the others built from the upstream
-// checkout at its tag (ADR-0062):
+// describes each variable): Python, Node.js, Rust and Java installed from
+// their registries at the docs' release, the others built from the upstream
+// checkout at its tag (ADR-0062, ADR-0071, ADR-0072):
 //
 //   python  RELATE_PY (a Python that can `import relate`, package relate-db),
 //           RELATE_PY_<NAME> for `env=<name>`
@@ -93,7 +100,10 @@
 //           native library from its npm platform package, so a sample runs
 //           without RELATE_LIB
 //   rust    RELATE_CARGO, RELATE_RUST_PROJECT
-//   java    RELATE_JAVA, RELATE_JAVA_CLASSPATH, RELATE_LIB
+//   java    RELATE_JAVA, RELATE_JAVA_CLASSPATH (the jar from Maven Central,
+//           which loads the engine it bundles, so a sample runs without
+//           RELATE_LIB)
+//   csharp  RELATE_DOTNET, RELATE_DOTNET_CLIENT, RELATE_DOTNET_HOME, RELATE_LIB
 //   go      RELATE_GO, RELATE_GO_CLIENT, RELATE_GO_HOME, RELATE_C_INCLUDE, RELATE_LIB
 //   swift   RELATE_SWIFT, RELATE_SWIFT_PACKAGE
 //   c       RELATE_CC, RELATE_C_INCLUDE, RELATE_LIB
@@ -116,12 +126,12 @@ import { VERIFIERS, type Verifier } from './model.ts';
 import { parsePage } from './parse.ts';
 import { parseRunInfo, resultsFile } from './results.ts';
 
-export type SampleLang = 'python' | 'js' | 'rust' | 'java' | 'go' | 'swift' | 'c';
+export type SampleLang = 'python' | 'js' | 'rust' | 'java' | 'csharp' | 'go' | 'swift' | 'c';
 /** Every sample language, in the order the runner and the docs list them. */
-export const SAMPLE_LANGS: readonly SampleLang[] = ['python', 'js', 'rust', 'java', 'go', 'swift', 'c'];
+export const SAMPLE_LANGS: readonly SampleLang[] = ['python', 'js', 'rust', 'java', 'csharp', 'go', 'swift', 'c'];
 
 /** A `verified_by` name for a sample language's client (model.ts VERIFIERS lists the ones the twin prints). */
-export type SampleVerifier = 'python' | 'node' | 'rust' | 'java' | 'go' | 'swift' | 'c';
+export type SampleVerifier = 'python' | 'node' | 'rust' | 'java' | 'dotnet' | 'go' | 'swift' | 'c';
 
 /** The client each sample language runs against, as `verified_by` names it. */
 export const SAMPLE_VERIFIER: Record<SampleLang, SampleVerifier> = {
@@ -129,6 +139,7 @@ export const SAMPLE_VERIFIER: Record<SampleLang, SampleVerifier> = {
   js: 'node',
   rust: 'rust',
   java: 'java',
+  csharp: 'dotnet',
   go: 'go',
   swift: 'swift',
   c: 'c',
@@ -140,6 +151,7 @@ export const SAMPLE_HIGHLIGHT: Record<SampleLang, string> = {
   js: 'javascript',
   rust: 'rust',
   java: 'java',
+  csharp: 'csharp',
   go: 'go',
   swift: 'swift',
   c: 'c',
@@ -151,6 +163,7 @@ export const SAMPLE_CLIENT_LABEL: Record<SampleLang, string> = {
   js: 'Node.js',
   rust: 'Rust',
   java: 'Java',
+  csharp: '.NET',
   go: 'Go',
   swift: 'Swift',
   c: 'C',
@@ -162,6 +175,7 @@ export const SAMPLE_FILES: Record<SampleLang, { extensions: readonly string[]; f
   js: { extensions: ['.js', '.cjs', '.mjs'], file: 'sample.cjs' },
   rust: { extensions: ['.rs'], file: 'main.rs' },
   java: { extensions: ['.java'], file: 'Main.java' },
+  csharp: { extensions: ['.cs'], file: 'Program.cs' },
   go: { extensions: ['.go'], file: 'main.go' },
   swift: { extensions: ['.swift'], file: 'main.swift' },
   c: { extensions: ['.c'], file: 'sample.c' },
@@ -433,6 +447,13 @@ export interface CClient {
 export interface JavaClient {
   java: string;
   classpath: string;
+}
+export interface DotnetClient {
+  dotnet: string;
+  /** The client's Relate.Net.csproj, the sample project's ProjectReference. */
+  client: string;
+  /** The CLI home and NuGet package folder live under it. */
+  home: string;
   lib: string;
 }
 export interface GoClient {
@@ -459,6 +480,7 @@ export interface ClientEnv {
   nodeModules: string | null;
   rust: RustClient | null;
   java: JavaClient | null;
+  csharp: DotnetClient | null;
   go: GoClient | null;
   swift: SwiftClient | null;
   c: CClient | null;
@@ -523,10 +545,14 @@ export function clientEnv(env: NodeJS.ProcessEnv = process.env): ClientEnv {
     }
     return { cargo: v.RELATE_CARGO, project: v.RELATE_RUST_PROJECT };
   });
-  const java = set('java', need(['RELATE_JAVA', 'RELATE_LIB'], ['RELATE_JAVA_CLASSPATH']), (v): JavaClient | Missing => {
+  const java = set('java', need(['RELATE_JAVA'], ['RELATE_JAVA_CLASSPATH']), (v): JavaClient | Missing => {
     const absent = v.RELATE_JAVA_CLASSPATH.split(delimiter).filter((p) => p && !existsSync(p));
     if (absent.length) return no(`RELATE_JAVA_CLASSPATH names ${absent[0]}, which does not exist`);
-    return { java: v.RELATE_JAVA, classpath: v.RELATE_JAVA_CLASSPATH, lib: v.RELATE_LIB };
+    return { java: v.RELATE_JAVA, classpath: v.RELATE_JAVA_CLASSPATH };
+  });
+  const csharp = set('csharp', need(['RELATE_DOTNET', 'RELATE_DOTNET_CLIENT', 'RELATE_DOTNET_HOME', 'RELATE_LIB']), (v): DotnetClient | Missing => {
+    if (!v.RELATE_DOTNET_CLIENT.endsWith('.csproj')) return no(`RELATE_DOTNET_CLIENT (${v.RELATE_DOTNET_CLIENT}) is not the client's Relate.Net.csproj`);
+    return { dotnet: v.RELATE_DOTNET, client: v.RELATE_DOTNET_CLIENT, home: v.RELATE_DOTNET_HOME, lib: v.RELATE_LIB };
   });
   const go = set('go', need(['RELATE_GO', 'RELATE_GO_CLIENT', 'RELATE_GO_HOME', 'RELATE_C_INCLUDE', 'RELATE_LIB']), (v): GoClient | Missing => {
     if (!existsSync(join(v.RELATE_GO_CLIENT, 'go.mod'))) return no(`RELATE_GO_CLIENT (${v.RELATE_GO_CLIENT}) holds no go.mod`);
@@ -540,7 +566,7 @@ export function clientEnv(env: NodeJS.ProcessEnv = process.env): ClientEnv {
     if (!existsSync(join(v.RELATE_C_INCLUDE, 'relate.h'))) return no(`RELATE_C_INCLUDE (${v.RELATE_C_INCLUDE}) holds no relate.h`);
     return { cc: v.RELATE_CC, include: v.RELATE_C_INCLUDE, lib: v.RELATE_LIB };
   });
-  return { python, pythonEnvs, node, nodeModules, rust, java, go, swift, c, missing };
+  return { python, pythonEnvs, node, nodeModules, rust, java, csharp, go, swift, c, missing };
 }
 
 /** The variable a Python `env=<name>` sample runs with. */
@@ -569,8 +595,10 @@ export function describeClient(lang: SampleLang, env: ClientEnv): string {
       return `${env.rust?.project} (cargo ${env.rust?.cargo})`;
     case 'java': {
       const jar = env.java?.classpath.split(delimiter)[0] ?? '';
-      return `${env.java?.java}, ${basename(jar)}, ${env.java?.lib}`;
+      return `${env.java?.java}, ${basename(jar)}`;
     }
+    case 'csharp':
+      return `${env.csharp?.dotnet}, ${env.csharp?.client}, ${env.csharp?.lib}`;
     case 'go':
       return `${env.go?.go}, ${env.go?.client}, ${env.go?.lib}`;
     case 'swift':
@@ -630,6 +658,43 @@ const rustManifest = (template: string, file: string) => {
 /** The go.mod a Go sample is built in: module `relatesample`, the client replaced by `client` (RELATE_GO_CLIENT). */
 export const goModule = (client: string) =>
   `module relatesample\n\ngo 1.22\n\nrequire github.com/relatedb/relate/clients/go v0.0.0\n\nreplace github.com/relatedb/relate/clients/go => ${client}\n`;
+
+/** The project file a C# sample is built in, referencing the client at `client` (RELATE_DOTNET_CLIENT). */
+export const dotnetProject = (client: string) => `<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>sample</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include=${JSON.stringify(client)} />
+  </ItemGroup>
+</Project>
+`;
+
+/**
+ * The environment of a C# sample's build and run: the CLI's home and NuGet's
+ * package folder under RELATE_DOTNET_HOME (never the user's), no telemetry,
+ * banner or first-run work, and no build servers left behind (a lingering
+ * MSBuild node or compiler server would hold the runner's pipes open).
+ */
+export const dotnetEnv = (home: string): Record<string, string> => ({
+  DOTNET_CLI_HOME: join(home, 'cli'),
+  NUGET_PACKAGES: join(home, 'packages'),
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1',
+  DOTNET_NOLOGO: '1',
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1',
+  DOTNET_CLI_USE_MSBUILD_SERVER: '0',
+  MSBUILDDISABLENODEREUSE: '1',
+});
+
+/** The arguments of a C# sample's build, its output in `out` and the engine from `lib` (RELATE_LIB). */
+export const dotnetBuildArgs = (out: string, lib: string) => [
+  'build', 'sample.csproj', '-c', 'Release', '-o', out, '--nologo', '-v:q', '-clp:NoSummary',
+  '-nodeReuse:false', '-p:UseSharedCompilation=false', `-p:RelateNativeLibraryPath=${lib}`,
+];
 
 /** The Package.swift a Swift sample is built in, depending on the package at `pkg` (RELATE_SWIFT_PACKAGE). */
 export const swiftManifest = (pkg: string) => `// swift-tools-version: 6.0
@@ -697,16 +762,28 @@ function plan(sample: SampleSource, env: ClientEnv, runDir: string, buildDir: st
       ];
     }
     case 'java': {
-      const { java, classpath, lib } = env.java!;
+      const { java, classpath } = env.java!;
       writeFileSync(join(buildDir, file), code);
-      // JNA unpacks its stub into jna.tmpdir, and the client its library into relate.native.cache
-      // when RELATE_LIB is unset: both into the build directory, never a user cache.
+      // The jar from Maven Central loads the engine it bundles, as a reader's build does, so RELATE_LIB
+      // (set for the clients built from the checkout) is unset. JNA unpacks its stub into jna.tmpdir, and
+      // the client its library into relate.native.cache: both into the build directory, never a user cache.
       return [
         run(java, [`-Djna.tmpdir=${buildDir}`, `-Drelate.native.cache=${join(buildDir, 'native')}`, '-cp', classpath, join(buildDir, file)], {
-          RELATE_LIB: lib,
+          RELATE_LIB: undefined,
           JAVA_TOOL_OPTIONS: undefined,
           JDK_JAVA_OPTIONS: undefined,
         }),
+      ];
+    }
+    case 'csharp': {
+      const d = env.csharp!;
+      writeFileSync(join(buildDir, file), code);
+      writeFileSync(join(buildDir, 'sample.csproj'), dotnetProject(d.client));
+      const out = join(buildDir, 'out');
+      const dn = dotnetEnv(d.home);
+      return [
+        { cmd: d.dotnet, args: dotnetBuildArgs(out, d.lib), cwd: buildDir, env: { ...childEnv, ...dn }, build: true },
+        run(d.dotnet, [join(out, 'sample.dll')], dn),
       ];
     }
     case 'go': {
@@ -852,6 +929,11 @@ public class Main {
         }
     }
 }`,
+  csharp: `using Relate.Net;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+Console.WriteLine(conn.Query(${JSON.stringify(VERSION_QUERY)}).Scalar<string>());`,
   go: `package main
 
 import (

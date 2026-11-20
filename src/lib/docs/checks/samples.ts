@@ -1,7 +1,7 @@
 // The verified language samples' static check, for docs:check (the runner is
 // scripts/docs-samples.ts; the contract is in src/lib/docs/samples.ts): every
 // sample fence (```python run, ```js run, ```rust run, ```java run,
-// ```go run, ```swift run, ```c run) on a published page parses, has an id
+// ```csharp run, ```go run, ```swift run, ```c run) on a published page parses, has an id
 // that is unique on the page and that no Cypher cell shares, and has an entry
 // of kind "text" in the page's results sidecar, recorded from the code as it
 // now reads (`source_sha256`); no "text" entry is left without its sample.

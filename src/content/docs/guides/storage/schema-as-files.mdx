@@ -1,14 +1,14 @@
 ---
 title: Keep the schema as files
 label: Schema as files
-description: Read a relate store's indexes and constraints from the text files in .cypherlite/schema/, review schema changes as diffs, and apply them to a new store.
+description: Read a relate store's indexes and constraints from the text files in .relate/schema/, review schema changes as diffs, and apply them to a new store.
 order: 50
 surfaces: [cli, agents]
 prerequisites: [get-started/install]
 related: [reference/storage/formats#directory-store-files, guides/agents/diffable-memory, guides/cypher/indexes-and-constraints, reference/cypher/schema-clauses, guides/storage/clone-and-convert, concepts/problems-relate-solves#schema-as-files]
 ---
 
-This guide shows you how to read a store's schema from files, review a schema change in a pull request, and apply the same schema to a new store. Every checkpoint of a durable store writes its indexes and constraints as Cypher text into the :term[schema folder]{id=schema-folder}, `.cypherlite/schema/`, inside a directory store. The files are a copy for reading and diffing: the schema changes only through Cypher statements, and an edited file stops the store from opening.
+This guide shows you how to read a store's schema from files, review a schema change in a pull request, and apply the same schema to a new store. Every checkpoint of a durable store writes its indexes and constraints as Cypher text into the :term[schema folder]{id=schema-folder}, `.relate/schema/`, inside a directory store. The files are a copy for reading and diffing: the schema changes only through Cypher statements, and an edited file stops the store from opening.
 
 ## Prerequisites
 
@@ -36,7 +36,7 @@ relate query --database ./team < team.cypher
 The folder holds one file for a store without a schema, `schema.cypher`, and it is empty:
 
 ```bash verify
-ls -A team/.cypherlite/schema
+ls -A team/.relate/schema
 ```
 
 ```text
@@ -49,7 +49,7 @@ schema.cypher
 | `graph-type.cypher` | The store's :term[graph type]{id=graph-type}, as the body of its declaration, such as ``(:`Person` => {`name` :: STRING NOT NULL})`` | When the store has a graph type |
 | `ontology.json` or `ontology.yaml` | The :term[ontology]{id=ontology} document, byte for byte as it was set | When an ontology is set; the `db.ontology.*` procedures are a preview feature (`RELATE_PREVIEW=ontology`, [Use an ontology](/docs/guides/cypher/ontology)) |
 
-A `markdown` store keeps the same folder beside its other engine files, in `.cypherlite/schema/` under the vault root. A constraint that a graph type manages, and an index that has no standalone `CREATE` form, is left out of `schema.cypher`; the graph type and the store's manifest carry it.
+A `markdown` store keeps the same folder beside its other engine files, in `.relate/schema/` under the vault root. A constraint that a graph type manages, and an index that has no standalone `CREATE` form, is left out of `schema.cypher`; the graph type and the store's manifest carry it.
 
 ## Read the schema
 
@@ -68,7 +68,7 @@ relate --database ./team --mode envelope "CREATE INDEX person_role IF NOT EXISTS
 One file read now answers what the schema is, with no store opened and no `SHOW` statement run:
 
 ```bash verify
-cat team/.cypherlite/schema/schema.cypher
+cat team/.relate/schema/schema.cypher
 ```
 
 ```text
@@ -80,12 +80,12 @@ The folder changes at a checkpoint, not at each commit. A one-shot CLI run check
 
 ## Review a schema change
 
-Commit the store folder, or at least `.cypherlite/schema/`, to the repository. A schema change then shows up in a pull request as added and removed lines. To see the same diff without git, keep a copy of the file, add a full-text :term[index]{id=index}, and compare:
+Commit the store folder, or at least `.relate/schema/`, to the repository. A schema change then shows up in a pull request as added and removed lines. To see the same diff without git, keep a copy of the file, add a full-text :term[index]{id=index}, and compare:
 
 ```bash verify
-cp team/.cypherlite/schema/schema.cypher schema-before.cypher
+cp team/.relate/schema/schema.cypher schema-before.cypher
 relate --database ./team --mode envelope "CREATE FULLTEXT INDEX project_search IF NOT EXISTS FOR (p:Project) ON EACH [p.name, p.language]"
-diff schema-before.cypher team/.cypherlite/schema/schema.cypher
+diff schema-before.cypher team/.relate/schema/schema.cypher
 ```
 
 ```text
@@ -101,8 +101,8 @@ The rendered statement spells out every option, defaults included, so a reviewer
 Each line of `schema.cypher` is a statement that ends with `;`, so the file runs as a script. Pipe it into a new, empty store to give that store the same indexes and constraints, then compare the two copies:
 
 ```bash verify
-relate query --database ./team-staging --mode envelope < team/.cypherlite/schema/schema.cypher
-cmp team/.cypherlite/schema/schema.cypher team-staging/.cypherlite/schema/schema.cypher && echo "same schema"
+relate query --database ./team-staging --mode envelope < team/.relate/schema/schema.cypher
+cmp team/.relate/schema/schema.cypher team-staging/.relate/schema/schema.cypher && echo "same schema"
 ```
 
 ```text
@@ -120,23 +120,23 @@ The folder is a mirror of the schema the last checkpoint wrote, never a source. 
 
 ```bash verify
 cp -R team team-edited
-echo "CREATE INDEX person_age FOR (n:Person) ON (n.age);" >> team-edited/.cypherlite/schema/schema.cypher
+echo "CREATE INDEX person_age FOR (n:Person) ON (n.age);" >> team-edited/.relate/schema/schema.cypher
 relate --database ./team-edited --read-only --mode envelope "RETURN 1 AS ok"
 echo "exit=$?"
 ```
 
 ```text
-Failed to open Relate: storage error: schema mirror .cypherlite/schema/schema.cypher differs from the schema this store's checkpoint persisted; it was edited by hand or copied from another store; delete the .cypherlite/schema/ directory and reopen: the next checkpoint regenerates it from the store's schema
-{"error":{"code":"fatal_error","exit_code":1,"kind":"storage","message":"storage error: schema mirror .cypherlite/schema/schema.cypher differs from the schema this store's checkpoint persisted; it was edited by hand or copied from another store; delete the .cypherlite/schema/ directory and reopen: the next checkpoint regenerates it from the store's schema","retryable":false}}
+Failed to open Relate: storage error: schema mirror .relate/schema/schema.cypher differs from the schema this store's checkpoint persisted; it was edited by hand or copied from another store; delete the .relate/schema/ directory and reopen: the next checkpoint regenerates it from the store's schema
+{"error":{"code":"fatal_error","exit_code":1,"kind":"storage","message":"storage error: schema mirror .relate/schema/schema.cypher differs from the schema this store's checkpoint persisted; it was edited by hand or copied from another store; delete the .relate/schema/ directory and reopen: the next checkpoint regenerates it from the store's schema","retryable":false}}
 exit=1
 ```
 
 The refusal touched nothing else in the store. The repair is in the message: delete the folder and open the store for writing once, so its checkpoint at exit writes the folder again from the store's schema:
 
 ```bash verify
-rm -r team-edited/.cypherlite/schema
+rm -r team-edited/.relate/schema
 relate --database ./team-edited --mode envelope "RETURN 1 AS ok"
-cat team-edited/.cypherlite/schema/schema.cypher
+cat team-edited/.relate/schema/schema.cypher
 ```
 
 ```text
@@ -146,7 +146,7 @@ CREATE FULLTEXT INDEX `project_search` FOR (n:`Project`) ON EACH [n.`name`, n.`l
 CREATE CONSTRAINT `person_name` FOR (n:`Person`) REQUIRE (n.`name`) IS UNIQUE;
 ```
 
-The hand-added `person_age` index is gone: to add an index, run its `CREATE INDEX` statement. A schema change committed since the last checkpoint is not drift; it waits in the WAL, and the next checkpoint writes it to the folder. A store with no `.cypherlite/schema/` folder at all, such as one written by an older release, opens normally and gains the folder at its next checkpoint.
+The hand-added `person_age` index is gone: to add an index, run its `CREATE INDEX` statement. A schema change committed since the last checkpoint is not drift; it waits in the WAL, and the next checkpoint writes it to the folder. A store with no `.relate/schema/` folder at all, such as one written by an older release, opens normally and gains the folder at its next checkpoint.
 
 ## Diff the data too
 
@@ -154,19 +154,19 @@ The schema folder covers indexes and constraints. To review changes to nodes and
 
 ```bash verify
 relate clone --to-snapshot-format json ./team ./team-json
-ls -A team-json team-json/.cypherlite/schema
+ls -A team-json team-json/.relate/schema
 ```
 
 ```text
 team-json:
-.cypherlite
 .cypherlite.lock
 .cypherlite.writer
+.relate
 graph.json
 manifest.json
 wal
 
-team-json/.cypherlite/schema:
+team-json/.relate/schema:
 schema.cypher
 ```
 
@@ -186,7 +186,7 @@ relate --database ./team --read-only --mode envelope "SHOW INDEXES YIELD name, t
 
 ## If it goes wrong
 
-- **`Failed to open Relate: storage error: schema mirror .cypherlite/schema/<file> differs from the schema this store's checkpoint persisted; …`**, **`… schema mirror .cypherlite/schema/<file> is missing from the mirror this store's checkpoint wrote; …`** or **`… schema mirror .cypherlite/schema/<file> is not part of this store's schema mirror; …`** (exit code 1). A file in the folder was edited, deleted or added, or copied from another store, or a crash interrupted a checkpoint between writing the store and rewriting the folder. Delete `.cypherlite/schema/` and open the store for writing once; nothing in the store is lost.
+- **`Failed to open Relate: storage error: schema mirror .relate/schema/<file> differs from the schema this store's checkpoint persisted; …`**, **`… schema mirror .relate/schema/<file> is missing from the mirror this store's checkpoint wrote; …`** or **`… schema mirror .relate/schema/<file> is not part of this store's schema mirror; …`** (exit code 1). A file in the folder was edited, deleted or added, or copied from another store, or a crash interrupted a checkpoint between writing the store and rewriting the folder. Delete `.relate/schema/` and open the store for writing once; nothing in the store is lost.
 - **`semantic error: IndexAlreadyExists`** (exit code 6) when piping `schema.cypher` into a store. The store already has an index of that name; the script stops at the first failing statement and runs none after it. Apply the file to an empty store, or run only the statements for the entries the store lacks.
 - **The folder shows an old schema.** A long-running process has not checkpointed since the change. The folder catches up at its next checkpoint, or when the process closes the store.
 

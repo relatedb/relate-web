@@ -6,6 +6,112 @@
   ],
   "releases": [
     {
+      "version": "1.2.0",
+      "date": "2026-11-20",
+      "published_at": "2026-11-20T09:20:24Z",
+      "previous": "1.1.0",
+      "summary": "A .NET client, the Java client on Maven Central, a dozen Neo4j Cypher spellings that used to fail and now run, aggregations that read an existing index, faster reopens of large stores, and the engine folder inside a directory store renamed from `.cypherlite/` to `.relate/`.",
+      "added": [
+        {
+          "text": "A .NET client, `Relate.Net`, for C#, F# and Visual Basic on .NET 8 or later, over the same C library as the other clients; it is not on NuGet, so a project references `clients/dotnet` at the release tag and takes the engine library from the release's `relate-ffi-<target>.tar.gz`.",
+          "pages": [
+            "get-started/dotnet",
+            "guides/embed/dotnet",
+            "reference/api/dotnet"
+          ]
+        },
+        {
+          "text": "The Java client `ai.relatedb:relate` is on Maven Central from 1.2.0, so a Maven or Gradle build declares it like any other dependency, with no `mvn install:install-file` step.",
+          "pages": [
+            "get-started/java",
+            "guides/embed/java"
+          ]
+        },
+        {
+          "text": "`relate skill` knows Mistral Vibe: a home with `~/.vibe` gets a `vibe` row, and `--agent vibe` installs the skill to `~/.vibe/skills/relate`.",
+          "pages": [
+            "reference/cli/skill#agents-and-paths"
+          ]
+        },
+        {
+          "text": "`EXPLAIN` of a statement that names a parameter the caller did not supply plans it and warns with `01N60`, naming every missing parameter; `PROFILE` and a plain run still refuse with `ParameterMissing`.",
+          "pages": [
+            "reference/cypher/notifications#performance",
+            "guides/cypher/parameters#if-it-goes-wrong"
+          ]
+        },
+        {
+          "text": "A plan shows the steps of an index-seek `MATCH` as display-only children of its `NodeIndexSeek`: the seek on the index, then one `Expand` per hop, in the CLI's plan table and in the structured plans of the machine modes, Bolt and HTTP.",
+          "pages": [
+            "reference/cypher/explain-and-profile#the-plan-tree",
+            "guides/cypher/tune-a-query"
+          ]
+        },
+        {
+          "text": "`USING RANGE INDEX` and `USING TEXT INDEX` hints parse and are checked like `USING INDEX`; 1.1.0 failed them with a parse error.",
+          "pages": [
+            "reference/cypher/notifications#hints"
+          ]
+        }
+      ],
+      "changed": [
+        {
+          "text": "A directory store keeps its engine folder (the schema text copy, and for `markdown` the manifest and WAL) in `.relate/` instead of `.cypherlite/`: the first writable open renames the folder, a read-only open of an older `markdown` store is refused until then, and a store that a release before 1.2.0 opens again gets a second `.cypherlite/` that 1.2.0 refuses until it is deleted; the lock files keep their names.",
+          "breaking": true,
+          "pages": [
+            "guides/operate/upgrade-a-store#read-the-stores-format-version",
+            "reference/storage/formats#directory-store-files",
+            "guides/storage/schema-as-files"
+          ]
+        },
+        {
+          "text": "`MATCH (n:L) RETURN n.p, count(*)`, and the `min`, `max` and `count(n.p)` forms over one labeled property, answer from an existing index on that label and property, and an aggregation grouped by a relationship property with a selective predicate on the start node walks only that node's relationships; results are unchanged, and the engine's release notes report 17.3 ms falling to 6.2 ms and 16.0 ms to 1.0 ms on their measured graphs."
+        },
+        {
+          "text": "Opening a large store decodes its checkpoint on every CPU core; the engine's release notes report a benchmark store reopening in 461 ms instead of 1,225 ms, with a lower peak while it opens.",
+          "pages": [
+            "guides/operate/sizing-and-memory#allow-for-process-memory"
+          ]
+        },
+        {
+          "text": "The logical graph size counts the memory the engine reserves, which grows in steps of 1.5 times where that is smaller than doubling: the example graph measures 6,523 logical bytes where 1.1.0 measured 6,771, so a `--logical-graph-size-limit` leaves more room than before.",
+          "pages": [
+            "guides/operate/sizing-and-memory#estimate-from-counts"
+          ]
+        },
+        {
+          "text": "A fixed-length pattern fed by two or more rows no longer falls back to a row-by-row walk that grew exponentially on dense cyclic graphs."
+        }
+      ],
+      "deprecated": [],
+      "fixed": [
+        {
+          "text": "Parameter names in backticks or after whitespace, ``$`p 1` `` and `$ p2`, parse, and so does a constraint, index or database named `null`."
+        },
+        {
+          "text": "Parentheses around a projection item no longer change it: `WITH (n)` and `RETURN DISTINCT(n.p1) ORDER BY n.p1` run."
+        },
+        {
+          "text": "Label expressions parse in every node pattern, including a `WHERE` pattern predicate such as `WHERE (a:L1|L2)-[:R]->()` and the first node of a pattern comprehension."
+        },
+        {
+          "text": "A pattern expression runs as a `SET` value and inside a quantifier filter, as in `SET n.p1 = EXISTS((n)-[:R]->(:L2))`."
+        },
+        {
+          "text": "A property of an aggregation's result, `max(n.p1).p2`, aggregates first and then reads the property."
+        },
+        {
+          "text": "A filtered list comprehension takes a map projection after its `|`, `[n IN nodes(p) WHERE n:L1 | n{.p1}]`, and a type predicate before the `|` leaves the pipe to the comprehension."
+        },
+        {
+          "text": "`\\uXXXX` escapes are decoded between tokens and inside identifiers, not only in string literals."
+        },
+        {
+          "text": "`EXPLAIN` of a statement of about 250 chained clauses returns its plan instead of failing."
+        }
+      ]
+    },
+    {
       "version": "1.1.0",
       "date": "2026-11-17",
       "published_at": "2026-11-17T15:11:40Z",

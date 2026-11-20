@@ -1,23 +1,26 @@
 # Runs the docs' verified language samples (```python run, ```js run,
-# ```rust run, ```java run, ```go run, ```swift run and ```c run fences; the
+# ```rust run, ```java run, ```csharp run, ```go run, ```swift run and
+# ```c run fences; the
 # contract is in src/lib/docs/samples.ts) against the relate clients, and
 # fails when a sample no longer builds, runs, or prints its recorded result
 # (DOCS-PLAN.md §6, "Language samples are verified from phase 1").
 #
 # Weekly and on demand; not a required check, because it needs the network
 # (the registries and the public upstream repository) and takes long.
-# scripts/samples/setup.sh installs relate-db, @relate/relate and the relate
-# crate from PyPI, npm and crates.io at src/content/docs/_data/engine.json's
-# version, and builds the Java, Go, Swift and C clients from an upstream
-# checkout at that version's tag (ADR-0062).
+# scripts/samples/setup.sh installs relate-db, @relate/relate, the relate
+# crate and ai.relatedb:relate from PyPI, npm, crates.io and Maven Central at
+# src/content/docs/_data/engine.json's version, and builds the .NET, Go, Swift
+# and C clients from an upstream checkout at that version's tag (ADR-0062,
+# ADR-0071, ADR-0072).
 #
 # The checkout is the `ref` input, else the tag v<version>. A `ref` at another
 # version fails setup, which holds the checkout to the registry clients'
 # version.
 #
 # Two jobs, so each language runs where its client builds:
-#   samples  ubuntu: Python, Node.js, Rust, Java, Go and C. The JDK comes from
-#            actions/setup-java (Temurin 21) and Go from actions/setup-go;
+#   samples  ubuntu: Python, Node.js, Rust, Java, .NET, Go and C. The JDK
+#            comes from actions/setup-java (Temurin 21), the .NET SDK from
+#            actions/setup-dotnet and Go from actions/setup-go;
 #            scripts/samples/setup.sh downloads Maven and checks it against
 #            the SHA-512 it pins, as it does locally.
 #   swift    macOS: the Swift client's binary target is an XCFramework, which
@@ -36,7 +39,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: Upstream ref to build the Java, Go, Swift and C clients from (default v<engine version>)
+        description: Upstream ref to build the .NET, Go, Swift and C clients from (default v<engine version>)
         required: false
         default: ''
 
@@ -102,6 +105,10 @@ jobs:
           distribution: temurin
           java-version: '21'
 
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
       - uses: actions/setup-go@v5
         with:
           go-version: '1.27'
@@ -128,7 +135,7 @@ jobs:
 
       - name: Run the samples
         working-directory: site
-        run: node scripts/docs-samples.ts --require --lang python,js,rust,java,go,c
+        run: node scripts/docs-samples.ts --require --lang python,js,rust,java,csharp,go,c
 
   swift:
     needs: gate
@@ -168,7 +175,7 @@ jobs:
         working-directory: site
         run: >-
           bash scripts/samples/setup.sh --upstream ../upstream --out "$RUNNER_TEMP/samples"
-          --skip-python --skip-node --skip-rust --skip-java --skip-go --skip-c --github-env
+          --skip-python --skip-node --skip-rust --skip-java --skip-dotnet --skip-go --skip-c --github-env
 
       - name: Run the samples
         working-directory: site

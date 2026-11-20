@@ -13,7 +13,7 @@ This guide shows you how to run `relate serve` in a container, with the Dockerfi
 ## Prerequisites
 
 - Docker Engine 23.0 or later, where BuildKit is the default builder. This page parsed its Compose file with Docker Compose 5.6.1 on Docker 29.9.2.
-- A checkout of the relate source repository, `github.com/relatedb/relate`, at the release you want to serve: `git clone --branch v1.1.0 --depth 1 https://github.com/relatedb/relate`.
+- A checkout of the relate source repository, `github.com/relatedb/relate`, at the release you want to serve: `git clone --branch v1.2.0 --depth 1 https://github.com/relatedb/relate`.
 - relate on your `PATH` for the last check, optional ([Install relate](/docs/get-started/install)).
 
 ## Build the image
@@ -21,7 +21,7 @@ This guide shows you how to run `relate serve` in a container, with the Dockerfi
 From the root of the checkout:
 
 ```bash
-docker build -t relate-bolt:1.1.0 .
+docker build -t relate-bolt:1.2.0 .
 ```
 
 The Dockerfile compiles `relate` in a Rust build stage and copies the static binaries into an image built `FROM scratch`. The repository's `make docker` runs the same build and tags it `relate-bolt:<version>` and `relate-bolt:latest`. What the image holds:
@@ -48,7 +48,7 @@ docker run -d --name relate-seed \
   -e DO_NOT_TRACK=1 \
   -e RELATE_AUTH \
   -e RELATE_QUERY="UNWIND ['Ada', 'Grace', 'Noor'] AS name CREATE (:Person {name: name})" \
-  relate-bolt:1.1.0
+  relate-bolt:1.2.0
 ```
 
 | Setting | Why |
@@ -76,7 +76,7 @@ docker run -d --name relate \
   -v relate-data:/data \
   -e DO_NOT_TRACK=1 \
   -e RELATE_AUTH \
-  relate-bolt:1.1.0 --read-only
+  relate-bolt:1.2.0 --read-only
 ```
 
 To allow writes, remove `--read-only`. A read-only open never creates a store, so on an empty volume this container exits at once. The same flags with the host binary show the message it prints, with the path the container would name in place of `<dir>/data/graph`:
@@ -98,7 +98,7 @@ The same read-only service as a Compose file. `RELATE_AUTH` comes from your shel
 ```yaml title="compose.yaml"
 services:
   relate:
-    image: relate-bolt:1.1.0
+    image: relate-bolt:1.2.0
     command: ["--read-only"]
     environment:
       DO_NOT_TRACK: "1"

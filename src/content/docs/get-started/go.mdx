@@ -21,10 +21,10 @@ The Go :term[client]{id=client} is the module `github.com/relatedb/relate/client
 ```bash
 mkdir team && cd team
 go mod init team
-go get github.com/relatedb/relate/clients/go@v1.1.0
+go get github.com/relatedb/relate/clients/go@v1.2.0
 ```
 
-`v1.1.0` is the relate release: as of relate 1.0.2 every release tags the module with its own version, so `go.mod` records `v1.1.0`. Keep the module and the C library on the same release.
+`v1.2.0` is the relate release: as of relate 1.0.2 every release tags the module with its own version, so `go.mod` records `v1.2.0`. Keep the module and the C library on the same release.
 
 The module uses cgo and links the engine's C library, `librelate_ffi`. Each release attaches it as `relate-ffi-<target>.tar.gz` (`cypherlite-ffi-<target>.tar.gz` up to and including 0.16.1), holding the library and its header. The module carries its own copy of the header, so cgo needs only the library. Unpack the archive into a directory and point the linker at that directory when you build, and the dynamic loader at it when you run:
 

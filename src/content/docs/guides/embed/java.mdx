@@ -12,13 +12,13 @@ This guide shows you how to use the relate Java :term[client]{id=client} in an a
 
 ## Prerequisites
 
-- Java 17 or later. The programs on this page ran on JDK 21.0.13 with JNA 5.14.0 and Jackson databind 2.17.2, the client's two dependencies.
+- Java 17 or later. The programs on this page ran on JDK 21.0.13 with JNA 5.19.1 and Jackson databind 2.23.0, the versions the client's POM names.
 - Maven or Gradle.
 - macOS (arm64 or x86-64), Linux with glibc (arm64 or x86-64), or Windows (x86-64): the platforms the jar carries an engine for.
 
 ## Add the client
 
-The artifact is `ai.relatedb:relate` and the package is `ai.relatedb`. The jars are attached to each release on the [releases page](https://github.com/relatedb/relate/releases), not published to Maven Central, so a build resolves them from the local Maven repository. Each jar carries its POM; install the plain jar with `mvn install:install-file -Dfile=relate-<release>.jar`, and a classifier jar with `-Dclassifier=<classifier>` added. The plain jar carries the engine for all five platforms, about 40 MB; in these blocks `<release>` is the release version:
+The artifact is `ai.relatedb:relate` on Maven Central, and the package is `ai.relatedb`. Every release from 1.2.0 on is published there, with its POM, its sources and Javadoc jars, and one classifier jar per platform; the same jars are attached to each release on the [releases page](https://github.com/relatedb/relate/releases). The plain jar carries the engine for all five platforms, about 40 MB; in these blocks `<release>` is the release version:
 
 ```xml title="pom.xml"
 <dependency>
@@ -29,7 +29,7 @@ The artifact is `ai.relatedb:relate` and the package is `ai.relatedb`. The jars 
 ```
 
 ```kotlin title="build.gradle.kts"
-repositories { mavenLocal(); mavenCentral() }
+repositories { mavenCentral() }
 dependencies { implementation("ai.relatedb:relate:<release>") }
 ```
 

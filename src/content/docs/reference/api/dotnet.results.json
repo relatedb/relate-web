@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "verified": "1.2.0",
+  "cells": {
+    "values": {
+      "kind": "text",
+      "text": "ada: Node\nk: Relationship\nbig: Int64\nratio: Double\nday: DateOnly\noffset: DateTimeOffset\nmeeting: CypherZonedDateTime\nslot: CypherOffsetTime\nterm: CypherDuration\nspot: CypherPoint\ncounts: CypherVector\nlist: ReadOnlyCollection`1\nmap: ReadOnlyDictionary`2\nEurope/Berlin\n14\nInteger8",
+      "table": null,
+      "graph": null,
+      "expectError": false,
+      "verified": "1.2.0",
+      "source_sha256": "d3a0ce20db00908a9c8d0530868725351899564219092fb66455d13e6d4c4354"
+    }
+  }
+}

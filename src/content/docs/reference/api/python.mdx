@@ -38,7 +38,7 @@ ipc = db.execute_arrow(query, params=None)    # Arrow IPC stream bytes
 | `apilevel` | `str` | `"2.0"` |
 | `threadsafety` | `int` | `1`: threads may share the module, not a connection |
 | `paramstyle` | `str` | `"named"`: parameters are `$name` with a dict |
-| `__version__` | `str` | The client version string, `"1.1.0"` in this release (a literal in the package, not read from the installed metadata) |
+| `__version__` | `str` | The client version string, `"1.2.0"` in this release (a literal in the package, not read from the installed metadata) |
 | `STRING`, `BINARY`, `NUMBER`, `DATETIME`, `ROWID` | type objects | The `type_code` values of `Cursor.description` |
 | `Date`, `Time`, `Timestamp`, `Binary`, `DateFromTicks`, `TimeFromTicks`, `TimestampFromTicks` | constructors | PEP 249 constructors over `datetime` and `bytes` |
 | `relate.viz` | module | Optional graph visualization over the `neo4j-viz` package; imported on its own, see [`relate.viz`](#relateviz) |

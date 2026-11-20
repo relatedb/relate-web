@@ -1,0 +1,78 @@
+{
+  "format": 1,
+  "verified": "1.2.0",
+  "cells": {
+    "version": {
+      "kind": "text",
+      "text": "1.2.0\nC ABI version 2",
+      "table": null,
+      "graph": null,
+      "expectError": false,
+      "verified": "1.2.0",
+      "source_sha256": "0ac9397a12a4009e37258cc85537f9cfb452dbffe46d554454f92e0d6299e398"
+    },
+    "open": {
+      "kind": "text",
+      "text": "hello\nTrue",
+      "table": null,
+      "graph": null,
+      "expectError": false,
+      "verified": "1.2.0",
+      "source_sha256": "08ba6245a936dc9504e6d940ef5872e0c08aedcb262c658dba5a71c07e7ad402"
+    },
+    "create": {
+      "kind": "text",
+      "text": "nodes created: 5\nrelationships created: 5\nproperties set: 13",
+      "table": null,
+      "graph": null,
+      "expectError": false,
+      "verified": "1.2.0",
+      "source_sha256": "62178d01e7b5c2bc285246251baece4b4626006fc1df1f4c7ca36a5f83d11cf2"
+    },
+    "params": {
+      "kind": "text",
+      "text": "relate\n  Grace since 2023\n  Ada since 2024\nopencypher-tck\n  Grace since 2022",
+      "table": null,
+      "graph": null,
+      "expectError": false,
+      "verified": "1.2.0",
+      "source_sha256": "89ec2dff4cd7de472b7dcaaeab8f84357aec8e2c047230de4c9b2fd06f0abc1a"
+    },
+    "transaction": {
+      "kind": "text",
+      "text": "committed: True\npeople after commit: 4\nprojects inside the transaction: 0\nprojects after rollback: 2",
+      "table": null,
+      "graph": null,
+      "expectError": false,
+      "verified": "1.2.0",
+      "source_sha256": "df679710ab3f148487483eea9ea95f2f109304f98bfe3c19cf9f189adda7bcc9"
+    },
+    "metadata": {
+      "kind": "text",
+      "text": "name, since\nname String\nsince Int64\nquery type: Read\nnamespace: neo4j\nquery type: Write\nproperties set: 1\nbookmark: True\ntimed: True",
+      "table": null,
+      "graph": null,
+      "expectError": false,
+      "verified": "1.2.0",
+      "source_sha256": "f3a50dd8d209ee3e884bdd9061a839d797cb4a3275c0f2de9d16b1bcee673a31"
+    },
+    "error": {
+      "kind": "text",
+      "text": "semantic error: ParameterMissing: Expected parameter(s): name\nGqlStatus: 42N02\nCode: Neo.ClientError.Statement.ParameterMissing\nStage: Compile\nIsRetryable: False\nmaintainer",
+      "table": null,
+      "graph": null,
+      "expectError": false,
+      "verified": "1.2.0",
+      "source_sha256": "ecdfacfd12204f66987fca737faa50597b71b1b996bc00a09271e4ba8f2436c5"
+    },
+    "program": {
+      "kind": "text",
+      "text": "created the team graph\nrelate\n  Grace since 2023\n  Ada since 2024\nopencypher-tck\n  Grace since 2022",
+      "table": null,
+      "graph": null,
+      "expectError": false,
+      "verified": "1.2.0",
+      "source_sha256": "66050030a726bac348f36a91606ac11de203a310ea049b6857bd5a67515cf11e"
+    }
+  }
+}

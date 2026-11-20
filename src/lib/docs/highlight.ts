@@ -5,8 +5,8 @@
 import { createHighlighter, type Highlighter } from 'shiki';
 
 export const THEMES = { light: 'github-light-default', dark: 'github-dark-default' } as const;
-const LANGS = ['cypher', 'python', 'shellscript', 'json', 'javascript', 'typescript', 'rust', 'toml', 'yaml', 'java', 'go', 'swift', 'c', 'markdown', 'html', 'powershell', 'dockerfile'];
-const ALIASES: Record<string, string> = { sh: 'shellscript', bash: 'shellscript', shell: 'shellscript', zsh: 'shellscript', console: 'shellscript', js: 'javascript', ts: 'typescript', py: 'python', yml: 'yaml', md: 'markdown', ps1: 'powershell' };
+const LANGS = ['cypher', 'python', 'shellscript', 'json', 'javascript', 'typescript', 'rust', 'toml', 'yaml', 'java', 'csharp', 'xml', 'go', 'swift', 'c', 'markdown', 'html', 'powershell', 'dockerfile'];
+const ALIASES: Record<string, string> = { sh: 'shellscript', bash: 'shellscript', shell: 'shellscript', zsh: 'shellscript', console: 'shellscript', js: 'javascript', ts: 'typescript', py: 'python', cs: 'csharp', yml: 'yaml', md: 'markdown', ps1: 'powershell' };
 
 export type Highlight = (code: string, lang: string) => string;
 

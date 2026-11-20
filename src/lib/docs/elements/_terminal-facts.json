@@ -1,6 +1,6 @@
 {
-  "version": "1.1.0",
-  "recordedWith": "relate 1.1.0 (f529cbb), release build",
+  "version": "1.2.0",
+  "recordedWith": "relate 1.2.0 (e0ea536), release build",
   "agentCap": 100,
   "harnessVariable": "CLAUDECODE",
   "harnessVariables": [

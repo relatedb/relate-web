@@ -92,7 +92,7 @@ These rows apply to `relate serve`, which hosts the HTTP Query API, MCP, and Bol
 | The WASM build has no statement timeout and no way to cancel a running statement. A panic stops the module, and the instance has to be replaced. | A long statement runs until it finishes; a panic surfaces as `WebAssembly.RuntimeError` | [Architecture](/docs/concepts/architecture) |
 | The Python client needs Python 3.9 or later. A connection belongs to the thread that opened it. | Using it from another thread raises `ProgrammingError` with `kind` `WrongThread` | [Python](/docs/get-started/python) |
 | The Node.js client needs Node.js 18 or later. | — | [Node.js](/docs/get-started/node) |
-| The Java client is not on Maven Central, and the Go module does not hold the C library. | A Maven or Gradle build finds `ai.relatedb:relate` only after the release jar is installed into the local repository; a Go build links `librelate_ffi` from the release archive | [Project](/docs/reference/project#platforms) |
+| The Go module and the .NET client do not hold the C library, and the .NET client is on no registry. | A Go build links `librelate_ffi` from the release archive; a .NET build references the client's project from a checkout of the release tag and copies the library from the same archive | [Project](/docs/reference/project#platforms) |
 
 ## Examples
 

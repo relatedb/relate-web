@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "storage-animator",
-  "hash": "360f4acd5faf4b81b2393e69ba37557e92dd721bfdf44af615cd760942ebec61",
+  "hash": "2d7e52a7c93f70e78e6080f66ee433d20eb01e73c0c93d8a1b10eab5640b6e94",
   "inputs": [
     "src/content/docs/_data/cli.json"
   ],
@@ -11,8 +11,8 @@
   "caption": "The write path, what each durability mode can lose in a crash and the parts of one .rl file, as relate documents them",
   "svg": true,
   "svgSha256": {
-    "light": "6ae0787d7fa474ff223fa51100158ffd1e0e02f7888ea71a83aa8e96f60bfadf",
-    "dark": "98dcc88076bdf27d3660ba77463b1f8ebc0c2f23b4b2ea6045a7d2e87e2ff3f4"
+    "light": "373e5fb31ff6544b8ca527c75965e16f6bc50604e2aae486628b1bac5f2491e8",
+    "dark": "7aca2c095e7b24d26deb7474d4afd21d2638ae4237e930f93fc272efbda4ef57"
   },
   "textSha256": "b9712eb4adcce532da171a9dbd426f04483d9fae1d83586deadcf91bfd37ddc6"
 }

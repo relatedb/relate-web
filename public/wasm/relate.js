@@ -1,5 +1,5 @@
 /* @ts-self-types="./relate.d.ts" */
-import { prepareOpfs, slotClose, slotFlush, slotRead, slotSize, slotTruncate, slotWrite } from './snippets/relate-wasm-b80f57cef2af568f/js/opfs.js';
+import { prepareOpfs, slotClose, slotFlush, slotRead, slotSize, slotTruncate, slotWrite } from './snippets/relate-wasm-dd0c6225f894802b/js/opfs.js';
 
 
 /**
@@ -290,7 +290,7 @@ function __wbg_get_imports() {
             const ret = arg0.performance;
             return ret;
         },
-        __wbg_prepareOpfs_f778116fc46d6667: function() { return handleError(function (arg0, arg1) {
+        __wbg_prepareOpfs_1931b28424890029: function() { return handleError(function (arg0, arg1) {
             const ret = prepareOpfs(getStringFromWasm0(arg0, arg1));
             return ret;
         }, arguments); },
@@ -323,24 +323,24 @@ function __wbg_get_imports() {
             const ret = Promise.resolve(arg0);
             return ret;
         },
-        __wbg_slotClose_7586559e49478bc8: function() { return handleError(function (arg0) {
+        __wbg_slotClose_ae47c87a43bb25b1: function() { return handleError(function (arg0) {
             slotClose(arg0 >>> 0);
         }, arguments); },
-        __wbg_slotFlush_5ea46702fcfb3e0d: function() { return handleError(function (arg0) {
+        __wbg_slotFlush_0d5ef4c32944c8be: function() { return handleError(function (arg0) {
             slotFlush(arg0 >>> 0);
         }, arguments); },
-        __wbg_slotRead_5d59c26e462146f7: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
+        __wbg_slotRead_8bacdb13daf3da07: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
             const ret = slotRead(arg0 >>> 0, arg1, arg2 >>> 0, arg3 >>> 0, arg4);
             return ret;
         }, arguments); },
-        __wbg_slotSize_ecbbf8cc3448014e: function() { return handleError(function (arg0) {
+        __wbg_slotSize_09b3f68918fa7a6c: function() { return handleError(function (arg0) {
             const ret = slotSize(arg0 >>> 0);
             return ret;
         }, arguments); },
-        __wbg_slotTruncate_65d754886fc5f606: function() { return handleError(function (arg0, arg1) {
+        __wbg_slotTruncate_fedcfb0f06bdcff4: function() { return handleError(function (arg0, arg1) {
             slotTruncate(arg0 >>> 0, arg1);
         }, arguments); },
-        __wbg_slotWrite_eb8169f515d868d9: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
+        __wbg_slotWrite_361fef84aaf29f02: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
             const ret = slotWrite(arg0 >>> 0, arg1, arg2 >>> 0, arg3 >>> 0, arg4);
             return ret;
         }, arguments); },
@@ -384,7 +384,7 @@ function __wbg_get_imports() {
             return ret;
         },
         __wbindgen_generic_0000000000000001: function(arg0, arg1) {
-            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 2152, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
+            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 2169, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
             const ret = makeMutClosure(arg0, arg1, wasm_bindgen__convert__closures_____invoke__h37bb470ddbba42b5);
             return ret;
         },

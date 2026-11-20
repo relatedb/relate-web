@@ -282,7 +282,7 @@ relate --read-only --mode envelope --param name=Grace --param since=2023 'RETURN
 
 | Message | Cause | Remedy |
 | --- | --- | --- |
-| `semantic error: ParameterMissing: Expected parameter(s): name` (exit code 6) | The statement names `$name` and nothing binds it. relate never binds a missing parameter as `null`. | Bind every parameter the statement names, or remove the reference. |
+| `semantic error: ParameterMissing: Expected parameter(s): name` (exit code 6) | The statement names `$name` and nothing binds it. relate never binds a missing parameter as `null`. `EXPLAIN` of the same statement still plans it, with the warning `01N60` naming every missing parameter ([notifications](/docs/reference/cypher/notifications#performance)). | Bind every parameter the statement names, or remove the reference. |
 | `syntax error: parse error: unexpected token "}" (RightBrace) at line 1, col 24` | The statement was in double quotes, so the shell replaced `$name` with an empty string before relate saw it. | Put the statement in single quotes. |
 | `Error: invalid --param value: parameter day: invalid parameter JSON: trailing characters at line 1 column 5` (exit code 2) | The value starts with a digit, `-`, `"`, `[` or `{` and is not valid JSON. | JSON-quote it: `--param 'day="2026-11-08"'`. |
 | `Error: invalid --param value: parameter x: $: integer exceeds i64 range` (exit code 2) | An integer beyond the 64-bit range. | Pass it as a JSON string. |

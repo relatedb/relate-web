@@ -21,7 +21,7 @@ relate info --database <path> [--json]
 | --- | --- | --- |
 | [`--checkpoint-interval-secs <n>`](/docs/reference/cli/flags#checkpoint-interval-secs) | `300` | Seconds between timed checkpoints, on `relate` and `relate query`. `0` turns off the timer only; the other triggers still run |
 | [`RELATE_CHECKPOINT_INTERVAL_SECS`](/docs/reference/cli/flags#env-relate-checkpoint-interval-secs) | `300` | The same period for an open that sets no interval, `relate serve` included; the flag wins over the variable. A value that is not a whole number is not an error: the period stays `300` |
-| [`--wal-dir <dir>`](/docs/reference/cli/flags#wal-dir) | `<database>/wal`; `<database>/.cypherlite/wal` for the `markdown` codec | Where a directory store keeps its WAL. Refused for a `.rl` file; `relate serve` has no such flag |
+| [`--wal-dir <dir>`](/docs/reference/cli/flags#wal-dir) | `<database>/wal`; `<database>/.relate/wal` for the `markdown` codec | Where a directory store keeps its WAL. Refused for a `.rl` file; `relate serve` has no such flag |
 | [`--durability-mode`](/docs/reference/cli/flags#durability-mode), `RELATE_DURABILITY_MODE` | `full` | When a commit's record is synced to disk relative to its acknowledgment |
 
 Two dot commands of the interactive shell, also accepted as lines of a script piped to `relate query`, act on the WAL and checkpoints:
@@ -36,7 +36,7 @@ Two dot commands of the interactive shell, also accepted as lines of a script pi
 | Layout | WAL location | Segment files | Lock files |
 | --- | --- | --- | --- |
 | Directory store, `parquet` or `json` codec | `<database>/wal/`, or the `--wal-dir` folder | `NNNNNNNN.log` | `.cypherlite.lock` and `.cypherlite.writer` in the WAL folder |
-| Directory store, `markdown` codec | `<database>/.cypherlite/wal/`, or the `--wal-dir` folder | `NNNNNNNN.log` | `.cypherlite.lock` and `.cypherlite.writer` in the WAL folder |
+| Directory store, `markdown` codec | `<database>/.relate/wal/`, or the `--wal-dir` folder | `NNNNNNNN.log` | `.cypherlite.lock` and `.cypherlite.writer` in the WAL folder |
 | `.rl` file | Inside the file, as `wal/` in the same tree | `wal/NNNNNNNN.log` inside the file | None beside the file; a writer holds the `.rl` file itself |
 | In memory | Process memory; nothing on disk | Not applicable | Not applicable |
 
@@ -89,7 +89,7 @@ The record is appended to the open segment. When that segment then holds 64 MiB 
 | --- | --- |
 | Rotate | The open segment closes, if it holds records; new commits go to a segment with the next id |
 | Pin | The checkpoint takes the LSN of the newest closed segment's last record |
-| Write the snapshot | The committed state up to that LSN is written through the store's codec ([codecs](/docs/reference/storage/formats#codecs)), together with the schema text copy under `.cypherlite/schema/` |
+| Write the snapshot | The committed state up to that LSN is written through the store's codec ([codecs](/docs/reference/storage/formats#codecs)), together with the schema text copy under `.relate/schema/` |
 | Publish | Files are written under a temporary name and renamed into place, `manifest.json` last; the manifest's `checkpoint_lsn` is the pinned LSN. A crash before this step leaves the previous snapshot in force |
 | Recycle | Closed segments whose last record's LSN is no higher than the checkpoint LSN are deleted |
 

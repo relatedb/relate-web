@@ -102,7 +102,7 @@ relate clone ./backups/team-2026-11-07.rl ./team
 
 ## Copy files only when nothing has the store open
 
-A directory store keeps two things: the snapshot files, which hold the state at the last checkpoint, and the WAL folder (`wal/`, or `.cypherlite/wal/` in a markdown store), which holds every commit since. The WAL is the only copy of those recent commits until the next checkpoint: every 300 seconds by default, after 64 MiB of WAL or 10,000 commits, and when the store closes.
+A directory store keeps two things: the snapshot files, which hold the state at the last checkpoint, and the WAL folder (`wal/`, or `.relate/wal/` in a markdown store), which holds every commit since. The WAL is the only copy of those recent commits until the next checkpoint: every 300 seconds by default, after 64 MiB of WAL or 10,000 commits, and when the store closes.
 
 That has two consequences for a file copy:
 

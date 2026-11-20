@@ -43,20 +43,20 @@ CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
        (noor)-[:MAINTAINS]->(relate),
        (ada)-[:KNOWS]->(grace);
 EOF
-ls -A memory memory/wal memory/.cypherlite/schema
+ls -A memory memory/wal memory/.relate/schema
 ```
 
 ```text
 {"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":3.681333,"execute_ms":3.3569590000000002,"lex_parse_ms":0.013166,"lower_ms":0.017207999999999998,"parse_ms":0.306375,"plan_ms":0.011708999999999999,"result_generation_ms":0.000209,"rewrite_ms":0.0005},"truncated":false}
 memory:
-.cypherlite
 .cypherlite.lock
 .cypherlite.writer
+.relate
 graph.json
 manifest.json
 wal
 
-memory/.cypherlite/schema:
+memory/.relate/schema:
 schema.cypher
 
 memory/wal:
@@ -69,7 +69,7 @@ memory/wal:
 | --- | --- | --- |
 | `graph.json` | Every node with its id, labels and properties, every relationship with its type, its start and end node ids and its properties, then the index and constraint catalog | The facts that changed |
 | `manifest.json` | The codec and the position of the last checkpoint | Two counters that move with each checkpoint |
-| `.cypherlite/schema/schema.cypher` | One `CREATE INDEX` or `CREATE CONSTRAINT` statement per entry: the :term[schema folder]{id=schema-folder} | A schema change: a line added, or one removed |
+| `.relate/schema/schema.cypher` | One `CREATE INDEX` or `CREATE CONSTRAINT` statement per entry: the :term[schema folder]{id=schema-folder} | A schema change: a line added, or one removed |
 | `wal/<n>.log` | The WAL; after a clean exit it holds only its 8-byte header | Renamed by each session that commits |
 | `.cypherlite.lock`, `.cypherlite.writer`, and the same two in `wal/` | Markers that make the directory a store | Never change |
 
@@ -245,7 +245,7 @@ git status --short
 | A merge conflict in `graph.json` and `manifest.json` | Two branches each wrote the memory; git cannot merge two versions of a one-line file | Keep one side's `memory/` whole, then replay the other session's statements on it; `MERGE` writes only what is missing |
 | `Failed to open Relate: storage error: read-only open requires an existing WAL at <path>/wal` on a fresh clone | `wal/` was left out of the commit, or ignored | Commit the whole store directory |
 | `Failed to open Relate: storage error: snapshot codec mismatch: directory is json, requested parquet`, exit code 1 | `--snapshot-format` given for a store that already exists | Drop the flag; to change the codec, `relate clone --to-snapshot-format` |
-| `Failed to open Relate: storage error: schema mirror .cypherlite/schema/<file> differs from the schema this store's checkpoint persisted; …` | A file in the schema folder was edited, or resolved by hand in a merge | Delete `.cypherlite/schema/` and open the store for writing once ([Keep the schema as files](/docs/guides/storage/schema-as-files)) |
+| `Failed to open Relate: storage error: schema mirror .relate/schema/<file> differs from the schema this store's checkpoint persisted; …` | A file in the schema folder was edited, or resolved by hand in a merge | Delete `.relate/schema/` and open the store for writing once ([Keep the schema as files](/docs/guides/storage/schema-as-files)) |
 
 ## Related
 

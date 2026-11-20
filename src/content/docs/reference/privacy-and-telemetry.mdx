@@ -14,7 +14,7 @@ The `relate` CLI binary sends anonymous usage metrics to Mixpanel. They are on b
 | --- | --- | --- |
 | `relate` CLI (release binary) | Yes, unless turned off | Only the usage metrics, and a [feedback report](#feedback-reports) an agent sends under a person's grant. `relate upgrade`, `relate extension install`, `--load <url>`, `--fetch-params`, `pull`, and `push` reach the addresses they are given or document, and only when run |
 | `relate serve` (HTTP, :term[MCP]{id=mcp}, Bolt) | One `RELATE-CLI_COMMAND` event when the server exits; statements it serves send nothing | Only that one usage metrics event, unless turned off |
-| Python, Node.js, Java, Go, Swift, and Rust clients, and the C library | Never | None |
+| Python, Node.js, Java, .NET, Go, Swift, and Rust clients, and the C library | Never | None |
 | WebAssembly (WASM) build | Never | None |
 | `agent` and `minimal` CLI builds, from source | Never; the usage metrics code is not compiled in | `agent`: only `pull`, `push`, `--fetch-params`, `--load <url>`, and `extension install`, when run. `minimal`: none |
 
@@ -125,7 +125,7 @@ The environment variables for development and testing:
 
 | Surface | Why |
 | --- | --- |
-| The embedded engine, as used by the Python, Node.js, Java, Go, Swift, and Rust clients | Usage metrics live in the CLI binary only |
+| The embedded engine, as used by the Python, Node.js, Java, .NET, Go, Swift, and Rust clients | Usage metrics live in the CLI binary only |
 | The C library (`relate-ffi`) | Same |
 | The WASM build (`@relate/relate-wasm`, and the engine on these pages) | Same |
 | Statements served by `relate serve` over HTTP, MCP, or Bolt | The server process sends one `RELATE-CLI_COMMAND` event when it exits, unless usage metrics are off; no event is sent per connection or statement |

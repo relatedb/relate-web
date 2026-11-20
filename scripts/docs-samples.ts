@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Runs the docs' verified language samples (```python run, ```js run,
-// ```rust run, ```java run, ```go run, ```swift run and ```c run fences; the
+// ```rust run, ```java run, ```csharp run, ```go run, ```swift run and ```c run fences; the
 // contract is in src/lib/docs/samples.ts and the docs README) against local
 // builds of the relate clients, and compares each sample's output with the
 // result recorded in its page's sidecar (`<page>.results.json`, kind
@@ -12,7 +12,7 @@
 //   node scripts/docs-samples.ts <page>…     only these pages: page ids
 //                                            (get-started/python) or .mdx paths
 //   --lang <lang>[,<lang>…]                  only those languages' samples
-//                                            (python, js, rust, java, go, swift, c)
+//                                            (python, js, rust, java, csharp, go, swift, c)
 //   --require                                fail, instead of skipping, when a
 //                                            selected language's client is not
 //                                            set up (CI)
@@ -218,13 +218,13 @@ if (wantedClients.size && notSetUp.size === wantedClients.size && !args.require)
       `docs:samples: skipped (${total} sample(s) on ${pages.length} page(s); no client set up).`,
       'The samples run against local builds of the relate clients. To build them from the',
       'upstream checkout (macOS or Linux; needs Rust, and per client Python 3.9+, Node 22.13+,',
-      'a C compiler, Go 1.22+, Swift 6 with Xcode; the JDK and Maven are downloaded):',
+      'the .NET 8 SDK, a C compiler, Go 1.22+, Swift 6 with Xcode; the JDK and Maven are downloaded):',
       '',
       `  ${SETUP_COMMAND}`,
       '  source "${XDG_CACHE_HOME:-$HOME/.cache}/relate-web-samples/env.sh"',
       '',
       'env.sh sets the variables each client needs (RELATE_PY, RELATE_NODE and NODE_PATH,',
-      'RELATE_RUST_PROJECT, RELATE_JAVA_CLASSPATH, RELATE_GO_CLIENT, RELATE_SWIFT_PACKAGE,',
+      'RELATE_RUST_PROJECT, RELATE_JAVA_CLASSPATH, RELATE_DOTNET_CLIENT, RELATE_GO_CLIENT, RELATE_SWIFT_PACKAGE,',
       'RELATE_CC, RELATE_LIB, …; scripts/samples/setup.sh describes each).',
     ].join('\n'),
   );

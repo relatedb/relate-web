@@ -94,7 +94,7 @@ printf '%s\n' \
 ```
 
 ```text
-{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"tools":{}},"protocolVersion":"2024-11-05","serverInfo":{"name":"relate-mcp","version":"1.1.0"}}}
+{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"tools":{}},"protocolVersion":"2024-11-05","serverInfo":{"name":"relate-mcp","version":"1.2.0"}}}
 {"jsonrpc":"2.0","id":2,"result":{"content":[{"text":"{\"Person\":{\"count\":3,\"properties\":{\"name\":{\"type\":\"String\"},\"role\":{\"type\":\"String\"}},\"relationships\":{\"KNOWS\":{\"direction\":\"out\",\"labels\":[\"Person\"]},\"MAINTAINS\":{\"direction\":\"out\",\"labels\":[\"Project\"]},\"WORKS_ON\":{\"direction\":\"out\",\"labels\":[\"Project\"],\"properties\":{\"since\":{\"type\":\"Integer\"}}}},\"type\":\"node\"},\"Project\":{\"count\":2,\"properties\":{\"language\":{\"type\":\"String\"},\"name\":{\"type\":\"String\"}},\"type\":\"node\"}}","type":"text"}],"isError":false}}
 ```
 
@@ -259,6 +259,7 @@ relate --database ./team.rl --read-only --mode envelope "EXPLAIN MATCH (p:Person
 | What you see | Cause | Remedy |
 | --- | --- | --- |
 | No rows, and `EXPLAIN` reports `01N50`, `01N51` or `01N52` | The statement names a label, relationship type or property key the store does not have | Send the notification back to the model with the schema text |
+| `EXPLAIN` reports `01N60`, then the run fails with `semantic error: ParameterMissing: Expected parameter(s): <names>`, exit code 6 | The model wrote `$name` parameters, and the run binds none of them | Bind each parameter the notification names with `--param`, or ask the model for literals |
 | `syntax error: ProcedureNotFound: <name>`, exit code 6 | A procedure from a Neo4j library, such as APOC | The Write instead column of [Differences from Neo4j](/docs/reference/cypher/differences-from-neo4j#differences) |
 | `semantic error: DatabaseNotFound: Graph not found: <name>`, exit code 6 | A `USE` clause with a database name; a store has only the fixed namespaces | Drop the `USE` clause; [Namespaces](/docs/concepts/namespaces) explains the three names |
 | `semantic error: WriteOnReadOnlyAccessDatabase: …`, exit code 6, or `Only MATCH queries are allowed for read-query` from MCP | The model wrote a write: the CLI store is open read-only, as configured, and MCP's `read_cypher` refuses writes on any server | Keep it read-only for questions; a write goes through a separate, reviewed path |

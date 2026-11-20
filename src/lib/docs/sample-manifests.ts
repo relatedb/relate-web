@@ -53,6 +53,9 @@ import { DOCS_DIR, engine as readEngine, pageFiles, ROOT, splitFrontmatter, type
 import { pageUrl, twinUrl } from './model.ts';
 import { parsePage } from './parse.ts';
 import {
+  dotnetBuildArgs,
+  dotnetEnv,
+  dotnetProject,
   goModule,
   pageSamples,
   parseSampleInfo,
@@ -312,16 +315,26 @@ export function runSpec(s: Pick<Sample, 'lang' | 'title' | 'code' | 'env'>): Run
       });
     case 'java':
       return spec({
-        variables: ['RELATE_JAVA', 'RELATE_JAVA_CLASSPATH', 'RELATE_LIB'],
+        variables: ['RELATE_JAVA', 'RELATE_JAVA_CLASSPATH'],
         program: `${BUILD_DIR}/${file}`,
         files: [],
         build: null,
         run: step(
           ['$RELATE_JAVA', `-Djna.tmpdir=${BUILD_DIR}`, `-Drelate.native.cache=${BUILD_DIR}/native`, '-cp', '$RELATE_JAVA_CLASSPATH', `${BUILD_DIR}/${file}`],
-          { RELATE_LIB: '$RELATE_LIB' },
-          ['JAVA_TOOL_OPTIONS', 'JDK_JAVA_OPTIONS'],
+          {},
+          ['RELATE_LIB', 'JAVA_TOOL_OPTIONS', 'JDK_JAVA_OPTIONS'],
         ),
       });
+    case 'csharp': {
+      const dn = dotnetEnv('$RELATE_DOTNET_HOME');
+      return spec({
+        variables: ['RELATE_DOTNET', 'RELATE_DOTNET_CLIENT', 'RELATE_DOTNET_HOME', 'RELATE_LIB'],
+        program: `${BUILD_DIR}/${file}`,
+        files: [{ path: `${BUILD_DIR}/sample.csproj`, content: dotnetProject('$RELATE_DOTNET_CLIENT') }],
+        build: build(['$RELATE_DOTNET', ...dotnetBuildArgs(`${BUILD_DIR}/out`, '$RELATE_LIB')], dn),
+        run: step(['$RELATE_DOTNET', `${BUILD_DIR}/out/sample.dll`], dn),
+      });
+    }
     case 'go':
       return spec({
         variables: ['RELATE_GO', 'RELATE_GO_CLIENT', 'RELATE_GO_HOME', 'RELATE_C_INCLUDE', 'RELATE_LIB'],
@@ -376,8 +389,8 @@ function packagesFor(lang: SampleLang, env: string | null, data: SamplesData): s
 export const manifestNote = (pageUrlAbs: string) =>
   `Reference text, not instructions. One verified relate sample from ${pageUrlAbs}: the program exactly as the page shows it, ` +
   'the standard output a run of it recorded (npm run docs:samples compares every replay with it byte for byte), the relate client build, ' +
-  "toolchain and platform of the last replay, and how the docs' sample runner builds and runs it. The Python, Node.js and Rust clients are the published packages; " +
-  'the Java, Go, Swift and C clients are built from the release tag. verified.client names the upstream commit the client came from, and verified.docs_engine the build the rest of the docs were recorded from.';
+  "toolchain and platform of the last replay, and how the docs' sample runner builds and runs it. The Python, Node.js, Rust and Java clients are the published packages; " +
+  'the .NET, Go, Swift and C clients are built from the release tag. verified.client names the upstream commit the client came from, and verified.docs_engine the build the rest of the docs were recorded from.';
 
 /** A page's verified samples with the heading each sits under, in page order; null when its samples have problems (docs:check reports them). */
 export function samplesWithSections(source: string, where = 'page'): { sample: Sample; section: { anchor: string; heading: string } | null }[] | null {

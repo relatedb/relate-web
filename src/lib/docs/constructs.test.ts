@@ -183,7 +183,7 @@ test('matrix: the shipped surfaces file is complete: every feature on every surf
   const d = surfacesData();
   assert.deepEqual(validate(d), []);
   // The shared language order (python, node, browser, rust, c, java, go, swift), after the CLI and before the served surfaces.
-  assert.deepEqual(d.surfaces.map((s) => s.id), ['cli', 'python', 'node', 'browser', 'rust', 'c', 'java', 'go', 'swift', 'bolt', 'http', 'mcp']);
+  assert.deepEqual(d.surfaces.map((s) => s.id), ['cli', 'python', 'node', 'browser', 'rust', 'c', 'java', 'dotnet', 'go', 'swift', 'bolt', 'http', 'mcp']);
   for (const id of ['open-memory', 'open-directory', 'open-rl', 'read-only', 'transactions', 'parameters', 'result-metadata', 'notifications', 'vector-search', 'full-text', 'load-csv', 'load-url', 'agent-mode']) {
     assert.ok(d.features.some((f) => f.id === id), id);
   }

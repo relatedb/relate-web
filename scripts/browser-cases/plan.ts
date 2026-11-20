@@ -68,7 +68,8 @@ const HELPERS = `
   const L = h.querySelector('.element-live');
   const btn = (text) => [...L.querySelectorAll('button')].find((b) => b.textContent.trim() === text);
   const panes = () => [...L.querySelectorAll('.plan-pane')];
-  const ops = (pane) => [...pane.querySelectorAll('.plan-op-name')].map((n) => n.textContent);
+  // The operators that run: a display-only step of an index seek (.plan-op-step) is drawn but is not where the plan starts.
+  const ops = (pane) => [...pane.querySelectorAll('.plan-op:not(.plan-op-step)')].map((d) => d.querySelector('.plan-op-name').textContent);
   const status = () => L.querySelector('.plan-status').textContent;
   const settle = async (before) => { await until(() => status() !== before && !/Running/.test(status()), 60000); await idle(); };
   const press = async (b) => { const before = status(); b.click(); await settle(before); };

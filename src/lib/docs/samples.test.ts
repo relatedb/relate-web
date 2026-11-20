@@ -252,6 +252,7 @@ test('clientEnv: says what is missing', () => {
     js: 'RELATE_NODE is not set',
     rust: 'RELATE_CARGO is not set',
     java: 'RELATE_JAVA is not set',
+    csharp: 'RELATE_DOTNET is not set',
     go: 'RELATE_GO is not set',
     swift: 'RELATE_SWIFT is not set',
     c: 'RELATE_CC is not set',
@@ -262,6 +263,10 @@ test('clientEnv: says what is missing', () => {
   assert.match(noHeader.missing.c!, /holds no relate\.h/);
   const noCp = clientEnv({ RELATE_JAVA: process.execPath, RELATE_LIB: process.execPath, RELATE_JAVA_CLASSPATH: join(scratch, 'absent.jar') });
   assert.match(noCp.missing.java!, /names .*absent\.jar, which does not exist/);
+  const noJavaLib = clientEnv({ RELATE_JAVA: process.execPath, RELATE_JAVA_CLASSPATH: process.execPath });
+  assert.equal(noJavaLib.missing.java, undefined, 'the Java client loads the engine its jar bundles, so it needs no RELATE_LIB');
+  const notCsproj = clientEnv({ RELATE_DOTNET: process.execPath, RELATE_DOTNET_CLIENT: scratch, RELATE_DOTNET_HOME: scratch, RELATE_LIB: process.execPath });
+  assert.match(notCsproj.missing.csharp!, /is not the client's Relate\.Net\.csproj/);
   const noProject = clientEnv({ RELATE_CARGO: process.execPath, RELATE_RUST_PROJECT: scratch });
   assert.match(noProject.missing.rust!, /holds no Cargo\.toml/);
   const pyEnvs = clientEnv({ RELATE_PY_CREWAI: process.execPath, RELATE_PY_GONE: join(scratch, 'nope') });
@@ -333,8 +338,8 @@ test('runSample: a C sample builds against relate.h and the library, and runs in
 });
 
 test('VERSION_PROBES: every language has one; the compiled clients ask the engine', () => {
-  for (const lang of ['python', 'js', 'rust', 'java', 'go', 'swift', 'c'] as const) assert.ok(VERSION_PROBES[lang].length > 0, lang);
-  for (const lang of ['rust', 'java', 'go', 'swift', 'c'] as const) assert.match(VERSION_PROBES[lang], /CALL dbms\.components\(\) YIELD name, versions WHERE name = 'Relate'/);
+  for (const lang of ['python', 'js', 'rust', 'java', 'csharp', 'go', 'swift', 'c'] as const) assert.ok(VERSION_PROBES[lang].length > 0, lang);
+  for (const lang of ['rust', 'java', 'csharp', 'go', 'swift', 'c'] as const) assert.match(VERSION_PROBES[lang], /CALL dbms\.components\(\) YIELD name, versions WHERE name = 'Relate'/);
 });
 
 test('checkSamples: records are checked without a client; a language that is not set up is a warning when others are', () => {

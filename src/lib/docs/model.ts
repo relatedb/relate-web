@@ -19,7 +19,7 @@ export const DOC_TYPES = SECTIONS.map((s) => s.type) as [DocType, ...DocType[]];
 
 /** The front doors a page can apply to (DOCS-PLAN.md §1). */
 export const SURFACES = [
-  'cli', 'python', 'node', 'browser', 'rust', 'c', 'java', 'go', 'swift',
+  'cli', 'python', 'node', 'browser', 'rust', 'c', 'java', 'dotnet', 'go', 'swift',
   'bolt', 'http', 'mcp', 'docker', 'extensions', 'cypher', 'agents',
 ] as const;
 export type Surface = (typeof SURFACES)[number];
@@ -34,11 +34,11 @@ export const GENERATED_FIELDS = ['verified', 'verified_by', 'samples', 'canonica
 /**
  * The checks a page's examples can have passed at the docs' engine version,
  * in the order the twin's generated `verified_by` lists them (DOCS-PLAN.md §6):
- * Cypher cells (docs:check), Python, Node.js, Rust, Java, Go, Swift and C
+ * Cypher cells (docs:check), Python, Node.js, Rust, Java, .NET, Go, Swift and C
  * samples (docs:samples; samples.ts SAMPLE_VERIFIER), and `bash verify`
  * commands (docs:cli-check).
  */
-export const VERIFIERS = ['cypher', 'python', 'node', 'rust', 'java', 'go', 'swift', 'c', 'cli'] as const;
+export const VERIFIERS = ['cypher', 'python', 'node', 'rust', 'java', 'dotnet', 'go', 'swift', 'c', 'cli'] as const;
 export type Verifier = (typeof VERIFIERS)[number];
 
 /** The section a page id belongs to, or null (a page outside the four sections). */

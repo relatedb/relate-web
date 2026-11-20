@@ -18,7 +18,9 @@
 import type { ElementContext, ElementRun } from '../element-api.ts';
 import {
   deltas,
+  executedOps,
   indexName,
+  isFusedStep,
   missingIndex,
   neverExecuted,
   noteHref,
@@ -31,6 +33,7 @@ import {
   type PlacedOp,
   type PlanDoc,
   type PlanNote,
+  type PlanOp,
 } from '../../../lib/docs/elements/_plan-model.ts';
 import { engineMs, formatMs, liveLine, recordedLine, versions } from '../../../lib/docs/elements/_wording.ts';
 // `?inline`: the styles ride in this lazy chunk (a plain import would be hoisted into every docs page).
@@ -133,11 +136,12 @@ export async function mount(ctx: ElementContext) {
     return el('div', { className: 'plan-metric' }, el('dt', { textContent: label }), el('dd', {}, el('span', { className: 'plan-track' }, bar), el('span', { className: 'plan-num', textContent: text })));
   }
 
-  function opItem(p: PlacedOp, kids: Map<PlacedOp, PlacedOp[]>, max: { rows: number; time: number; hits: number }): HTMLLIElement {
+  function opItem(p: PlacedOp, kids: Map<PlacedOp, PlacedOp[]>, max: { rows: number; time: number; hits: number }, parent: PlanOp | null = null): HTMLLIElement {
     const { op } = p;
+    const step = isFusedStep(op, parent);
     const head = el('div', { className: 'plan-op-head' }, el('span', { className: 'plan-op-name', textContent: op.operator }), el('span', { className: 'plan-op-id', textContent: `Id ${p.id}` }));
     if (op.estimated_rows !== null && op.estimated_rows !== undefined) head.append(el('span', { className: 'plan-op-est', textContent: `estimated ${plural(op.estimated_rows, 'row')}` }));
-    const row = el('div', { className: 'plan-op' }, head);
+    const row = el('div', { className: step ? 'plan-op plan-op-step' : 'plan-op' }, head);
     if (op.details) row.append(el('code', { className: 'plan-op-details', textContent: op.details }));
     // The engine files these notifications under the operator, but their severity is its own (the three plan warnings are INFORMATION).
     // The word is the channel; the colour follows it, and only a WARNING or an ERROR takes --danger.
@@ -158,12 +162,14 @@ export async function mount(ctx: ElementContext) {
         );
         row.append(dl);
       }
+    } else if (step) {
+      row.append(el('p', { className: 'plan-op-never', textContent: 'A step of the operator above, shown for reading; it runs and is measured as part of that operator.' }));
     } else if (panes.some((x) => x.plan.profiled)) {
       row.append(el('p', { className: 'plan-op-never', textContent: 'No measures: the engine recorded none for this operator.' }));
     }
     const li = el('li', {}, row);
     const children = kids.get(p) ?? [];
-    if (children.length) li.append(el('ol', { className: 'plan-tree' }, ...children.map((c) => opItem(c, kids, max))));
+    if (children.length) li.append(el('ol', { className: 'plan-tree' }, ...children.map((c) => opItem(c, kids, max, op))));
     return li;
   }
 
@@ -338,7 +344,7 @@ export async function mount(ctx: ElementContext) {
     const r = await run(planned(mode));
     if (r.error) return `The engine refused the statement: ${r.error}`;
     panes = [paneOf(r, 'The plan', mode.toLowerCase())];
-    return `${liveLine({ version: versions(page).live, ms: r.envelopes.at(-1)?.elapsed_ms })} ${mode}: ${plural(preOrder(panes[0].plan.root).length, 'operator')}, ${plural(panes[0].notes.length, 'notification')}.`;
+    return `${liveLine({ version: versions(page).live, ms: r.envelopes.at(-1)?.elapsed_ms })} ${mode}: ${plural(executedOps(panes[0].plan.root).length, 'operator')}, ${plural(panes[0].notes.length, 'notification')}.`;
   }
 
   /**

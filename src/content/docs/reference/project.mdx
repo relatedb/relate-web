@@ -2,11 +2,11 @@
 title: Project
 description: relate's license, how it takes contributions, what versions and preview features promise, how releases are cut, and the platforms each artifact runs on.
 order: 80
-surfaces: [cli, python, node, browser, rust, java, go, swift, c]
+surfaces: [cli, python, node, browser, rust, java, dotnet, go, swift, c]
 related: [reference/changelog, reference/security, reference/privacy-and-telemetry, get-started/install, reference/limitations]
 ---
 
-relate is open source under the Apache License 2.0. It follows semantic versioning, with 1.0.0 as its first stable release, and every change that can break working code is marked in the changelog. Releases are cut by hand and signed; the CLI ships for macOS, Linux, and Windows, and the clients cover Python, Node.js, the browser, Rust, Java, Go, Swift, and C. This page records those facts and where each comes from.
+relate is open source under the Apache License 2.0. It follows semantic versioning, with 1.0.0 as its first stable release, and every change that can break working code is marked in the changelog. Releases are cut by hand and signed; the CLI ships for macOS, Linux, and Windows, and the clients cover Python, Node.js, the browser, Rust, Java, .NET, Go, Swift, and C. This page records those facts and where each comes from.
 
 ## Synopsis
 
@@ -14,7 +14,7 @@ relate is open source under the Apache License 2.0. It follows semantic versioni
 | --- | --- |
 | License | Apache License 2.0 |
 | Source | [github.com/relatedb/relate](https://github.com/relatedb/relate), public |
-| Version these pages track | 1.1.0 |
+| Version these pages track | 1.2.0 |
 | Stability | 1.0.0 is the first stable release; a breaking change comes with a new major version and is marked |
 | Contributions | Issues; no pull requests from outside the maintainer team |
 | Release cadence | None published |
@@ -28,7 +28,7 @@ relate --version
 ```
 
 ```text
-Relate v1.1.0
+Relate v1.2.0
 License: Apache 2.0 (binary)
 ```
 
@@ -96,24 +96,26 @@ The project publishes no release cadence and no support period for older release
 | Python client, `relate-db` | Yes | Yes | Yes | Yes | Yes | Python 3.9 or later |
 | Node.js client, `@relate/relate` | Yes | Yes | Yes | Yes | Yes | Node.js 18 or later |
 | Java client, `ai.relatedb:relate` | Yes | Yes | Yes | Yes | Yes | Java 17 or later; the native library is in the jar |
+| .NET client, `Relate.Net` | Yes | Yes | Yes | Yes | Yes | .NET 8 or later, and the C library for the target; the client is built from the release tag |
 | Go client | Yes | Yes | Yes | Yes | Yes | cgo, and the C library for the target; on Windows, a MinGW import library generated from the DLL |
 | C library, `relate-ffi-<target>.tar.gz` (`cypherlite-ffi-<target>.tar.gz` up to and including 0.16.1) | Yes | Yes | Yes | Yes | Yes | — |
 | Swift package, `Relate` | Yes | Yes | — | — | — | macOS 13 or later; iOS 16 or later |
 
 Releases up to and including 0.16.1 were published under the project's earlier name, cypherlite, with `cypherlite-<os>-<arch>` binaries; the first release named relate restarted the version numbers at 0.1.0. The Swift package also builds for iOS devices (arm64) and the iOS simulator. The browser package, `@relate/relate-wasm`, is a WebAssembly build that runs in the browser on any of these systems; a durable browser :term[store]{id=store} needs a dedicated worker and the origin private file system. The Rust crate, `relate`, builds from source with Rust 1.88 or later. No artifact is built for another operating system or architecture.
 
-Each release publishes the packages below at its version, from the same commit as the release downloads. As of 1.1.0:
+Each release publishes the packages below at its version, from the same commit as the release downloads. As of 1.2.0:
 
 | Registry | Name | Install |
 | --- | --- | --- |
 | PyPI | `relate-db` (`import relate`): wheels for the five platforms above and a source distribution | `pip install relate-db` |
 | npm | `@relate/relate`, with its engine in a platform package, `@relate/relate-<platform>-<arch>`, which npm picks; `@relate/relate-wasm` for the browser | `npm install @relate/relate` |
 | crates.io | `relate`, with the crates it depends on at the same version | `cargo add relate` |
-| Go modules | `github.com/relatedb/relate/clients/go`, resolved from the repository; as of relate 1.0.2 each release tags the module `clients/go/v<version>` | `go get github.com/relatedb/relate/clients/go@v1.1.0` |
-| SwiftPM | `Relate`, from `github.com/relatedb/relate` at the release tag | `.package(url: "https://github.com/relatedb/relate", from: "1.1.0")` |
+| Maven Central | `ai.relatedb:relate` (package `ai.relatedb`), from 1.2.0 on: the jar with the engine for all five platforms, one classifier jar per platform, and its sources and Javadoc | The `ai.relatedb:relate:1.2.0` dependency ([Java guide](/docs/guides/embed/java#add-the-client)) |
+| Go modules | `github.com/relatedb/relate/clients/go`, resolved from the repository; as of relate 1.0.2 each release tags the module `clients/go/v<version>` | `go get github.com/relatedb/relate/clients/go@v1.2.0` |
+| SwiftPM | `Relate`, from `github.com/relatedb/relate` at the release tag | `.package(url: "https://github.com/relatedb/relate", from: "1.2.0")` |
 | Release downloads | `github.com/relatedb/relate/releases`: the CLI binaries, the C libraries, the Java jars and the Swift XCFramework | [Install relate](/docs/get-started/install) |
 
-`ai.relatedb:relate` is not on Maven Central: the Java jars are release downloads only, and a Maven or Gradle build installs the jar into its local repository ([Java guide](/docs/guides/embed/java)).
+The .NET client, `Relate.Net`, is on no registry: an application references `clients/dotnet/src/Relate.Net/Relate.Net.csproj` from a checkout of the release tag and takes the engine from the `relate-ffi-<target>.tar.gz` release download ([.NET guide](/docs/guides/embed/dotnet#add-the-client)). The `Relate.Net` package on NuGet is a community package that predates it, not this client.
 
 ## Questions and bug reports
 

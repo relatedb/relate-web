@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.1.0",
+  "verified": "1.2.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -150,7 +150,26 @@
             "children": [
               {
                 "actual": null,
-                "children": [],
+                "children": [
+                  {
+                    "actual": null,
+                    "children": [],
+                    "details": "RANGE INDEX p:Person(name) WHERE name = 'Ada'",
+                    "estimated_rows": 1,
+                    "identifiers": [],
+                    "operator": "NodeIndexSeek",
+                    "warnings": []
+                  },
+                  {
+                    "actual": null,
+                    "children": [],
+                    "details": "(p:Person)-[:WORKS_ON]->(proj:Project)",
+                    "estimated_rows": 2,
+                    "identifiers": [],
+                    "operator": "Expand",
+                    "warnings": []
+                  }
+                ],
                 "details": "RANGE INDEX p:Person(name) WHERE name = 'Ada', (p:Person)-[:WORKS_ON]->(proj:Project)",
                 "estimated_rows": 1,
                 "identifiers": [],
