@@ -1,0 +1,273 @@
+---
+title: .NET API
+label: .NET
+description: The .NET client's types and their members, the Cypher and .NET value mapping in both directions, the exceptions and codes, and the native library.
+order: 75
+surfaces: [dotnet]
+related: [guides/embed/dotnet, get-started/dotnet, reference/api, reference/api/c, reference/errors, concepts/problems-relate-solves#embedded-graph-in-an-app]
+---
+
+The .NET :term[client]{id=client} is `Relate.Net`, namespace `Relate.Net`, for .NET 8 or later and usable from C#, F# and Visual Basic. It calls the relate C library, `librelate_ffi`, through source-generated P/Invoke; the library's C application binary interface (C ABI) is version 2. It has no package dependencies, and it is on no registry: an application references `clients/dotnet/src/Relate.Net/Relate.Net.csproj` from a checkout of the release tag. Every call has a synchronous form, and most an async one. This page describes the client of relate 1.2.0, the first release that ships it.
+
+## Synopsis
+
+```csharp
+namespace Relate.Net;
+
+public sealed class RelateDatabase : IDisposable, IAsyncDisposable
+{
+    public const string InMemory = ":memory:";
+    public const string DefaultNamespace = "neo4j";
+    public static int NativeAbiVersion { get; }
+    public static RelateDatabase Open(string location);
+    public static RelateDatabase OpenInMemory();
+    public static RelateDatabase OpenReadOnly(string location);
+    public static Task<RelateDatabase> OpenAsync(string location, CancellationToken cancellationToken = default);
+    public string Location { get; }
+    public bool IsReadOnly { get; }
+    public bool IsDisposed { get; }
+    public RelateConnection Connect(string? @namespace = null);
+    public void Checkpoint();
+    public Task CheckpointAsync(CancellationToken cancellationToken = default);
+}
+
+public sealed class RelateConnection : IDisposable, IAsyncDisposable
+{
+    public RelateDatabase Database { get; }
+    public string Namespace { get; }
+    public RelateTransaction? CurrentTransaction { get; }
+    public bool IsDisposed { get; }
+    public QueryResult Query(string cypher, object? parameters = null);
+    public Task<QueryResult> QueryAsync(string cypher, object? parameters = null, CancellationToken cancellationToken = default);
+    public void ChangeNamespace(string @namespace);
+    public RelateTransaction BeginTransaction();
+    public Task<RelateTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
+}
+
+public sealed class RelateTransaction : IDisposable, IAsyncDisposable
+{
+    public RelateConnection Connection { get; }
+    public bool IsActive { get; }
+    public QueryResult Query(string cypher, object? parameters = null);
+    public Task<QueryResult> QueryAsync(string cypher, object? parameters = null, CancellationToken cancellationToken = default);
+    public Bookmark? Commit();
+    public Task<Bookmark?> CommitAsync(CancellationToken cancellationToken = default);
+    public void Rollback();
+    public Task RollbackAsync(CancellationToken cancellationToken = default);
+}
+```
+
+## Public types
+
+| Type | Kind | Holds |
+| --- | --- | --- |
+| `RelateDatabase` | class, `IDisposable`, `IAsyncDisposable` | An open store |
+| `RelateConnection` | class, `IDisposable`, `IAsyncDisposable` | One session on a store |
+| `RelateTransaction` | class, `IDisposable`, `IAsyncDisposable` | One explicit transaction on a connection |
+| `QueryResult` | class, `IReadOnlyList<RelateRecord>` | One statement's records and metadata |
+| `RelateRecord` | class, `IReadOnlyDictionary<string, object?>` | One row, by column name or index |
+| `Node`, `Relationship` | classes deriving from `GraphEntity` | A node or relationship, with its element id and properties |
+| `GraphPath` | class | `Nodes`, `Relationships`, `Start`, `End`, `Length` |
+| `CypherPoint`, `CypherDuration`, `CypherOffsetTime`, `CypherZonedDateTime` | structs | The spatial and temporal values .NET has no type for |
+| `CypherVector` | class | A typed vector |
+| `VectorElementType` | enum | `Integer8`, `Integer16`, `Integer32`, `Integer64`, `Float16`, `BFloat16`, `Float32`, `Float64` |
+| `QueryType` | enum | `Read`, `Write`, `ReadWrite`, `Schema` |
+| `QueryCounters`, `QueryTimings`, `Notification` | classes | A result's counters, timings and notifications |
+| `Bookmark` | class, `IComparable<Bookmark>` | A commit's place in the store's history |
+| `UnsupportedValue` | class | A value of a kind this client does not know, with its `KindCode` |
+| `RelateException` | class, derives from `Exception` | An engine failure, with its codes |
+| `ErrorStage` | enum | `Unknown`, `Compile`, `Runtime`, `Internal` |
+
+## RelateDatabase
+
+| Member | Returns | Behavior |
+| --- | --- | --- |
+| `Open(location)` | `RelateDatabase` | Opens `:memory:`, a directory store or a `.rl` store for writing; creates a missing store |
+| `OpenInMemory()` | `RelateDatabase` | A fresh in-memory store; the same as `Open(RelateDatabase.InMemory)` |
+| `OpenReadOnly(location)` | `RelateDatabase` | Loads an existing store once; refuses writes and checkpoints; a missing store is an error |
+| `OpenAsync(location, token)` | `Task<RelateDatabase>` | `Open` on a thread-pool thread; the token applies before it starts |
+| `Connect(namespace)` | `RelateConnection` | A connection in `neo4j` (the default) or `system`, matched case-insensitively. `system_ontologies` exists only with `RELATE_PREVIEW=ontology` set before the open |
+| `Checkpoint()`, `CheckpointAsync(token)` | — | Writes a :term[checkpoint]{id=checkpoint}, folding the write-ahead log into a fresh snapshot; nothing for an in-memory store; refused on a read-only database |
+| `Dispose()`, `DisposeAsync()` | — | Disposes every connection of the database, then closes the store; idempotent |
+| `NativeAbiVersion` | `int` | The C ABI version of the loaded library, checked to be 2 |
+
+A failed `Open` or `OpenReadOnly` throws `RelateException` with message `internal error`, code `Neo.DatabaseError.General.UnknownError`, GQLSTATUS `42000` and stage `Internal`, whether the store is locked by another writer or missing. An unknown namespace throws `RelateException`: `semantic error: DatabaseNotFound: Graph not found: <name>`, GQLSTATUS `42N00`.
+
+## RelateConnection
+
+| Member | Returns | Behavior |
+| --- | --- | --- |
+| `Query(cypher, parameters)` | `QueryResult` | Runs one statement; joins the open transaction when there is one, else commits on its own |
+| `QueryAsync(cypher, parameters, token)` | `Task<QueryResult>` | `Query` on a thread-pool thread; the token applies while it waits to start |
+| `ChangeNamespace(namespace)` | — | Changes the session namespace; refused inside a transaction |
+| `BeginTransaction()`, `BeginTransactionAsync(token)` | `RelateTransaction` | Opens an explicit transaction; a second one throws `InvalidOperationException` |
+| `CurrentTransaction` | `RelateTransaction?` | The open transaction, or `null` |
+| `Dispose()`, `DisposeAsync()` | — | Rolls back an open transaction and disconnects; idempotent |
+
+A connection runs one native call at a time and queues concurrent callers; a database can be shared across threads, and parallel work uses one connection per worker. `ChangeNamespace` inside a transaction throws `RelateException`: `semantic error: TransactionError: Cannot change the namespace while a transaction is open.` A call on a disposed connection or database throws `ObjectDisposedException`.
+
+## RelateTransaction
+
+| Member | Returns | Behavior |
+| --- | --- | --- |
+| `Query`, `QueryAsync` | `QueryResult` | As on the connection, inside this transaction |
+| `Commit()`, `CommitAsync(token)` | `Bookmark?` | Commits; returns the :term[bookmark]{id=bookmark}, or `null` when the transaction wrote nothing |
+| `Rollback()`, `RollbackAsync(token)` | — | Discards the transaction's writes |
+| `IsActive` | `bool` | Whether this is still its connection's `CurrentTransaction` |
+| `Dispose()`, `DisposeAsync()` | — | Rolls back when still active; never throws |
+
+A call on a transaction after it committed or rolled back throws `InvalidOperationException`: `The transaction has already been committed or rolled back.` A statement that fails inside a transaction marks it for rollback, and every later statement and `Commit()` throw `semantic error: transaction failed; rollback required`. A failed `Commit()` has ended the transaction in the engine; in relate 1.2.0 the connection still reports it as `CurrentTransaction`, so a later `BeginTransaction()` on that connection throws, and the next attempt needs a new connection.
+
+## QueryResult and RelateRecord
+
+`QueryResult` holds every record, copied out of the engine before `Query` returns, so it outlives its connection and database.
+
+| Member | Returns |
+| --- | --- |
+| `Count`, indexer, enumeration | The records, in order |
+| `Columns` | The column names, in `RETURN` order |
+| `Scalar<T>()` | The first column of the first record as `T`; an empty result throws `InvalidOperationException` |
+| `QueryType` | `Read`, `Write` (a write with no columns), `ReadWrite` (a write with columns) or `Schema`; `EXPLAIN` and `PROFILE` report the wrapped statement's type |
+| `Namespace` | The statement's `USE` target, else the session namespace |
+| `Counters` | `NodesCreated`, `NodesDeleted`, `RelationshipsCreated`, `RelationshipsDeleted`, `PropertiesSet`, `LabelsAdded`, `LabelsRemoved`, `IndexesAdded`, `IndexesRemoved`, `ConstraintsAdded`, `ConstraintsRemoved`, `ContainsUpdates` |
+| `Bookmark` | An auto-commit write's bookmark; `null` for a read and for a statement inside a transaction |
+| `Notifications` | The planner's notifications, from `EXPLAIN` and `PROFILE` |
+| `PlanJson` | The `relate.plan/v1` plan document as a JSON string under `EXPLAIN` or `PROFILE`; `null` otherwise |
+| `Timings` | `Elapsed`, `Parse`, `Plan` and `Execute`, as `TimeSpan` values |
+
+`RelateRecord` reads a value by column name or index as `object?`, or converted with `Get<T>(name)` and `Get<T>(index)`; it also has `Keys`, `Values`, `ContainsKey` and `TryGetValue`. A missing column name throws `KeyNotFoundException`, whose message lists the columns. `Get<T>()` converts between numeric types with an overflow check, a list to an array, `List<T>` or another list interface, a map to a dictionary, a string to a `Guid`, `char` or enum, a `CypherZonedDateTime` to a `DateTimeOffset`, a `CypherDuration` with no months to a `TimeSpan`, and a `CypherVector` to a `float[]`, `double[]` or `long[]`; anything else throws `InvalidCastException`.
+
+## Values
+
+Each result value is decoded into one .NET type per Cypher kind:
+
+| Cypher kind | .NET type |
+| --- | --- |
+| `NULL` | `null` |
+| `BOOLEAN` | `bool` |
+| `INTEGER` | `long` |
+| `FLOAT` | `double`, NaN and infinities included |
+| `STRING` | `string` |
+| `LIST` | `IReadOnlyList<object?>` |
+| `MAP` | `IReadOnlyDictionary<string, object?>`, in engine order |
+| node | `Node`: `ElementId`, `Id` (deprecated), `Labels`, `Properties`, `HasLabel`, `Get<T>` |
+| relationship | `Relationship`: `ElementId`, `Id`, `Type`, `StartNodeElementId`, `EndNodeElementId`, `Properties`, `Get<T>` |
+| path | `GraphPath` |
+| `DATE`, `LOCAL TIME`, `LOCAL DATETIME` | `DateOnly`, `TimeOnly`, `DateTime` with `Kind` `Unspecified` |
+| `ZONED TIME` | `CypherOffsetTime`: `Time` and `Offset` |
+| `ZONED DATETIME` | `DateTimeOffset` when the value has only an offset; `CypherZonedDateTime` (a `DateTimeOffset` and a `ZoneId`) when it has a zone |
+| `DURATION` | `CypherDuration`: `Months`, `Days`, `Seconds`, `Nanoseconds`; `duration('P1Y2M')` has `Months` 14 |
+| `POINT` | `CypherPoint`: `Srid`, `X`, `Y`, `Z` (`null` in 2D) |
+| `VECTOR` | `CypherVector`: its `VectorElementType` and coordinates |
+| a kind this client does not know | `UnsupportedValue` |
+
+.NET temporal types count in 100-nanosecond ticks and cover years 1 to 9999: digits below a tick are dropped, a date outside that range throws `OverflowException`, and `CypherDuration` keeps whole nanoseconds. A `Node` or `Relationship` equals another with the same element id. An :term[element id]{id=element-id} is the string `elementId()` returns, such as `4:rl-id:n0`.
+
+## Parameters
+
+`parameters` is an anonymous object or any other object, whose public readable properties are the names; a string-keyed `IDictionary` or `IReadOnlyDictionary`; or an F# map. `null` binds none. Each value crosses as one Cypher value:
+
+| .NET type | Binds as |
+| --- | --- |
+| `null`, `DBNull` | `NULL` |
+| `bool` | `BOOLEAN` |
+| `sbyte`, `byte`, `short`, `ushort`, `int`, `uint`, `long`, and `ulong` up to `long.MaxValue` | `INTEGER` |
+| `float`, `double`, `decimal` | `FLOAT`; a `decimal` converts to `double` |
+| `string`, `char`, `Guid`, an enum | `STRING`; a `Guid` in its `D` form, an enum by its name |
+| `DateOnly`, `TimeOnly` | `DATE`, `LOCAL TIME` |
+| `DateTime` | `ZONED DATETIME` at `+00:00` when its `Kind` is `Utc`, else `LOCAL DATETIME` |
+| `DateTimeOffset`, `CypherZonedDateTime`, `CypherOffsetTime` | `ZONED DATETIME` with its offset or zone, `ZONED TIME` |
+| `TimeSpan`, `CypherDuration` | `DURATION` |
+| `CypherPoint`, `CypherVector` | `POINT`, `VECTOR` |
+| `byte[]`, any other `IEnumerable` | `LIST` |
+| a dictionary or any other object | `MAP`, nested up to 64 levels |
+
+A `ulong` greater than `long.MaxValue` throws `ArgumentOutOfRangeException`. A `Node`, `Relationship` or `GraphPath` throws `ArgumentException`: pass its `ElementId` and match on `elementId()`. A value the engine refuses, such as an unknown zone in a `CypherZonedDateTime`, throws `ArgumentException` naming the parameter path, with the engine's `RelateException` as its `InnerException`. A statement that refers to a parameter it was not given fails with `semantic error: ParameterMissing: Expected parameter(s): <names>`, GQLSTATUS `42N02`.
+
+## Errors
+
+| Exception | Thrown when |
+| --- | --- |
+| `RelateException` | The engine refused or failed a statement, an open, a commit or a namespace |
+| `ArgumentException`, `ArgumentNullException`, `ArgumentOutOfRangeException` | A parameter or argument the client can't send, a string argument holding a NUL character, a `null` statement or location |
+| `InvalidOperationException` | A second open transaction, a transaction used after it ended, `Scalar<T>()` on an empty result |
+| `ObjectDisposedException` | A call on a disposed database or connection |
+| `InvalidCastException`, `OverflowException`, `KeyNotFoundException` | A `Get<T>()` conversion or a column name that fails |
+| `DllNotFoundException`, `BadImageFormatException`, `NotSupportedException` | The library is missing, built for another architecture, or of another C ABI version |
+
+`RelateException` has these properties:
+
+| Property | Holds |
+| --- | --- |
+| `Message` | The engine's message |
+| `Code` | The Neo4j status code, such as `Neo.ClientError.Statement.ArithmeticError` |
+| `GqlStatus` | The five-character GQLSTATUS, such as `22G03` |
+| `Stage` | `Compile` (parse or plan), `Runtime` (execution) or `Internal` (the C boundary) |
+| `IsRetryable` | `true` exactly when running the same work again can succeed: a write-write :term[conflict]{id=conflict}, `Neo.TransientError.Transaction.Outdated` |
+
+A write on a read-only database throws with code `Neo.ClientError.Statement.SemanticError` and GQLSTATUS `42N18`. For a storage or internal failure the message is a fixed `internal error`; `RELATE_FFI_LOG=1`, set before the process starts, logs the detail to standard error. The [errors reference](/docs/reference/errors) lists the engine's messages.
+
+## Notifications, plans and bookmarks
+
+`Notification` has `Code`, `GqlStatus`, `Severity`, `Category`, `Title`, `Description`, `Remedy` and `OperatorId`, which is `null` on a statement-scoped notification. `PlanJson` is the plan document the other surfaces return as an object; parse it with `System.Text.Json`.
+
+`Bookmark` has `Value`, the string `relate:<n>`, and `Sequence`, the `long` `<n>`. `Bookmark.Parse` and `Bookmark.TryParse` read one from its string. Bookmarks compare, order and hash by `Sequence`, which grows across every connection of the store: as strings, `relate:10` sorts before `relate:9`.
+
+## Native library
+
+The build copies the library from the MSBuild property `RelateNativeLibraryPath` into the output and publish folders, and the client loads it from there through .NET's standard native library resolution; no library is downloaded at build or run time.
+
+| Property | Default | Effect |
+| --- | --- | --- |
+| `RelateNativeLibraryPath` | `<checkout>/target/debug/` and the library's name, for the build host | The library to copy: one from the release's `relate-ffi-<target>.tar.gz` archive, or one built with `cargo build -p relate-ffi` |
+| `RelateNativeRuntimeIdentifier` | The SDK's host runtime identifier | The platform the library is for: `win-x64`, `linux-x64`, `linux-arm64`, `osx-x64` or `osx-arm64`; another platform needs `RelateNativeLibraryPath` set |
+
+| Platform | Library |
+| --- | --- |
+| macOS | `librelate_ffi.dylib` |
+| Linux | `librelate_ffi.so` |
+| Windows | `relate_ffi.dll` |
+
+A build with no library at the path stops with `Build the current native library first: cargo build -p relate-ffi. Or pass -p:RelateNativeLibraryPath=/absolute/path/to/the/native/library.` `dotnet pack` makes a local package for one runtime identifier, not a package for every platform.
+
+## Limits
+
+The limits come from the engine and are the same on every surface: a statement's text is at most 4194304 bytes, a parameter list or map holds at most 100,000 entries, and a file-backed store has one writing open across every process. A running statement can't be cancelled. [Limits and sizing](/docs/reference/storage/limits-and-sizing) lists each limit with its default and the setting that changes it.
+
+## Capabilities
+
+<Matrix columns={["dotnet"]} />
+
+## Example
+
+This program writes two `Person` nodes and a `KNOWS` relationship to an in-memory store and prints the .NET type of each returned value:
+
+```csharp run name=values
+using Relate.Net;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+var row = conn.Query("""
+    CREATE (ada:Person {name: 'Ada'})-[k:KNOWS {since: 2024}]->(grace:Person {name: 'Grace'})
+    RETURN ada, k, 9007199254740993 AS big, 1.5 AS ratio, date('2024-05-06') AS day,
+           datetime('2024-05-06T09:30:00+02:00') AS offset, datetime('2024-05-06T09:30:00[Europe/Berlin]') AS meeting,
+           time('09:30+02:00') AS slot, duration('P1Y2M') AS term, point({x: 1, y: 2}) AS spot,
+           vector([1, 2, 3], 3, INT8) AS counts, [1, 'a'] AS list, {k: 1} AS map
+    """)[0];
+foreach (var (column, value) in row)
+{
+    Console.WriteLine($"{column}: {value?.GetType().Name}");
+}
+Console.WriteLine(row.Get<CypherZonedDateTime>("meeting").ZoneId);
+Console.WriteLine(row.Get<CypherDuration>("term").Months);
+Console.WriteLine(row.Get<CypherVector>("counts").ElementType);
+```
+
+## See also
+
+- [Use the .NET client](/docs/guides/embed/dotnet): the project reference, open modes, parameters, transactions and errors, task by task.
+- [Embed relate in a .NET app](/docs/get-started/dotnet): the first program, step by step.
+- [API reference](/docs/reference/api): every surface and the capability matrix.
+- [C ABI](/docs/reference/api/c): the library this client calls.
+- [Errors](/docs/reference/errors): every engine message with its codes.
+- [Embedded graph in an app](/docs/concepts/problems-relate-solves#embedded-graph-in-an-app): the problem the clients solve.

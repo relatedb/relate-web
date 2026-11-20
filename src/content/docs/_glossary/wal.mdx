@@ -8,7 +8,7 @@ see: reference/storage/wal-and-checkpoints
 related: ["checkpoint", "snapshot", "durability-mode"]
 ---
 
-The write-ahead log (WAL) is a series of segment files, `00000001.log` and on, in a folder of the store: `wal/` by default, `.cypherlite/wal/` with the `markdown` codec, or wherever `--wal-dir` points for a directory store. A single-file store keeps its WAL inside the `.rl` file. Each commit appends one record holding its physical changes, never Cypher text, so replay never re-runs a statement.
+The write-ahead log (WAL) is a series of segment files, `00000001.log` and on, in a folder of the store: `wal/` by default, `.relate/wal/` with the `markdown` codec, or wherever `--wal-dir` points for a directory store. A single-file store keeps its WAL inside the `.rl` file. Each commit appends one record holding its physical changes, never Cypher text, so replay never re-runs a statement.
 
 Opening a store loads the :term[snapshot]{id=snapshot}, then replays the records written after it. A :term[checkpoint]{id=checkpoint} folds the log into a new snapshot and deletes the segments it covers.
 

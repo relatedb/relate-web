@@ -542,11 +542,11 @@ A new element is a decision: an ADR and a row here.
 ### Verified samples
 
 A ```` ```<lang> run ```` fence, where `<lang>` is `python`, `js`, `rust`,
-`java`, `go`, `swift` or `c`, is a sample: a whole program that runs against
+`java`, `csharp`, `go`, `swift` or `c`, is a sample: a whole program that runs against
 the relate client for that language, and whose output the page shows. Each
 sample runs on its own, in a fresh temporary directory that is its working
 directory, so a relative store path such as `./app.rl` lands there. A
-compiled sample (Rust, Java, Go, Swift, C) is built in a second temporary
+compiled sample (Rust, Java, C#, Go, Swift, C) is built in a second temporary
 directory, so its working directory starts empty. A sample passes when it
 exits 0 and prints at least one line; print only what is the same on every
 run (no timings, ids or absolute paths).
@@ -567,6 +567,7 @@ print(db.execute("MATCH (p:Person) RETURN p.name AS name").data[0]["name"])
 | ```` ```js run ```` | `sample.cjs`, or `sample.mjs` with an `import` or `export` statement | `RELATE_NODE`, `NODE_PATH` | `@relate/relate` and the installed frameworks |
 | ```` ```rust run ```` | `main.rs` | `cargo build --release --locked --offline` from the template in `RELATE_RUST_PROJECT` | `use relate::…` and the standard library |
 | ```` ```java run ```` | `Main.java` | `java <file>` (a single-file source program) on `RELATE_JAVA_CLASSPATH` | `ai.relatedb.*` and the JDK |
+| ```` ```csharp run ```` | `Program.cs` | `dotnet build` of a `net8.0` console project that references `RELATE_DOTNET_CLIENT`, then `dotnet` on the built assembly | `Relate.Net` and the base class library |
 | ```` ```go run ```` | `main.go` | `go build` in a module that replaces the client with `RELATE_GO_CLIENT`; `GOPROXY=off` | `relate "github.com/relatedb/relate/clients/go"` and the standard library |
 | ```` ```swift run ```` | `main.swift` | `swift build` of a package that depends on `.product(name: "Relate", package: "relate")` | `import Relate` |
 | ```` ```c run ```` | `sample.c` | `RELATE_CC` with `relate.h`, linked with `-lrelate_ffi` | `relate.h` and the C library |
@@ -580,7 +581,7 @@ a cell's.
 The output is recorded in the page's sidecar beside the cells' results,
 keyed by the sample's id, with `"kind": "text"`, the client version that
 ran it in `verified` (the engine version from `CALL dbms.components()` for
-the Java, Go, Swift and C clients), and a SHA-256 of the program
+the Rust, Java, .NET, Go, Swift and C clients), and a SHA-256 of the program
 (`source_sha256`). The recorder writes it; do not edit it by hand. A sample
 whose code changed since its record fails `docs:check` and drops its
 language from the twin's `verified_by` until it is recorded again.
@@ -589,7 +590,7 @@ language from the twin's `verified_by` until it is recorded again.
 build, run or print its record; `-- --record` rewrites the records, `--
 --lang rust,go` limits the languages, and `-- --clients` prints each
 client's version. It needs the clients: `bash scripts/samples/setup.sh
---upstream <path to the relate checkout>` builds all seven outside both
+--upstream <path to the relate checkout>` sets up all eight outside both
 repositories (`--skip-<lang>` leaves one out; Swift on macOS only; the JDK
 and Maven it downloads are checked against their published digests) and
 writes `env.sh` with the variables it reads. A language whose variables are
@@ -786,7 +787,7 @@ To allow writes, remove `--read-only`.
 
 Only shipped behavior, verified against the relate binary the data files
 name (`recorded_with`) or the WASM build the site ships (`AGENTS.md`). That
-binary is a published release (today v1.1.0), installed through
+binary is a published release (today v1.2.0), installed through
 `install.sh`; each release re-records everything (`AGENTS.md` §4). Quote
 error messages, flags and JSON keys character for character. The one part of
 an output that changes from run to run, a timing value (the number after a

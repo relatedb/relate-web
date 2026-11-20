@@ -8,7 +8,7 @@ see: reference/storage/wal-and-checkpoints
 related: ["snapshot", "wal", "durability-mode"]
 ---
 
-A checkpoint writes the committed graph to the store's :term[snapshot]{id=snapshot} files, rewrites the schema text copy under `.cypherlite/schema/`, and deletes the :term[WAL]{id=wal} segments the new snapshot covers. It bounds two things: how much WAL an open has to replay, and how much space the WAL takes on disk.
+A checkpoint writes the committed graph to the store's :term[snapshot]{id=snapshot} files, rewrites the schema text copy under `.relate/schema/`, and deletes the :term[WAL]{id=wal} segments the new snapshot covers. It bounds two things: how much WAL an open has to replay, and how much space the WAL takes on disk.
 
 Three triggers run one. A timer fires every 300 seconds by default; `--checkpoint-interval-secs` or `RELATE_CHECKPOINT_INTERVAL_SECS` sets the period, and `0` turns off the timer only. A clean exit checkpoints. The shell's `.checkpoint` dot command checkpoints at once and prints nothing on success. A `--read-only` open never checkpoints.
 

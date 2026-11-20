@@ -123,6 +123,26 @@ export function preOrder(root: PlanOp): PlacedOp[] {
   return out;
 }
 
+/**
+ * A display-only step of an index-seek `MATCH` (relate 1.2.0, upstream
+ * ADR-0622): the seek on the index, then one `Expand` per hop, listed after
+ * the seek operator's real children. The CLI's machine modes flag such a
+ * step `FusedInto`; `relate.plan/v1` carries no flag, so the viewer reads it
+ * off its shape: a leaf with no measures under an `…IndexSeek…` operator
+ * whose details contain the step's. The table prints it like the CLI; the
+ * speedscope export and the comparison skip it, as upstream's exporter does.
+ */
+export const isFusedStep = (op: PlanOp, parent: PlanOp | null): boolean =>
+  !!parent && parent.operator.includes('IndexSeek') && !op.actual && !op.children?.length && !!op.details && parent.details.includes(op.details);
+
+/** The operators that run, root first, in pre-order: `preOrder` without the display-only steps, each keeping its `Id`. */
+export function executedOps(root: PlanOp): PlacedOp[] {
+  const parents = new Map<PlanOp, PlanOp>();
+  const visit = (op: PlanOp) => op.children?.forEach((c) => (parents.set(c, op), visit(c)));
+  visit(root);
+  return preOrder(root).filter((p) => !isFusedStep(p.op, parents.get(p.op) ?? null));
+}
+
 /** The rows the operator's first child produced (the CLI's `input_rows`), when that child was measured. */
 const inputRows = (op: PlanOp): number | null => {
   const first = op.children?.[0];
@@ -311,17 +331,20 @@ export function speedscope(plan: PlanDoc, version: string): string {
   if (!plan.root.actual) throw new Error(speedscopeRefusal('the plan tree carries no PROFILE metrics'));
   const frames: string[] = [];
   const events: string[] = [];
+  // A frame is named by the operator's `Id`, which counts the display-only steps it skips.
+  const ids = new Map(preOrder(plan.root).map((p) => [p.op, p.id]));
   const walk = (op: PlanOp, start: number, duration: number) => {
     const frame = frames.length;
-    frames.push(`${op.operator} ${frames.length}`);
+    frames.push(`${op.operator} ${ids.get(op)}`);
     events.push(`{"at":${start},"frame":${frame},"type":"O"}`);
-    const times = (op.children ?? []).map((c) => {
+    const children = (op.children ?? []).filter((c) => !isFusedStep(c, op));
+    const times = children.map((c) => {
       if (!c.actual) throw new Error(speedscopeRefusal('an operator carries no PROFILE metrics'));
       return nanos(c.actual);
     });
     const total = times.reduce((s, t) => s + t, 0);
     let cursor = start;
-    op.children.forEach((child, i) => {
+    children.forEach((child, i) => {
       const last = i === times.length - 1;
       const span =
         total <= duration ? times[i]
@@ -357,9 +380,9 @@ export interface PlanSummary {
 }
 
 export function summarize(plan: PlanDoc, notes: PlanNote[]): PlanSummary {
-  const ops = preOrder(plan.root);
+  const ops = executedOps(plan.root);
   let start = plan.root;
-  while (start.children?.length) start = start.children[0];
+  while (start.children?.length && !isFusedStep(start.children[0], start)) start = start.children[0];
   const measured = ops.filter((p) => p.op.actual);
   return {
     operators: ops.map((p) => p.op.operator),

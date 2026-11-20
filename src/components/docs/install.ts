@@ -70,7 +70,7 @@ export const SIGNING_KEY = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHgv/GHY5mtv/Hop
 export const SIGNING_KEY_FINGERPRINT = 'SHA256:BfnIA0YD0h+ldihdq8V1k/xFY91lm8mRCuVS21+3kzA';
 export const SIGNER = 'relate-release';
 /** The agents `relate skill install --agent` accepts, as the CLI lists them. */
-export const SKILL_AGENTS = ['claude-code', 'cursor', 'windsurf', 'copilot', 'antigravity', 'gemini-cli', 'cline', 'codex', 'pi', 'opencode', 'junie'];
+export const SKILL_AGENTS = ['claude-code', 'cursor', 'windsurf', 'copilot', 'antigravity', 'gemini-cli', 'cline', 'codex', 'pi', 'opencode', 'junie', 'vibe'];
 
 /** The last release published under the earlier name, cypherlite (its assets are `cypherlite-<os>-<arch>`). */
 export const LAST_CYPHERLITE_RELEASE = '0.16.1';
@@ -198,9 +198,18 @@ function packageTab(v: string): Tab {
         key: 'java',
         label: 'Java',
         blocks: [
-          { p: `\`ai.relatedb:relate\`, for Java 17 or later, with the native library bundled in the jar. The jars are on the [releases page](${RELEASES}), not on Maven Central. Download \`relate-${v}.jar\` and install it into your local Maven repository:` },
-          bash(`mvn install:install-file -Dfile=relate-${v}.jar`),
-          { p: 'The jar carries its POM, so a Maven or Gradle build (with `mavenLocal()`) resolves `ai.relatedb:relate` and brings in its two dependencies, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`), from Maven Central.' },
+          { p: '`ai.relatedb:relate` on Maven Central, for Java 17 or later, with the native library bundled in the jar. In Maven:' },
+          { code: `<dependency>\n  <groupId>ai.relatedb</groupId>\n  <artifactId>relate</artifactId>\n  <version>${v}</version>\n</dependency>`, lang: 'xml' },
+          { p: `In Gradle, \`implementation("ai.relatedb:relate:${v}")\` with \`mavenCentral()\`. Its POM brings in the client's two dependencies, JNA (\`net.java.dev.jna:jna\`) and Jackson (\`com.fasterxml.jackson.core:jackson-databind\`).` },
+        ],
+      },
+      {
+        key: 'dotnet',
+        label: '.NET',
+        blocks: [
+          { p: `\`Relate.Net\`, for .NET 8 or later, is not on NuGet. From your project's folder, clone the release tag beside it and reference the client's project:` },
+          bash(`git clone --branch v${v} --depth 1 ${REPO} ../relate\ndotnet add reference ../relate/clients/dotnet/src/Relate.Net/Relate.Net.csproj`),
+          { p: `The build copies the engine library beside your program from \`RelateNativeLibraryPath\`: point it at \`librelate_ffi\` from the release's \`relate-ffi-<target>.tar.gz\` archive, as the [.NET page](/docs/get-started/dotnet) shows.` },
         ],
       },
       {

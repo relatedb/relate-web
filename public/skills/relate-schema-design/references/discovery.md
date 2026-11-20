@@ -3,7 +3,7 @@
 Three ways to read what a store's schema is: Cypher (`SHOW` statements and
 the `db.schema.*` procedures), the schema folder a directory store writes as
 text, and the ontology procedures, a preview. The Cypher statements below
-run in order on one in-memory store, on relate 1.1.0.
+run in order on one in-memory store, on relate 1.2.0.
 
 Sources: <https://relatedb.ai/docs/reference/cypher/differences-from-neo4j.md>
 (the `db.schema` procedures in place of APOC's),
@@ -56,7 +56,7 @@ procedures above describe the same graph.
 
 ## The schema folder
 
-A directory store writes its schema as text under `.cypherlite/schema/`,
+A directory store writes its schema as text under `.relate/schema/`,
 rewritten at every checkpoint.
 
 | File | Holds |
@@ -71,7 +71,7 @@ does not change the schema; the next open refuses the store with an error
 that names the file and its repair:
 
 ```text
-Failed to open Relate: storage error: schema mirror .cypherlite/schema/schema.cypher differs from the schema this store's checkpoint persisted; it was edited by hand or copied from another store; delete the .cypherlite/schema/ directory and reopen: the next checkpoint regenerates it from the store's schema
+Failed to open Relate: storage error: schema mirror .relate/schema/schema.cypher differs from the schema this store's checkpoint persisted; it was edited by hand or copied from another store; delete the .relate/schema/ directory and reopen: the next checkpoint regenerates it from the store's schema
 ```
 
 ## The ontology procedures, a preview

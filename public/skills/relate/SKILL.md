@@ -1,7 +1,7 @@
 ---
 name: relate
 description: Relate is an embedded openCypher graph database with a single-binary CLI. Use this skill when the user wants to run Cypher queries, manage a local graph database, or embed it from Python; its focused references cover vector search, geospatial, operations, and agent safety.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Relate
@@ -30,6 +30,7 @@ it:
 | Command-kind extensions: author, install, or run `relate run <name>` packages | [client-extensions](references/client-extensions.md) |
 | Agent-proposed feedback: draft the friction, get the person's approval, then `relate agent-feedback` | [client-cli](references/client-cli.md) |
 | Node.js client: `@relate/relate` install, native-lib resolution | [client-javascript](references/client-javascript.md) |
+| .NET client: C#, F#, VB, source build, native library and disposal | [client-dotnet](references/client-dotnet.md) |
 | Java client: `ai.relatedb:relate` dependency, bundled natives, classifier jars | [client-java](references/client-java.md) |
 | Go client: cgo link, typed values, numeric + element ids, typed errors | [client-go](references/client-go.md) |
 | Browser/WASM client: `@relate/relate-wasm` init, OPFS, traps | [client-wasm](references/client-wasm.md) |

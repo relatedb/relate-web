@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # Sets up the relate clients, outside this repository, for the docs' verified
 # samples (npm run docs:samples; the contract is in src/lib/docs/samples.ts):
-# Python, Node.js, Rust, C, Java, Go and Swift. macOS and Linux (Swift on
-# macOS only). The clients a registry publishes are installed from it at the
-# release the docs are pinned to (ADR-0062): relate-db from PyPI,
-# @relate/relate from npm and the relate crate from crates.io. The rest are
-# built from an upstream checkout at that release's tag: the C library, the
-# Java jar (ai.relatedb:relate is not on Maven Central), the Go module (its
-# clients/go/v<version> tag is on the release's commit; the samples build it
-# through a replace directive, with no proxy) and the Swift package's
-# XCFramework.
+# Python, Node.js, Rust, C, Java, .NET, Go and Swift. macOS and Linux (Swift
+# on macOS only). The clients a registry publishes are installed from it at
+# the release the docs are pinned to (ADR-0062, ADR-0071): relate-db from
+# PyPI, @relate/relate from npm, the relate crate from crates.io and
+# ai.relatedb:relate from Maven Central. The rest are built from an upstream
+# checkout at that release's tag: the C library, the .NET client (Relate.Net
+# is not on NuGet; ADR-0072), the Go module (its clients/go/v<version> tag is
+# on the release's commit; the samples build it through a replace directive,
+# with no proxy) and the Swift package's XCFramework.
 #
 #   bash scripts/samples/setup.sh --upstream <path to the relate checkout>
 #   source "${XDG_CACHE_HOME:-$HOME/.cache}/relate-web-samples/env.sh"
@@ -40,9 +40,16 @@
 #                              nothing it does not), rust-toolchain.toml (the
 #                              checkout's), and target/ with the engine compiled
 #                              once, so a sample compiles only itself
-#   java/                      a copy of clients/java packaged with Maven against
-#                              the library below (client/target/relate-<v>.jar),
-#                              its Maven repository (m2/) and runtime classpath
+#   java/                      a POM depending on ai.relatedb:relate:<version>
+#                              (project/), the Maven repository it resolves
+#                              from Maven Central into (m2/: the client jar,
+#                              which bundles the engine, with JNA and
+#                              Jackson) and its runtime classpath
+#   dotnet/                    a copy of the checkout's clients/dotnet without
+#                              its tests (client/), built once against the
+#                              library below, and the CLI home and NuGet
+#                              package folder the C# samples build with
+#                              (home/)
 #   go/                        GOPATH, GOMODCACHE and GOCACHE for the Go samples,
 #                              which build clients/go in the checkout through a
 #                              replace directive
@@ -60,14 +67,18 @@
 #   RELATE_PY_CREWAI       Python: the interpreter of py-crewai/ (env=crewai samples)
 #   RELATE_NODE            Node.js: the node binary
 #   NODE_PATH              Node.js: node/node_modules (holds @relate/relate)
-#   RELATE_LIB             the FFI library (C, Java, Go and Swift link it; the Node.js
-#                          client loads its npm platform package instead)
+#   RELATE_LIB             the FFI library (C, .NET, Go and Swift link it; the Node.js
+#                          and Java clients load the engine their package carries)
 #   RELATE_CARGO           Rust: the cargo binary (rustup's, so rust-toolchain.toml applies)
 #   RELATE_RUST_PROJECT    Rust: the template project rust/
 #   RELATE_CC              C: the C compiler
 #   RELATE_C_INCLUDE       C and Go: the directory holding relate.h
 #   RELATE_JAVA            Java: the java binary (JDK 17+; samples run as single-file source programs)
 #   RELATE_JAVA_CLASSPATH  Java: the client jar and its runtime dependencies
+#   RELATE_DOTNET          .NET: the dotnet binary (an SDK for .NET 8 or later)
+#   RELATE_DOTNET_CLIENT   .NET: dotnet/client/src/Relate.Net/Relate.Net.csproj, the
+#                          project a C# sample references
+#   RELATE_DOTNET_HOME     .NET: dotnet/home (the CLI home and the NuGet package folder)
 #   RELATE_GO              Go: the go binary
 #   RELATE_GO_CLIENT       Go: the checkout's clients/go, the replace directive's target
 #   RELATE_GO_HOME         Go: go/ (GOPATH, GOMODCACHE and GOCACHE live under it)
@@ -91,15 +102,18 @@
 #                    --python when it is 3.10 to 3.13)
 #   --jdk DIR        use this JDK (17+) instead of downloading Temurin 21
 #   --mvn BIN        use this Maven instead of downloading Maven
+#   --dotnet BIN     the dotnet to build the C# samples with (default: dotnet
+#                    on PATH; needs an SDK for .NET 8 or later)
 #   --skip-python, --skip-crewai, --skip-node, --skip-rust, --skip-c, --skip-java,
-#   --skip-go, --skip-swift
+#   --skip-dotnet, --skip-go, --skip-swift
 #                    leave that client out
 #   --github-env     also append the variables to $GITHUB_ENV (GitHub Actions)
 #
 # Needs: the Rust toolchain the checkout pins (rust-toolchain.toml, through
 # rustup), and per client: Python 3.9+ with venv and pip (PyPI); Node 22.13+
 # and npm (the npm registry); cargo with crates.io access; a C
-# compiler (cc); Go 1.22+ with cgo; Swift 6 with Xcode (xcodebuild); curl and
+# compiler (cc); Maven Central access (Java); the .NET 8 SDK or later;
+# Go 1.22+ with cgo; Swift 6 with Xcode (xcodebuild); curl and
 # tar for the JDK and Maven downloads, which are checked against the SHA-256
 # (JDK) and SHA-512 (Maven) their publishers list, pinned below. The first
 # build compiles the engine twice (the FFI library and the Rust samples'
@@ -148,7 +162,8 @@ python_bin=python3
 crewai_python=""
 jdk_dir=""
 mvn_bin=""
-do_python=1 do_crewai=1 do_node=1 do_rust=1 do_c=1 do_java=1 do_go=1 do_swift=1
+dotnet_bin=""
+do_python=1 do_crewai=1 do_node=1 do_rust=1 do_c=1 do_java=1 do_dotnet=1 do_go=1 do_swift=1
 github_env=0
 
 die() { echo "setup.sh: $*" >&2; exit 1; }
@@ -163,12 +178,14 @@ while [ $# -gt 0 ]; do
     --crewai-python) crewai_python="${2:?--crewai-python needs a binary}"; shift 2 ;;
     --jdk) jdk_dir="${2:?--jdk needs a directory}"; shift 2 ;;
     --mvn) mvn_bin="${2:?--mvn needs a binary}"; shift 2 ;;
+    --dotnet) dotnet_bin="${2:?--dotnet needs a binary}"; shift 2 ;;
     --skip-python) do_python=0; do_crewai=0; shift ;;
     --skip-crewai) do_crewai=0; shift ;;
     --skip-node) do_node=0; shift ;;
     --skip-rust) do_rust=0; shift ;;
     --skip-c) do_c=0; shift ;;
     --skip-java) do_java=0; shift ;;
+    --skip-dotnet) do_dotnet=0; shift ;;
     --skip-go) do_go=0; shift ;;
     --skip-swift) do_swift=0; shift ;;
     --github-env) github_env=1; shift ;;
@@ -320,11 +337,11 @@ if [ "$do_crewai" = 1 ]; then
   fi
 fi
 
-# --- The FFI library (C, Java, Go, Swift) -----------------------------------
+# --- The FFI library (C, .NET, Go, Swift) -----------------------------------
 
 lib=""
 include_dir="$out/include"
-if [ "$do_c" = 1 ] || [ "$do_java" = 1 ] || [ "$do_go" = 1 ] || [ "$do_swift" = 1 ]; then
+if [ "$do_c" = 1 ] || [ "$do_dotnet" = 1 ] || [ "$do_go" = 1 ] || [ "$do_swift" = 1 ]; then
   start_step
   say "FFI: building the library (cargo build -p relate-ffi --release)"
   (cd "$upstream" && cargo build --release --locked -p relate-ffi)
@@ -509,26 +526,91 @@ if [ "$do_java" = 1 ]; then
     mvn_bin="$mvn_root/bin/mvn"
   fi
   [ -x "$mvn_bin" ] || die "$mvn_bin is not executable"
-  say "Java: packaging a copy of clients/java with Maven (tests skipped)"
-  rm -rf "$out/java/client"
-  mkdir -p "$out/java"
-  cp -R "$upstream/clients/java" "$out/java/client"
-  rm -rf "$out/java/client/target"
-  mvn_args=(-B -q -f "$out/java/client/pom.xml" "-Dmaven.repo.local=$out/java/m2" -Dmaven.test.skip=true)
-  JAVA_HOME="$jdk_dir" "$mvn_bin" "${mvn_args[@]}" "-Drelate.ffi.dir=$lib_dir" package
-  JAVA_HOME="$jdk_dir" "$mvn_bin" "${mvn_args[@]}" dependency:build-classpath \
-    -DincludeScope=runtime "-Dmdep.outputFile=$out/java/runtime.classpath"
-  jars=("$out"/java/client/target/relate-*.jar)
-  client_jar=""
-  for j in "${jars[@]}"; do
-    case "$j" in *-osx-* | *-linux-* | *-windows-*) ;; *) client_jar="$j" ;; esac
-  done
-  [ -f "$client_jar" ] || die "Maven produced no client jar in $out/java/client/target"
-  java_cp="$client_jar:$(cat "$out/java/runtime.classpath")"
+  # A project with the one dependency a reader's build declares, resolved
+  # from Maven Central into a repository of its own; -C fails on a checksum
+  # mismatch instead of warning. The runtime classpath lists the client
+  # first, then JNA and Jackson, as its POM names them.
+  say "Java: resolving ai.relatedb:relate:$version from Maven Central"
+  rm -rf "$out/java/project"
+  mkdir -p "$out/java/project"
+  cat >"$out/java/project/pom.xml" <<EOF
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <!-- Written by scripts/samples/setup.sh: the Java samples' dependency, from Maven Central. -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ai.relatedb.samples</groupId>
+  <artifactId>relate-samples</artifactId>
+  <version>0</version>
+  <packaging>pom</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>ai.relatedb</groupId>
+      <artifactId>relate</artifactId>
+      <version>$version</version>
+    </dependency>
+  </dependencies>
+</project>
+EOF
+  JAVA_HOME="$jdk_dir" "$mvn_bin" -B -q -C -f "$out/java/project/pom.xml" "-Dmaven.repo.local=$out/java/m2" \
+    dependency:build-classpath -DincludeScope=runtime "-Dmdep.outputFile=$out/java/runtime.classpath"
+  java_cp="$(cat "$out/java/runtime.classpath")"
+  client_jar="${java_cp%%:*}"
+  [ "$(basename "$client_jar")" = "relate-$version.jar" ] && [ -f "$client_jar" ] ||
+    die "Java: the runtime classpath does not start with relate-$version.jar: $java_cp"
   # Samples may use ai.relatedb.* and the JDK only: no test-scoped jar.
   case "$java_cp" in *junit* | *opentest4j* | *apiguardian*) die "the runtime classpath holds test dependencies: $java_cp" ;; esac
   jar_version="$(basename "$client_jar" .jar)"
-  end_step "java: ${jar_version#relate-} jar of ai.relatedb:relate on $("$java_bin" -version 2>&1 | head -1)"
+  end_step "java: ai.relatedb:relate:${jar_version#relate-} from Maven Central on $("$java_bin" -version 2>&1 | head -1)"
+fi
+
+# --- .NET -------------------------------------------------------------------
+
+dotnet_client="$out/dotnet/client/src/Relate.Net/Relate.Net.csproj"
+dotnet_home="$out/dotnet/home"
+if [ "$do_dotnet" = 1 ]; then
+  start_step
+  [ -n "$dotnet_bin" ] || dotnet_bin="$(command -v dotnet || true)"
+  [ -n "$dotnet_bin" ] || die "dotnet is required (an SDK for .NET 8 or later; pass --dotnet)"
+  [ -f "$upstream/clients/dotnet/src/Relate.Net/Relate.Net.csproj" ] || die "$upstream has no clients/dotnet/src/Relate.Net/Relate.Net.csproj"
+  # The CLI writes its first-run state and NuGet its packages under dotnet/home, never the user's.
+  dn_env=(env "DOTNET_CLI_HOME=$dotnet_home/cli" "NUGET_PACKAGES=$dotnet_home/packages" DOTNET_CLI_TELEMETRY_OPTOUT=1
+    DOTNET_NOLOGO=1 DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1 DOTNET_CLI_USE_MSBUILD_SERVER=0 MSBUILDDISABLENODEREUSE=1)
+  sdk_major="$("${dn_env[@]}" "$dotnet_bin" --version | cut -d. -f1)"
+  [ "${sdk_major:-0}" -ge 8 ] 2>/dev/null || die "$dotnet_bin is SDK $("${dn_env[@]}" "$dotnet_bin" --version), older than 8 (Relate.Net targets net8.0)"
+  say "Dotnet: copying clients/dotnet (without its tests) to $out/dotnet/client"
+  rm -rf "$out/dotnet/client"
+  mkdir -p "$out/dotnet/client" "$dotnet_home"
+  for f in Directory.Build.props nuget.config build src README.md UPSTREAM.md LICENSE THIRD-PARTY-NOTICES.md docs; do
+    cp -R "$upstream/clients/dotnet/$f" "$out/dotnet/client/"
+  done
+  # A probe with the project file and build arguments samples.ts uses, which
+  # also builds the client once, so the first sample does not.
+  probe_dir="$(mktemp -d)"
+  cat >"$probe_dir/sample.csproj" <<EOF
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>sample</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$dotnet_client" />
+  </ItemGroup>
+</Project>
+EOF
+  printf 'using Relate.Net;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+Console.WriteLine(conn.Query("RETURN 1 AS x").Scalar<long>());
+' >"$probe_dir/Program.cs"
+  say "Dotnet: building Relate.Net against $lib_name"
+  (cd "$probe_dir" && "${dn_env[@]}" "$dotnet_bin" build sample.csproj -c Release -o "$probe_dir/out" --nologo -v:q -clp:NoSummary \
+    -nodeReuse:false -p:UseSharedCompilation=false "-p:RelateNativeLibraryPath=$lib" >/dev/null &&
+    [ "$("${dn_env[@]}" "$dotnet_bin" "$probe_dir/out/sample.dll")" = 1 ]) || die "Dotnet: the probe did not build or run (run it in $probe_dir to see why)"
+  rm -rf "$probe_dir"
+  end_step "dotnet: clients/dotnet (Relate.Net) from the checkout, SDK $("${dn_env[@]}" "$dotnet_bin" --version)"
 fi
 
 # --- Go ---------------------------------------------------------------------
@@ -619,6 +701,11 @@ fi
   if [ "$do_java" = 1 ]; then
     echo "export RELATE_JAVA='$java_bin'"
     echo "export RELATE_JAVA_CLASSPATH='$java_cp'"
+  fi
+  if [ "$do_dotnet" = 1 ]; then
+    echo "export RELATE_DOTNET='$dotnet_bin'"
+    echo "export RELATE_DOTNET_CLIENT='$dotnet_client'"
+    echo "export RELATE_DOTNET_HOME='$dotnet_home'"
   fi
   if [ "$do_go" = 1 ]; then
     echo "export RELATE_GO='$go_bin'"

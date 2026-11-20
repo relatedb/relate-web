@@ -20,7 +20,7 @@ A single statement outside a transaction is one commit. An explicit transaction 
 
 ## The write-ahead log
 
-The WAL is a series of segment files, `wal/NNNNNNNN.log` in a directory store (`.cypherlite/wal/` under the `markdown` codec) and the same tree inside a `.rl` file. Each record carries a checksum. One commit's record can be at most 64 MiB; a larger commit is refused before anything is written, and splitting it into smaller transactions clears it.
+The WAL is a series of segment files, `wal/NNNNNNNN.log` in a directory store (`.relate/wal/` under the `markdown` codec) and the same tree inside a `.rl` file. Each record carries a checksum. One commit's record can be at most 64 MiB; a larger commit is refused before anything is written, and splitting it into smaller transactions clears it.
 
 On open, relate loads the latest :term[snapshot]{id=snapshot} and replays every WAL record written after the snapshot's position in the log. Committed writes that never reached a snapshot survive this way. A crash can leave a final record cut short, which recovery does not count as a commit; [Recover from a crash](/docs/guides/operate/crash-and-recovery) covers what recovery does and the errors it can report.
 

@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "replayed": "2026-11-17",
+  "replayed": "2026-11-20",
   "platform": "macOS on arm64",
   "pins": {
     "python_frameworks": [
@@ -14,65 +14,94 @@
       "langchain-core==1.7.6"
     ],
     "crewai": "crewai==1.15.37",
-    "node_frameworks": ["ai@7.0.165", "zod@4.6.7", "@mastra/core@1.82.0"],
+    "node_frameworks": [
+      "ai@7.0.165",
+      "zod@4.6.7",
+      "@mastra/core@1.82.0"
+    ],
     "jdk": "jdk-21.0.13+9",
     "maven": "3.10.0"
   },
   "clients": {
     "python": {
       "package": "relate-db",
-      "engine_commit": "f529cbb",
-      "client_commit": "f529cbb",
-      "build": "relate-db 1.1.0 from PyPI (the abi3 wheel published from upstream v1.1.0, f529cbb), installed in a venv with the pinned frameworks.",
-      "toolchain": { "python": "3.15.2" },
+      "engine_commit": "e0ea536",
+      "client_commit": "e0ea536",
+      "build": "relate-db 1.2.0 from PyPI (the abi3 wheel published from upstream v1.2.0, e0ea536), installed in a venv with the pinned frameworks.",
+      "toolchain": {
+        "python": "3.15.2"
+      },
       "envs": {
         "crewai": {
-          "build": "relate-db 1.1.0 from PyPI, installed in a second venv with crewai, whose pins would hold the main venv's frameworks back.",
-          "toolchain": { "python": "3.13.16" }
+          "build": "relate-db 1.2.0 from PyPI, installed in a second venv with crewai, whose pins would hold the main venv's frameworks back.",
+          "toolchain": {
+            "python": "3.13.16"
+          }
         }
       }
     },
     "js": {
       "package": "@relate/relate",
-      "engine_commit": "f529cbb",
-      "client_commit": "f529cbb",
-      "build": "@relate/relate 1.1.0 from npm, with its platform package @relate/relate-darwin-arm64 carrying librelate_ffi (both published from upstream v1.1.0, f529cbb), and the pinned frameworks beside it.",
-      "toolchain": { "node": "26.13.0" }
+      "engine_commit": "e0ea536",
+      "client_commit": "e0ea536",
+      "build": "@relate/relate 1.2.0 from npm, with its platform package @relate/relate-darwin-arm64 carrying librelate_ffi (both published from upstream v1.2.0, e0ea536), and the pinned frameworks beside it.",
+      "toolchain": {
+        "node": "26.13.0"
+      }
     },
     "rust": {
       "package": "relate",
-      "engine_commit": "f529cbb",
-      "client_commit": "f529cbb",
-      "build": "The relate crate 1.1.0 from crates.io (packaged from upstream v1.1.0, f529cbb), a dependency of a template project carrying that commit's Cargo.lock and rust-toolchain.toml.",
-      "toolchain": { "rust": "1.88.0" }
+      "engine_commit": "e0ea536",
+      "client_commit": "e0ea536",
+      "build": "The relate crate 1.2.0 from crates.io (packaged from upstream v1.2.0, e0ea536), a dependency of a template project carrying that commit's Cargo.lock and rust-toolchain.toml.",
+      "toolchain": {
+        "rust": "1.88.0"
+      }
     },
     "java": {
       "package": "ai.relatedb:relate",
-      "engine_commit": "f529cbb",
-      "client_commit": "f529cbb",
-      "build": "A copy of clients/java at upstream v1.1.0 (f529cbb) packaged with Maven 3.10.0 (relate-1.1.0.jar, with JNA 5.14.0 and Jackson databind 2.17.2 on the classpath), loading librelate_ffi built from the same commit.",
-      "toolchain": { "jdk": "Temurin 21.0.13+9" }
+      "engine_commit": "e0ea536",
+      "client_commit": "e0ea536",
+      "build": "ai.relatedb:relate 1.2.0 from Maven Central (published from upstream v1.2.0, e0ea536), resolved with Maven 3.10.0 with JNA 5.19.1 and Jackson databind 2.23.0, loading the engine its jar bundles.",
+      "toolchain": {
+        "jdk": "Temurin 21.0.13+9"
+      }
+    },
+    "csharp": {
+      "package": "Relate.Net",
+      "engine_commit": "e0ea536",
+      "client_commit": "e0ea536",
+      "build": "A copy of clients/dotnet at upstream v1.2.0 (e0ea536), referenced by each sample's net8.0 console project and built with librelate_ffi built from the same commit.",
+      "toolchain": {
+        "dotnet-sdk": "8.0.134"
+      }
     },
     "go": {
       "package": "github.com/relatedb/relate/clients/go",
-      "engine_commit": "f529cbb",
-      "client_commit": "f529cbb",
-      "build": "clients/go from a checkout of upstream v1.1.0 (f529cbb), built with cgo against relate.h and librelate_ffi built from the same commit.",
-      "toolchain": { "go": "1.27.3" }
+      "engine_commit": "e0ea536",
+      "client_commit": "e0ea536",
+      "build": "clients/go from a checkout of upstream v1.2.0 (e0ea536), built with cgo against relate.h and librelate_ffi built from the same commit.",
+      "toolchain": {
+        "go": "1.27.4"
+      }
     },
     "swift": {
       "package": "Relate",
-      "engine_commit": "f529cbb",
-      "client_commit": "f529cbb",
-      "build": "A copy of Package.swift and clients/swift at upstream v1.1.0 (f529cbb), with an XCFramework made from librelate_ffi built from the same commit.",
-      "toolchain": { "swift": "6.4.2" }
+      "engine_commit": "e0ea536",
+      "client_commit": "e0ea536",
+      "build": "A copy of Package.swift and clients/swift at upstream v1.2.0 (e0ea536), with an XCFramework made from librelate_ffi built from the same commit.",
+      "toolchain": {
+        "swift": "6.4.2"
+      }
     },
     "c": {
       "package": "relate.h and librelate_ffi",
-      "engine_commit": "f529cbb",
-      "client_commit": "f529cbb",
-      "build": "relate.h and librelate_ffi built from upstream v1.1.0 (f529cbb) (cargo build -p relate-ffi --release).",
-      "toolchain": { "cc": "Apple clang 21.0.0" }
+      "engine_commit": "e0ea536",
+      "client_commit": "e0ea536",
+      "build": "relate.h and librelate_ffi built from upstream v1.2.0 (e0ea536) (cargo build -p relate-ffi --release).",
+      "toolchain": {
+        "cc": "Apple clang 21.0.0"
+      }
     }
   }
 }

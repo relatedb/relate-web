@@ -155,14 +155,14 @@ grep -E '^(name|version):' "$HOME/.claude/skills/relate/SKILL.md"
 
 ```text
 name: relate
-version: 1.1.0
+version: 1.2.0
 ```
 
 For a project copy, the same two commands on `.claude/skills/relate` show `SKILL.md` and `references` without the marker, and the same two lines.
 
 ## If it goes wrong
 
-- **`Error: skill: no supported agents detected`** (exit code 1): `relate skill install` found none of the directories in the agent table. Its second line, `valid agents: claude-code, cursor, windsurf, copilot, antigravity, gemini-cli, cline, codex, pi, opencode, junie`, lists the names `--agent` accepts; pass one of them.
+- **`Error: skill: no supported agents detected`** (exit code 1): `relate skill install` found none of the directories in the agent table. Its second line, `valid agents: claude-code, cursor, windsurf, copilot, antigravity, gemini-cli, cline, codex, pi, opencode, junie, vibe`, lists the names `--agent` accepts; pass one of them.
 - **`Error: skill: unknown agent: '<name>'`** (exit code 2): `--agent` names an agent relate does not know. Use a name from the `valid agents:` line ([errors reference](/docs/reference/errors#cli-skill-unknown-agent)).
 - **`Error: skill: refusing to touch <dest>: no .relate-installed marker present (directory was not created by relate); pass --force to override`** (exit code 1): a `relate` directory that relate did not write is in the way. Move it aside, or pass `--force` to replace it ([errors reference](/docs/reference/errors#cli-skill-refusing-to-touch)).
 - **`relate skill check` prints `drifted`** (exit code 1): an installed copy differs from the binary's bundle, for example after the binary was replaced without `relate upgrade`. `relate skill install` rewrites it.

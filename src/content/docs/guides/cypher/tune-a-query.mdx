@@ -121,16 +121,20 @@ relate --database ./team.rl --read-only --mode table "EXPLAIN MATCH (p:Person {n
 ```text
 Query: MATCH (p:Person {name: 'Ada'})-[:WORKS_ON]->(proj:Project) RETURN proj.name AS project
 Plan:
-+-------------------+----+---------------------------------------------------------------------------------------+----------------+
-| Operator          | Id | Details                                                                               | Estimated Rows |
-+-------------------+----+---------------------------------------------------------------------------------------+----------------+
-| + ProduceResults  | 0  | 1 item(s)                                                                             | -              |
-+-------------------+----+---------------------------------------------------------------------------------------+----------------+
-| | + NodeIndexSeek | 1  | RANGE INDEX p:Person(name) WHERE name = 'Ada', (p:Person)-[:WORKS_ON]->(proj:Project) | 1              |
-+-------------------+----+---------------------------------------------------------------------------------------+----------------+
++---------------------+----+---------------------------------------------------------------------------------------+----------------+
+| Operator            | Id | Details                                                                               | Estimated Rows |
++---------------------+----+---------------------------------------------------------------------------------------+----------------+
+| + ProduceResults    | 0  | 1 item(s)                                                                             | -              |
++---------------------+----+---------------------------------------------------------------------------------------+----------------+
+| | + NodeIndexSeek   | 1  | RANGE INDEX p:Person(name) WHERE name = 'Ada', (p:Person)-[:WORKS_ON]->(proj:Project) | 1              |
++---------------------+----+---------------------------------------------------------------------------------------+----------------+
+| | | + NodeIndexSeek | 2  | RANGE INDEX p:Person(name) WHERE name = 'Ada'                                         | 1              |
++---------------------+----+---------------------------------------------------------------------------------------+----------------+
+| | | + Expand        | 3  | (p:Person)-[:WORKS_ON]->(proj:Project)                                                | 2              |
++---------------------+----+---------------------------------------------------------------------------------------+----------------+
 ```
 
-`Expand` became `NodeIndexSeek`: the walk now starts from the one node the index finds, and the plan estimates one row. The `Notifications:` block is gone, and the envelope's `notifications` is an empty list.
+`Expand` became `NodeIndexSeek`: the walk now starts from the one node the index finds, and the plan estimates one row. The two rows under it, a `NodeIndexSeek` on the index and an `Expand` for the hop, show the steps the seek runs; they are part of the same operator, which runs as before. The `Notifications:` block is gone, and the envelope's `notifications` is an empty list.
 
 The plan viewer holds both recorded plans and what changed between them. In a browser it draws each plan as a tree. **Compare with the index** creates `relate_Person__name` on this page's database, plans the statement without it and with it, and shows the two side by side; pressed again, it drops the index it created (an index the `create-index` cell made stays). **PROFILE** runs the statement for each plan and adds the rows, time and database hits of every operator.
 

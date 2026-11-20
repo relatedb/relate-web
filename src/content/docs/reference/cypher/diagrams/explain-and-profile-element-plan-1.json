@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "plan",
-  "hash": "d57d70e93ee3fa961cfc85309aa2adb310a237d6eafc4a32971f52a330519067",
+  "hash": "645b8bc5508cd8fb7c4924307d1bf393f8eb81c7c2d9c16984d68d921e5c606d",
   "inputs": [],
   "live": "the plan is drawn as a tree, and PROFILE runs the statement on the page's database in your browser and adds each operator's rows, time and database hits as bars; the index button creates the index on the page's database, plans the statement with and without it side by side with the changes, and drops it again; a PROFILE downloads as a speedscope file.",
   "engine": true,

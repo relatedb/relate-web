@@ -1,0 +1,325 @@
+---
+title: Use the .NET client
+label: .NET
+description: Reference the relate .NET client, supply its engine library, open stores, bind typed parameters, run transactions and async calls, and handle exceptions.
+order: 65
+surfaces: [dotnet]
+prerequisites: [get-started/dotnet]
+related: [reference/api/dotnet, get-started/dotnet, reference/errors, concepts/transactions-and-concurrency, guides/storage/choose-a-store-layout, reference/project, concepts/problems-relate-solves#embedded-graph-in-an-app]
+---
+
+This guide shows you how to use the relate .NET :term[client]{id=client}, `Relate.Net`, in an app: the project reference and the engine library, which store to open and how, which .NET types values cross as, how to group writes and retry a conflict, how the async calls and threads behave, what a result reports about itself, and how to branch on an exception. The client runs the engine inside your process through the relate C library, `librelate_ffi`. The programs on this page are C#; the client works the same from F# and Visual Basic. Every program writes to a store it creates, using the team graph from the [tutorial](/docs/get-started/dotnet).
+
+## Prerequisites
+
+- The .NET SDK, version 8 or later. The programs on this page ran on SDK 8.0.134.
+- macOS (arm64 or x86-64), Linux with glibc (arm64 or x86-64), or Windows (x86-64): the runtime identifiers `osx-arm64`, `osx-x64`, `linux-arm64`, `linux-x64` and `win-x64`.
+
+## Add the client
+
+`Relate.Net` is on no registry; relate 1.2.0 is the first release that ships it. A project references `clients/dotnet/src/Relate.Net/Relate.Net.csproj` from a checkout of the release tag, kept outside the project's folder. The client has no package dependencies, and it targets `net8.0`, so a project on .NET 8 or later can reference it:
+
+```xml title="team.csproj"
+<ItemGroup>
+  <ProjectReference Include="../relate/clients/dotnet/src/Relate.Net/Relate.Net.csproj" />
+</ItemGroup>
+```
+
+The engine is a native library that the build copies beside your program, from the path in the MSBuild property `RelateNativeLibraryPath`. Either source works:
+
+| Source | Library path | Needs |
+| --- | --- | --- |
+| The release archive `relate-ffi-<target>.tar.gz` for your platform | The `librelate_ffi.dylib`, `librelate_ffi.so` or `relate_ffi.dll` it unpacks | Nothing else |
+| `cargo build -p relate-ffi` in the checkout | The default, `<checkout>/target/debug/` and the library's name; `--release` builds `target/release/`, which needs the property | Rust 1.88 or later |
+
+Pass the property on each command, as `-p:RelateNativeLibraryPath=<absolute path>`, or set an environment variable of the same name, which MSBuild reads as a property. `dotnet publish` copies the library into the publish folder too, so the folder runs on a machine with no checkout. The build packs one library, for the build host's runtime identifier: to build for another platform, set `RelateNativeRuntimeIdentifier` to its identifier and point `RelateNativeLibraryPath` at that platform's library.
+
+The client loads the library from beside your program when the first `RelateDatabase` opens, and checks that it speaks C ABI version 2, the version the client was built for. `RelateDatabase.NativeAbiVersion` reports the version it checked.
+
+## Open a store
+
+`RelateDatabase` opens one :term[store]{id=store} in one of four ways, each with its own failure when the store can't be opened:
+
+| Call | Store | Creates a missing store |
+| --- | --- | --- |
+| `RelateDatabase.OpenInMemory()` | A fresh in-memory store, gone when disposed | — |
+| `RelateDatabase.Open("./graph")` | A directory store, or with a `.rl` path a :term[single-file store]{id=single-file-store} | Yes |
+| `RelateDatabase.OpenReadOnly("./graph")` | An existing store, loaded once; writes and checkpoints throw | No: it throws |
+| `await RelateDatabase.OpenAsync("./graph")` | `Open` on a thread-pool thread | Yes |
+
+`Connect()` opens a connection in the `neo4j` namespace, and `Connect("system")` one in `system`. Disposing a database disposes its connections, then closes the store, so the same process can open it again. This program writes a store, reopens it read-only, and shows the refusal of a write:
+
+```csharp run name=open
+using Relate.Net;
+
+using (var db = RelateDatabase.Open("./team.rl"))
+using (var conn = db.Connect())
+{
+    conn.Query("CREATE (:Person {name: 'Ada'}), (:Person {name: 'Grace'})");
+    db.Checkpoint();
+}
+
+using (var db = RelateDatabase.OpenReadOnly("./team.rl"))
+using (var conn = db.Connect())
+{
+    Console.WriteLine($"read-only: {db.IsReadOnly}");
+    Console.WriteLine($"people: {conn.Query("MATCH (p:Person) RETURN count(p)").Scalar<long>()}");
+    try
+    {
+        conn.Query("CREATE (:Person {name: 'Noor'})");
+    }
+    catch (RelateException e)
+    {
+        Console.WriteLine($"{e.GqlStatus}: {e.Message}");
+    }
+}
+
+try
+{
+    using var missing = RelateDatabase.OpenReadOnly("./missing.rl");
+}
+catch (RelateException e)
+{
+    Console.WriteLine($"{e.GqlStatus} {e.Stage}: {e.Message}");
+}
+```
+
+`Checkpoint()` folds the write-ahead log into a fresh snapshot of the committed state; disposing a durable store does the same, so the call is only needed between writes. A store has one writing open at a time across every process: a second `Open` of a store another process or an undisposed `RelateDatabase` holds throws the same `internal error` as the missing store.
+
+## Bind parameters and read typed values
+
+`Query(statement, parameters)` takes the parameters as any object: an anonymous object or a record, whose public properties are the names, or a dictionary with string keys. Each value crosses as one Cypher value, with no JSON in between: lists and arrays as lists, nested objects and dictionaries as maps, and the .NET date, time and the client's spatial and vector types as their Cypher kinds.
+
+```csharp run name=values
+using System.Globalization;
+using Relate.Net;
+
+CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+
+conn.Query("""
+    UNWIND $people AS p
+    CREATE (:Person {name: p.name, born: p.born, home: p.home, tags: p.tags, embedding: p.embedding})
+    """,
+    new
+    {
+        people = new object[]
+        {
+            new { name = "Ada", born = new DateOnly(1815, 12, 10), home = CypherPoint.Wgs84(-0.13, 51.51),
+                  tags = new[] { "math" }, embedding = CypherVector.FromSingles(new[] { 0.1f, 0.9f }) },
+            new { name = "Grace", born = new DateOnly(1906, 12, 9), home = CypherPoint.Wgs84(-73.99, 40.73),
+                  tags = new[] { "navy", "compilers" }, embedding = CypherVector.FromSingles(new[] { 0.8f, 0.2f }) },
+        },
+    });
+
+var byName = new Dictionary<string, object?> { ["name"] = "Grace" };
+var row = conn.Query("""
+    MATCH (p:Person {name: $name})
+    RETURN p, p.born AS born, p.home AS home, p.tags AS tags, p.embedding AS embedding,
+           duration.between(p.born, date('2026-01-01')) AS age
+    """, byName)[0];
+
+foreach (var (column, value) in row)
+{
+    Console.WriteLine($"{column}: {value?.GetType().Name}");
+}
+
+var person = row.Get<Node>("p");
+Console.WriteLine($"labels: {string.Join(",", person.Labels)}, name: {person.Get<string>("name")}");
+Console.WriteLine($"born: {row.Get<DateOnly>("born"):yyyy-MM-dd}");
+Console.WriteLine($"tags: {string.Join(", ", row.Get<List<string>>("tags"))}");
+Console.WriteLine($"embedding: {string.Join(", ", row.Get<float[]>("embedding"))}");
+Console.WriteLine($"age: {row.Get<CypherDuration>("age").Months / 12} years");
+```
+
+`Get<T>()` returns the value when it already is a `T` and converts it otherwise: between numeric types with an overflow check, a list to an array or a `List<T>`, a vector to a `float[]`, `double[]` or `long[]`, and a string to a `Guid` or an enum. A conversion it cannot make throws `InvalidCastException`. A `Node`, `Relationship` or `GraphPath` can't be a parameter: pass its `ElementId` and match on `elementId(n)` instead. A parameter type the client can't send throws `ArgumentException` before the statement runs, naming the parameter.
+
+## Group writes in a transaction
+
+Outside a transaction, each `Query` commits on its own. `BeginTransaction()` returns a `RelateTransaction`: `Commit()` applies its statements together and returns its :term[bookmark]{id=bookmark}, or `null` when it wrote nothing, and `Rollback()` discards them. Disposing a transaction that is still open rolls it back, so a `using` block that throws leaves nothing behind. A connection has one transaction at a time: a second `BeginTransaction()` throws `InvalidOperationException`.
+
+A :term[conflict]{id=conflict}, another connection committing a change to the same node first, throws a `RelateException` from `Commit()` whose `IsRetryable` is `true` and whose `Code` is `Neo.TransientError.Transaction.Outdated`. It is the one exception worth retrying. In relate 1.2.0 a connection whose commit failed keeps the ended transaction as its `CurrentTransaction`, and every later `BeginTransaction()` on it throws `InvalidOperationException`, so run each attempt on a connection of its own. This program loses a conflict on its first attempt and retries:
+
+```csharp run name=retry
+using Relate.Net;
+
+using var db = RelateDatabase.OpenInMemory();
+using var other = db.Connect();
+other.Query("CREATE (:Counter {n: 0})");
+
+for (var attempt = 1; ; attempt++)
+{
+    try
+    {
+        using var conn = db.Connect();
+        using var tx = conn.BeginTransaction();
+        tx.Query("MATCH (c:Counter) SET c.n = c.n + 1");
+        if (attempt == 1)
+        {
+            other.Query("MATCH (c:Counter) SET c.n = c.n + 10");
+        }
+        tx.Commit();
+        Console.WriteLine($"committed on attempt {attempt}");
+        break;
+    }
+    catch (RelateException e) when (e.IsRetryable && attempt < 3)
+    {
+        Console.WriteLine($"attempt {attempt}: {e.Code}");
+    }
+}
+
+Console.WriteLine($"n = {other.Query("MATCH (c:Counter) RETURN c.n").Scalar<long>()}");
+```
+
+A statement that fails inside a transaction marks it for rollback: every later statement and `Commit()` throw `semantic error: transaction failed; rollback required`. Dispose the transaction, or call `Rollback()`, then run the work again. While a transaction is open, a statement run on its connection joins it, and `ChangeNamespace()` is refused.
+
+## Run async calls and share a database
+
+Each call has an async twin: `OpenAsync`, `QueryAsync`, `BeginTransactionAsync`, `CommitAsync`, `RollbackAsync`, `CheckpointAsync` and `DisposeAsync`. The engine is synchronous, so an async call runs the native work on a thread-pool thread. A `CancellationToken` stops a call that is still waiting to start; one that has started runs to the end.
+
+A `RelateDatabase` can be shared between threads. A connection runs one statement at a time and queues the rest, so for work in parallel, open one connection per worker:
+
+```csharp run name=parallel
+using Relate.Net;
+
+await using var db = RelateDatabase.OpenInMemory();
+
+await Parallel.ForEachAsync(Enumerable.Range(1, 20), async (id, ct) =>
+{
+    await using var conn = db.Connect();
+    await conn.QueryAsync("MERGE (:Item {id: $id})", new { id }, ct);
+});
+
+await using var reader = db.Connect();
+var result = await reader.QueryAsync("MATCH (i:Item) RETURN count(i) AS items, sum(i.id) AS total");
+Console.WriteLine($"items: {result[0]["items"]}, total: {result[0]["total"]}");
+```
+
+Results hold no native resources: `Query` copies every row into managed objects before it returns, so a result outlives its connection and its database, and its memory grows with the answer. Bound large answers with `LIMIT`.
+
+## Read result metadata
+
+A `QueryResult` carries, beside its rows:
+
+| Member | Holds |
+| --- | --- |
+| `Columns` | The column names, in `RETURN` order |
+| `QueryType` | `Read`, `Write` (a write with no columns), `ReadWrite` (a write with columns) or `Schema` |
+| `Namespace` | The namespace the statement ran in: its `USE` target, else the session's |
+| `Counters` | What a write changed: `NodesCreated`, `PropertiesSet`, `IndexesAdded` and the rest, and `ContainsUpdates` |
+| `Bookmark` | An auto-commit write's bookmark; `null` for a read and inside a transaction |
+| `Notifications` | The planner's notifications, from `EXPLAIN` and `PROFILE` |
+| `PlanJson` | The `relate.plan/v1` plan as JSON, from `EXPLAIN` and `PROFILE`; `null` otherwise |
+| `Timings` | `Elapsed`, `Parse`, `Plan` and `Execute`, as `TimeSpan` values |
+
+`EXPLAIN` plans a statement without running it, and reports what the planner noticed:
+
+```csharp run name=explain
+using System.Text.Json;
+using Relate.Net;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+conn.Query("CREATE (:Person {name: 'Ada'}), (:Project {name: 'relate'})");
+
+var explain = conn.Query("EXPLAIN MATCH (p:Person), (r:Project) RETURN p.name, r.name");
+Console.WriteLine($"rows: {explain.Count}, query type: {explain.QueryType}");
+foreach (var n in explain.Notifications)
+{
+    Console.WriteLine($"{n.GqlStatus} {n.Severity} {n.Title}");
+    Console.WriteLine($"  remedy: {n.Remedy}");
+}
+
+using var plan = JsonDocument.Parse(explain.PlanJson!);
+Console.WriteLine($"plan root: {plan.RootElement.GetProperty("root").GetProperty("operator").GetString()}");
+```
+
+`PROFILE` runs the statement and adds each operator's actual rows and time to the plan.
+
+## Handle errors
+
+| Exception | Thrown when |
+| --- | --- |
+| `RelateException` | The engine refused or failed the statement, the open, the commit, or a namespace: it carries `Code`, `GqlStatus`, `Stage` and `IsRetryable` |
+| `ArgumentException` | A parameter value can't be sent, or the engine rejected one (its `InnerException` is the `RelateException`); a string argument that holds a NUL character |
+| `ArgumentNullException` | A `null` statement or location |
+| `InvalidOperationException` | A second open transaction, a transaction used after it ended, or `Scalar<T>()` on an empty result |
+| `ObjectDisposedException` | A call on a disposed database or connection |
+| `InvalidCastException`, `OverflowException` | `Get<T>()` can't convert the value |
+| `KeyNotFoundException` | A record has no column of that name; the message lists the columns |
+| `DllNotFoundException`, `BadImageFormatException`, `NotSupportedException` | The engine library is missing, built for another architecture, or speaks another C ABI version |
+
+`RelateException.Stage` is `Compile` (parse or plan), `Runtime` (execution) or `Internal` (the C boundary: a failed open, a locked store), and `IsRetryable` is `true` exactly when running the same work again can succeed. For a storage or internal failure the message is a fixed `internal error`; set `RELATE_FFI_LOG=1` before the process starts to have the engine log the detail to standard error. A failed auto-commit statement leaves the connection usable.
+
+```csharp run name=errors
+using Relate.Net;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+
+foreach (var statement in new[] { "RETRN 1", "RETURN 1 / 0", "RETURN $missing" })
+{
+    try
+    {
+        conn.Query(statement);
+    }
+    catch (RelateException e)
+    {
+        Console.WriteLine($"{statement}: {e.GqlStatus} {e.Code} {e.Stage} retryable={e.IsRetryable}");
+    }
+}
+
+try
+{
+    db.Connect("nowhere");
+}
+catch (RelateException e)
+{
+    Console.WriteLine(e.Message);
+}
+
+Console.WriteLine(conn.Query("RETURN 'still usable' AS s").Scalar<string>());
+```
+
+The [errors reference](/docs/reference/errors) lists the engine's messages with their causes and remedies.
+
+## Verify
+
+This program checks the client end to end: it loads the library, opens a store, and asks the engine for its version.
+
+```csharp run name=verify
+using Relate.Net;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+var version = conn.Query(
+    "CALL dbms.components() YIELD name, versions WHERE name = 'Relate' RETURN versions[0]").Scalar<string>();
+Console.WriteLine($"relate {version}, C ABI {RelateDatabase.NativeAbiVersion}");
+```
+
+A version means the build found the engine library, the client loaded it, and a statement ran through it.
+
+## If it goes wrong
+
+| Error | Cause | Remedy |
+| --- | --- | --- |
+| Build error `Build the current native library first: cargo build -p relate-ffi. Or pass -p:RelateNativeLibraryPath=…` | `RelateNativeLibraryPath` is not set and the checkout has no built library | Set it to the library from the release archive, or build the library in the checkout |
+| `DllNotFoundException` | The library is not beside the program | Rebuild with `RelateNativeLibraryPath` set, or copy the library into the output folder |
+| `BadImageFormatException` | The library is for another architecture than the process | Use the archive for the process's platform |
+| `NotSupportedException` | The library speaks another C ABI version | Take the library from the same release as the checkout |
+| `RelateException`: `internal error` (`Neo.DatabaseError.General.UnknownError`, stage `Internal`) from `Open` or `OpenReadOnly` | Another process or an undisposed `RelateDatabase` holds the store for writing, or `OpenReadOnly` named a path with no store | Close the other writer, open a directory store read-only beside its writer, or fix the path |
+| `RelateException`: `semantic error: WriteOnReadOnlyAccessDatabase: …` (`42N18`) | A write or `Checkpoint()` on a database opened with `OpenReadOnly` | Open with `RelateDatabase.Open` for writes |
+| `RelateException`: `semantic error: transaction failed; rollback required` | An earlier statement in the same transaction failed | Dispose or roll back the transaction, then run the work again |
+| `InvalidOperationException`: `A transaction is already open on this connection; …` after a failed `Commit()` | The connection still holds the transaction the failed commit ended (relate 1.2.0) | Dispose the connection and open a new one for the next attempt |
+
+## Related
+
+- [.NET API](/docs/reference/api/dotnet): every type, member, value mapping, and exception.
+- [Embed relate in a .NET app](/docs/get-started/dotnet): the first program, step by step.
+- [Errors](/docs/reference/errors): every engine error message, its codes, and its remedy.
+- [Transactions and concurrency](/docs/concepts/transactions-and-concurrency): what a transaction isolates, and why a store has one writer.
+- [Choose a store layout](/docs/guides/storage/choose-a-store-layout): in memory, a directory or one `.rl` file.
+- [Project](/docs/reference/project): releases, platforms, and where each client is published.
+- [Embedded graph in an app](/docs/concepts/problems-relate-solves#embedded-graph-in-an-app): the problem this client solves.

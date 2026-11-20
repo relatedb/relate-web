@@ -2,7 +2,7 @@
 title: Where relate fits
 description: The shape of relate, the jobs it suits, and the conditions where another kind of database fits better, each traced to the limit it comes from.
 order: 10
-surfaces: [cli, python, node, browser, rust, java, go, swift, bolt, http, mcp, agents]
+surfaces: [cli, python, node, browser, rust, java, dotnet, go, swift, bolt, http, mcp, agents]
 related: [reference/limitations, guides/operate/sizing-and-memory, guides/operate/two-processes-one-store, concepts/architecture, guides/migrate/from-neo4j]
 ---
 
@@ -12,7 +12,7 @@ Does relate fit the job? It does when the graph belongs to one application, one 
 
 A relate :term[store]{id=store} is a directory, a single `.rl` file, or `:memory:`. One process opens it and owns it. Inside that process the engine holds the whole graph in memory and answers statements from there; disk is for durability, not for scanning. Every commit goes to the write-ahead log (:term[WAL]{id=wal}) before it applies, and a checkpoint later writes the committed graph back to the store.
 
-The same engine sits behind every front door: the `relate` CLI, the Python, Node.js, Rust, Java, Go and Swift clients, the C ABI, and a WebAssembly build for the browser. `relate serve` hosts one store in one process for Bolt, HTTP Query API and :term[MCP]{id=mcp} clients, so several clients can share a store through that one process.
+The same engine sits behind every front door: the `relate` CLI, the Python, Node.js, Rust, Java, .NET, Go and Swift clients, the C ABI, and a WebAssembly build for the browser. `relate serve` hosts one store in one process for Bolt, HTTP Query API and :term[MCP]{id=mcp} clients, so several clients can share a store through that one process.
 
 ```mermaid
 flowchart TB

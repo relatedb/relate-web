@@ -51,6 +51,7 @@ Each notification has these fields, under these keys in the :term[envelope]{id=e
 | `03N92` | Exhaustive shortest path | `Neo.ClientNotification.Statement.ExhaustiveShortestPath` | `INFORMATION` | A `shortestPath` whose `WHERE` tests the path's length or quantifies over its relationships | `The query runs with exhaustive shortest path due to an existential predicate; separate the predicate from the MATCH with WITH where possible.` | ``Separate the existential predicate from the `MATCH` with `WITH` where possible.`` |
 | `03N61` | Redundant optional procedure | `Neo.ClientNotification.Statement.RedundantOptionalProcedure` | `INFORMATION` | An `OPTIONAL CALL` of a procedure that declares no return columns, such as `db.awaitIndexes()` | ``The use of `OPTIONAL` is redundant as `CALL <procedure>` is a void procedure.`` | ``Drop `OPTIONAL`: the procedure declares no return columns, so the call yields the same single row either way.`` |
 | `03N62` | Redundant optional subquery | `Neo.ClientNotification.Statement.RedundantOptionalSubquery` | `INFORMATION` | An `OPTIONAL CALL (…) { … }` whose body returns no columns, such as one that only writes | ``The use of `OPTIONAL` is redundant as `CALL` is a unit subquery.`` | ``Drop `OPTIONAL`: the subquery projects no columns, so the call yields the same single row either way.`` |
+| `01N60` | Parameter missing | `Neo.ClientNotification.Statement.ParameterMissing` | `WARNING` | `EXPLAIN` of a statement that names a parameter the caller did not supply; one notification names every missing parameter. `PROFILE` and a plain run refuse the statement instead, with `semantic error: ParameterMissing: Expected parameter(s): <names>` | `The undefined parameter(s) $<name>, … prevent plan reuse.` | `Supply the parameter(s): without them the statement can only be planned, never run.` |
 
 ## Unrecognized names
 
@@ -93,6 +94,7 @@ The engine defines two hint notifications. Neither was triggered when this page 
 | Hint | Result |
 | --- | --- |
 | `USING INDEX` on a label and property that the pattern and its `WHERE` use | Accepted with no hint notification; a pair no index serves still gives `03C91` |
+| `USING RANGE INDEX` and `USING TEXT INDEX` | Read like `USING INDEX`, with the same checks and results |
 | `USING JOIN ON` | Accepted with no notification |
 | `USING INDEX` on a label not in the pattern, or on a property with no predicate in the `WHERE` | Fails with `syntax error: InvalidPatternCharacter: unfulfillable hints: the hint(s) USING INDEX <hint> cannot be fulfilled` |
 
@@ -170,6 +172,21 @@ Notifications:
 INFORMATION 03N61 Neo.ClientNotification.Statement.RedundantOptionalProcedure: The use of `OPTIONAL` is redundant as `CALL db.awaitIndexes()` is a void procedure. Remedy: Drop `OPTIONAL`: the procedure declares no return columns, so the call yields the same single row either way.
 Notifications:
 INFORMATION 03N62 Neo.ClientNotification.Statement.RedundantOptionalSubquery: The use of `OPTIONAL` is redundant as `CALL` is a unit subquery. Remedy: Drop `OPTIONAL`: the subquery projects no columns, so the call yields the same single row either way.
+```
+
+`01N60`, with the statement in single quotes so the shell leaves `$name` alone. `EXPLAIN` plans the statement and warns; running it refuses:
+
+```bash verify
+relate --database ./team.rl --read-only --mode markdown 'EXPLAIN MATCH (p:Person {name: $name}) RETURN p.role'
+relate --database ./team.rl --read-only --mode markdown 'MATCH (p:Person {name: $name}) RETURN p.role'
+echo "exit=$?"
+```
+
+```text
+Notifications:
+WARNING 01N60 Neo.ClientNotification.Statement.ParameterMissing: The undefined parameter(s) $name prevent plan reuse. Remedy: Supply the parameter(s): without them the statement can only be planned, never run.
+semantic error: ParameterMissing: Expected parameter(s): name
+exit=6
 ```
 
 ### Unrecognized name examples

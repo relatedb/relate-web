@@ -1,0 +1,366 @@
+---
+title: Embed relate in a .NET app
+label: .NET
+description: A first C# program on the relate .NET client, which opens a store, passes parameters, runs transactions, reads result metadata, and catches errors.
+order: 75
+surfaces: [dotnet]
+related: [get-started/java, get-started/python, get-started/c, reference/errors, concepts/transactions-and-concurrency, reference/storage/formats, reference/api/dotnet, guides/embed/dotnet, concepts/problems-relate-solves#embedded-graph-in-an-app]
+---
+
+By the end of this page, you'll have a C# program that keeps a small graph of people and projects in one file. It reads the graph with parameters and reports errors by their code. Along the way we write inside a :term[transaction]{id=transaction}, roll one back, and read what a result says about itself. It takes about fifteen minutes. relate runs inside your .NET process, so there is no server to start, and every step writes to a store it creates.
+
+## Prerequisites
+
+- The .NET SDK, version 8 or later, and `git`.
+- macOS (arm64 or x86-64), Linux with glibc (arm64 or x86-64), or Windows (x86-64): the platforms the engine library is built for.
+- A terminal and a text editor. The relate CLI is not needed: the client loads the engine as a library.
+
+## Install the client
+
+The .NET :term[client]{id=client} is `Relate.Net`, for C#, F# and Visual Basic, with the namespace `Relate.Net`. relate 1.2.0 is the first release to ship it. It is not on NuGet: the `Relate.Net` package there is an older community package, not this client. Your project references the client's source from a checkout of the release instead, and the build copies the engine library, `librelate_ffi`, beside your program.
+
+Each release attaches the engine library as `relate-ffi-<target>.tar.gz`, one archive per platform: `aarch64-apple-darwin`, `x86_64-apple-darwin`, `aarch64-unknown-linux-gnu`, `x86_64-unknown-linux-gnu` or `x86_64-pc-windows-msvc`. Clone the release tag, download and unpack the archive for your platform, and create a console app beside them. `<release>` is the release version, such as `1.2.0`:
+
+```bash
+git clone --branch v<release> --depth 1 https://github.com/relatedb/relate.git relate
+curl -sSfLO https://github.com/relatedb/relate/releases/download/v<release>/relate-ffi-<target>.tar.gz
+mkdir relate-ffi && tar -xzf relate-ffi-<target>.tar.gz -C relate-ffi
+dotnet new console --framework net8.0 -o team
+cd team
+dotnet add reference ../relate/clients/dotnet/src/Relate.Net/Relate.Net.csproj
+```
+
+Keep the checkout outside your project's folder: a project compiles every `.cs` file under its folder, and the checkout holds the client's tests and examples. The build reads the library's path from the MSBuild property `RelateNativeLibraryPath`, which an environment variable of the same name sets for every build in the shell. On Linux the file is `librelate_ffi.so`, and on Windows `relate_ffi.dll`:
+
+```bash
+export RelateNativeLibraryPath="$PWD/../relate-ffi/librelate_ffi.dylib"
+dotnet run
+```
+
+Without it, the build stops with `Build the current native library first: cargo build -p relate-ffi. Or pass -p:RelateNativeLibraryPath=/absolute/path/to/the/native/library.`: the client's default is a library built in the checkout with Rust.
+
+Each program on this page is the whole of `Program.cs`, run with `dotnet run`. The client's project carries no release number, so this program asks the engine which release it is:
+
+```csharp run name=version
+using Relate.Net;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+var result = conn.Query(
+    "CALL dbms.components() YIELD name, versions " +
+    "WHERE name = 'Relate' RETURN versions[0] AS version");
+Console.WriteLine(result.Scalar<string>());
+Console.WriteLine($"C ABI version {RelateDatabase.NativeAbiVersion}");
+```
+
+The first call loads the engine library, so a missing or mismatched library fails at this step: `DllNotFoundException` when there is none beside the program, `NotSupportedException` for a library of another C application binary interface (C ABI) version. Notice the version: the programs on this page were checked against that release, and their recorded output comes from it.
+
+## Open a store
+
+A :term[store]{id=store} is where relate keeps a graph. `RelateDatabase.OpenInMemory()` opens a store that lives in the process and forgets everything when it closes. A path ending in `.rl` is a :term[single-file store]{id=single-file-store}, which `RelateDatabase.Open()` creates when nothing is there yet.
+
+```csharp run name=open
+using Relate.Net;
+
+using (var memory = RelateDatabase.OpenInMemory())
+using (var conn = memory.Connect())
+{
+    Console.WriteLine(conn.Query("RETURN 'hello' AS greeting").Scalar<string>());
+}
+
+using (var team = RelateDatabase.Open("./team.rl"))
+{
+    Console.WriteLine(File.Exists("team.rl"));
+}
+```
+
+`Open()` opens a store, `Connect()` returns a connection on it, and `Query()` runs one statement and returns its whole result. `RelateDatabase` and `RelateConnection` are `IDisposable`, and disposing them closes the store, so the programs on this page open them with `using`. Notice that `team.rl` now exists.
+
+## Create the graph
+
+Our graph is three people and two projects: who works on what, since when, and who maintains `relate`. One `CREATE` statement writes all of it. The rest of this page uses the same statement, as `Team`, on an in-memory store, so each program runs on its own.
+
+```csharp run name=create
+using Relate.Net;
+
+const string Team = """
+    CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
+           (grace:Person {name: 'Grace', role: 'engineer'}),
+           (noor:Person {name: 'Noor', role: 'maintainer'}),
+           (relate:Project {name: 'relate', language: 'Rust'}),
+           (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),
+           (ada)-[:WORKS_ON {since: 2024}]->(relate),
+           (grace)-[:WORKS_ON {since: 2023}]->(relate),
+           (grace)-[:WORKS_ON {since: 2022}]->(tck),
+           (noor)-[:MAINTAINS]->(relate),
+           (ada)-[:KNOWS]->(grace)
+    """;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+var counters = conn.Query(Team).Counters;
+Console.WriteLine($"nodes created: {counters.NodesCreated}");
+Console.WriteLine($"relationships created: {counters.RelationshipsCreated}");
+Console.WriteLine($"properties set: {counters.PropertiesSet}");
+```
+
+A write returns no rows, but its result counts what it changed. Five nodes and five relationships: the whole team.
+
+## Read it back with parameters
+
+A statement names each value it needs as `$name`, and `Query()` takes the values as an object whose properties are the names: an anonymous object here, or a dictionary or a record. The statement text stays the same while the values change, and a value never becomes part of the Cypher.
+
+```csharp run name=params
+using Relate.Net;
+
+const string Team = """
+    CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
+           (grace:Person {name: 'Grace', role: 'engineer'}),
+           (noor:Person {name: 'Noor', role: 'maintainer'}),
+           (relate:Project {name: 'relate', language: 'Rust'}),
+           (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),
+           (ada)-[:WORKS_ON {since: 2024}]->(relate),
+           (grace)-[:WORKS_ON {since: 2023}]->(relate),
+           (grace)-[:WORKS_ON {since: 2022}]->(tck),
+           (noor)-[:MAINTAINS]->(relate),
+           (ada)-[:KNOWS]->(grace)
+    """;
+
+const string TeamOf = """
+    MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: $project})
+    RETURN p.name AS name, w.since AS since
+    ORDER BY since
+    """;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+conn.Query(Team);
+foreach (var project in new[] { "relate", "opencypher-tck" })
+{
+    Console.WriteLine(project);
+    foreach (var row in conn.Query(TeamOf, new { project }))
+    {
+        Console.WriteLine($"  {row.Get<string>("name")} since {row.Get<long>("since")}");
+    }
+}
+```
+
+A result is a list of records, and a record reads a column by name or by position. `Get<T>()` converts the value to the type you ask for: a Cypher integer arrives as a `long`, and a string as a `string`. Notice that Noor isn't listed: she maintains `relate` through a `MAINTAINS` relationship, and the pattern asks for `WORKS_ON`.
+
+## Change it in a transaction
+
+A connection commits each statement on its own until you call `BeginTransaction()`. The transaction it returns runs every statement until `Commit()` keeps them or `Rollback()` throws them away, and disposing a transaction that was not committed rolls it back. This program adds Lin to the team and commits, then deletes every project and rolls back.
+
+```csharp run name=transaction
+using Relate.Net;
+
+const string Team = """
+    CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
+           (grace:Person {name: 'Grace', role: 'engineer'}),
+           (noor:Person {name: 'Noor', role: 'maintainer'}),
+           (relate:Project {name: 'relate', language: 'Rust'}),
+           (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),
+           (ada)-[:WORKS_ON {since: 2024}]->(relate),
+           (grace)-[:WORKS_ON {since: 2023}]->(relate),
+           (grace)-[:WORKS_ON {since: 2022}]->(tck),
+           (noor)-[:MAINTAINS]->(relate),
+           (ada)-[:KNOWS]->(grace)
+    """;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+conn.Query(Team);
+long Count(string label) => conn.Query($"MATCH (n:{label}) RETURN count(n) AS n").Scalar<long>();
+
+using (var tx = conn.BeginTransaction())
+{
+    tx.Query("MATCH (tck:Project {name: 'opencypher-tck'}) " +
+             "CREATE (:Person {name: 'Lin', role: 'engineer'})-[:WORKS_ON {since: 2026}]->(tck)");
+    Bookmark? bookmark = tx.Commit();
+    Console.WriteLine($"committed: {bookmark is not null}");
+}
+Console.WriteLine($"people after commit: {Count("Person")}");
+
+using (var tx = conn.BeginTransaction())
+{
+    tx.Query("MATCH (p:Project) DETACH DELETE p");
+    Console.WriteLine($"projects inside the transaction: {Count("Project")}");
+    tx.Rollback();
+}
+Console.WriteLine($"projects after rollback: {Count("Project")}");
+```
+
+While a transaction is open, a statement run on the connection belongs to it too, so the count inside it sees the delete: zero projects. After `Rollback()`, both are back, and Lin, who was committed, stays. `Commit()` returns a :term[bookmark]{id=bookmark}, the commit's place in the store's history as `relate:<n>`, or `null` when the transaction wrote nothing.
+
+## Read result metadata
+
+A `QueryResult` describes itself as well as holding rows: the column names, what kind of statement it was, what it changed, how long it took, and, for a write outside a transaction, the bookmark of its commit.
+
+```csharp run name=metadata
+using Relate.Net;
+
+const string Team = """
+    CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
+           (grace:Person {name: 'Grace', role: 'engineer'}),
+           (noor:Person {name: 'Noor', role: 'maintainer'}),
+           (relate:Project {name: 'relate', language: 'Rust'}),
+           (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),
+           (ada)-[:WORKS_ON {since: 2024}]->(relate),
+           (grace)-[:WORKS_ON {since: 2023}]->(relate),
+           (grace)-[:WORKS_ON {since: 2022}]->(tck),
+           (noor)-[:MAINTAINS]->(relate),
+           (ada)-[:KNOWS]->(grace)
+    """;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+conn.Query(Team);
+
+var result = conn.Query(
+    "MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: $project}) " +
+    "RETURN p.name AS name, w.since AS since ORDER BY since",
+    new { project = "relate" });
+Console.WriteLine(string.Join(", ", result.Columns));
+foreach (var column in result.Columns)
+{
+    Console.WriteLine($"{column} {result[0][column]!.GetType().Name}");
+}
+Console.WriteLine($"query type: {result.QueryType}");
+Console.WriteLine($"namespace: {result.Namespace}");
+
+var write = conn.Query("MATCH (n:Person {name: 'Noor'}) SET n.role = 'lead'");
+Console.WriteLine($"query type: {write.QueryType}");
+Console.WriteLine($"properties set: {write.Counters.PropertiesSet}");
+Console.WriteLine($"bookmark: {write.Bookmark is not null}");
+Console.WriteLine($"timed: {write.Timings.Elapsed > TimeSpan.Zero}");
+```
+
+A result has no list of column types: each value carries its own .NET type, and a node arrives as a `Node` with its labels and properties. `QueryType` is `Read` for a read and `Write` for a write that returns no columns. `Counters` says what a write changed, `Timings` how long it took to parse, plan and run, and `Bookmark` is set on a write that committed on its own and `null` for a read.
+
+## Catch an error
+
+Every error the engine reports throws `RelateException`, which carries the engine's codes. A statement that uses `$name` without a value is rejected before it runs:
+
+```csharp run name=error
+using Relate.Net;
+
+const string Team = """
+    CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
+           (grace:Person {name: 'Grace', role: 'engineer'}),
+           (noor:Person {name: 'Noor', role: 'maintainer'}),
+           (relate:Project {name: 'relate', language: 'Rust'}),
+           (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),
+           (ada)-[:WORKS_ON {since: 2024}]->(relate),
+           (grace)-[:WORKS_ON {since: 2023}]->(relate),
+           (grace)-[:WORKS_ON {since: 2022}]->(tck),
+           (noor)-[:MAINTAINS]->(relate),
+           (ada)-[:KNOWS]->(grace)
+    """;
+
+const string RoleOf = "MATCH (p:Person {name: $name}) RETURN p.role AS role";
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+conn.Query(Team);
+
+try
+{
+    conn.Query(RoleOf);
+}
+catch (RelateException e)
+{
+    Console.WriteLine(e.Message);
+    Console.WriteLine($"GqlStatus: {e.GqlStatus}");
+    Console.WriteLine($"Code: {e.Code}");
+    Console.WriteLine($"Stage: {e.Stage}");
+    Console.WriteLine($"IsRetryable: {e.IsRetryable}");
+}
+
+Console.WriteLine(conn.Query(RoleOf, new { name = "Noor" }).Scalar<string>());
+```
+
+The message says what's missing; the properties are what code branches on:
+
+| Property | This error | Meaning |
+| --- | --- | --- |
+| `GqlStatus` | `42N02` | The GQLSTATUS code; every client reports the same code for the same error |
+| `Code` | `Neo.ClientError.Statement.ParameterMissing` | The Neo4j status code for the same error |
+| `Stage` | `Compile` | Where it was found: `Compile` before any work, `Runtime` while producing rows, `Internal` for a failure outside the statement, such as a locked store |
+| `IsRetryable` | `False` | Whether running it again can succeed; `true` for a write-write conflict, never for a mistake in the statement |
+
+The client's own checks throw the usual .NET exceptions instead: `ArgumentException` for a value it cannot send, `InvalidOperationException` for a second transaction on one connection, and `ObjectDisposedException` after `Dispose()`. The [errors reference](/docs/reference/errors#engine-parameter-missing) lists this message with its cause and remedy. With the value bound, the same statement finds Noor's role.
+
+## Put it together
+
+This program puts the steps together. It opens `team.rl`, creates the graph only when the store has no people yet, and prints who works on each project. A relate error anywhere ends it with the error's code and a nonzero exit status.
+
+```csharp run name=program
+using Relate.Net;
+
+const string Team = """
+    CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
+           (grace:Person {name: 'Grace', role: 'engineer'}),
+           (noor:Person {name: 'Noor', role: 'maintainer'}),
+           (relate:Project {name: 'relate', language: 'Rust'}),
+           (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),
+           (ada)-[:WORKS_ON {since: 2024}]->(relate),
+           (grace)-[:WORKS_ON {since: 2023}]->(relate),
+           (grace)-[:WORKS_ON {since: 2022}]->(tck),
+           (noor)-[:MAINTAINS]->(relate),
+           (ada)-[:KNOWS]->(grace)
+    """;
+
+const string TeamOf = """
+    MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: $project})
+    RETURN p.name AS name, w.since AS since
+    ORDER BY since
+    """;
+
+try
+{
+    using var db = RelateDatabase.Open("./team.rl");
+    using var conn = db.Connect();
+
+    var people = conn.Query("MATCH (p:Person) RETURN count(p) AS n").Scalar<long>();
+    if (people == 0)
+    {
+        conn.Query(Team);
+        Console.WriteLine("created the team graph");
+    }
+    else
+    {
+        Console.WriteLine($"found {people} people");
+    }
+
+    foreach (var project in new[] { "relate", "opencypher-tck" })
+    {
+        Console.WriteLine(project);
+        foreach (var row in conn.Query(TeamOf, new { project }))
+        {
+            Console.WriteLine($"  {row["name"]} since {row["since"]}");
+        }
+    }
+}
+catch (RelateException e)
+{
+    Console.Error.WriteLine($"relate error {e.GqlStatus}: {e.Message}");
+    return 1;
+}
+return 0;
+```
+
+Run it with `dotnet run`. Each statement is durable in `team.rl` when `Query()` returns, and `using` closes the connection and the store at the end. Run it a second time and it prints `found 3 people` instead of creating the graph again, then the same report. If another process has `team.rl` open for writing, `Open()` throws, and the program prints `relate error 42000: internal error` and exits with status 1.
+
+To read the file with no chance of changing it, open it read-only: `RelateDatabase.OpenReadOnly("./team.rl")`. A write then throws a `RelateException` with GQLSTATUS `42N18`, and a path with no store behind it throws instead of creating a new store.
+
+## What you built
+
+You have a C# program that keeps a graph of people and projects in `team.rl`, one file you can copy or archive. It reads with parameters, writes inside transactions, knows a read from a write by its query type, and reports errors by their GQLSTATUS code. Ada, Grace, and Noor are waiting in that file for the next run.
+
+## Next
+
+- [Use the .NET client](/docs/guides/embed/dotnet): open modes, parameters, value types, transactions, async calls and errors in depth.
+- [.NET API](/docs/reference/api/dotnet): every type and member.
+- [Embed relate in a Java app](/docs/get-started/java): the same steps, the same graph, in Java.
+- [Errors](/docs/reference/errors): every error message, its cause, its remedy, and its codes.
+- [Transactions and concurrency](/docs/concepts/transactions-and-concurrency): what a transaction isolates, and why a store has one writer.

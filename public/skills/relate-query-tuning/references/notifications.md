@@ -3,7 +3,7 @@
 `EXPLAIN` and `PROFILE` attach notifications to a plan; a plain run derives
 none. Each has a GQLSTATUS code, a severity, a category, a title, a
 description that names the labels, properties and counts involved, and a
-remedy. The descriptions below are quoted from runs on relate 1.1.0; the
+remedy. The descriptions below are quoted from runs on relate 1.2.0; the
 parts that name labels, properties and counts vary. The Cypher statements
 run in order on one in-memory store.
 

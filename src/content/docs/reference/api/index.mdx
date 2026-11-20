@@ -3,11 +3,11 @@ title: API reference
 label: API
 description: Every relate surface, from the CLI and the language clients to the served protocols, with the capability matrix and each surface's reference page.
 order: 10
-surfaces: [cli, rust, c, python, node, browser, java, go, swift, bolt, http, mcp]
+surfaces: [cli, rust, c, python, node, browser, java, dotnet, go, swift, bolt, http, mcp]
 related: [get-started/install, reference/project, reference/cli, reference/errors, concepts/architecture, concepts/problems-relate-solves#embedded-graph-in-an-app]
 ---
 
-relate is one engine with several front doors, and each front door is a :term[surface]{id=surface}. The Rust crate is the engine. The C library, `librelate_ffi`, exposes it through a C application binary interface (C ABI), which the Node.js, Java, Go and Swift :term[clients]{id=client} call; the Python client and the WebAssembly (WASM) browser build carry the engine themselves. The `relate` CLI links the engine too, and `relate serve` hosts :term[Bolt]{id=bolt}, the HTTP Query API and :term[MCP]{id=mcp} over one :term[store]{id=store}. Every surface runs the same engine, so a statement means the same thing on each; the surfaces differ in what they expose around it, which the matrix on this page records.
+relate is one engine with several front doors, and each front door is a :term[surface]{id=surface}. The Rust crate is the engine. The C library, `librelate_ffi`, exposes it through a C application binary interface (C ABI), which the Node.js, Java, .NET, Go and Swift :term[clients]{id=client} call; the Python client and the WebAssembly (WASM) browser build carry the engine themselves. The `relate` CLI links the engine too, and `relate serve` hosts :term[Bolt]{id=bolt}, the HTTP Query API and :term[MCP]{id=mcp} over one :term[store]{id=store}. Every surface runs the same engine, so a statement means the same thing on each; the surfaces differ in what they expose around it, which the matrix on this page records.
 
 ## Synopsis
 
@@ -39,7 +39,7 @@ Each row is a feature and each column a surface; every row has a stable anchor, 
 | `partial` | The surface has part of it; the note names the part |
 | `unknown` | Nobody has checked the cell; the matrix never guesses |
 
-A cell is checked against a run of the surface or its upstream reference, and the note says what the surface does, not how the cell was checked. The C, Java, Go and Swift clients load the same C library as the Node.js client, so a statement-level cell such as vector search is checked once through that library; the Bolt and MCP cells of statement-level features are checked on the store all three served surfaces share. The reference page of each language client shows its own column alone.
+A cell is checked against a run of the surface or its upstream reference, and the note says what the surface does, not how the cell was checked. The C, Java, .NET, Go and Swift clients load the same C library as the Node.js client, so a statement-level cell such as vector search is checked once through that library; the Bolt and MCP cells of statement-level features are checked on the store all three served surfaces share. The reference page of each language client shows its own column alone.
 
 ## Surfaces
 

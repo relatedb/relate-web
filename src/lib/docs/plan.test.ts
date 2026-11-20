@@ -14,6 +14,7 @@ import { loadEngine } from '../cookbook/run.ts';
 import { DOCS_DIR } from './content.ts';
 import {
   deltas,
+  executedOps,
   fixed,
   indexName,
   missingIndex,
@@ -191,6 +192,30 @@ test('the statement helpers split the prefix and read index statements', () => {
   assert.equal(indexName('CREATE CONSTRAINT c FOR (n:P) REQUIRE n.x IS UNIQUE'), null);
   const before = onExample("EXPLAIN MATCH (p:Person {name: 'Ada'})-[:WORKS_ON]->(proj:Project) RETURN proj.name AS project");
   assert.equal(missingIndex(before.notifications), 'CREATE INDEX relate_Person__name FOR (n:Person) ON (n.name)');
+});
+
+// relate 1.2.0 lists an index-seek MATCH's steps as display-only children of
+// the seek: the seek on the index, then one Expand per hop, after the real
+// input. `relate --mode speedscope` skips them and names each frame by its
+// `Id` (upstream surfaces/relate-formatter/src/speedscope.rs); its frames for
+// this statement on the example graph with the name index are these.
+test('display-only seek steps: the table lists them, speedscope and the comparison skip them', () => {
+  const db = new wasm.RelateDb();
+  try {
+    db.executeScript(`${SEED}; CREATE INDEX relate_Person__name FOR (n:Person) ON (n.name)`, null);
+    const env = JSON.parse(
+      db.executeScript("PROFILE MATCH (x:Project) WITH count(x) AS c MATCH (p:Person {name: 'Ada'})-[:WORKS_ON]->(r) RETURN c, r.name AS n", null).at(-1)!,
+    ) as Envelope;
+    const plan = env.plan!;
+    assert.deepEqual(preOrder(plan.root).map((p) => p.op.operator), ['ProduceResults', 'NodeIndexSeek', 'EagerAggregation', 'NodeByLabelScan', 'NodeIndexSeek', 'Expand']);
+    assert.deepEqual(executedOps(plan.root).map((p) => `${p.op.operator} ${p.id}`), ['ProduceResults 0', 'NodeIndexSeek 1', 'EagerAggregation 2', 'NodeByLabelScan 3']);
+    const frames = (JSON.parse(speedscope(plan, '1.2.0')) as { shared: { frames: { name: string }[] } }).shared.frames.map((f) => f.name);
+    assert.deepEqual(frames, ['ProduceResults 0', 'NodeIndexSeek 1', 'EagerAggregation 2', 'NodeByLabelScan 3']);
+    assert.deepEqual(summarize(plan, env.notifications).operators, ['ProduceResults', 'NodeIndexSeek', 'EagerAggregation', 'NodeByLabelScan']);
+    assert.equal(planTableLines(plan).filter((l) => l.startsWith('| ')).length, 7);
+  } finally {
+    db.free();
+  }
 });
 
 test('deltas compare two plans of one statement, before and after its index', () => {

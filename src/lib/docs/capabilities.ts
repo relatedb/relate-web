@@ -266,7 +266,7 @@ export function pageRuns(file: string): PageRuns {
 }
 
 /** A sample's client as the card names it. */
-const CLIENT_NAMES: Record<string, string> = { python: 'Python', js: 'Node.js', rust: 'Rust', java: 'Java', go: 'Go', swift: 'Swift', c: 'C' };
+const CLIENT_NAMES: Record<string, string> = { python: 'Python', js: 'Node.js', rust: 'Rust', java: 'Java', csharp: '.NET', go: 'Go', swift: 'Swift', c: 'C' };
 
 /** The HTML anchor of a docs cell (constructs.ts: `cell-<id>`, an unnamed cell's id already is). */
 export const cellAnchor = (id: string) => (id.startsWith('cell-') ? id : `cell-${id}`);

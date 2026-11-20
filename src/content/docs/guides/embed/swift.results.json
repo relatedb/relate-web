@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.1.0",
+  "verified": "1.2.0",
   "cells": {
     "open": {
       "kind": "text",
@@ -8,7 +8,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.1.0",
+      "verified": "1.2.0",
       "source_sha256": "88e05878583b937bf4b74b5699200a24024fdecd7e81c6196fdf48310ddf59ce"
     },
     "params": {
@@ -17,7 +17,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.1.0",
+      "verified": "1.2.0",
       "source_sha256": "cd8e0a83b8d1cd9fb67c2b193bbe829b250d96cdb8fc1a9e29f001336f33c980"
     },
     "transaction": {
@@ -26,7 +26,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.1.0",
+      "verified": "1.2.0",
       "source_sha256": "51d6e6ff319d0cbbf373fb32057b0c6b1e8086440657f9bfe82f6bd6e8f388c3"
     },
     "metadata": {
@@ -35,7 +35,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.1.0",
+      "verified": "1.2.0",
       "source_sha256": "bfdea663daf152e7509492c5ddea546baa2ba34aae49a2c26eb0eb83b778d0ee"
     },
     "errors": {
@@ -44,7 +44,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.1.0",
+      "verified": "1.2.0",
       "source_sha256": "efc7504c18f18d11166d5b42bbb62cbd16cb434abf51a7f33aaabd2418515147"
     },
     "actor": {
@@ -53,16 +53,16 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.1.0",
+      "verified": "1.2.0",
       "source_sha256": "00b46401dd21151421ea7070c22030cfcc62769f42cb72562190e5502e5582ed"
     },
     "verify": {
       "kind": "text",
-      "text": "relate 1.1.0",
+      "text": "relate 1.2.0",
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.1.0",
+      "verified": "1.2.0",
       "source_sha256": "602087079d683917b11c3f9848c263e275160295c9d90b5e2869a11bbcd37dba"
     },
     "async": {
@@ -71,7 +71,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.1.0",
+      "verified": "1.2.0",
       "source_sha256": "74b81804bb6f78b5218f8874882e1fc9d5b99fa58e32e58adc0f5e06eea384d6"
     }
   }

@@ -28,13 +28,13 @@ A missing path is created on the first writable open. A `--read-only` open of a 
 
 | | In memory | Directory store | `.rl` file |
 | --- | --- | --- | --- |
-| On disk | Nothing | A folder: snapshot files, the WAL (`wal/`, or `.cypherlite/wal/` for `markdown`), lock files | One file holding the same tree, WAL included |
+| On disk | Nothing | A folder: snapshot files, the WAL (`wal/`, or `.relate/wal/` for `markdown`), lock files | One file holding the same tree, WAL included |
 | Durable | No: gone when the process exits | Yes | Yes |
 | Codecs | None | `parquet`, `json`, `markdown` | `parquet`, `json`, `markdown` |
 | Writers | One process | One process at a time | One process at a time |
 | `--read-only` beside a writer | Not applicable | Allowed; several readers can share the store | Refused while a writer holds the file |
 | `--read-only=live` | Refused | Allowed: follows the writer's commits | Refused |
-| `--wal-dir` | Not applicable | Allowed (default `<database>/wal`; `<database>/.cypherlite/wal` for `markdown`) | Refused |
+| `--wal-dir` | Not applicable | Allowed (default `<database>/wal`; `<database>/.relate/wal` for `markdown`) | Refused |
 | `relate info` | Refused (exit code 2) | Allowed, without opening the store | Allowed, without opening the store |
 | `relate clone` as source or destination | Refused | Allowed | Allowed |
 
@@ -48,7 +48,7 @@ The codec is chosen when a store is created, with `--snapshot-format` or the `RE
 | --- | --- | --- | --- | --- |
 | `parquet` (default) | `manifest.json`, `nodes/<lo>-<hi>-<hash>.parquet`, `relationships/<lo>-<hi>-<hash>.parquet`, with a typed column per shared property key ([data files](#parquet-data-files)) | The node and relationship id ranges that changed | No (columnar binary) | Format version, node and relationship counts at the checkpoint, and index and constraint counts |
 | `json` | `manifest.json`, `graph.json` | The whole `graph.json` | Yes | Layout, codec, checkpoint, size; the rest as `unavailable` |
-| `markdown` | One note per node at `<Label>/<name>.md`, an `index.md` per label, a root `index.md` and `log.md`; engine state under `.cypherlite/` | The notes that changed; the index and log notes again | Yes | Layout, codec, checkpoint, size; the rest as `unavailable` |
+| `markdown` | One note per node at `<Label>/<name>.md`, an `index.md` per label, a root `index.md` and `log.md`; engine state under `.relate/` | The notes that changed; the index and log notes again | Yes | Layout, codec, checkpoint, size; the rest as `unavailable` |
 
 `graph.json` holds every node and relationship with its labels or type and properties, then the index and constraint catalog. A store holding one `KNOWS` relationship between two people starts like this:
 
@@ -71,7 +71,7 @@ WORKS_ON:
 ---
 ```
 
-`relate clone --to-snapshot-format <codec>` copies a store into a new store in another codec; the source is not written. In relate 1.1.0 a `markdown` store clones into a `.rl` file only with `--to-snapshot-format parquet` or `json` ([`relate clone`](/docs/reference/cli/clone#markdown-into-a-rl-file)).
+`relate clone --to-snapshot-format <codec>` copies a store into a new store in another codec; the source is not written. In relate 1.2.0 a `markdown` store clones into a `.rl` file only with `--to-snapshot-format parquet` or `json` ([`relate clone`](/docs/reference/cli/clone#markdown-into-a-rl-file)).
 
 ### Parquet data files
 
@@ -101,14 +101,14 @@ Releases up to and including 0.1.2 wrote every property in the tagged-JSON colum
 | `nodes/`, `relationships/` | `parquet` data files, one per id range |
 | `graph.json` | The `json` snapshot |
 | `wal/NNNNNNNN.log` | WAL segments: commits since the last checkpoint, as physical changes to nodes, relationships, labels and properties, not Cypher text ([segment format](/docs/reference/storage/wal-and-checkpoints#segment-format)) |
-| `.cypherlite/schema/` | A text copy of the schema (indexes, constraints, graph type), rewritten at each checkpoint |
+| `.relate/schema/` | A text copy of the schema (indexes, constraints, graph type), rewritten at each checkpoint |
 | `.cypherlite.lock`, `.cypherlite.writer`, `wal/.cypherlite.lock`, `wal/.cypherlite.writer` | The writer lock |
 
-A `markdown` store keeps `manifest.json` and the WAL in its `.cypherlite/` folder (`.cypherlite/manifest.json`, `.cypherlite/wal/NNNNNNNN.log`, `.cypherlite/wal/.cypherlite.lock`, `.cypherlite/wal/.cypherlite.writer`) and the root lock files `.cypherlite.lock` and `.cypherlite.writer` beside its notes; the `parquet` and `json` codecs keep them at the root and in `wal/`.
+A `markdown` store keeps `manifest.json` and the WAL in its `.relate/` folder (`.relate/manifest.json`, `.relate/wal/NNNNNNNN.log`, `.relate/wal/.cypherlite.lock`, `.relate/wal/.cypherlite.writer`) and the root lock files `.cypherlite.lock` and `.cypherlite.writer` beside its notes; the `parquet` and `json` codecs keep them at the root and in `wal/`.
 
 The snapshot files hold the state at the last checkpoint; the WAL holds every commit since. Opening a store loads the snapshot, then replays the WAL. A copy of the snapshot files without the WAL folder holds the state at the last checkpoint only, and a `--read-only` open of it fails.
 
-On-disk names that start with `.cypherlite` and the magic numbers in the version markers table keep the product's former name, so stores written by earlier releases open unchanged.
+The lock files `.cypherlite.lock` and `.cypherlite.writer` and the magic numbers in the version markers table keep the product's former name, so stores written by earlier releases open unchanged. Before 1.2.0 the engine folder was `.cypherlite/`. The first writable open by 1.2.0 or later renames it to `.relate/`; a read-only open leaves it, and a store holding both folders is refused until the stale `.cypherlite/` is deleted ([Upgrade a store](/docs/guides/operate/upgrade-a-store#read-the-stores-format-version)).
 
 The schema copy is plain text. After two schema statements on a directory store, `schema.cypher` holds one statement per index and constraint:
 
@@ -118,7 +118,7 @@ relate --database ./people --mode envelope "CREATE INDEX person_role IF NOT EXIS
 ```
 
 ```bash verify
-cat people/.cypherlite/schema/schema.cypher
+cat people/.relate/schema/schema.cypher
 ```
 
 ```text
@@ -129,14 +129,14 @@ CREATE CONSTRAINT `person_name` FOR (n:`Person`) REQUIRE (n.`name`) IS UNIQUE;
 The copy is checked on every open, so an edited file stops the store from opening, read-only included:
 
 ```bash verify
-echo "// edited" >> people/.cypherlite/schema/schema.cypher
+echo "// edited" >> people/.relate/schema/schema.cypher
 relate --database ./people --read-only --mode envelope "RETURN 1 AS ok"
 echo "exit=$?"
 ```
 
 ```text
-Failed to open Relate: storage error: schema mirror .cypherlite/schema/schema.cypher differs from the schema this store's checkpoint persisted; it was edited by hand or copied from another store; delete the .cypherlite/schema/ directory and reopen: the next checkpoint regenerates it from the store's schema
-{"error":{"code":"fatal_error","exit_code":1,"kind":"storage","message":"storage error: schema mirror .cypherlite/schema/schema.cypher differs from the schema this store's checkpoint persisted; it was edited by hand or copied from another store; delete the .cypherlite/schema/ directory and reopen: the next checkpoint regenerates it from the store's schema","retryable":false}}
+Failed to open Relate: storage error: schema mirror .relate/schema/schema.cypher differs from the schema this store's checkpoint persisted; it was edited by hand or copied from another store; delete the .relate/schema/ directory and reopen: the next checkpoint regenerates it from the store's schema
+{"error":{"code":"fatal_error","exit_code":1,"kind":"storage","message":"storage error: schema mirror .relate/schema/schema.cypher differs from the schema this store's checkpoint persisted; it was edited by hand or copied from another store; delete the .relate/schema/ directory and reopen: the next checkpoint regenerates it from the store's schema","retryable":false}}
 exit=1
 ```
 
@@ -148,7 +148,7 @@ Each durable part of a store carries a version marker. A store is checked agains
 | --- | --- | --- | --- |
 | `parquet` snapshot | `format_version` in `manifest.json` | `5`; `6` while the store holds an ontology | `1` to `6`; `3` and `4` are rewritten as `5` and `6` at the next checkpoint |
 | `json` snapshot | `value_encoding` in `graph.json` | `2`; `3` while the store holds an ontology | absent, `2`, `3` |
-| `markdown` snapshot | `value_encoding` in `.cypherlite/manifest.json` | `2`; `3` while the store holds an ontology | `1` to `3`; an absent marker counts as current |
+| `markdown` snapshot | `value_encoding` in `.relate/manifest.json` | `2`; `3` while the store holds an ontology | `1` to `3`; an absent marker counts as current |
 | WAL segment | The first 8 bytes | `MDBWAL01`; `MDBWAL02` for segments written while the store holds an ontology | `MDBWAL01`, `MDBWAL02` |
 | `.rl` container | Superblock magic and version | `MDBCLB01`, version `1` | `MDBCLB01`, version `1` |
 
@@ -223,5 +223,5 @@ On stderr, an error at open is prefixed `Failed to open Relate: `. The [errors r
 - [Back up and restore a store](/docs/guides/storage/backup-and-restore): `relate clone` and file copies.
 - [Storage and durability](/docs/concepts/storage-and-durability): the write path, the WAL, and checkpoints.
 - [Limits and sizing](/docs/reference/storage/limits-and-sizing): the limits on graph size, commits, and values.
-- [Keep the schema as files](/docs/guides/storage/schema-as-files): reading, reviewing and applying `.cypherlite/schema/`.
+- [Keep the schema as files](/docs/guides/storage/schema-as-files): reading, reviewing and applying `.relate/schema/`.
 - [Open a store as an Obsidian vault](/docs/guides/storage/obsidian-vault): the `markdown` codec in use.

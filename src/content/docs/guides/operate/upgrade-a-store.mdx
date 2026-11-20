@@ -61,7 +61,7 @@ Where each part's version shows:
 | --- | --- |
 | Parquet snapshot | `format version` in `relate info` |
 | JSON snapshot | `value_encoding` in `graph.json` |
-| Markdown snapshot | `value_encoding` in `.cypherlite/manifest.json` |
+| Markdown snapshot | `value_encoding` in `.relate/manifest.json` |
 | `.rl` file | `superblock version` in `relate info` |
 
 [Version markers](/docs/reference/storage/formats#version-markers) lists the versions this release writes and reads for each part.
@@ -69,6 +69,8 @@ Where each part's version shows:
 A store whose versions are all readable but not all current is migrated on its next writable open. A store with a version this release can't read is refused before anything is written to it.
 
 From 0.1.2 to 1.0.0, the one part that changes is the Parquet snapshot: format version `3` becomes `5` at the store's first checkpoint, which a writable open writes at the latest when it closes, not before the statement runs. relate 0.1.2 reads format version `5`, so it still opens the store after the upgrade.
+
+From 1.1.0 to 1.2.0, a directory store's hidden engine folder moves from `.cypherlite/` to `.relate/`. The first writable open renames the folder in one step and leaves the lock files `.cypherlite.lock` and `.cypherlite.writer` as they are; a `.rl` file has no such folder and doesn't change. A `--read-only` open doesn't rename the folder. For a `parquet` or `json` store it reads the store anyway; a `markdown` store refuses it until one writable open has run. After the rename, relate 1.1.0 refuses a `markdown` store. relate 1.1.0 still opens a `parquet` or `json` store, but it writes a new `.cypherlite/` beside `.relate/`, and 1.2.0 then refuses the store until you delete `.cypherlite/`.
 
 ## Back up with the release you have
 
@@ -89,14 +91,14 @@ relate upgrade --check
 relate upgrade
 ```
 
-Then confirm the version that opens the store from now on. The first line names the release you installed; this run shows 1.1.0, the version this page is verified against:
+Then confirm the version that opens the store from now on. The first line names the release you installed; this run shows 1.2.0, the version this page is verified against:
 
 ```bash verify
 relate --version
 ```
 
 ```text
-Relate v1.1.0
+Relate v1.2.0
 License: Apache 2.0 (binary)
 ```
 
@@ -132,7 +134,9 @@ Between two releases with the same format, the version stays the same and there 
 
 ## If it goes wrong
 
-- **`Failed to open Relate: storage error: unsupported snapshot version <n>`, or `storage error: unsupported graph value encoding: <n>` for a JSON store, exit code 1.** A newer relate wrote the store, or already migrated it. For a Parquet store, `relate info` fails too, with `Failed to read store info:` before the same detail. Open the store with that newer release, or restore the backup for the older one.
+- **`Failed to open Relate: storage error: unsupported snapshot version <n>`, or `storage error: unsupported graph value encoding: <n>` for a JSON store, :term[exit code]{id=exit-code} 1.** A newer relate wrote the store, or already migrated it. For a Parquet store, `relate info` fails too, with `Failed to read store info:` before the same detail. Open the store with that newer release, or restore the backup for the older one.
+- **``Failed to open Relate: storage error: the store still carries the legacy `.cypherlite` engine directory; open it writable once to adopt the `.relate` spelling``, exit code 1.** A `--read-only` open of a `markdown` store that a release before 1.2.0 wrote. Open it once without `--read-only`, then read it as before.
+- **``Failed to open Relate: storage error: refusing to open: the store carries both a `.cypherlite` and an `.relate` engine directory; …``, exit code 1.** A release before 1.2.0 opened the store after the rename and wrote a new `.cypherlite/`. `.relate/` is the current folder: delete `.cypherlite/` and open the store again.
 - **The older release refuses the store after the upgrade.** That is the forward-only rule. Restore the backup made before the upgrade, and open the migrated store only with the new release.
 - **`Failed to open Relate: storage locked: <path>`, exit code 5.** Another process has the store open, so the migration can't start. Stop it and open the store again ([Share one store between two processes](/docs/guides/operate/two-processes-one-store)).
 - **`relate upgrade` fails.** Install the new release with the install script or the pinned binary steps instead ([Install relate](/docs/get-started/install)).

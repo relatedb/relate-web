@@ -1,12 +1,12 @@
 {
-  "version": "1.1.0",
-  "verified": "1.1.0",
-  "date": "2026-11-17",
-  "commit": "f529cbb",
+  "version": "1.2.0",
+  "verified": "1.2.0",
+  "date": "2026-11-20",
+  "commit": "e0ea536",
   "version_check": {
     "recorded": {
       "command": "relate --version",
-      "stdout": "Relate v1.1.0\nLicense: Apache 2.0 (binary)\n",
+      "stdout": "Relate v1.2.0\nLicense: Apache 2.0 (binary)\n",
       "stderr": "",
       "exit": 0
     }

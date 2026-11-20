@@ -6,13 +6,14 @@ surfaces:
   - python
 status: stable
 since: 0.16.0
-verified: 1.1.0
+verified: 1.2.0
 verified_by:
   - cypher
   - python
   - node
   - rust
   - java
+  - dotnet
   - go
   - swift
   - c
@@ -22,6 +23,7 @@ samples:
   - https://relatedb.ai/docs/_example/example/samples/python-2.json
   - https://relatedb.ai/docs/_example/example/samples/rust-1.json
   - https://relatedb.ai/docs/_example/example/samples/java-1.json
+  - https://relatedb.ai/docs/_example/example/samples/csharp-1.json
   - https://relatedb.ai/docs/_example/example/samples/go-1.json
   - https://relatedb.ai/docs/_example/example/samples/swift-1.json
   - https://relatedb.ai/docs/_example/example/samples/c-1.json
@@ -37,7 +39,7 @@ last_updated: 2026-11-07
 
 A throwaway page that exercises every docs construct, for the pipeline's tests. Not part of the site.
 
-> Verified against relate 1.1.0. If your `relate --version` is newer, read https://relatedb.ai/docs/reference/changelog/#since-1.1.0
+> Verified against relate 1.2.0. If your `relate --version` is newer, read https://relatedb.ai/docs/reference/changelog/#since-1.2.0
 
 This page opens a store and writes through the write-ahead log. The second store link adds no second entry to the terms. A colon in prose, like ratio a:b, stays text. Badges: (since 0.16) and (preview).
 
@@ -262,7 +264,7 @@ crewai 1.15.37 imports beside relate
 people: 2
 ```
 
-The compiled clients take the same fence with their language: `rust run`, `java run`, `go run`, `swift run` and `c run`. Each of these five programs builds the team graph in memory and prints how many people it holds:
+The compiled clients take the same fence with their language: `rust run`, `java run`, `csharp run`, `go run`, `swift run` and `c run`. Each of these six programs builds the team graph in memory and prints how many people it holds:
 
 ```rust run title="main.rs"
 use relate::Database;
@@ -319,6 +321,32 @@ public class Team {
         }
     }
 }
+```
+
+```text
+people: 3
+```
+
+```csharp run title="Program.cs"
+using Relate.Net;
+
+const string Team = """
+    CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
+           (grace:Person {name: 'Grace', role: 'engineer'}),
+           (noor:Person {name: 'Noor', role: 'maintainer'}),
+           (relate:Project {name: 'relate', language: 'Rust'}),
+           (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),
+           (ada)-[:WORKS_ON {since: 2024}]->(relate),
+           (grace)-[:WORKS_ON {since: 2023}]->(relate),
+           (grace)-[:WORKS_ON {since: 2022}]->(tck),
+           (noor)-[:MAINTAINS]->(relate),
+           (ada)-[:KNOWS]->(grace)
+    """;
+
+using var db = RelateDatabase.OpenInMemory();
+using var conn = db.Connect();
+conn.Query(Team);
+Console.WriteLine($"people: {conn.Query("MATCH (p:Person) RETURN count(p) AS people").Scalar<long>()}");
 ```
 
 ```text
@@ -550,23 +578,38 @@ The crate is on crates.io; the first build compiles the engine from source, with
 
 #### Java
 
-`ai.relatedb:relate`, for Java 17 or later, with the native library bundled in the jar. The jars are on the [releases page](https://github.com/relatedb/relate/releases), not on Maven Central. Download `relate-1.1.0.jar` and install it into your local Maven repository:
+`ai.relatedb:relate` on Maven Central, for Java 17 or later, with the native library bundled in the jar. In Maven:
 
-```bash
-mvn install:install-file -Dfile=relate-1.1.0.jar
+```xml
+<dependency>
+  <groupId>ai.relatedb</groupId>
+  <artifactId>relate</artifactId>
+  <version>1.2.0</version>
+</dependency>
 ```
 
-The jar carries its POM, so a Maven or Gradle build (with `mavenLocal()`) resolves `ai.relatedb:relate` and brings in its two dependencies, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`), from Maven Central.
+In Gradle, `implementation("ai.relatedb:relate:1.2.0")` with `mavenCentral()`. Its POM brings in the client's two dependencies, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`).
+
+#### .NET
+
+`Relate.Net`, for .NET 8 or later, is not on NuGet. From your project's folder, clone the release tag beside it and reference the client's project:
+
+```bash
+git clone --branch v1.2.0 --depth 1 https://github.com/relatedb/relate ../relate
+dotnet add reference ../relate/clients/dotnet/src/Relate.Net/Relate.Net.csproj
+```
+
+The build copies the engine library beside your program from `RelateNativeLibraryPath`: point it at `librelate_ffi` from the release's `relate-ffi-<target>.tar.gz` archive, as the [.NET page](https://relatedb.ai/docs/get-started/dotnet/) shows.
 
 #### Go
 
 In a Go module (`go mod init <module>` creates one):
 
 ```bash
-go get github.com/relatedb/relate/clients/go@v1.1.0
+go get github.com/relatedb/relate/clients/go@v1.2.0
 ```
 
-`v1.1.0` is the relate release: each release tags the module with its own version.
+`v1.2.0` is the relate release: each release tags the module with its own version.
 
 The module uses cgo and links `librelate_ffi`, from the `relate-ffi-<target>.tar.gz` archive attached to each release.
 
@@ -588,7 +631,7 @@ Set up relate, the embedded Cypher graph database (relatedb.ai), for me.
 
 1. Install the CLI with `curl -sSfL https://relatedb.ai/install.sh | bash`, which verifies the release signature and SHA-256 before installing the binary. On Windows outside WSL, where `install.sh` does not run, run `powershell -ExecutionPolicy ByPass -c "irm https://relatedb.ai/install.ps1 | iex"` instead, which makes the same checks. Stop and report any installation failure. If `relate` is not found afterwards, run `export PATH="$HOME/.local/bin:$PATH"`; on Windows, open a new shell. Check that `relate --version` runs and report the installed version; additional license text is normal.
 
-2. Install the relate skill for your agent with `relate skill install --agent <name>` (one of claude-code, cursor, windsurf, copilot, antigravity, gemini-cli, cline, codex, pi, opencode, junie). Read the installed SKILL.md, then run `relate agent-context` for the command reference of the installed version.
+2. Install the relate skill for your agent with `relate skill install --agent <name>` (one of claude-code, cursor, windsurf, copilot, antigravity, gemini-cli, cline, codex, pi, opencode, junie, vibe). Read the installed SKILL.md, then run `relate agent-context` for the command reference of the installed version.
 
 3. Use ./graph.rl. If it already exists, inspect its schema and ask whether I want to query its existing data or import more. Never replace or clear existing data without asking. Otherwise, ask me what data to load and my first question, then create the database and load it. Import in a transaction where supported and verify the imported counts.
 
@@ -827,7 +870,7 @@ relate, the embedded Cypher graph database (relatedb.ai).
 | Read-only open. An open that loads the store once and refuses every write. | yes: `--read-only`; a write exits 6 | yes: `read_only=True` | yes: `new RelateDb(true)` |
 | Explicit transactions. Several statements committed or rolled back together. | yes: `.begin`, `.commit`, `.rollback` in a script on stdin or the shell | yes: `autocommit = False`, then `commit()` or `rollback()` | no: each statement commits on its own; `BEGIN` is a syntax error |
 
-Each cell is yes, no, partial or unknown, with the call, flag or reason. Checked on 2026-11-11 against relate 1.0.0: runs of the CLI binary and `relate serve` (Bolt, HTTP and MCP), the WebAssembly build this site ships, and the Python, Node.js, C, Java, Go, Swift and Rust clients, and each surface's upstream reference. The C, Java, Go and Swift clients load the same C ABI library as the Node.js client.
+Each cell is yes, no, partial or unknown, with the call, flag or reason. Checked on 2026-11-20 against relate 1.2.0: runs of the CLI binary and `relate serve` (Bolt, HTTP and MCP), the WebAssembly build this site ships, and the Python, Node.js, C, Java, Go, Swift and Rust clients (and the .NET client, at 1.2.0, the release that added it), and each surface's upstream reference. The C, Java, .NET, Go and Swift clients load the same C ABI library as the Node.js client.
 
 ## Links
 

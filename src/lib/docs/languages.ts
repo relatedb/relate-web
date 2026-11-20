@@ -21,6 +21,7 @@ export const LANGUAGES: readonly Language[] = [
   { id: 'rust', label: 'Rust', keys: ['rust'] },
   { id: 'c', label: 'C', keys: ['c'] },
   { id: 'java', label: 'Java', keys: ['java'] },
+  { id: 'dotnet', label: '.NET', keys: ['dotnet', 'csharp', 'net'] },
   { id: 'go', label: 'Go', keys: ['go'] },
   { id: 'swift', label: 'Swift', keys: ['swift'] },
   { id: 'browser', label: 'Browser', keys: ['browser', 'wasm'] },

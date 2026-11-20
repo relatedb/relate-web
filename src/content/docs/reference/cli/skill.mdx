@@ -51,6 +51,7 @@ An agent is detected when the directory in the "Detected when this exists" colum
 | `pi` | Pi | `~/.pi/agent` | `~/.pi/agent/skills/relate` |
 | `opencode` | OpenCode | `$XDG_CONFIG_HOME/opencode` | `$XDG_CONFIG_HOME/opencode/skills/relate` |
 | `junie` | Junie | `~/.junie` | `~/.junie/skills/relate` |
+| `vibe` | Mistral Vibe | `~/.vibe` | `~/.vibe/skills/relate` |
 
 `~` is `$HOME`. When `XDG_CONFIG_HOME` is unset or empty, OpenCode's paths use `$HOME/.config` in its place. A skills directory inside a project, such as `.claude/skills/`, is outside every action's reach.
 
@@ -100,7 +101,7 @@ After [`relate upgrade`](/docs/reference/cli/upgrade) replaces the binary, it ru
 The second line of the two agent errors is the same:
 
 ```text
-valid agents: claude-code, cursor, windsurf, copilot, antigravity, gemini-cli, cline, codex, pi, opencode, junie
+valid agents: claude-code, cursor, windsurf, copilot, antigravity, gemini-cli, cline, codex, pi, opencode, junie, vibe
 ```
 
 The [errors reference](/docs/reference/errors#cli-skill-refusing-to-touch) has the remedies.
@@ -116,7 +117,7 @@ echo "exit=$?"
 
 ```text
 Error: skill: no supported agents detected
-valid agents: claude-code, cursor, windsurf, copilot, antigravity, gemini-cli, cline, codex, pi, opencode, junie
+valid agents: claude-code, cursor, windsurf, copilot, antigravity, gemini-cli, cline, codex, pi, opencode, junie, vibe
 exit=1
 ```
 

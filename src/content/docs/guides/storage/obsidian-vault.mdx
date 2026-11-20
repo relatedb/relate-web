@@ -8,7 +8,7 @@ prerequisites: [get-started/install]
 related: [reference/storage/formats#codecs, reference/cli/flags#markdown-body-properties, guides/storage/clone-and-convert, guides/agents/diffable-memory, guides/storage/schema-as-files, concepts/problems-relate-solves#diffable-memory]
 ---
 
-This guide shows you how to open a folder of markdown notes, such as an Obsidian vault, as a relate store, query and write it with Cypher, and keep editing the same files by hand. With the `markdown` :term[codec]{id=codec}, the notes are the store: each note is a :term[node]{id=node}, each top-level folder a :term[label]{id=label}, and each `[[wikilink]]` under a frontmatter key a relationship. The engine keeps its own state in a hidden `.cypherlite/` folder and two hidden lock files, `.cypherlite.lock` and `.cypherlite.writer`, at the vault root.
+This guide shows you how to open a folder of markdown notes, such as an Obsidian vault, as a relate store, query and write it with Cypher, and keep editing the same files by hand. With the `markdown` :term[codec]{id=codec}, the notes are the store: each note is a :term[node]{id=node}, each top-level folder a :term[label]{id=label}, and each `[[wikilink]]` under a frontmatter key a relationship. The engine keeps its own state in a hidden `.relate/` folder and two hidden lock files, `.cypherlite.lock` and `.cypherlite.writer`, at the vault root.
 
 ## Prerequisites
 
@@ -74,7 +74,7 @@ The first writable open adds `type` and `name` to every note's frontmatter, sort
 
 ## Open the vault
 
-Name the codec on the first open with `--snapshot-format markdown`; relate never takes a folder of notes for a store on its own. The first open must be writable, because it creates the `.cypherlite/` folder:
+Name the codec on the first open with `--snapshot-format markdown`; relate never takes a folder of notes for a store on its own. The first open must be writable, because it creates the `.relate/` folder:
 
 ```bash verify
 relate --database ./team-vault --snapshot-format markdown --mode envelope "MATCH (n) RETURN labels(n)[0] AS label, n.name AS name ORDER BY label, name"
@@ -84,11 +84,11 @@ relate --database ./team-vault --snapshot-format markdown --mode envelope "MATCH
 {"columnTypes":["STRING","STRING"],"columns":["label","name"],"notifications":[],"planCache":"miss","rows":[{"label":"Person","name":"Ada"},{"label":"Person","name":"Grace"},{"label":"Person","name":"Noor"},{"label":"Project","name":"opencypher-tck"},{"label":"Project","name":"relate"}],"timings":{"elapsed_ms":0.545708,"execute_ms":0.362875,"lex_parse_ms":0.005791999999999999,"lower_ms":0.045417,"parse_ms":0.130916,"plan_ms":0.045958000000000006,"result_generation_ms":0.000166,"rewrite_ms":0.007416},"truncated":false}
 ```
 
-`opencypher-tck` is a node because Grace's note links it. The codec is now recorded in `.cypherlite/manifest.json`, so later opens need no flag.
+`opencypher-tck` is a node because Grace's note links it. The codec is now recorded in `.relate/manifest.json`, so later opens need no flag.
 
 ## Read the file layout
 
-The checkpoint at exit wrote the stub note, an index note per folder, and the two root notes. `ls` leaves out the hidden `.cypherlite/` folder and lock files:
+The checkpoint at exit wrote the stub note, an index note per folder, and the two root notes. `ls` leaves out the hidden `.relate/` folder and lock files:
 
 ```bash verify
 ls team-vault team-vault/Person team-vault/Project
@@ -223,11 +223,11 @@ Writes the planner.
 Prefers small commits.
 ```
 
-The list is recorded in `.cypherlite/manifest.json`, so later opens use it without the flag; other properties stay in the frontmatter. After a change to the list, the text of a section no longer listed becomes part of the first property's value, and none is lost.
+The list is recorded in `.relate/manifest.json`, so later opens use it without the flag; other properties stay in the frontmatter. After a change to the list, the text of a section no longer listed becomes part of the first property's value, and none is lost.
 
 ## Round-trip through another codec
 
-`relate clone` copies the vault into another layout and codec, and back. A `.rl` copy of a vault names its codec, `parquet` or `json`: in relate 1.1.0 a `.rl` destination refuses the body list a vault records. A `parquet` copy does not record the body list, so pass it again when cloning back to markdown, and the notes come back the same:
+`relate clone` copies the vault into another layout and codec, and back. A `.rl` copy of a vault names its codec, `parquet` or `json`: in relate 1.2.0 a `.rl` destination refuses the body list a vault records. A `parquet` copy does not record the body list, so pass it again when cloning back to markdown, and the notes come back the same:
 
 ```bash verify
 relate clone --to-snapshot-format parquet ./team-vault ./team.rl

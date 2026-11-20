@@ -113,13 +113,17 @@ Notifications:
 Id 1: INFORMATION 03C91 Relate.Notification.Statement.MissingIndex: the equality predicate on name filters :Person without a range index on (:Person {name}) Remedy: CREATE INDEX relate_Person__name FOR (n:Person) ON (n.name)
 Query: MATCH (p:Person {name: 'Ada'})-[:WORKS_ON]->(r:Project) RETURN r.name AS project
 Plan:
-+-------------------+----+------------------------------------------------------------------------------------+----------------+
-| Operator          | Id | Details                                                                            | Estimated Rows |
-+-------------------+----+------------------------------------------------------------------------------------+----------------+
-| + ProduceResults  | 0  | 1 item(s)                                                                          | -              |
-+-------------------+----+------------------------------------------------------------------------------------+----------------+
-| | + NodeIndexSeek | 1  | RANGE INDEX p:Person(name) WHERE name = 'Ada', (p:Person)-[:WORKS_ON]->(r:Project) | 1              |
-+-------------------+----+------------------------------------------------------------------------------------+----------------+
++---------------------+----+------------------------------------------------------------------------------------+----------------+
+| Operator            | Id | Details                                                                            | Estimated Rows |
++---------------------+----+------------------------------------------------------------------------------------+----------------+
+| + ProduceResults    | 0  | 1 item(s)                                                                          | -              |
++---------------------+----+------------------------------------------------------------------------------------+----------------+
+| | + NodeIndexSeek   | 1  | RANGE INDEX p:Person(name) WHERE name = 'Ada', (p:Person)-[:WORKS_ON]->(r:Project) | 1              |
++---------------------+----+------------------------------------------------------------------------------------+----------------+
+| | | + NodeIndexSeek | 2  | RANGE INDEX p:Person(name) WHERE name = 'Ada'                                      | 1              |
++---------------------+----+------------------------------------------------------------------------------------+----------------+
+| | | + Expand        | 3  | (p:Person)-[:WORKS_ON]->(r:Project)                                                | 2              |
++---------------------+----+------------------------------------------------------------------------------------+----------------+
 ```
 
 **Storage.** A commit appends physical changes to the write-ahead log (:term[WAL]{id=wal}), then applies them to the graph. A :term[checkpoint]{id=checkpoint} writes the committed graph to a snapshot in one :term[codec]{id=codec}, such as Parquet (the default) or JSON, and recycles old log segments. A virtual file system puts the same files in a directory, packs them into one `.rl` file, or keeps them in memory. [Storage and durability](/docs/concepts/storage-and-durability) explains when a commit is safe on disk.
