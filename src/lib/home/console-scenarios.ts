@@ -5,6 +5,8 @@
 export interface Demo {
   /** The suggestion chip. */
   name: string;
+  /** The same question in plain words: a few-shot example for text-to-Cypher and its test question. Absent for the schema and full graph chips. */
+  ask?: string;
   query: string;
 }
 
@@ -93,10 +95,12 @@ export const SCENARIOS: Record<string, Scenario> = {
       { name: 'full graph',
         query: 'MATCH (n) WITH n OPTIONAL MATCH (n)-[r]-(m) RETURN n, r, m' },
       { name: 'co-stars of Christian Bale',
+        ask: "Who has acted in a film with Christian Bale?",
         query:
           "MATCH p = (:Person {name:'Christian Bale'})-[:ACTED_IN]->(:Movie)<-[:ACTED_IN]-(:Person)\n" +
           "RETURN p" },
       { name: "recommend for Chloe",
+        ask: "Which films should Chloe watch next, based on what people with similar taste liked?",
         query:
           "MATCH (chloe:User {name:'Chloe'})-[r1:RATED]->(seen:Movie)\n" +
           "WHERE r1.score >= 4\n" +
@@ -107,6 +111,7 @@ export const SCENARIOS: Record<string, Scenario> = {
           "       round(avg(r3.score)*10)/10 AS peerScore\n" +
           "ORDER BY endorsers DESC, peerScore DESC LIMIT 5" },
       { name: 'directors ranked by audience score',
+        ask: "Rank the directors by the average rating their films got from users.",
         query:
           "MATCH (d:Person)-[:DIRECTED]->(m:Movie)<-[r:RATED]-(:User)\n" +
           "RETURN d.name AS director, count(DISTINCT m) AS films,\n" +
@@ -202,10 +207,12 @@ export const SCENARIOS: Record<string, Scenario> = {
       { name: 'full graph',
         query: 'MATCH (n) WITH n OPTIONAL MATCH (n)-[r]-(m) RETURN n, r, m' },
       { name: 'orders ownership chain',
+        ask: "Show how ownership of the orders service changed over time.",
         query:
           "MATCH p = (f:Fact {slot:'orders service/owner'})-[:SUPERSEDES*0..]->(:Fact)\n" +
           "RETURN p" },
       { name: 'current state of the orders service',
+        ask: "What is currently true about the orders service?",
         query:
           "MATCH (e:Entity {key:'orders service'})<-[:ABOUT]-(x)\n" +
           "WHERE x.supersededAt IS NULL\n" +
@@ -213,6 +220,7 @@ export const SCENARIOS: Record<string, Scenario> = {
           "       x.at AS asOf\n" +
           "ORDER BY kind, slot" },
       { name: 'ownership timeline',
+        ask: "List every owner of the orders service with when each started and ended.",
         query:
           "MATCH (f:Fact {slot:'orders service/owner'})\n" +
           "RETURN f.text AS statement, f.at AS from,\n" +
@@ -277,15 +285,18 @@ export const SCENARIOS: Record<string, Scenario> = {
       { name: 'full graph',
         query: 'MATCH (n) WITH n OPTIONAL MATCH (n)-[r]-(m) RETURN n, r, m' },
       { name: 'which crates depend on the parser?',
+        ask: "Which crates depend on the parser, directly or through others?",
         query:
           "MATCH p = (c:Crate)-[:DEPENDS_ON*1..3]->(:Crate {name:'relate-parser'})\n" +
           "RETURN p" },
       { name: 'blast radius if the parser changes',
+        ask: "If the parser changes, which crates could be affected and what do they do?",
         query:
           "MATCH (p:Crate {name:'relate-parser'})<-[:DEPENDS_ON*1..5]-(dependent:Crate)\n" +
           "RETURN DISTINCT dependent.name AS crate, dependent.description AS what\n" +
           "ORDER BY crate" },
       { name: 'crate footprint (transitive deps)',
+        ask: "For each crate, how many crates does it depend on, directly and transitively, and how many ADRs does it cite?",
         query:
           "MATCH (c:Crate)\n" +
           "OPTIONAL MATCH (c)-[:DEPENDS_ON*1..5]->(d:Crate)\n" +
@@ -360,16 +371,19 @@ export const SCENARIOS: Record<string, Scenario> = {
       { name: 'the resolved graph',
         query: 'MATCH (n) WITH n LIMIT 80 OPTIONAL MATCH (n)-[r]-(m) RETURN n, r, m' },
       { name: 'advisories express can reach',
+        ask: "Which security advisories can express reach through its dependencies?",
         query:
           "MATCH p = (:Version:Root {name:'express'})-[:DEPENDS_ON*0..5]->(v:Version)-[:AFFECTED_BY]->(a:Advisory)\n" +
           "RETURN p" },
       { name: 'rank each root by worst advisory it reaches',
+        ask: "For each top-level package, how many advisories does it reach and what is the worst CVSS score?",
         query:
           "MATCH (root:Root)-[:DEPENDS_ON*0..5]->(v:Version)-[:AFFECTED_BY]->(a:Advisory)\n" +
           "RETURN root.name AS package, count(DISTINCT a) AS advisories,\n" +
           "       max(a.cvss3) AS worstCvss\n" +
           "ORDER BY worstCvss DESC" },
       { name: 'what goes if we drop jsonwebtoken?',
+        ask: "Which packages would disappear if we dropped jsonwebtoken?",
         query:
           "MATCH (root:Version:Root {name:'jsonwebtoken'})-[:DEPENDS_ON*1..5]->(v:Version)\n" +
           "WITH collect(DISTINCT v) AS reachable\n" +
@@ -380,6 +394,7 @@ export const SCENARIOS: Record<string, Scenario> = {
           "}\n" +
           "RETURN v.name AS gone, v.version AS version ORDER BY gone" },
       { name: 'shortest chain to the worst advisory',
+        ask: "What is the shortest dependency chain from a top-level package to the most severe advisory?",
         query:
           "MATCH (root:Root)-[:DEPENDS_ON*0..5]->(v:Version)-[:AFFECTED_BY]->(a:Advisory)\n" +
           "WITH a ORDER BY a.cvss3 DESC LIMIT 1\n" +
