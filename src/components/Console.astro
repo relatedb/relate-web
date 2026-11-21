@@ -35,6 +35,7 @@ const ids = Object.keys(SCENARIOS);
       <label class="sr-only" for="tc-input">Cypher query</label>
       <span class="tc-ps" aria-hidden="true">cypher&gt;</span>
       <input id="tc-input" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="type a Cypher query and press Enter" translate="no" />
+      <button type="button" class="tc-mode" id="tc-ask" hidden title="Turn the question in the box into a query, written by this browser's on-device model">Ask</button>
       <button type="button" class="tc-mode" id="tc-explain" title="Show the query plan without running it (EXPLAIN)">Explain</button>
       <button type="button" class="tc-mode" id="tc-profile" title="Run the query and show the plan with measured rows and time (PROFILE)">Profile</button>
       <button type="submit" class="tc-run" id="tc-run">Run<span aria-hidden="true"> &#9654;</span></button>

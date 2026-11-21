@@ -10,3 +10,6 @@ tmp/
 
 # Agent worktrees: full copies of the repo made by Claude Code
 .claude/worktrees/
+
+# Chrome profile kept by scripts/text2cypher-browser.ts (it holds the downloaded on-device model)
+.text2cypher-profile/

@@ -9,7 +9,9 @@ import { expandNode, type Graph, type StatementRun } from '../../lib/cookbook/gr
 import { canDraw, esc, lastEnvelope, tableHtml, type TableCells } from '../../lib/cookbook/result-view.ts';
 import { planText, splitStatement, type PlanDoc, type PlanNote } from '../../lib/docs/elements/_plan-model.ts';
 import { SCENARIOS, type Scenario } from '../../lib/home/console-scenarios.ts';
+import { extractCypher, messagesFor, retryMessages, schemaText } from '../../lib/home/text2cypher.ts';
 import type { GraphView } from '../cookbook/graph.ts';
+import { askSupport, generate } from './ask.ts';
 
 interface Recording {
   kind: 'table' | 'gram';
@@ -100,6 +102,7 @@ if (root && typeof Worker !== 'undefined') {
   const form = $<HTMLFormElement>('#tc-form');
   const input = $<HTMLInputElement>('#tc-input');
   const runBtn = $<HTMLButtonElement>('#tc-run');
+  const askBtn = $<HTMLButtonElement>('#tc-ask');
   const explainBtn = $<HTMLButtonElement>('#tc-explain');
   const profileBtn = $<HTMLButtonElement>('#tc-profile');
   const resetBtn = $<HTMLButtonElement>('#tc-reset');
@@ -115,6 +118,7 @@ if (root && typeof Worker !== 'undefined') {
   let loaded = ''; // the dataset the engine holds
   let busy = false;
   let version: string | null = null;
+  let schema = ''; // the loaded dataset's schema, as the model reads it
   const views = new Map<HTMLElement, GraphView[]>();
   const history: string[] = [];
   let at = -1;
@@ -129,9 +133,10 @@ if (root && typeof Worker !== 'undefined') {
     status.textContent = text;
     status.dataset.state = state;
   };
+  const readyText = () => (version ? `ready · relate ${version}` : 'ready');
   const setBusy = (on: boolean) => {
     busy = on;
-    for (const b of [runBtn, explainBtn, profileBtn, resetBtn]) b.disabled = on;
+    for (const b of [runBtn, askBtn, explainBtn, profileBtn, resetBtn]) b.disabled = on;
     root.toggleAttribute('data-busy', on);
   };
   const scroll = () => {
@@ -198,9 +203,11 @@ if (root && typeof Worker !== 'undefined') {
         if (failed(last)) throw new Error(`${last!.error}\nin: ${stmt.slice(0, 80)}`);
       }
       loaded = current;
+      const answer = async (q: string) => (await engine.run(q, true)).envelopes.at(-1) ?? '{}';
+      schema = schemaText(await answer('CALL db.schema.nodeTypeProperties()'), await answer('CALL db.schema.visualization()'));
       const lines = scenario().banner;
       if (lines?.length) put(addFrame(), `<p class="tc-banner">${lines.map(esc).join('<br>')}</p>`);
-      setStatus(version ? `ready · relate ${version}` : 'ready', 'ready');
+      setStatus(readyText(), 'ready');
       await execute(SCHEMA);
     } catch (err) {
       if (mine !== generation) return;
@@ -298,6 +305,64 @@ if (root && typeof Worker !== 'undefined') {
     }
   }
 
+  /** Why a query would not run (its EXPLAIN fails), or null; nothing executes. */
+  async function problemWith(query: string): Promise<string | null> {
+    if (!query) return 'the reply held no query';
+    try {
+      const last = lastEnvelope((await engine.run(`EXPLAIN ${query}`, true)).envelopes);
+      return failed(last) ? String(last!.error) : null;
+    } catch (err) {
+      return (err as Error).message;
+    }
+  }
+
+  /** Turn the question in the box into a query with the on-device model; the reader checks it and runs it. */
+  async function ask() {
+    const question = input.value.trim();
+    if (!question || busy) return;
+    if (loaded !== current) await load();
+    if (loaded !== current) return;
+    setBusy(true);
+    lastRun = null;
+    const frame = addFrame();
+    const echo = document.createElement('p');
+    echo.className = 'tc-echo';
+    const ps = document.createElement('span');
+    ps.className = 'tc-ps';
+    ps.textContent = 'ask>';
+    echo.append(ps, ` ${question}`);
+    frame.append(echo);
+    scroll();
+    try {
+      setStatus('asking the model…', 'busy');
+      // ?holdout=1 leaves the typed question out of the worked examples, for scoring (scripts/text2cypher-browser.ts).
+      const skip = new URLSearchParams(location.search).get('holdout') ? question : undefined;
+      let messages = messagesFor(current, schema, question, { skip });
+      let cypher = extractCypher(await generate(messages, (t) => setStatus(t, 'busy')));
+      let problem = await problemWith(cypher);
+      let tries = 1;
+      if (problem) {
+        // One retry, with the error given back.
+        setStatus('checking the query…', 'busy');
+        messages = retryMessages(messages, cypher, problem);
+        cypher = extractCypher(await generate(messages));
+        problem = await problemWith(cypher);
+        tries = 2;
+      }
+      input.value = flat(cypher); // the box is one line: a reply's line breaks become spaces
+      input.focus();
+      const how = tries > 1 ? 'after a retry' : 'first try';
+      put(frame, problem
+        ? `<p class="tc-err">The model's query did not pass a check (${esc(problem.split('\n')[0])}). It is in the box to edit.</p>`
+        : `<p class="out-summary">query written on this device (${how}) · check it, then Run</p>`);
+    } catch (err) {
+      put(frame, `<p class="tc-err">Ask failed: ${esc((err as Error).message)}</p>`);
+    } finally {
+      setStatus(loaded === current ? readyText() : 'engine unavailable', loaded === current ? 'ready' : 'error');
+      setBusy(false);
+    }
+  }
+
   async function runQuery(query: string) {
     setBusy(true);
     try {
@@ -357,6 +422,7 @@ if (root && typeof Worker !== 'undefined') {
     e.preventDefault();
     void submit();
   });
+  askBtn.addEventListener('click', () => void ask());
   explainBtn.addEventListener('click', () => void submit('EXPLAIN'));
   profileBtn.addEventListener('click', () => void submit('PROFILE'));
   input.addEventListener('focus', start);
@@ -371,4 +437,10 @@ if (root && typeof Worker !== 'undefined') {
   });
 
   renderChips();
+  // Ask appears only where the browser has an on-device model (Chrome's Prompt API).
+  void askSupport().then((s) => {
+    if (s === 'none') return;
+    askBtn.hidden = false;
+    if (s === 'download') askBtn.title += '. The first question downloads the model.';
+  });
 }
