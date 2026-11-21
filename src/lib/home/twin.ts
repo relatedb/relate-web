@@ -86,7 +86,7 @@ export const HOME_SECTIONS: HomeSection[] = [
   {
     h: 'Zero to querying in seconds.',
     lede: 'Install the open-source package, create a database and start running your first query. No account, no instance and no server to deploy.',
-    note: 'relate speaks the openCypher language and is tested against the openCypher TCK. Where it differs from Neo4j: {origin}/docs/reference/cypher/differences-from-neo4j.md',
+    note: 'It runs openCypher, GQL and Cypher 25, and is tested against the openCypher TCK. Where it differs from Neo4j: {origin}/docs/reference/cypher/differences-from-neo4j.md',
   },
   {
     h: 'Build it with us, one recipe at a time.',
