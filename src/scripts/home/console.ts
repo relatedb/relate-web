@@ -316,12 +316,46 @@ if (root && typeof Worker !== 'undefined') {
     }
   }
 
+  let support: 'none' | 'download' | 'ready' = 'none'; // Ask: no model, one to download first, or ready
+  let agreed = false; // the reader agreed to the download
+
+  /** Ask the reader before the browser downloads its model (several GB, kept by the browser for every site). */
+  function confirmDownload(): Promise<boolean> {
+    return new Promise((resolve) => {
+      const frame = addFrame();
+      const text = document.createElement('p');
+      text.textContent = 'Ask needs Chrome\'s on-device model: a download of about 4 GB, kept by your browser (not by this site) and used by other sites that ask for it. Once it is there, questions are answered on this device and nothing is sent anywhere. Download it now?';
+      const row = document.createElement('p');
+      const button = (label: string, yes: boolean) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'tc-chip';
+        b.textContent = label;
+        b.addEventListener('click', () => {
+          row.remove();
+          text.textContent = yes ? 'Downloading the model…' : 'Not downloaded. Your question is still in the box; Run works as before.';
+          if (!yes) setTimeout(() => frame.remove(), 4000);
+          resolve(yes);
+        });
+        return b;
+      };
+      row.append(button('Download', true), ' ', button('Not now', false));
+      frame.append(text, row);
+      scroll();
+      row.querySelector('button')?.focus();
+    });
+  }
+
   /** Turn the question in the box into a query with the on-device model; the reader checks it and runs it. */
   async function ask() {
     const question = input.value.trim();
     if (!question || busy) return;
     if (loaded !== current) await load();
     if (loaded !== current) return;
+    if (support === 'download' && !agreed) {
+      agreed = await confirmDownload();
+      if (!agreed) return;
+    }
     setBusy(true);
     lastRun = null;
     const frame = addFrame();
@@ -332,23 +366,34 @@ if (root && typeof Worker !== 'undefined') {
     ps.textContent = 'ask>';
     echo.append(ps, ` ${question}`);
     frame.append(echo);
+    // A live line under the question: the first use downloads the model, which takes a while.
+    const live = document.createElement('p');
+    live.className = 'out-summary';
+    live.textContent = 'asking the on-device model…';
+    frame.append(live);
     scroll();
+    const progress = (t: string) => {
+      setStatus(t, 'busy');
+      live.textContent = t.startsWith('downloading') ? `${t} (first use only; the model stays in your browser)` : t;
+    };
     try {
       setStatus('asking the model…', 'busy');
       // ?holdout=1 leaves the typed question out of the worked examples, for scoring (scripts/text2cypher-browser.ts).
       const skip = new URLSearchParams(location.search).get('holdout') ? question : undefined;
       let messages = messagesFor(current, schema, question, { skip });
-      let cypher = extractCypher(await generate(messages, (t) => setStatus(t, 'busy')));
+      let cypher = extractCypher(await generate(messages, progress));
       let problem = await problemWith(cypher);
       let tries = 1;
       if (problem) {
         // One retry, with the error given back.
-        setStatus('checking the query…', 'busy');
+        progress('the first query did not pass a check; asking again…');
         messages = retryMessages(messages, cypher, problem);
-        cypher = extractCypher(await generate(messages));
+        cypher = extractCypher(await generate(messages, progress));
         problem = await problemWith(cypher);
         tries = 2;
       }
+      live.remove();
+      support = 'ready';
       input.value = flat(cypher); // the box is one line: a reply's line breaks become spaces
       input.focus();
       const how = tries > 1 ? 'after a retry' : 'first try';
@@ -356,6 +401,7 @@ if (root && typeof Worker !== 'undefined') {
         ? `<p class="tc-err">The model's query did not pass a check (${esc(problem.split('\n')[0])}). It is in the box to edit.</p>`
         : `<p class="out-summary">query written on this device (${how}) · check it, then Run</p>`);
     } catch (err) {
+      live.remove();
       put(frame, `<p class="tc-err">Ask failed: ${esc((err as Error).message)}</p>`);
     } finally {
       setStatus(loaded === current ? readyText() : 'engine unavailable', loaded === current ? 'ready' : 'error');
@@ -439,8 +485,9 @@ if (root && typeof Worker !== 'undefined') {
   renderChips();
   // Ask appears only where the browser has an on-device model (Chrome's Prompt API).
   void askSupport().then((s) => {
+    support = s;
     if (s === 'none') return;
     askBtn.hidden = false;
-    if (s === 'download') askBtn.title += '. The first question downloads the model.';
+    if (s === 'download') askBtn.title += '. The first question asks before it downloads the model.';
   });
 }

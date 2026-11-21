@@ -75,6 +75,8 @@ for (const [id, sc] of Object.entries(SCENARIOS)) {
     if (!d.ask) continue;
     await page.fill('#tc-input', d.ask);
     await page.click('#tc-ask');
+    // The first question asks before the model downloads: agree.
+    await page.locator('#tc-out button', { hasText: 'Download' }).click({ timeout: 1500 }).catch(() => {});
     // Done when the box holds a query and Ask is enabled again (the model may first download).
     await page.waitForFunction((q) => (document.querySelector('#tc-input') as HTMLInputElement).value !== q && !(document.querySelector('#tc-ask') as HTMLButtonElement).disabled, d.ask, { timeout: 300_000 });
     answers[`${id}/${d.ask}`] = await page.inputValue('#tc-input');
