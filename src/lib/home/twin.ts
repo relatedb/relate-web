@@ -29,7 +29,7 @@ export interface HomeSection {
 
 export const HOME_SECTIONS: HomeSection[] = [
   {
-    h: 'Run Cypher in your browser.',
+    h: 'Run directly in your browser.',
     lede: 'Pick a dataset and query it. The database runs entirely in this page: nothing is sent anywhere.',
     note: 'On the HTML page this is a console on the engine\'s WebAssembly build, with four sample datasets (analytics, agent-memory, codebase, dependencies). The same engine, full screen, is the playground: {origin}/playground/',
   },
@@ -45,7 +45,7 @@ export const HOME_SECTIONS: HomeSection[] = [
       { h: 'Open source', p: 'Read the code, run it locally, and add your own recipes.' },
       { h: 'Part of your application', p: 'Relate runs inside your application. Keep your data in memory, in a directory, or in one file.' },
       { h: 'Cypher, for connected data', p: 'Your agent asks in Cypher and gets back how the facts connect. Skill and MCP endpoint included.' },
-      { h: 'Start in minutes', p: 'No signup. No server to deploy.' },
+      { h: 'Start in milliseconds', p: 'No signup. No server to deploy.' },
     ],
   },
   {

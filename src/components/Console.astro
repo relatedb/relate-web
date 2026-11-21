@@ -11,7 +11,7 @@ const ids = Object.keys(SCENARIOS);
 ---
 <section class="tc" id="try" aria-labelledby="h-try" data-console>
   <div class="tc-h">
-    <h2 id="h-try">Run Cypher in your browser.</h2>
+    <h2 id="h-try">Run directly in your browser.</h2>
     <p class="tc-lede">Pick a dataset and query it. The database runs entirely in this page: nothing is sent anywhere. <a href="/playground/" target="_blank" rel="noopener">Open the playground<span aria-hidden="true">&nbsp;&#8599;</span><span class="sr-only"> (opens in new tab)</span></a></p>
   </div>
 
@@ -32,9 +32,9 @@ const ids = Object.keys(SCENARIOS);
     </div>
     <div class="tc-chips" id="tc-chips" aria-label="Query suggestions"></div>
     <form class="tc-in" id="tc-form" autocomplete="off">
-      <label class="sr-only" for="tc-input">Cypher query</label>
-      <span class="tc-ps" aria-hidden="true">cypher&gt;</span>
-      <input id="tc-input" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="type a Cypher query and press Enter" translate="no" />
+      <label class="sr-only" for="tc-input">Query</label>
+      <span class="tc-ps" id="tc-ps" aria-hidden="true">{ids[0]}&gt;</span>
+      <input id="tc-input" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Run a query and press Enter" translate="no" />
       <button type="button" class="tc-mode" id="tc-explain" title="Show the query plan without running it (EXPLAIN)">Explain</button>
       <button type="button" class="tc-mode" id="tc-profile" title="Run the query and show the plan with measured rows and time (PROFILE)">Profile</button>
       <button type="submit" class="tc-run" id="tc-run">Run<span aria-hidden="true"> &#9654;</span></button>
@@ -44,7 +44,7 @@ const ids = Object.keys(SCENARIOS);
 
 <style is:global>
   /* Global: the script adds the chips, echoes, tables and graph at run time, which scoped styles do not reach. Every selector starts with .tc. */
-  .tc { position: relative; max-width: var(--page-w); margin: 0 auto; padding: 8px 24px 80px; }
+  .tc { position: relative; max-width: var(--page-w); margin: 0 auto; padding: 8px 24px 0; }
   .tc-h { margin-bottom: 20px; }
   .tc-h h2 { margin: 0; font: 500 clamp(24px, 2.4vw, 32px) / 1.1 var(--font); letter-spacing: -.03em; color: var(--ink); }
   .tc-lede { margin: 8px 0 0; color: var(--ink-muted); font-size: 16px; line-height: 24px; }
@@ -126,7 +126,7 @@ const ids = Object.keys(SCENARIOS);
   .tc-run:hover:not(:disabled) { opacity: .88; }
   .tc-run:disabled { opacity: .4; cursor: default; }
 
-  @media (max-width: 900px) { .tc { padding: 8px 16px 64px; } }
+  @media (max-width: 900px) { .tc { padding: 8px 16px 0; } }
   @media (max-width: 640px) {
     .tc-title { display: none; }
     .tc-select { flex: 1 1 0; }

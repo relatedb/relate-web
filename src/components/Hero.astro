@@ -26,7 +26,7 @@ const first = tabs[0];
       </div>
     </aside>
 
-    <h1 id="h-hero">{HERO.name} <span class="hh-t" aria-hidden="true"><Fragment set:html={HERO_MASCOT} /></span><span class="hh-sub">{HERO.headline}</span></h1>
+    <h1 id="h-hero">{HERO.name} <span class="hh-t" aria-hidden="true"><Fragment set:html={HERO_MASCOT} /></span><span class="hh-v" aria-hidden="true" translate="no">{version}</span><span class="hh-sub">{HERO.headline}</span></h1>
     <p class="hero-sub">{HERO.sub}</p>
     <p class="hero-joy">Pure data joy.</p>
 
@@ -91,6 +91,11 @@ const first = tabs[0];
   h1 {
     margin: 0; font: 500 clamp(46px, 6.2vw, 92px) / 1 var(--font);
     letter-spacing: -.05em; text-wrap: balance; color: var(--ink);
+  }
+  /* The release, as a pill after the name (from engine.json, so it tracks each re-pin). */
+  .hh-v {
+    display: inline-block; margin-left: .35em; padding: .12em .5em; border: 1px solid var(--line-strong); border-radius: 999px;
+    font: 500 .22em/1.2 var(--mono); letter-spacing: 0; vertical-align: .9em; color: var(--ink-muted); white-space: nowrap;
   }
   .hh-sub { display: block; margin-top: .2em; font-size: .62em; letter-spacing: -.04em; }
   .hh-t {

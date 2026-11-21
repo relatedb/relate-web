@@ -105,6 +105,7 @@ if (root && typeof Worker !== 'undefined') {
   const resetBtn = $<HTMLButtonElement>('#tc-reset');
   const picker = $<HTMLSelectElement>('#tc-scenario');
   const status = $('#tc-status');
+  const prompt = $('#tc-ps');
 
   /** The first command of every dataset: its shape, drawn. */
   const SCHEMA = 'CALL db.schema.visualization()';
@@ -185,6 +186,7 @@ if (root && typeof Worker !== 'undefined') {
     setStatus('loading the engine…', 'busy');
     clearOutput();
     picker.value = current;
+    prompt.textContent = `${current}>`; // the prompt names the dataset
     renderChips();
     try {
       const info = await engine.start();
@@ -262,7 +264,7 @@ if (root && typeof Worker !== 'undefined') {
     echo.className = 'tc-echo';
     const ps = document.createElement('span');
     ps.className = 'tc-ps';
-    ps.textContent = 'cypher>';
+    ps.textContent = `${current}>`;
     echo.append(ps, ` ${compact.endsWith(';') ? compact : `${compact};`}`);
     frame.append(echo);
     scroll();
