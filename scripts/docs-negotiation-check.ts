@@ -77,8 +77,11 @@ const PAGES: { id: string; section: string | null }[] = [
   { id: 'get-started/install', section: 'verify' },
   { id: 'reference/errors', section: 'cli-errors' },
 ];
-/** Heading ids the layout adds that the twin has no section for (its `related` is frontmatter). */
-const LAYOUT_IDS = new Set(['related']);
+/**
+ * Heading ids the layout adds that the twin has no section for: `related` (frontmatter in the twin)
+ * and `fb-title` (the Got feedback? dialog's heading, src/components/Feedback.astro).
+ */
+const LAYOUT_IDS = new Set(['related', 'fb-title']);
 /** Pages whose twin is a different document from the HTML (src/lib/docs/landing.ts). */
 const OWN_TWIN = new Set(['']);
 
