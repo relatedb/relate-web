@@ -55,7 +55,7 @@ export function installTabs(engineVersion: string): InstallTab[] {
 /** The quickstart's four steps: heading, line, tag, the guide each links, and what the mascot says while it runs. */
 export const QUICKSTART_STEPS = [
   { h: 'Install the agent skill', p: 'One command, for the agents you already use.', tag: 'agent skill', href: '/docs/guides/agents/install-the-skill/', say: 'Installing the agent skill' },
-  { h: 'Pick a storage format', p: 'In memory, a directory, or one .rl file.', tag: 'memory / directory / .rl', href: '/docs/guides/storage/choose-a-store-layout/', say: 'Picking a storage format' },
+  { h: 'Pick a storage format', p: 'In memory, a directory, one .rl file, or a markdown vault.', tag: 'memory / directory / .rl / markdown', href: '/docs/guides/storage/choose-a-store-layout/', say: 'Picking a storage format' },
   { h: 'Create data', p: 'Write Cypher, load a CSV, or mirror from Aura.', tag: 'Cypher / CSV / Aura', href: '/docs/get-started/first-graph/', say: 'Adding your data' },
   { h: 'Query it', p: 'Tables for you, JSON for your agent.', tag: 'table / JSON', href: '/docs/guides/cli/output-formats/', say: 'Running your query' },
 ] as const;
