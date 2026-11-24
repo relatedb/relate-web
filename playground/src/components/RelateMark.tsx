@@ -1,23 +1,12 @@
 import type { SVGProps } from 'react';
 
-// The relate logomark: the shaded pixel arch from the site's brand assets
-// (public/brand/logomark-shaded-dark.svg, the same paths as the site header's
-// glyph in src/components/Header.astro), coloured for a dark ground since the
-// playground always uses Needle's dark theme: lit top and left, mid body,
-// shadowed right and base.
-const LIT =
-  'M3 0h6v1h-6zM2 1h1v1h-1zM1 2h1v1h-1zM1 3h1v1h-1zM7 3h1v1h-1zM1 4h1v1h-1zM8 4h1v1h-1zM1 5h1v1h-1zM8 5h1v1h-1zM1 6h1v1h-1zM8 6h1v1h-1zM0 7h1v1h-1zM8 7h1v1h-1zM0 8h1v1h-1zM8 8h1v1h-1zM0 9h1v1h-1zM8 9h1v1h-1z';
-const MID =
-  'M3 1h6v1h-6zM2 2h3v1h-3zM7 2h3v1h-3zM2 3h2v1h-2zM8 3h2v1h-2zM2 4h1v1h-1zM9 4h1v1h-1zM2 5h1v1h-1zM9 5h1v1h-1zM2 6h1v1h-1zM9 6h1v1h-1zM1 7h2v1h-2zM9 7h2v1h-2zM1 8h2v1h-2zM9 8h2v1h-2z';
-const SHADE =
-  'M9 1h1v1h-1zM5 2h2v1h-2zM10 2h1v1h-1zM4 3h1v1h-1zM10 3h1v1h-1zM3 4h1v1h-1zM10 4h1v1h-1zM3 5h1v1h-1zM10 5h1v1h-1zM3 6h1v1h-1zM10 6h1v1h-1zM3 7h1v1h-1zM11 7h1v1h-1zM3 8h1v1h-1zM11 8h1v1h-1zM1 9h3v1h-3zM9 9h3v1h-3z';
-
+// The relate logomark: the two-legged arch from the brand kit (public/brand/02_Icon/SVG/relate-icon-cyan.svg),
+// in the kit's cyan since the playground always uses Needle's dark theme.
 export function RelateMark(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 12 10" shapeRendering="crispEdges" role="img" aria-label="Relate logomark" {...props}>
-      <path fill="#D6F7F8" d={LIT} />
-      <path fill="#8FE3E8" d={MID} />
-      <path fill="#4C99A4" d={SHADE} />
+    <svg viewBox="0 0 292 239" role="img" aria-label="Relate logomark" fill="#8FE3E8" {...props}>
+      <path d="M150.094 0C228.424 0 291.934 63.6447 291.934 142.142V229.849C291.934 234.903 287.837 239 282.783 239H198.854C193.8 239 189.703 234.903 189.703 229.849V142.142C189.703 120.259 171.93 102.449 150.094 102.449V0Z" />
+      <path d="M141.84 0C63.5093 0 0 63.6447 0 142.142L0 229.849C0 234.903 4.09702 239 9.15095 239H93.0801C98.134 239 102.231 234.903 102.231 229.849V142.142C102.231 120.259 120.003 102.449 141.84 102.449V0Z" />
     </svg>
   );
 }
