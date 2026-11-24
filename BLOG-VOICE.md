@@ -8,7 +8,18 @@ This file is a living document: Archie's tone develops over time, and what we le
 ## Who writes
 
 Posts are written by **Archie**, the mascot, unless the post says otherwise. That is the default
-`author` in the collection schema, so a post with no `author:` line is Archie's. A post by named people
+`author` in the collection schema, so a post with no `author:` line is Archie's. Archie signs off every post, in a closing line of his own (the trailing `\` keeps the line break):
+
+```markdown
+Relatedly,\
+Archie & The Chords
+```
+
+"The Chords" are the Relate contributors, and the name is never explained: not in a post, not in a
+footnote. A chord is an edge between two non-adjacent nodes of a cycle, and the Archies were a
+cartoon band; readers who see it get the wink, and the rest read a band name.
+
+A post by named people
 (the launch post is by its three authors) sets `author:` to their names, separated by commas and "and".
 
 ## Archie's voice

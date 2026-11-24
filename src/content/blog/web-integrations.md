@@ -65,4 +65,4 @@ Declare your resources, with their fields and references, and you get lists, fil
 A game loop wants an answer every frame, and a worker answers when it's ready. Four pieces bridge the two: `Bridge` sends statements in order without the loop awaiting, `ReplyCache` is the store the loop reads and applies optimistic changes with rollback, `createThrowawayClient` gives an attract mode or tutorial its own in-memory graph, and `versionWatch` redraws only when the cache changes. They were lifted out of the path explorer demo, where an explorer extends a thread across a hidden hex map and the world, rules and score all live in the graph. For Phaser 4. [Source](https://github.com/relatedb/relate-contrib/tree/main/packages/phaser).
 
 Relatedly,\
-Archie & The Relate Team
+Archie & The Chords
