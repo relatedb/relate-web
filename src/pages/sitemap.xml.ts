@@ -2,7 +2,7 @@
 // landing and every docs page, generated so new pages are listed without a
 // hand edit, each with its last change (`lastmod`, from git: src/lib/docs/content.ts).
 // URLs name relatedb.ai, as the home page's canonical link does (LAUNCH.md). The
-// blog placeholder is left out until it has content.
+// blog and its posts are listed once a post is published (ADR-0073).
 import { join } from 'node:path';
 
 import type { APIRoute } from 'astro';
@@ -12,10 +12,12 @@ import { COOKBOOK_DIR } from '../lib/cookbook/load.ts';
 import { cookbook } from '../lib/cookbook/site.ts';
 import { lastUpdated } from '../lib/docs/content.ts';
 import { docsSite } from '../lib/docs/site.ts';
+import { isListed, isoDate, postPath, posts } from '../lib/blog.ts';
 
 export const GET: APIRoute = async () => {
   const { pages } = await cookbook();
   const docs = await docsSite();
+  const blog = (await posts()).filter(isListed);
   // The home page, the cookbook index and the docs landing change with the release.
   const release = docs.engine.date;
   const entries: { path: string; modified: string }[] = [
@@ -25,6 +27,9 @@ export const GET: APIRoute = async () => {
     { path: '/docs/', modified: release },
     ...docs.pages.filter((p) => p.section !== null).map((p) => ({ path: p.url, modified: p.lastUpdated })),
     ...docs.generated.map((g) => ({ path: g.url, modified: g.lastUpdated })),
+    ...(blog.length
+      ? [{ path: '/blog/', modified: isoDate(blog[0].data.updated ?? blog[0].data.date) }, ...blog.map((p) => ({ path: postPath(p), modified: isoDate(p.data.updated ?? p.data.date) }))]
+      : []),
     { path: '/playground/', modified: release },
   ];
   const urls = entries

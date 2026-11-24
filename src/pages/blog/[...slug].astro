@@ -1,0 +1,52 @@
+---
+// /blog/<slug>/: one post. A single <article> with the title, byline and date, so reader modes and
+// agents get the prose and little else.
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { isoDate, longDate, postPath, posts } from '../../lib/blog.ts';
+import { absolute, SITE_NAME } from '../../lib/seo.ts';
+import '../../styles/blog.css';
+
+export async function getStaticPaths() {
+  return (await posts()).map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { title, subtitle, description, date, updated, author, tags } = post.data;
+// The page title reads "Title: subtitle"; the heading shows the title and the subtitle under it.
+const fullTitle = subtitle ? `${title}${/[.!?]$/.test(title) ? ' ' : ': '}${subtitle}` : title;
+const modified = isoDate(updated ?? date);
+const authors = author.split(/\s*,\s*|\s+and\s+/).filter(Boolean);
+const jsonld = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    ...(subtitle ? { alternativeHeadline: subtitle } : {}),
+    description,
+    datePublished: isoDate(date),
+    dateModified: modified,
+    author: authors.map((name) => ({ '@type': name === 'The Relate Authors' ? 'Organization' : 'Person', name })),
+    publisher: { '@type': 'Organization', name: SITE_NAME },
+    mainEntityOfPage: absolute(postPath(post)),
+    ...(tags.length ? { keywords: tags.join(', ') } : {}),
+  },
+];
+---
+<Base title={fullTitle} description={description} path={postPath(post)} type="article" modified={modified} jsonld={jsonld} noindex={post.data.draft || post.data.unlisted}>
+  <div class="blog">
+    <p class="blog-back"><a href="/blog/">&larr; Related Posts</a></p>
+    <article class="post">
+      <header>
+        <h1>{title}</h1>
+        {subtitle && <p class="post-sub">{subtitle}</p>}
+        <p class="blog-meta">
+          <time datetime={isoDate(date)}>{longDate(date)}</time> · {author}{updated && <> · updated <time datetime={isoDate(updated)}>{longDate(updated)}</time></>}
+          {post.data.draft && <span class="blog-draft">draft</span>}
+          {post.data.unlisted && <span class="blog-draft">unlisted</span>}
+        </p>
+      </header>
+      <div class="post-body"><Content /></div>
+    </article>
+  </div>
+</Base>

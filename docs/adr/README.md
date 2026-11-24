@@ -150,3 +150,4 @@ Copy `template.md`.
 | [0070](0070-content-signals-in-robots-txt.md) | robots.txt declares content signals, and all three say yes | Proposed |
 | [0071](0071-java-samples-from-maven-central.md) | The Java samples install ai.relatedb:relate from Maven Central | Proposed |
 | [0072](0072-dotnet-joins-the-client-languages.md) | .NET joins the docs' client languages, its samples built from the release tag | Proposed |
+| [0073](0073-blog-as-a-content-collection.md) | The blog is a content collection of plain Markdown posts | Proposed |

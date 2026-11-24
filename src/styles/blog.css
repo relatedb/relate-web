@@ -1,0 +1,41 @@
+/* The blog: an index of posts and a single-column article (ADR-0073). Tokens come from base.css. */
+.blog { max-width: 720px; margin: 0 auto; }
+.blog a { color: var(--ink); text-underline-offset: 3px; }
+.blog a:hover { color: var(--brand); }
+.blog-head h1, .post h1 { margin: 0; font: 500 clamp(30px, 3.4vw, 44px) / 1.1 var(--font); letter-spacing: -.035em; color: var(--ink); }
+.blog-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 40px; }
+.blog-rss { font: 500 13px/18px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); text-decoration: none; }
+.blog-rss:hover { color: var(--ink); text-decoration: underline; }
+.blog-empty { color: var(--ink-muted); }
+.blog-list { list-style: none; margin: 0; padding: 0; }
+.blog-list li { padding: 28px 0; border-top: 1px solid var(--line); }
+.blog-list h2 { margin: 0; font: 500 24px/1.2 var(--font); letter-spacing: -.02em; }
+.blog-list h2 a { text-decoration: none; }
+.blog-list p { margin: 8px 0 0; color: var(--ink-muted); line-height: 24px; }
+.blog-list .blog-meta { margin-top: 6px; }
+.blog-meta { margin: 14px 0 0; font: 400 13px/18px var(--mono); color: var(--ink-muted); }
+.blog-draft { margin-left: 8px; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 4px; font: 500 11px/14px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); }
+.blog-back { margin: 0 0 28px; font-size: 14px; }
+.blog-back a { text-decoration: none; color: var(--ink-muted); }
+
+.blog-sub, .post-sub { margin: 6px 0 0; color: var(--ink-muted); font: 400 18px/26px var(--font); }
+.blog-list .blog-sub { margin-top: 4px; font-size: 16px; }
+.post-sub { margin-top: 10px; font-size: 20px; line-height: 28px; }
+.post header { margin-bottom: 36px; }
+.post-body { color: var(--ink); font-size: 17px; line-height: 28px; }
+.post-body > :first-child { margin-top: 0; }
+.post-body h2 { margin: 44px 0 12px; font: 500 26px/1.2 var(--font); letter-spacing: -.025em; }
+.post-body h3 { margin: 32px 0 8px; font: 500 20px/1.3 var(--font); letter-spacing: -.015em; }
+.post-body p, .post-body ul, .post-body ol, .post-body blockquote, .post-body pre, .post-body table, .post-body figure { margin: 0 0 20px; }
+.post-body ul, .post-body ol { padding-left: 24px; }
+.post-body li { margin: 4px 0; }
+.post-body a { text-decoration: underline; text-decoration-color: var(--line-strong); }
+.post-body blockquote { padding: 2px 0 2px 18px; border-left: 3px solid var(--line-strong); color: var(--ink-muted); }
+.post-body hr { margin: 40px 0; border: 0; border-top: 1px solid var(--line); }
+.post-body img { max-width: 100%; height: auto; }
+.post-body code { padding: 1px 5px; border-radius: 4px; background: var(--surface-2); font: 400 .88em var(--mono); }
+.post-body pre { padding: 14px 16px; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--code-bg); font: 400 13.5px/1.6 var(--mono); tab-size: 2; }
+.post-body pre code { padding: 0; background: none; font: inherit; }
+.post-body table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 15px; }
+.post-body th, .post-body td { padding: 6px 12px; border-bottom: 1px solid var(--line); text-align: left; }
+.post-body th { color: var(--ink-muted); font-weight: 500; }

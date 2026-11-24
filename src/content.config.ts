@@ -1,5 +1,5 @@
 // Content collections (DOCS-PLAN.md §5): the docs pages, the glossary and the
-// capability catalog.
+// capability catalog, and the blog (ADR-0073).
 // The cookbook stays outside collections; its own parser owns
 // src/content/cookbook (src/lib/cookbook/).
 
@@ -102,4 +102,33 @@ const capabilities = defineCollection({
     .strict(),
 });
 
-export const collections = { docs, glossary, capabilities };
+/**
+ * A blog post: src/content/blog/<slug>.md (plain Markdown), served at
+ * /blog/<slug>/. `draft: true` keeps a post out of production builds and the
+ * feed; the dev server still shows it. `unlisted: true` builds the page (noindex)
+ * but leaves it out of the index, the feed and the sitemap, to share by link (ADR-0073).
+ */
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  schema: z
+    .object({
+      title: z.string().min(1),
+      /** Elaborates the title ("Readme" or "Hello, world." plus what the post is about); shown under it. */
+      subtitle: z.string().min(1).optional(),
+      /** One or two sentences: the index, the feed and the social card. */
+      description: z.string().min(1),
+      /** Publication date, `YYYY-MM-DD`. */
+      date: z.coerce.date(),
+      /** Set when the post changes after publication. */
+      updated: z.coerce.date().optional(),
+      /** Who wrote it: Archie, the mascot, unless the post says otherwise (BLOG-VOICE.md). Several names: separate with commas and "and". */
+      author: z.string().min(1).default('Archie'),
+      tags: z.array(z.string().min(1)).default([]),
+      draft: z.boolean().default(false),
+      /** Built and reachable by its URL, but not listed in the index, the feed or the sitemap, and `noindex`. */
+      unlisted: z.boolean().default(false),
+    })
+    .strict(),
+});
+
+export const collections = { docs, glossary, capabilities, blog };
