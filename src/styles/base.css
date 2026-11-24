@@ -388,3 +388,14 @@ header.nav.scrolled { box-shadow: 0 1px 0 var(--line); }
 .consent-open { padding: 0; font: inherit; color: inherit; background: none; border: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .consent-open:hover { color: var(--ink); }
 @media (max-width: 640px) { .consent { flex-direction: column; align-items: stretch; gap: 12px; } .consent-actions button { flex: 1; } }
+
+/* Touch targets on the home page: at least 44px tall on phones and other coarse pointers.
+   Component styles are scoped (higher specificity), hence !important on the sizing only. */
+@media (max-width: 900px), (pointer: coarse) {
+  .hero .hact, .hero .hitabs button { min-height: 44px !important; }
+  .hero .hitabs button { min-width: 44px !important; }
+  .tc-chip, .graph-tool { min-height: 44px !important; }
+  .graph-tool { min-width: 44px !important; }
+  .qdoc, .chap .link, .tc a[href] { display: inline-flex !important; align-items: center; min-height: 44px; }
+  .foot .legal a, .foot .consent-open { display: inline-flex; align-items: center; min-height: 32px; }
+}
