@@ -21,6 +21,10 @@
 //     at 0.1.0), so the pinned blocks name what that release shipped.
 //   - The key and its fingerprint: distribution/release-signing-key.pub
 //     (`ssh-keygen -lf` prints the fingerprint).
+//   - The Homebrew channel: upstream docs/api/cli/spec.md's install section
+//     documents the six package-manager channels, and the formula in the
+//     relatedb/homebrew-tap repository pins every platform asset's SHA-256
+//     from the release's signed asset manifest (upstream ADR-0659).
 //   - `relate --version` and the envelope bytes of `RETURN 1 AS ok`: read from
 //     the runs recorded in src/content/docs/_data/engine.json (`version_check`,
 //     `envelope_check`), which `npm run docs:cli-check` replays against the
@@ -140,6 +144,15 @@ export const WINDOWS_INSTALL_URL = 'https://relatedb.ai/install.ps1';
  */
 export const WINDOWS_INSTALL_COMMAND = `irm ${WINDOWS_INSTALL_URL} | iex`;
 export const WINDOWS_INSTALL_COMMAND_ANY_SHELL = `powershell -ExecutionPolicy ByPass -c "${WINDOWS_INSTALL_COMMAND}"`;
+/**
+ * The Homebrew channel (upstream ADR-0659): the project tap `relatedb/tap`,
+ * whose formula pins every platform asset's SHA-256 from the release's signed
+ * manifest (upstream docs/api/cli/spec.md, the install section, is the one
+ * place the six package-manager channels are documented).
+ */
+export const HOMEBREW_COMMAND = 'brew install relatedb/tap/relate';
+/** The Homebrew channel's upgrade command: a package-managed install upgrades through the package manager. */
+export const HOMEBREW_UPGRADE_COMMAND = 'brew upgrade relate';
 
 function cliTab(): Tab {
   return {
@@ -160,6 +173,13 @@ function cliTab(): Tab {
           },
           { p: 'If `~/.local/bin` is not on your `PATH`, add it:' },
           bash(PATH_LINE),
+          { p: 'With Homebrew on macOS or Linux, install from the project tap instead:' },
+          bash(HOMEBREW_COMMAND),
+          {
+            p:
+              'A Homebrew install is package-managed: `' + HOMEBREW_UPGRADE_COMMAND +
+              '` installs the next release, and the formula pins every release binary\'s SHA-256 from the release\'s signed manifest.',
+          },
         ],
       },
       {

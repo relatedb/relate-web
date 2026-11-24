@@ -524,6 +524,14 @@ If `~/.local/bin` is not on your `PATH`, add it:
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
+With Homebrew on macOS or Linux, install from the project tap instead:
+
+```bash
+brew install relatedb/tap/relate
+```
+
+A Homebrew install is package-managed: `brew upgrade relate` installs the next release, and the formula pins every release binary's SHA-256 from the release's signed manifest.
+
 #### Windows
 
 `install.sh` runs on macOS and Linux. On Windows 10 or 11, run this in PowerShell:

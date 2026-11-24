@@ -33,6 +33,8 @@ Agent harnesses read a repository's `AGENTS.md` or `CLAUDE.md` before anything e
 
 `relate upgrade` downloads the latest release, checks it against the same signing key as `install.sh`, and replaces the running binary. It runs on macOS and Linux; `update` is an alias. On Windows a running `.exe` cannot replace itself, so `relate upgrade` exits with code 1 and names the Windows install command: run that command again to install the latest release over the old one. `relate upgrade --check` works on Windows too.
 
+A Homebrew install upgrades with `brew upgrade relate`, the package manager's own command.
+
 ```bash
 relate upgrade --check
 ```
