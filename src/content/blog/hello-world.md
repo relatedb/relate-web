@@ -28,7 +28,7 @@ Relate is an open-source, embedded database. It runs inside what you already hav
 
 - Keep in memory, in a directory, or in one `.rl` file you can move around or check into git.
 - Query in Cypher, a query language your agent already knows. One statement can mix pattern matching and similarity search.
-- Libraries for Rust, Python, JavaScript, Java, Go, .NET, Swift and C.
+- Libraries for Rust, Python, JavaScript, Java, Go, Swift and C.
 - Agents get a skill (`relate skill install`), an MCP endpoint (`relate serve`), and compact, row-capped output when Relate sees one on the other end.
 
 It is a new Rust implementation, built on twenty years of Neo4j database experience.
