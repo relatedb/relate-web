@@ -42,14 +42,6 @@ curl -sSfL https://relatedb.ai/install.sh | bash
 relate --database :memory: "CREATE (a:Agent {name:'planner'})-[:USES]->(t:Tool {name:'search'}) RETURN a.name, t.name"
 ```
 
-```
-+-----------+----------+
-| a.name    | t.name   |
-+-----------+----------+
-| "planner" | "search" |
-+-----------+----------+
-```
-
 Or tell your agent to get Relate, by pasting this:
 
 > Install Relate by Neo4j by following the instructions at https://relatedb.ai. Use Relate as this project's memory, task tracker, or application store.
