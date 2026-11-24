@@ -4,7 +4,7 @@ subtitle: A .NET client, more of Neo4j's Cypher spellings, and indexes that answ
 description: Relate.Net brings Relate to C#, F# and Visual Basic, more Neo4j Cypher runs unchanged, and aggregations and reopens get faster.
 date: 2026-11-20
 tags: [release, dotnet, java]
-draft: true
+draft: false
 ---
 
 One new language, one fewer reason for a query to fail on syntax, and two full-label scans retired.

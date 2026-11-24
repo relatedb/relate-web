@@ -4,7 +4,7 @@ subtitle: Lookups without an index, a leaner memory footprint, and a Swift API t
 description: Equality lookups no longer need a declared index, queries hold less memory, long shortest-path queries finish, and agents can send feedback from a session.
 date: 2026-11-17
 tags: [release, swift]
-draft: true
+draft: false
 ---
 
 If one theme runs through this release, it's doing the same work with less waiting and less memory.

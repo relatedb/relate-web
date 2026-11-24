@@ -4,7 +4,7 @@ subtitle: Imports that keep their footing, shortest paths that honor the filter,
 description: Large imports commit batch by batch, shortest-path filters run after selection, and the Swift client gets typed namespaces.
 date: 2026-11-16
 tags: [release, swift]
-draft: true
+draft: false
 ---
 
 Three fixes for things that were right in spirit and wrong in the details.

@@ -5,7 +5,6 @@ description: Agents keep facts yet lose the context. Relate is an embedded datab
 date: 2026-11-11
 tags: [launch]
 draft: false
-unlisted: true
 ---
 
 Today, Relate by Neo4j says hello to the agentic world.

@@ -4,7 +4,7 @@ subtitle: Relating with Astro, Next.js, SvelteKit, Observable, react-admin, Phas
 description: Seven npm packages put a Relate database in a web page and connect it to the frameworks you already use.
 date: 2026-11-23
 tags: [integrations, web, javascript]
-draft: true
+draft: false
 ---
 
 Relate runs in a browser as WebAssembly. The packages below handle the rest: where the database file goes, which thread it runs on, what happens to it when a visitor navigates. One core, six ways in.

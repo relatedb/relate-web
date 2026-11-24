@@ -4,7 +4,7 @@ subtitle: Python rows that behave, a Bolt server that stays on the line, and qui
 description: The first patch after launch smooths the edges where Relate meets other tools.
 date: 2026-11-12
 tags: [release, python]
-draft: true
+draft: false
 ---
 
 A day after hello, the first patch is about edges: where Relate meets a Python script, a Bolt client and a pipe.
