@@ -1,8 +1,9 @@
 // The home page's live console (src/components/Console.astro): the engine runs in this page, on the
 // cookbook's engine worker (src/scripts/cookbook/worker.ts, which loads /wasm/ at runtime), and
 // results are laid out by the cookbook's own code: tableHtml for rows, the NVL graph view for graphs.
-// Nothing loads until the console nears the viewport (or is used); NVL loads when a result first
-// draws a graph.
+// Nothing loads until the reader asks: the overlay's "Run it here" button, a suggestion chip, the dataset
+// menu, Reset or Enter in the prompt. The page shows a static schema preview until then. NVL loads when a
+// result first draws a graph.
 
 import { failed } from '../../lib/cookbook/cells.ts';
 import { expandNode, type Graph, type StatementRun } from '../../lib/cookbook/graph-model.ts';
@@ -106,6 +107,8 @@ if (root && typeof Worker !== 'undefined') {
   const picker = $<HTMLSelectElement>('#tc-scenario');
   const status = $('#tc-status');
   const prompt = $('#tc-ps');
+  const startBtn = $<HTMLButtonElement>('#tc-start');
+  const win = $('.tc-win');
 
   /** The first command of every dataset: its shape, drawn. */
   const SCHEMA = 'CALL db.schema.visualization()';
@@ -182,6 +185,7 @@ if (root && typeof Worker !== 'undefined') {
   /** Load the current dataset into an empty database, then run its schema as the first command. */
   async function load() {
     const mine = ++generation;
+    win.setAttribute('data-live', '');
     setBusy(true);
     setStatus('loading the engine…', 'busy');
     clearOutput();
@@ -325,29 +329,15 @@ if (root && typeof Worker !== 'undefined') {
     await runQuery(q);
   }
 
-  // The first look at the console starts the engine, so the first query is quick.
-  let started = false;
-  const start = () => {
-    if (started) return;
-    started = true;
-    void load();
-  };
-  new IntersectionObserver(
-    (entries, obs) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        obs.disconnect();
-        start();
-      }
-    },
-    { rootMargin: '300px 0px' },
-  ).observe(root);
+  // Asking for the console starts the engine; the preview stays until then.
+  startBtn.hidden = false;
+  startBtn.addEventListener('click', () => void load());
 
   picker.addEventListener('change', () => {
     if (!SCENARIOS[picker.value]) return;
     current = picker.value;
     input.value = '';
     at = -1;
-    started = true;
     void load();
   });
   resetBtn.addEventListener('click', () => {
@@ -361,7 +351,6 @@ if (root && typeof Worker !== 'undefined') {
   });
   explainBtn.addEventListener('click', () => void submit('EXPLAIN'));
   profileBtn.addEventListener('click', () => void submit('PROFILE'));
-  input.addEventListener('focus', start);
   // Arrow keys walk the queries run so far, then the dataset's suggestions.
   input.addEventListener('keydown', (e) => {
     if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;

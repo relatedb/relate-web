@@ -1,8 +1,9 @@
 ---
 // "Try it live": the engine in the page. A dataset menu in the window bar picks one of a few small
 // graphs, each loaded into an in-memory database in the browser, with suggested queries and a Cypher
-// prompt (Run, Explain, Profile). The engine is the site's WASM build, loaded from /wasm/ only when the
-// console nears the viewport; results use the cookbook's table and graph views and the docs' plan table
+// prompt (Run, Explain, Profile). The page shows a static preview of the first dataset's schema; the
+// engine (the site's WASM build) loads only when the reader asks, from the
+// overlay's "Run it here" button, a suggestion chip, the dataset menu or the prompt. Results use the cookbook's table and graph views and the docs' plan table
 // (src/scripts/home/console.ts). Scenario data: src/lib/home/console-scenarios.ts.
 import { SCENARIOS } from '../lib/home/console-scenarios.ts';
 import '../styles/graph-view.css';
@@ -11,24 +12,52 @@ const ids = Object.keys(SCENARIOS);
 ---
 <section class="tc" id="try" aria-labelledby="h-try" data-console>
   <div class="tc-h">
+    <p class="tc-eyebrow">Try it</p>
     <h2 id="h-try">Run directly in your browser.</h2>
     <p class="tc-lede">Pick a dataset and query it. The database runs entirely in this page: nothing is sent anywhere. <a href="/playground/" target="_blank" rel="noopener">Open the playground<span aria-hidden="true">&nbsp;&#8599;</span><span class="sr-only"> (opens in new tab)</span></a></p>
   </div>
 
   <div class="tc-win" id="tc-panel">
+    <button type="button" class="tc-start" id="tc-start" hidden>
+      <span class="tc-go">Run it here<span aria-hidden="true"> &#9654;</span></span>
+    </button>
     <div class="tc-bar">
       <span class="tc-title" translate="no">relate · :memory: · wasm ·</span>
       <label class="sr-only" for="tc-scenario">Dataset</label>
       <select class="tc-select" id="tc-scenario" translate="no">
         {ids.map((id) => <option value={id}>{SCENARIOS[id].label}</option>)}
       </select>
-      <span class="tc-status" id="tc-status" role="status" data-state="idle">starts when you scroll here</span>
+      <span class="tc-status" id="tc-status" role="status" data-state="idle">click to run</span>
       <button type="button" class="tc-reset" id="tc-reset" aria-label="Reset the dataset" title="Reset the dataset">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
       </button>
     </div>
     <div class="tc-out" id="tc-out" role="log" aria-live="polite" tabindex="0" translate="no">
       <noscript><p class="tc-banner">The console needs JavaScript to run the engine in your browser.</p></noscript>
+      <div class="tc-frame" data-preview>
+        <p class="tc-echo"><span class="tc-ps">analytics&gt;</span> CALL db.schema.visualization();</p>
+        <div class="tc-graph">
+          <svg class="tc-pv" viewBox="0 0 640 260" role="img" aria-label="The movies dataset's schema: Person acts in and directs Movie, User rates Movie, and Movie is in a Genre." focusable="false">
+            <g class="pv-edges">
+              <line x1="150" y1="70" x2="292" y2="120" /><line x1="150" y1="70" x2="292" y2="140" />
+              <line x1="348" y1="122" x2="490" y2="70" /><line x1="320" y1="158" x2="320" y2="196" />
+            </g>
+            <g class="pv-labels">
+              <text x="212" y="82" text-anchor="middle" transform="rotate(19 212 82)">ACTED_IN</text>
+              <text x="212" y="124" text-anchor="middle" transform="rotate(19 212 124)">DIRECTED</text>
+              <text x="426" y="86" text-anchor="middle" transform="rotate(-19 426 86)">IN_GENRE</text>
+              <text x="338" y="180">RATED</text>
+            </g>
+            <g class="pv-nodes">
+              <circle class="n-person" cx="120" cy="70" r="32" /><text x="120" y="74" text-anchor="middle">Person</text>
+              <circle class="n-movie" cx="320" cy="130" r="34" /><text x="320" y="134" text-anchor="middle">Movie</text>
+              <circle class="n-genre" cx="520" cy="70" r="32" /><text x="520" y="74" text-anchor="middle">Genre</text>
+              <circle class="n-user" cx="320" cy="222" r="26" /><text x="320" y="226" text-anchor="middle">User</text>
+            </g>
+          </svg>
+        </div>
+        <p class="out-summary">schema · 4 labels · 4 relationship types</p>
+      </div>
     </div>
     <div class="tc-chips" id="tc-chips" aria-label="Query suggestions"></div>
     <form class="tc-in" id="tc-form" autocomplete="off">
@@ -46,11 +75,12 @@ const ids = Object.keys(SCENARIOS);
   /* Global: the script adds the chips, echoes, tables and graph at run time, which scoped styles do not reach. Every selector starts with .tc. */
   .tc { position: relative; max-width: var(--page-w); margin: 0 auto; padding: 8px 24px 0; }
   .tc-h { margin-bottom: 20px; }
+  .tc-eyebrow { margin: 0 0 12px; font: 500 12px/16px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); }
   .tc-h h2 { margin: 0; font: 500 clamp(24px, 2.4vw, 32px) / 1.1 var(--font); letter-spacing: -.03em; color: var(--ink); }
   .tc-lede { margin: 8px 0 0; color: var(--ink-muted); font-size: 16px; line-height: 24px; }
   .tc-lede a { color: var(--ink); text-underline-offset: 4px; white-space: nowrap; }
 
-  .tc-win { border: 1px solid var(--line); background: var(--win); box-shadow: var(--ui-shadow); overflow: hidden; }
+  .tc-win { position: relative; border: 1px solid var(--line); background: var(--win); box-shadow: var(--ui-shadow); overflow: hidden; }
   .tc-bar { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 8px 0 16px; border-bottom: 1px solid var(--line); background: var(--surface-2); }
   .tc-title { flex: none; font: 400 12px/16px var(--mono); color: var(--ink-muted); white-space: nowrap; }
   .tc-select {
@@ -70,6 +100,29 @@ const ids = Object.keys(SCENARIOS);
   }
   .tc-reset:hover:not(:disabled) { color: var(--ink); background: var(--surface-3); }
   .tc-reset:disabled { opacity: .4; cursor: default; }
+
+  /* The start overlay: hidden until hovered or focused on a pointer device, always shown on touch. */
+  .tc-start {
+    position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    border: 0; padding: 0; cursor: pointer; font: inherit; color: var(--ink);
+    background: color-mix(in srgb, var(--win) 70%, transparent); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    opacity: 0; transition: opacity .15s;
+  }
+  .tc-start[hidden] { display: none; }
+  .tc-win:hover .tc-start, .tc-start:focus-visible { opacity: 1; }
+  .tc-start:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px var(--focus); }
+  .tc-go { padding: 12px 22px; border-radius: 6px; background: var(--ink); color: var(--surface-0); font: 500 15px/1 var(--font); }
+  .tc-start:hover .tc-go { opacity: .88; }
+  .tc-win[data-live] .tc-start { display: none; }
+  @media (hover: none) { .tc-start { opacity: 1; background: color-mix(in srgb, var(--win) 55%, transparent); } }
+  @media (prefers-reduced-motion: reduce) { .tc-start { transition: none; } }
+
+  /* The static schema preview shown before the engine runs. */
+  .tc-pv { display: block; width: 100%; height: 260px; }
+  .tc-pv line { stroke: var(--line-strong); stroke-width: 1.5; }
+  .tc-pv .pv-labels text { fill: var(--ink-muted); font: 400 10px var(--mono); text-anchor: middle; }
+  .tc-pv .pv-nodes text { fill: #0A1114; font: 500 12px var(--font); }
+  .tc-pv .n-person { fill: #9AAAFF; } .tc-pv .n-movie { fill: #F29BD0; } .tc-pv .n-genre { fill: #8FE3E8; } .tc-pv .n-user { fill: #8FCB62; }
 
   /* The output stream: statements, result tables and graphs. The reader can drag its bottom edge to resize it. */
   .tc-out {
@@ -127,6 +180,8 @@ const ids = Object.keys(SCENARIOS);
   .tc-run:disabled { opacity: .4; cursor: default; }
 
   @media (max-width: 900px) { .tc { padding: 8px 16px 0; } }
+  /* Phones: the block is hidden entirely (the playground link in the header and hero covers it). */
+  @media (max-width: 640px) { .tc { display: none; } }
   @media (max-width: 640px) {
     .tc-title { display: none; }
     .tc-select { flex: 1 1 0; }
