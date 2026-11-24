@@ -27,6 +27,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # A manual redeploy of main (a transient failure, or the host changed).
+  workflow_dispatch:
   # Upstream's release pipelines poke this after attaching install.sh,
   # releases.json or the signed extensions.json pair to a release (ADR-0546):
   # the discovery files go live with no pull request and no review.
@@ -149,12 +151,11 @@ jobs:
           test -s dist/wasm/relate_bg.wasm
           test -s dist/wasm/relate.js
           test -s dist/playground/index.html
-          test -s dist/CNAME
           test -s dist/install.sh
           test -s dist/releases.json
           test -s dist/extensions.json
 
-      # dist/ carries dotfiles (.nojekyll, .well-known/), which upload-artifact
+      # dist/ carries dotfiles (.well-known/), which upload-artifact
       # leaves out unless asked.
       - uses: actions/upload-artifact@v4
         if: steps.cf.outputs.configured == 'true'

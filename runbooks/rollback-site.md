@@ -17,7 +17,7 @@ git revert <sha>                           # or: git revert -m 1 <merge-sha>
 git push                                   # branch protection may require a pull request
 ```
 
-The push triggers `Deploy site` and `Deploy to Cloudflare Pages`. Watch it:
+The push triggers `Deploy to Cloudflare Pages`. Watch it:
 `gh run watch -R relatedb/relate-web`.
 
 ## Fix: Cloudflare Pages only, immediately

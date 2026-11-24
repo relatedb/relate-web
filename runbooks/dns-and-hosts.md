@@ -4,16 +4,17 @@
 
 | Host | What | Deployed by |
 | --- | --- | --- |
-| `https://relatedb.ai/` | Served from GitHub Pages: the four GitHub Pages A records on the apex (`185.199.108.153`–`185.199.111.153`) in DNS, and `www` pointing at the apex. Indexable. Obscure, not private: certificate-transparency logs expose it. | `deploy-pages.yml` |
-| Cloudflare Pages project `relate-web` | Scalable host. Skips until its secrets exist. | `deploy-cf.yml` |
+| `https://relatedb.ai/` | Cloudflare Pages, project `relate-web`: the apex serves it and `www` redirects (301) to the apex. Indexable. | `deploy-cf.yml` |
+| `https://relate-web.pages.dev/` | The project's own Cloudflare address; the same deployment. | `deploy-cf.yml` |
 
-`public/CNAME` holds `relatedb.ai` and ships in the Pages artifact.
+GitHub Pages is retired (ADR-0074): no workflow publishes to it, and the repository ships no `CNAME` file.
 
 ## Check
 
 ```bash
-dig +short A relatedb.ai                       # expect: 185.199.108.153 … 185.199.111.153
-curl -sI https://relatedb.ai/ | head -5
+dig +short A relatedb.ai                       # expect: Cloudflare addresses (104.21.x.x, 172.67.x.x)
+curl -sI https://relatedb.ai/ | grep -i -E '^(HTTP|server)'   # expect: 200, server: cloudflare
+curl -sI -H 'Accept: text/markdown' https://relatedb.ai/docs/ | grep -i content-type   # expect: text/markdown
 echo | openssl s_client -connect relatedb.ai:443 -servername relatedb.ai 2>/dev/null | openssl x509 -noout -subject -dates
 ```
 
@@ -21,15 +22,7 @@ echo | openssl s_client -connect relatedb.ai:443 -servername relatedb.ai 2>/dev/
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| `dig` returns nothing or the wrong name | The DNS record is missing or mistyped. | Fix the apex A records (the four GitHub Pages addresses); re-run `dig`. Propagation is minutes. |
-| Browser: certificate error, or no HTTPS | GitHub has not issued the certificate yet, or "Enforce HTTPS" is off. | Repo Settings → Pages: confirm the custom domain `relatedb.ai` and that DNS check passed; tick **Enforce HTTPS** once it can be. Issuance can take up to an hour after DNS verifies. |
-| 404 "There isn't a GitHub Pages site here" | Pages source is not "GitHub Actions", the deploy never ran, or the custom domain was cleared. | Settings → Pages → Source: **GitHub Actions**; re-run `Deploy site`; re-enter the custom domain in Settings → Pages (verify whether the `CNAME` file in the artifact alone is enough for Actions deploys; it has not been confirmed here). |
-| Domain keeps resetting in Pages settings | Not using the Actions-deployed `CNAME`, or another repo has claimed it. | Re-set it; consider verifying `relatedb.ai` at the org level (TXT record) so no one else can claim its subdomains. |
-| Pages deploy step fails with 404/permissions | `github-pages` environment or permissions (`pages: write`, `id-token: write`) missing; a private repo needs a paid plan to use Pages. | Check the repo's Pages settings and plan. |
-
-## Launch host switch
-
-The checklist is in `LAUNCH.md` ("Switch hosts"): DNS and TLS for `relatedb.ai`
-and `www`, retire `deploy-pages.yml` and the `CNAME` file, serve from the
-domain root, remove `noindex`, cache headers (long for `fonts/` and `wasm/`,
-short for `index.html` and the discovery files; `.wasm` as `application/wasm`).
+| `dig` returns nothing or non-Cloudflare addresses | The apex record is missing, mistyped or pointing at an old host. | Fix it in the Cloudflare DNS dashboard; re-run `dig`. Propagation is minutes. |
+| Browser: certificate error, or no HTTPS | The custom domain is not attached to the Pages project, or the certificate is still issuing. | Cloudflare dashboard → Workers & Pages → `relate-web` → Custom domains: confirm `relatedb.ai` is active. |
+| 404 or an old page on `relatedb.ai`, but `relate-web.pages.dev` is current | The custom domain is attached to a different deployment or branch, or a cache holds the old page. | Check the production branch is `main` and the custom domain points at the project; see [deploy-failed.md](deploy-failed.md). |
+| `Accept: text/markdown` returns HTML | The Pages Function did not deploy, or `functions/` failed to bundle. | Look at the `Deploy to Cloudflare Pages` run; `npm run docs:negotiation-check` after a build reproduces it. |

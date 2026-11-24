@@ -72,17 +72,17 @@ Page feedback for corrections lives in GitHub Discussions on `relatedb/relate-we
 
 ## Switch hosts: github.io → relatedb.ai
 
-Interim: GitHub Pages at `https://relatedb.github.io/relate-web/` via
-`.github/workflows/deploy-pages.yml` (needs Settings → Pages → Source:
-GitHub Actions; a private repo needs a paid plan, and the published site is
-public). Later: `relatedb.ai` on a more scalable host (CDN / static hosting).
+Done: `relatedb.ai` is served by Cloudflare Pages (`.github/workflows/deploy-cf.yml`, ADR-0012,
+ADR-0074). The GitHub Pages deploy it replaced is retired.
 
 - [x] Pick the host: Cloudflare Pages (ADR-0012 in `docs/adr/`; the hosted docs MCP Worker it also chose is withdrawn, ADR-0057)
 - [ ] The hosted docs MCP server is withdrawn until it is ready to ship (ADR-0057). The local tag `docs-mcp-shelved` marks the last commit with `workers/docs-mcp/`, its checks, the usage page and its docs pages; bringing it back is a new ADR
-- [ ] Set up hosting, TLS, and DNS for `relatedb.ai` (+ `www` redirect)
-- [ ] `CLOUDFLARE_API_TOKEN` (Pages: Edit) and `CLOUDFLARE_ACCOUNT_ID` set for `deploy-cf.yml`
+- [x] Set up hosting, TLS, and DNS for `relatedb.ai` (the apex resolves to Cloudflare and answers `server: cloudflare`, 2026-11-24)
+- [x] `www` redirects to the apex (301, served by Cloudflare)
+- [x] `CLOUDFLARE_API_TOKEN` (Pages: Edit) and `CLOUDFLARE_ACCOUNT_ID` set for `deploy-cf.yml`
 - [ ] Deploy trust boundary (ADR-0059): `CLOUDFLARE_API_TOKEN` scoped to Account > Cloudflare Pages > Edit on the one account, with no zone or other permissions; `main` protected by a ruleset (pull request with an approving review, the required `cookbook.yml` check, no force push or deletion); the write-access list reviewed
-- [ ] Replace or retire `deploy-pages.yml` with a deploy for the new host; remove the Pages site and `github-pages` environment
+- [x] Retire `deploy-pages.yml` (ADR-0074)
+- [ ] Turn off GitHub Pages (Settings → Pages) and delete the `github-pages` environment
 - [ ] Serve from the domain root: check the `/relate-web/` subpath assumption is gone (the cookbook and playground already use `/cookbook/` and `/playground/`)
 - [ ] Update canonical, `og:url`, `sitemap.xml`, and any hard-coded `github.io` URLs
 - [ ] Keep `install.sh` and `releases.json` at `https://relatedb.ai/` (the CLI's `upgrade` reads `releases.json`; release workflows rewrite it), with correct content types and no caching that hides new releases
@@ -238,10 +238,7 @@ Written in phase 2 part B (DOCS-PLAN.md §10); what a launch, a release or upstr
 - [ ] Integration traces: only `guides/integrations/claude-agent-sdk` reaches relate over MCP; the LangGraph and Vercel AI SDK traces replay their in-process statements as MCP calls and say so. Re-check when those pages' samples change
 - [ ] When ADR-0045 to ADR-0053 are accepted, add Later references lines where they amend earlier records (ADR-0010 for ADR-0051's network colours; ADR-0035 for recipes carrying elements, ADR-0046, and `page.scratch()`, ADR-0048; ADR-0039 for the search reference placement and ADR-0050; ADR-0027 already names ADR-0053), and change their status in `docs/adr/README.md`
 
-## Interim host: GitHub Pages at relatedb.ai
+## Host: Cloudflare Pages at relatedb.ai
 
-- Host: `https://relatedb.ai/` (apex A records → GitHub Pages in DNS; `public/CNAME` = `relatedb.ai`; Settings → Pages custom domain `relatedb.ai`). The former preview host `r31473.relatedb.ai` is retired.
+- Host: `https://relatedb.ai/` (Cloudflare Pages, project `relate-web`; ADR-0074). The former preview host `r31473.relatedb.ai` is retired and its DNS record is gone.
 - Indexable: the `noindex` meta tags are gone and `robots.txt` allows all with the sitemap line (2026-11-10).
-- [ ] Settings → Pages → Enforce HTTPS once the certificate issues (`dig +short A relatedb.ai`, then `curl -sI https://relatedb.ai/`).
-- [ ] Remove the `r31473` CNAME record in DNS; `www` should point at the apex (`relatedb.github.io` CNAME) so it redirects.
-- Optional: verify `relatedb.ai` at the org level (TXT record) so nobody else can claim it on Pages.

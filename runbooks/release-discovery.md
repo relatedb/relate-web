@@ -14,7 +14,7 @@
    (`relate-extensions-<name>-<X.Y.Z>`). Signing happens upstream only.
 2. Upstream sends `repository_dispatch` `relate-release` to this repo with
    `{"kind": "cli"|"extension", "tag": "..."}`, using `RELATE_WEB_DISPATCH_TOKEN`.
-3. `deploy-pages.yml` and `deploy-cf.yml` run on it. Before the build they run
+3. `deploy-cf.yml` runs on it. Before the build they run
    `scripts/fetch-discovery.sh`, which pulls the newest release's files
    (newest by publish date, never by the poke's tag), checks them and writes
    them into `public/`. The deploy then publishes `dist/`. No pull request, no
@@ -92,7 +92,7 @@ gh api repos/relatedb/relate-web/dispatches \
   -f event_type=relate-release -f 'client_payload[kind]=cli' -f 'client_payload[tag]=vX.Y.Z'
 ```
 
-GitHub Pages only: `gh workflow run deploy-pages.yml -R relatedb/relate-web`.
+A manual redeploy of `main`: `gh workflow run deploy-cf.yml -R relatedb/relate-web`.
 
 If the pokes never arrive: in the upstream run, look for
 `RELATE_WEB_DISPATCH_TOKEN is not set — skipping the relate-web poke` (token

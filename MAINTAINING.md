@@ -18,21 +18,10 @@ repository's `playground/` directory (its own package; see
 
 ## How the site is deployed
 
-`.github/workflows/deploy-pages.yml` (on `main`) assembles the live site
-from two sources — this `gh-pages` branch as the base tree, and the
-playground `dist/` layered under `playground/` — then publishes via
-`actions/deploy-pages`. Triggers:
-
-- pushes to `main` (playground / wasm changes rebuild the site);
-- completion of `update-website.yml` (picks up the auto-updater's
-  push to this branch);
-- manual `workflow_dispatch` from the Actions tab (for hand-edits to
-  this branch — direct pushes here do **not** auto-trigger, because
-  the workflow file lives on `main`).
-
-Repo Settings → Pages → Source must be **GitHub Actions** for the
-workflow's deploy to be live; until then it builds but does not
-publish.
+`.github/workflows/deploy-cf.yml` builds the site on every push to `main` and publishes `dist/`
+(playground included, under `playground/`) to Cloudflare Pages, project `relate-web`, behind
+`relatedb.ai` (ADR-0074). Pull requests from this repository get a preview. A manual run:
+`gh workflow run deploy-cf.yml -R relatedb/relate-web`.
 
 Page structure, top to bottom:
 

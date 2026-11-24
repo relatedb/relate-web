@@ -72,3 +72,4 @@ is retired at launch as `LAUNCH.md` already lists.
 - Amended by ADR-0057: the docs MCP Worker is withdrawn before launch.
   Cloudflare Pages still hosts the site with its Pages Functions; there is
   no Worker, route or Workers AI binding.
+- Amended by ADR-0074: GitHub Pages is retired. DNS has moved, and Cloudflare Pages is the only host.

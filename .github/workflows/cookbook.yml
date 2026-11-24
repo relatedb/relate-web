@@ -139,7 +139,7 @@ jobs:
       - name: Build site
         run: npm run build
 
-      # dist/ carries dotfiles (.nojekyll, .well-known/), which upload-artifact
+      # dist/ carries dotfiles (.well-known/), which upload-artifact
       # leaves out unless asked.
       - uses: actions/upload-artifact@v4
         with:

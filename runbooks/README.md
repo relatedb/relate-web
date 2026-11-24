@@ -35,9 +35,8 @@ git -C <checkout> log --oneline -5 main
 
 Facts worth knowing before touching anything:
 
-- Two hosts are deployed from `main`: GitHub Pages (`deploy-pages.yml`, serving
-  `relatedb.ai`) and Cloudflare Pages (`deploy-cf.yml`,
-  project `relate-web`; it skips, green, until its secrets exist).
+- Cloudflare Pages hosts `relatedb.ai` and is deployed from `main` by `deploy-cf.yml`
+  (project `relate-web`; it skips, green, until its secrets exist). GitHub Pages is retired (ADR-0074).
 - The site is static (`dist/`). A failed deploy leaves the previous deploy live.
 - The site is indexable: no `noindex`, and `robots.txt` allows all.
 - `install.sh`, `releases.json` and `extensions.json` (+ `.sig`) are signed or
