@@ -53,4 +53,4 @@ Or try Relate in the [playground](/playground/). No install required.
 OK, yes, there be graphs in here. If you have data, you have a graph. The graphs are the reason the data comes alive. Do the same kind of querying you're familiar with, extended with pattern matching, vector search, and an adaptive schema. Structured data, unstructured data, and vectors all in one bundle of joy.
 
 Relatedly,\
-Archie
+Archie & The Relate Team
