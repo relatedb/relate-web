@@ -1,11 +1,15 @@
 ---
-// /blog/: the posts, newest first. With none published the page says so and stays out of search.
+// /blog/: the posts, newest first, with the tags to browse by. With none published the page says so
+// and stays out of search.
 import Base from '../../layouts/Base.astro';
-import { isListed, isoDate, longDate, postPath, posts } from '../../lib/blog.ts';
+import PostList from '../../components/blog/PostList.astro';
+import TagList from '../../components/blog/TagList.astro';
+import { browsable, tagCounts } from '../../lib/blog.ts';
 import '../../styles/blog.css';
 
 // The dev server lists everything (drafts and unlisted, badged); production lists only listed posts.
-const list = (await posts()).filter((p) => import.meta.env.DEV || isListed(p));
+const list = await browsable();
+const counts = tagCounts(list);
 ---
 <Base
   title="Related Posts"
@@ -21,18 +25,10 @@ const list = (await posts()).filter((p) => import.meta.env.DEV || isListed(p));
     {list.length === 0 ? (
       <p class="blog-empty">Nothing published yet. <a href="/">Back to the home page</a>.</p>
     ) : (
-      <ol class="blog-list">
-        {list.map((post) => (
-          <li>
-            <article>
-              <h2><a href={postPath(post)}>{post.data.title}</a>{post.data.draft && <span class="blog-draft">draft</span>}{post.data.unlisted && <span class="blog-draft">unlisted</span>}</h2>
-              {post.data.subtitle && <p class="blog-sub">{post.data.subtitle}</p>}
-              <p class="blog-meta"><time datetime={isoDate(post.data.date)}>{longDate(post.data.date)}</time> · {post.data.author}</p>
-              <p>{post.data.description}</p>
-            </article>
-          </li>
-        ))}
-      </ol>
+      <>
+        <TagList tags={counts.map((c) => c.tag)} counts={Object.fromEntries(counts.map((c) => [c.tag, c.count]))} label="Browse by tag" />
+        <PostList list={list} />
+      </>
     )}
   </div>
 </Base>

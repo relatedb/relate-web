@@ -3,7 +3,7 @@ title: Relate 1.1.0
 subtitle: Lookups without an index, a leaner memory footprint, and a Swift API to match
 description: Equality lookups no longer need a declared index, queries hold less memory, long shortest-path queries finish, and agents can send feedback from a session.
 date: 2026-11-17
-tags: [release]
+tags: [release, swift]
 draft: true
 ---
 

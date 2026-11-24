@@ -1,0 +1,13 @@
+---
+// A row of tag links: each goes to /blog/tags/<tag>/ (ADR-0073).
+import { tagLabel, tagPath } from '../../lib/blog.ts';
+interface Props { tags: string[]; counts?: Record<string, number>; label?: string }
+const { tags, counts, label = 'Tags' } = Astro.props;
+---
+{tags.length > 0 && (
+  <ul class="tags" aria-label={label}>
+    {tags.map((t) => (
+      <li><a class="tag" href={tagPath(t)}>{tagLabel(t)}{counts && <span class="tag-n">{counts[t]}</span>}</a></li>
+    ))}
+  </ul>
+)}

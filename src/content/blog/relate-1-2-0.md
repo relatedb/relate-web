@@ -3,7 +3,7 @@ title: Relate 1.2.0
 subtitle: A .NET client, more of Neo4j's Cypher spellings, and indexes that answer aggregations
 description: Relate.Net brings Relate to C#, F# and Visual Basic, more Neo4j Cypher runs unchanged, and aggregations and reopens get faster.
 date: 2026-11-20
-tags: [release]
+tags: [release, dotnet, java]
 draft: true
 ---
 
@@ -25,7 +25,7 @@ conn.Query("CREATE (p:Person {name: $name, born: $born})",
 var person = conn.Query("MATCH (p:Person) RETURN p.name AS name")[0];
 Console.WriteLine(person.Get<string>("name")); // Ada
 ```
-## More Cypher runs as Neo4j writes it
+## More Cypher in the Neo4j-style
 
 A dozen spellings that used to fail now plan and run, so a query ported from Neo4j stops dying on syntax:
 

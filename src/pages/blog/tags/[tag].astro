@@ -1,0 +1,37 @@
+---
+// /blog/tags/<tag>/: the posts with one tag, newest first. A language tag (python, swift, ...) is how a
+// language's developers find what is for them (ADR-0073).
+import Base from '../../../layouts/Base.astro';
+import PostList from '../../../components/blog/PostList.astro';
+import TagList from '../../../components/blog/TagList.astro';
+import { browsable, LANGUAGES, tagCounts, tagLabel, tagPath } from '../../../lib/blog.ts';
+import '../../../styles/blog.css';
+
+export async function getStaticPaths() {
+  const all = await browsable();
+  return tagCounts(all).map(({ tag }) => ({
+    params: { tag },
+    props: { tag, list: all.filter((p) => p.data.tags.includes(tag)) },
+  }));
+}
+const { tag, list } = Astro.props;
+// Other tags on these posts, to keep browsing.
+const others = tagCounts(list).map((c) => c.tag).filter((t) => t !== tag);
+const label = tagLabel(tag);
+const isLang = (LANGUAGES as readonly string[]).includes(tag);
+const description = isLang
+  ? `Posts for ${label} developers: releases, integrations and write-ups from the relate project.`
+  : `Posts tagged ${label} from the relate project.`;
+---
+<Base title={`${label} posts`} description={description} path={tagPath(tag)}>
+  <link slot="head" rel="alternate" type="application/rss+xml" title={`Related Posts: ${label}`} href={`${tagPath(tag)}rss.xml`} />
+  <div class="blog">
+    <p class="blog-back"><a href="/blog/">&larr; Related Posts</a></p>
+    <header class="blog-head">
+      <h1>{label}</h1>
+      <a class="blog-rss" href={`${tagPath(tag)}rss.xml`}>RSS</a>
+    </header>
+    <TagList tags={others} label="Other tags" />
+    <PostList list={list} />
+  </div>
+</Base>

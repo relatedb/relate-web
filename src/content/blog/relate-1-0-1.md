@@ -3,7 +3,7 @@ title: Relate 1.0.1
 subtitle: Python rows that behave, a Bolt server that stays on the line, and quiet JSON lines
 description: The first patch after launch smooths the edges where Relate meets other tools.
 date: 2026-11-12
-tags: [release]
+tags: [release, python]
 draft: true
 ---
 

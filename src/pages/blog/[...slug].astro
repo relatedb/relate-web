@@ -3,7 +3,8 @@
 // agents get the prose and little else.
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { isoDate, longDate, postPath, posts } from '../../lib/blog.ts';
+import TagList from '../../components/blog/TagList.astro';
+import { browsable, isoDate, longDate, postPath, posts, related } from '../../lib/blog.ts';
 import { absolute, SITE_NAME } from '../../lib/seo.ts';
 import '../../styles/blog.css';
 
@@ -12,6 +13,7 @@ export async function getStaticPaths() {
 }
 const { post } = Astro.props;
 const { Content } = await render(post);
+const more = related(post, await browsable());
 const { title, subtitle, description, date, updated, author, tags } = post.data;
 // The page title reads "Title: subtitle"; the heading shows the title and the subtitle under it.
 const fullTitle = subtitle ? `${title}${/[.!?]$/.test(title) ? ' ' : ': '}${subtitle}` : title;
@@ -47,6 +49,19 @@ const jsonld = [
         </p>
       </header>
       <div class="post-body"><Content /></div>
+      <footer class="post-foot">
+        <TagList tags={tags} />
+      </footer>
     </article>
+    {more.length > 0 && (
+      <aside class="post-more" aria-labelledby="more">
+        <h2 id="more">Keep reading</h2>
+        <ul>
+          {more.map((p) => (
+            <li><a href={postPath(p)}>{p.data.title}</a><span class="post-more-sub">{p.data.subtitle}</span></li>
+          ))}
+        </ul>
+      </aside>
+    )}
   </div>
 </Base>

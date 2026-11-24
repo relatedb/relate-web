@@ -123,7 +123,8 @@ const blog = defineCollection({
       updated: z.coerce.date().optional(),
       /** Who wrote it: Archie, the mascot, unless the post says otherwise (BLOG-VOICE.md). Several names: separate with commas and "and". */
       author: z.string().min(1).default('Archie'),
-      tags: z.array(z.string().min(1)).default([]),
+      /** Lowercase, hyphenated slugs (`python`, `release`): each is a page at /blog/tags/<tag>/. Language tags are listed in src/lib/blog.ts. */
+      tags: z.array(z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'a lowercase, hyphenated slug')).default([]),
       draft: z.boolean().default(false),
       /** Built and reachable by its URL, but not listed in the index, the feed or the sitemap, and `noindex`. */
       unlisted: z.boolean().default(false),

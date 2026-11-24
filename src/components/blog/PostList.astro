@@ -1,0 +1,20 @@
+---
+// The post cards the index and the tag pages share (ADR-0073).
+import { isoDate, longDate, postPath, type Post } from '../../lib/blog.ts';
+import TagList from './TagList.astro';
+interface Props { list: Post[] }
+const { list } = Astro.props;
+---
+<ol class="blog-list">
+  {list.map((post) => (
+    <li>
+      <article>
+        <h2><a href={postPath(post)}>{post.data.title}</a>{post.data.draft && <span class="blog-draft">draft</span>}{post.data.unlisted && <span class="blog-draft">unlisted</span>}</h2>
+        {post.data.subtitle && <p class="blog-sub">{post.data.subtitle}</p>}
+        <p class="blog-meta"><time datetime={isoDate(post.data.date)}>{longDate(post.data.date)}</time> · {post.data.author}</p>
+        <p>{post.data.description}</p>
+        <TagList tags={post.data.tags} />
+      </article>
+    </li>
+  ))}
+</ol>

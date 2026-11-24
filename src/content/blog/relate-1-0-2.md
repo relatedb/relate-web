@@ -3,7 +3,7 @@ title: Relate 1.0.2
 subtitle: Imports that keep their footing, shortest paths that honor the filter, and a tidier Swift API
 description: Large imports commit batch by batch, shortest-path filters run after selection, and the Swift client gets typed namespaces.
 date: 2026-11-16
-tags: [release]
+tags: [release, swift]
 draft: true
 ---
 

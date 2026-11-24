@@ -21,7 +21,7 @@ footer links, the index heading, the feed); the path and the collection stay `bl
 
 - Frontmatter is strict: `title`, an optional `subtitle` (shown under the title; the page title
   reads "Title: subtitle", or "Title! Subtitle" with a space when the title ends in punctuation), `description`, `date` (and optionally `updated`), `author`
-  (default "Archie", the mascot; BLOG-VOICE.md), `tags`, `draft` and `unlisted`. A draft is shown by the dev server only; a
+  (default "Archie", the mascot; BLOG-VOICE.md), `tags` (lowercase slugs; each is a page at `/blog/tags/<tag>/`, each tag page has its own RSS feed at `/blog/tags/<tag>/rss.xml`, and the post page lists the posts that share its tags; language tags such as `python` and `swift` are how a language's developers find what is for them), `draft` and `unlisted`. A draft is shown by the dev server only; a
   production build leaves it out of the index, the feed and the sitemap. An `unlisted` post is built
   at its URL with `noindex` but left out of the index, the feed and the sitemap: a private-by-obscurity
   preview to share for review (the URL is public to anyone who has it).
@@ -29,6 +29,11 @@ footer links, the index heading, the feed); the path and the collection stay `bl
   is in the frontmatter, the page, the feed and the JSON-LD, so the URL stays stable when a post
   is revised. A release post may carry its version (`relate-1-2-0`). A published slug is never
   renamed; a move gets a line in `public/_redirects`, and a revision sets `updated`.
+- A tag is a public URL too (`/blog/tags/<tag>/` and its `rss.xml`, which readers subscribe to), so
+  the same rule holds: a tag that has appeared on a published post is never renamed or dropped
+  without a line in `public/_redirects` for its page and its feed. Adding a tag needs nothing but
+  the frontmatter; a new language also goes in `LANGUAGES` and `LABELS` in `src/lib/blog.ts`, for
+  its label and its place in the index row.
 - A post is one `<article>` with an `<h1>`, a byline and its date, so reader modes and agents get
   the prose without chrome. Its head carries `article` Open Graph data and `BlogPosting` JSON-LD.
 - `/blog/` lists posts newest first. With no published post it says so and is `noindex`, so an
