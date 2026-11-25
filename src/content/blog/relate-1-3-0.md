@@ -13,6 +13,16 @@ Fewer refusals: bigger patterns, bigger loads and bigger statements now run.
 
 A searching `MATCH` now keeps every pattern shape the general pattern machinery accepts. `SKIP` and `LIMIT` page over the entities the whole statement keeps, so labels, predicates and bindings from earlier clauses narrow the candidates before the window applies. The inner `WHERE` serves full-text searches too. The `complex-search-patterns` preview opt-in is retired.
 
+Find the films Pacino acted in whose plot vectors sit closest to a query, with the pattern narrowing the candidates before the window applies:
+
+```bash
+relate --database ./films "CREATE VECTOR INDEX plotVectors FOR (m:Movie) ON (m.plot) OPTIONS {indexConfig: {\`vector.dimensions\`: 2, \`vector.similarity_function\`: 'cosine'}}"
+relate --database ./films "CREATE (p:Person {name:'Pacino'}), (a:Movie {title:'Heat', plot:[1.0,0.0]}), (b:Movie {title:'Scarface', plot:[0.9,0.1]}), (c:Movie {title:'Jaws', plot:[0.0,1.0]}), (p)-[:ACTED_IN]->(a), (p)-[:ACTED_IN]->(b)"
+relate --database ./films "MATCH (movie:Movie)<-[:ACTED_IN]-({name: 'Pacino'}) SEARCH movie IN (VECTOR INDEX plotVectors FOR [1.0, 0.0] LIMIT 2) SCORE AS score RETURN movie.title AS title ORDER BY score DESC"
+```
+
+Jaws is in the graph but Pacino was not in it, so it never competes for the two slots. The rows come back as Heat, then Scarface.
+
 ## Install with your package manager
 
 Homebrew works today. Each release also builds signed APT and RPM repositories, plus winget, Chocolatey and Scoop packages, from its own signed, checksummed artifacts, ready as those channels go live. On an install a package manager owns, `relate upgrade` names that manager's own upgrade command and replaces nothing.
@@ -20,6 +30,13 @@ Homebrew works today. Each release also builds signed APT and RPM repositories, 
 ## One statement, a million rows
 
 `CALL { … } IN TRANSACTIONS` runs one engine pass per batch, and the per-statement nested-evaluation budget is now a million passes. A batched bulk load no longer refuses at the 100,001st row. A one-million-node load measured 4.98 s at 0.99 GB peak RSS.
+
+```bash
+relate --database ./people "UNWIND range(1,1000000) AS id CALL (id) { CREATE (n:Person {name:'Hakan '+id, id:id, age:id%100}) } IN TRANSACTIONS OF 100000 ROWS"
+relate --database ./people --read-only "MATCH (n:Person) RETURN count(n) AS people"
+```
+
+The second statement returns 1000000.
 
 ## Big statements stream
 
