@@ -3,6 +3,7 @@ title: Relate 1.2.0
 subtitle: A .NET client, more of Neo4j's Cypher spellings, and indexes that answer aggregations
 description: Relate.Net brings Relate to C#, F# and Visual Basic, more Neo4j Cypher runs unchanged, and aggregations and reopens get faster.
 date: 2026-11-20
+updated: 2026-11-25
 tags: [release, dotnet, java]
 draft: false
 ---
@@ -46,7 +47,7 @@ A checkpoint reopen decodes across all CPU cores and installs rows in bounded sl
 ## Also in this release
 
 - Mistral Vibe joins the agent catalog: `relate skill install --agent vibe` writes the skill to `~/.vibe/skills/relate`.
-- The Java client publishes to Maven Central with every release.
+- The Java client is on Maven Central from this release.
 - `EXPLAIN` warns when a statement references a parameter you didn't supply.
 - A store's engine directory is now `.relate/`. Opening an older store read-write adopts it in place; a read-only open asks for one writable pass first.
 
