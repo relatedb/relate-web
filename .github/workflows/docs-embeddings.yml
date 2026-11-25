@@ -1,0 +1,69 @@
+# Re-records the docs' embeddings (src/content/docs/_data/embeddings.json) on
+# Linux and commits the result to a branch.
+#
+# `npm run docs:embeddings` is an authoring tool: it runs bge-small-en-v1.5
+# through onnxruntime-node, which ships no macOS Intel build, and it downloads
+# the model on first use. Run this on a release's refresh branch
+# (engine-release/vX.Y.Z) when docs:check reports `embeddings-stale`.
+#
+# By hand only. The commit is pushed with RELEASE_PR_TOKEN when it is set, so
+# the pull request's required checks start; with the job's own token the push
+# does not start them (GitHub's rule), and the checks need a re-run or an
+# empty commit.
+name: Docs embeddings
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: The branch to re-record on (for example engine-release/v1.3.0)
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs-embeddings-${{ inputs.ref }}
+  cancel-in-progress: false
+
+env:
+  DO_NOT_TRACK: '1'
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - run: npm ci
+      - run: npm ci --prefix scripts/embeddings
+
+      - name: Embed the changed sections
+        run: npm run docs:embeddings
+
+      - name: Commit the embeddings
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          changed="$(git status --porcelain --untracked-files=all)"
+          if [ -z "$changed" ]; then
+            echo "::notice::the embeddings are current: nothing to commit"
+            exit 0
+          fi
+          # Only the embeddings may change.
+          if [ "$(echo "$changed" | grep -vc ' src/content/docs/_data/embeddings.json$')" != 0 ]; then
+            echo "::error::docs:embeddings changed more than embeddings.json:"; echo "$changed"; exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/content/docs/_data/embeddings.json
+          git commit -m 'Docs: re-record the embeddings'
+          git push origin "HEAD:refs/heads/$REF"
