@@ -6,7 +6,7 @@ date: 2026-11-23
 tags: [integrations, web, javascript]
 image: /blog/web-integrations.jpg
 card: /blog/web-integrations-card.jpg
-imageAlt: A claymation map in the style of the Seven Bridges of Königsberg, with seven Archies as the bridges (Blacksmith's, Connecting, Green, Merchant's, Wooden, High and Honey) arching over a blue river between felt islands.
+imageAlt: A claymation map in the style of the Seven Bridges of Königsberg. Seven Archies, the fuzzy blue-and-green arch mascot, arch over a blue plasticine river as the bridges between felt-green land, a town island and a small clay sailboat.
 draft: false
 ---
 
