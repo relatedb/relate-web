@@ -47,7 +47,7 @@ ls -A memory memory/wal memory/.relate/schema
 ```
 
 ```text
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":3.681333,"execute_ms":3.3569590000000002,"lex_parse_ms":0.013166,"lower_ms":0.017207999999999998,"parse_ms":0.306375,"plan_ms":0.011708999999999999,"result_generation_ms":0.000209,"rewrite_ms":0.0005},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":3.681333,"parse_ms":0.306375,"plan_ms":0.011708999999999999,"execute_ms":3.3569590000000002,"lex_parse_ms":0.013166,"rewrite_ms":0.0005,"lower_ms":0.017207999999999998,"result_generation_ms":0.000209},"planCache":"miss"}
 memory:
 .cypherlite.lock
 .cypherlite.writer
@@ -112,7 +112,7 @@ git status --short
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["nodes"],"notifications":[],"planCache":"miss","rows":[{"nodes":5}],"timings":{"elapsed_ms":0.335791,"execute_ms":0.169542,"lex_parse_ms":0.03125,"lower_ms":0.043125,"parse_ms":0.107042,"plan_ms":0.050708,"result_generation_ms":0.000292,"rewrite_ms":0.008208},"truncated":false}
+{"columns":["nodes"],"columnTypes":["INTEGER"],"rows":[{"nodes":5}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.335791,"parse_ms":0.107042,"plan_ms":0.050708,"execute_ms":0.169542,"lex_parse_ms":0.03125,"rewrite_ms":0.008208,"lower_ms":0.043125,"result_generation_ms":0.000292},"planCache":"miss"}
 ```
 
 ## Record a session's writes
@@ -125,8 +125,8 @@ relate --database ./memory --mode envelope "MATCH (ada:Person {name: 'Ada'}) MER
 ```
 
 ```text
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":1.5647499999999999,"execute_ms":1.341834,"lex_parse_ms":0.008166,"lower_ms":0.010416,"parse_ms":0.210459,"plan_ms":0.00725,"result_generation_ms":0.000167,"rewrite_ms":0.0005},"truncated":false}
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":0.523666,"execute_ms":0.304166,"lex_parse_ms":0.007209,"lower_ms":0.009000000000000001,"parse_ms":0.206875,"plan_ms":0.007459,"result_generation_ms":0.00020800000000000001,"rewrite_ms":0.000334},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":1.5647499999999999,"parse_ms":0.210459,"plan_ms":0.00725,"execute_ms":1.341834,"lex_parse_ms":0.008166,"rewrite_ms":0.0005,"lower_ms":0.010416,"result_generation_ms":0.000167},"planCache":"miss"}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.523666,"parse_ms":0.206875,"plan_ms":0.007459,"execute_ms":0.304166,"lex_parse_ms":0.007209,"rewrite_ms":0.000334,"lower_ms":0.009000000000000001,"result_generation_ms":0.00020800000000000001},"planCache":"miss"}
 note: write statement changed nothing; the graph is unchanged
 ```
 
@@ -235,7 +235,7 @@ git status --short
 ```
 
 ```text
-{"columnTypes":["STRING","INTEGER"],"columns":["project","since"],"notifications":[],"planCache":"miss","rows":[{"project":"relate","since":2024},{"project":"docs","since":2026}],"timings":{"elapsed_ms":0.471167,"execute_ms":0.25670800000000005,"lex_parse_ms":0.04,"lower_ms":0.044583000000000005,"parse_ms":0.13733399999999998,"plan_ms":0.067,"result_generation_ms":0.00033299999999999996,"rewrite_ms":0.009166},"truncated":false}
+{"columns":["project","since"],"columnTypes":["STRING","INTEGER"],"rows":[{"project":"relate","since":2024},{"project":"docs","since":2026}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.471167,"parse_ms":0.13733399999999998,"plan_ms":0.067,"execute_ms":0.25670800000000005,"lex_parse_ms":0.04,"rewrite_ms":0.009166,"lower_ms":0.044583000000000005,"result_generation_ms":0.00033299999999999996},"planCache":"miss"}
 ```
 
 ## If it goes wrong

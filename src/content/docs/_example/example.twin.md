@@ -6,7 +6,7 @@ surfaces:
   - python
 status: stable
 since: 0.16.0
-verified: 1.2.0
+verified: 1.3.0
 verified_by:
   - cypher
   - python
@@ -39,7 +39,7 @@ last_updated: 2026-11-07
 
 A throwaway page that exercises every docs construct, for the pipeline's tests. Not part of the site.
 
-> Verified against relate 1.2.0. If your `relate --version` is newer, read https://relatedb.ai/docs/reference/changelog/#since-1.2.0
+> Verified against relate 1.3.0. If your `relate --version` is newer, read https://relatedb.ai/docs/reference/changelog/#since-1.3.0
 
 This page opens a store and writes through the write-ahead log. The second store link adds no second entry to the terms. A colon in prose, like ratio a:b, stays text. Badges: (since 0.16) and (preview).
 
@@ -584,18 +584,18 @@ The crate is on crates.io; the first build compiles the engine from source, with
 <dependency>
   <groupId>ai.relatedb</groupId>
   <artifactId>relate</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
 </dependency>
 ```
 
-In Gradle, `implementation("ai.relatedb:relate:1.2.0")` with `mavenCentral()`. Its POM brings in the client's two dependencies, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`).
+In Gradle, `implementation("ai.relatedb:relate:1.3.0")` with `mavenCentral()`. Its POM brings in the client's two dependencies, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`).
 
 #### .NET
 
 `Relate.Net`, for .NET 8 or later, is not on NuGet. From your project's folder, clone the release tag beside it and reference the client's project:
 
 ```bash
-git clone --branch v1.2.0 --depth 1 https://github.com/relatedb/relate ../relate
+git clone --branch v1.3.0 --depth 1 https://github.com/relatedb/relate ../relate
 dotnet add reference ../relate/clients/dotnet/src/Relate.Net/Relate.Net.csproj
 ```
 
@@ -606,10 +606,10 @@ The build copies the engine library beside your program from `RelateNativeLibrar
 In a Go module (`go mod init <module>` creates one):
 
 ```bash
-go get github.com/relatedb/relate/clients/go@v1.2.0
+go get github.com/relatedb/relate/clients/go@v1.3.0
 ```
 
-`v1.2.0` is the relate release: each release tags the module with its own version.
+`v1.3.0` is the relate release: each release tags the module with its own version.
 
 The module uses cgo and links `librelate_ffi`, from the `relate-ffi-<target>.tar.gz` archive attached to each release.
 
@@ -763,7 +763,7 @@ relate, the embedded Cypher graph database (relatedb.ai).
 | `engine-division-by-zero`; code `validation_error`, kind `type`; GQL status `22G03`; Neo4j `Neo.ClientError.Statement.ArithmeticError`; HTTP 400 | `type error: / by zero` | Integer division by zero. Modulo by zero renders `% by zero`. | Guard the divisor. | no | 6 |
 | `engine-rounding-necessary`; code `fatal_error`, kind `execution`; Neo4j `Neo.ClientError.Statement.ArithmeticError` | `ArithmeticError: rounding necessary` | `round(x, p, 'UNNECESSARY')` on a value that needs rounding. | Use another rounding mode. | no | 1 |
 | `engine-cancelled`; Neo4j `Neo.ClientError.Transaction.TransactionTimedOut` | `query cancelled` | The statement was stopped through its cancel token, for example when the Bolt `--query-timeout-secs` bound expired. | Bound the work, or raise the timeout. | — | — |
-| `engine-wal-payload-cap`; code `fatal_error`, kind `capacity`; Neo4j `Neo.ClientError.General.TransactionOutOfMemoryError`; HTTP 507; Python `DataError` | `This statement tried to commit a single WAL record of at least <used>. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is <limit> (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).` | One commit is over the 64 MiB per-commit WAL payload cap; nothing is written. Up to and including 1.0.1 the message wrote the 64 MiB (67,108,864-byte) cap as `64 MB`, called it the per-record cap, and named no remedy beyond smaller transactions. | Commit the data in smaller transactions: `CALL { … } IN TRANSACTIONS OF <n> ROWS`, or batches sent by the client. | no | 1 |
+| `engine-wal-payload-cap`; code `fatal_error`, kind `capacity`; Neo4j `Neo.ClientError.General.TransactionOutOfMemoryError`; HTTP 507; Python `DataError` | `This statement tried to commit a single WAL record of at least <used>. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is <limit> (ADR-0650); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).` | One commit is over the 256 MiB per-commit WAL payload cap (64 MiB before 1.3.0), set at open by `RELATE_WAL_PAYLOAD_LIMIT`; nothing is written. Up to and including 1.0.1 the message wrote the 64 MiB (67,108,864-byte) cap as `64 MB`, called it the per-record cap, and named no remedy beyond smaller transactions. | Commit the data in smaller transactions: `CALL { … } IN TRANSACTIONS OF <n> ROWS`, or batches sent by the client. | no | 1 |
 | `engine-graph-size-cap`; code `fatal_error`, kind `capacity`; Neo4j `Neo.ClientError.General.TransactionOutOfMemoryError`; Python `DataError` | `capacity exceeded: used=… limit=…` | A growing write crossed `--logical-graph-size-limit`. | Raise the limit or reduce the graph. | no | 1 |
 | `engine-expression-memory-cap`; code `fatal_error`, kind `capacity` | `This statement tried to build a single value of <size>. This is a safety limit protecting against memory exhaustion (not a database limit) — build the value in smaller pieces, or raise it with --expression-memory-limit.` | One statement built a single value (a list, a string, a map) larger than the per-value expression cap, 256 MiB by default. | Build the value in smaller pieces, or raise `--expression-memory-limit` (`none` disables the cap for a known bulk pipeline). | no | 1 |
 | `engine-system-ontologies-not-queryable`; code `validation_error`, kind `semantic`; GQL status `42N17`; Python `OperationalError` | `This database is not queryable. Use the db.ontology.* procedures on the user database 'neo4j' instead.` | With `RELATE_PREVIEW=ontology` set, a statement other than an administration command was routed to `system_ontologies`, reads included. Without the opt-in the namespace is unknown and the statement fails with `Graph not found: system_ontologies` instead. As of 1.0.2 the namespace is visible only with `RELATE_PREVIEW=ontology`; earlier releases listed it in every store. | Run `CALL db.ontology.get()` on `neo4j` with `RELATE_PREVIEW=ontology` set. | — | 6 |
@@ -783,7 +783,7 @@ relate, the embedded Cypher graph database (relatedb.ai).
 | `engine-query-too-large`; code `validation_error`, kind `syntax` | `syntax error: query text of <n> bytes exceeds the maximum query size of 4194304 bytes` | The statement text is over 4 MiB (4,194,304 bytes). | Send the data as parameters, or split the statement. | no | 6 |
 | `engine-nesting-depth-exceeded`; code `validation_error`, kind `syntax` | `syntax error: parse error: maximum nesting depth of 500 exceeded` | The statement's expressions and clauses nest more than 500 levels deep. The error object also carries `column` and `source`. | Flatten the expression. | no | 6 |
 | `engine-value-depth-exceeded`; code `fatal_error`, kind `execution`; name `ValueDepthExceeded` | `ValueDepthExceeded: value nesting exceeds 500 levels; container nesting compounds per level (security limit).` | A list or map built at run time nests more than 500 levels. | Build a flatter value. | no | 1 |
-| `engine-nested-evaluation-budget`; code `fatal_error`, kind `execution`; Neo4j `Neo.ClientError.Statement.SemanticError` | `NestedEvaluationBudgetExceeded: nested evaluation exceeds 100000 passes per statement; nested subqueries compound per level (security budget).` | Nested subqueries, conditional branches and `FOREACH` lists would exceed 100,000 evaluation passes in one statement. A `CALL` subquery runs once per input row and each run counts against the budget, so a `CALL { … }` over more than 100,000 rows fails, `IN TRANSACTIONS` included; the same statement over 99,999 rows succeeds. | Flatten the nesting or split the statement. | no | 1 |
+| `engine-nested-evaluation-budget`; code `fatal_error`, kind `execution`; Neo4j `Neo.ClientError.Statement.SemanticError` | `NestedEvaluationBudgetExceeded: nested evaluation exceeds 1000000 passes per statement; nested subqueries compound per level (security budget).` | Nested subqueries, conditional branches and `FOREACH` lists would exceed 1,000,000 evaluation passes (100,000 before 1.3.0) in one statement. A `CALL` subquery runs once per input row and each run counts against the budget, so a `CALL { … }` over more than 1,000,000 rows fails, `IN TRANSACTIONS` included; the same statement over 1,000,000 rows succeeds. | Flatten the nesting or split the statement. | no | 1 |
 | `engine-write-on-read-only`; code `validation_error`, kind `semantic`; name `WriteOnReadOnlyAccessDatabase`; GQL status `42N18`; Neo4j `Neo.ClientError.Statement.SemanticError`; Python `OperationalError` | `semantic error: WriteOnReadOnlyAccessDatabase: No write operations are allowed on this database. The database is in read-only mode on this Neo4j instance.` | A write on a store opened `--read-only` (or an ephemeral `--load` into `:memory:`). A `--load` into `:memory:` is read-only too. The Bolt server's message is `database is read-only`. The C ABI clients (Java `ClientException`, Go `*relate.Error`, Swift `.engine`) report this code and GQL status, stage runtime, on a write or a checkpoint. On the HTTP Query API a write in a managed transaction on a store served `--read-only` runs inside the transaction and the commit answers 400 with `42N18`. | Reopen without `--read-only` when the write is intended. | no | 6 |
 | `engine-uniqueness-violation`; code `validation_error`, kind `semantic`; Neo4j `Neo.ClientError.Schema.ConstraintValidationFailed`; Python `IntegrityError` | ``semantic error: ConstraintValidationFailed: `<constraint>` uniqueness`` | A write violates a uniqueness constraint. | Use `MERGE` on the constrained key, or fix the duplicate. | no | 6 |
 | `engine-vector-dimension-mismatch`; code `validation_error`, kind `type` | `type error: vector() dimension does not match list` | `vector(list, n, type)` was given a list whose length is not `n`. | Pass a dimension equal to the list length. | no | 6 |
@@ -808,7 +808,7 @@ relate, the embedded Cypher graph database (relatedb.ai).
 | `engine-system-restricted-clauses`; code `validation_error`, kind `semantic` | `semantic error: SemanticError: The following unsupported clauses were used: <clauses>.  The system database supports a restricted set of Cypher clauses. The supported clause structure for procedure calls is: CALL, YIELD, RETURN. YIELD and RETURN clauses are optional. The order of the clauses is fixed and each can only occur once.` | A `MATCH`, `RETURN` or other clause outside a procedure call, routed to the `system` namespace. Two spaces follow the first period, as printed. | Run the statement on `neo4j`, or use `SHOW …` or `CALL … YIELD … RETURN` on `system`. | no | 6 |
 | `engine-point-latitude-range`; code `validation_error`, kind `argument` | `InvalidArgumentValue: point() latitude must be in the range [-90, 90]` | A geographic `point()` with a latitude outside -90 to 90; longitude and latitude may be swapped. The CLI prints it after `semantic error:`; the WebAssembly build after `type error:`. | Pass the latitude as `latitude` (or `y`) and keep it within range. | no | 6 |
 | `engine-no-transaction`; GQL status `42000`; Neo4j `Neo.ClientError.Statement.SemanticError` | `semantic error: no transaction` | A commit or rollback with no explicit transaction open: `.commit` or `.rollback` in the shell, or `commit()`/`rollback()` in a client. The Java, Go, Swift and Node.js clients report it with GQL status `42000` and stage runtime; in a CLI script it stops the run with exit code 1. | Begin a transaction first, or drop the commit. | no | 1 |
-| `engine-ontology-unsupported-version`; code `validation_error`, kind `semantic` | `semantic error: Unsupported ontology spec version: '<uri>'. This version of Relate supports up to Ontology Graph Spec 1.1.0 ('https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json').` | `db.ontology.set` got a document whose `schema` names a spec version this build does not support (preview: `RELATE_PREVIEW=ontology`). | Write the document against Ontology Graph Spec 1.1.0 or earlier. | no | 6 |
+| `engine-ontology-unsupported-version`; code `validation_error`, kind `argument` | `semantic error: The ontology document uses an unsupported graph-spec version. The document names '<uri>'; This version of Relate supports up to Ontology Graph Spec 1.1.0 ('https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json').` | `db.ontology.set` got a document whose `schema` names a spec version this build does not support (preview: `RELATE_PREVIEW=ontology`). | Write the document against Ontology Graph Spec 1.1.0 or earlier. | no | 6 |
 | `engine-ontology-argument-type`; code `validation_error`, kind `type` | ``type error: InvalidArgumentType: db.ontology.set argument `ontology` expects STRING`` | `db.ontology.set` got a map or another non-string value; the document is passed as one string (preview: `RELATE_PREVIEW=ontology`). | Pass the document as a string. | no | 6 |
 | `engine-ontology-user-database-only`; code `validation_error`, kind `semantic` | `semantic error: SemanticError: Ontologies can only be stored for the user database 'neo4j'.` | An ontology procedure called with the session on the `system` namespace (preview: `RELATE_PREVIEW=ontology`). | Call it on `neo4j`. | no | 6 |
 | `http-unauthorized`; GQL status `42NFF`; HTTP 401 | — | Missing or wrong credential. | Send `Authorization: Basic` with the `serve` credential (the generated token is printed at startup). | — | — |

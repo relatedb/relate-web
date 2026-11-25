@@ -90,6 +90,14 @@ one-line hint to this flow, exactly once per run.
 - **Local receipts** — `feedback-receipts.jsonl` in the config directory
   (`$XDG_CONFIG_HOME/relate/` or `~/.config/relate/`) records every rejection
   and send attempt.
+- **Fused plan children** — in the `{"plan": …}` machine modes a seek-started
+  `MATCH` nests display-only children marked by `FusedInto` (ADR-0622);
+  skip them when counting executed operators. They carry no `Rows`/`TimeNs`/`DbHits`.
+- **Memo counters** — a `PROFILE` table gains a `Memo` column (`hits/probes`,
+  `*` when a memo gave up) only when the statement used an expression memo; the
+  machine modes carry `MemoProbes`/`MemoHits`/`MemoInserts`/`MemoRefused`/
+  `MemoBytes`/`MemoDisabledCount` (and the root's `MemoKinds`) on those operators
+  only (ADR-0654). `MemoBytes` is not part of `MemoryBytes`.
 
 Full contract: `docs/api/cli/spec.md` (flag tables, mode gating, exit codes,
 environment, state files).

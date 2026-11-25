@@ -229,7 +229,7 @@ relate --mode json "RETURN 42 AS int, 3.5 AS float, 'Ada' AS string, true AS boo
 ```
 
 ```text
-{"data":[{"bool":true,"float":3.5,"int":42,"list":[1,"two"],"map":{"k":1},"nothing":null,"string":"Ada"}],"planCache":"miss","timings":{"elapsed_ms":0.553208,"execute_ms":0.388125,"lex_parse_ms":0.026042,"lower_ms":0.033167,"parse_ms":0.110167,"plan_ms":0.043833,"result_generation_ms":0.000417,"rewrite_ms":0.007}}
+{"data":[{"int":42,"float":3.5,"string":"Ada","bool":true,"nothing":null,"list":[1,"two"],"map":{"k":1}}],"timings":{"elapsed_ms":0.553208,"parse_ms":0.110167,"plan_ms":0.043833,"execute_ms":0.388125,"lex_parse_ms":0.026042,"rewrite_ms":0.007,"lower_ms":0.033167,"result_generation_ms":0.000417},"planCache":"miss"}
 ```
 
 ```bash verify
@@ -240,7 +240,7 @@ relate --mode toon "RETURN 42 AS int, 3.5 AS float, 'Ada' AS string, true AS boo
 rows[1]{int,float,string,bool,nothing,list,map}:
   42,3.5,Ada,true,null,[1,"two"],{"k":1}
 timings:
-  {"elapsed_ms":0.367209,"execute_ms":0.209583,"lex_parse_ms":0.023541,"lower_ms":0.031458,"parse_ms":0.107166,"plan_ms":0.040874999999999995,"result_generation_ms":0.000292,"rewrite_ms":0.00675}
+  {"elapsed_ms":0.367209,"parse_ms":0.107166,"plan_ms":0.040874999999999995,"execute_ms":0.209583,"lex_parse_ms":0.023541,"rewrite_ms":0.00675,"lower_ms":0.031458,"result_generation_ms":0.000292}
 planCache:
   miss
 ```
@@ -261,7 +261,7 @@ relate --mode jsonl "RETURN date('2026-11-08') AS d, localtime('10:15:30') AS lt
 ```
 
 ```text
-{"d":"2026-11-08","dt":"2026-11-08T10:15:30+01:00[Europe/Paris]","dur":"P1DT2H30M","ldt":"2026-11-08T10:15:30","lt":"10:15:30","t":"10:15:30+01:00"}
+{"d":"2026-11-08","lt":"10:15:30","t":"10:15:30+01:00","ldt":"2026-11-08T10:15:30","dt":"2026-11-08T10:15:30+01:00[Europe/Paris]","dur":"P1DT2H30M"}
 ```
 
 ```bash verify
@@ -280,7 +280,7 @@ relate --mode jsonl "RETURN point({x: 1, y: 2}) AS xy, point({latitude: 51.5, lo
 ```
 
 ```text
-{"geo":{"crs":"wgs-84","latitude":51.5,"longitude":-0.1,"srid":4326},"u":"f066ecfc-5151-4121-8a36-b35e00d72918","v":{"dim":3,"type":"INTEGER8","values":[1,2,3]},"xy":{"crs":"cartesian","srid":7203,"x":1.0,"y":2.0}}
+{"xy":{"srid":7203,"crs":"cartesian","x":1.0,"y":2.0},"geo":{"srid":4326,"crs":"wgs-84","longitude":-0.1,"latitude":51.5},"v":{"type":"INTEGER8","dim":3,"values":[1,2,3]},"u":"f066ecfc-5151-4121-8a36-b35e00d72918"}
 ```
 
 ```bash verify
@@ -299,7 +299,7 @@ relate --mode jsonl "CREATE p = (a:Person {name: 'Ada'})-[r:KNOWS {since: 2024}]
 ```
 
 ```text
-{"a":{"id":0,"kind":"node","labels":["Person"],"properties":{"name":"Ada"}},"p":[{"id":0,"kind":"node","labels":["Person"],"properties":{"name":"Ada"}},{"end_node":1,"id":0,"kind":"relationship","properties":{"since":2024},"start_node":0,"type":"KNOWS"},{"id":1,"kind":"node","labels":["Person"],"properties":{"name":"Grace"}}],"r":{"end_node":1,"id":0,"kind":"relationship","properties":{"since":2024},"start_node":0,"type":"KNOWS"}}
+{"a":{"kind":"node","id":0,"labels":["Person"],"properties":{"name":"Ada"}},"r":{"kind":"relationship","id":0,"type":"KNOWS","start_node":0,"end_node":1,"properties":{"since":2024}},"p":[{"kind":"node","id":0,"labels":["Person"],"properties":{"name":"Ada"}},{"kind":"relationship","id":0,"type":"KNOWS","start_node":0,"end_node":1,"properties":{"since":2024}},{"kind":"node","id":1,"labels":["Person"],"properties":{"name":"Grace"}}]}
 ```
 
 ## Column types in the envelope
@@ -322,7 +322,7 @@ relate --mode envelope "RETURN 42 AS int, null AS nothing, localtime('10:15:30')
 ```
 
 ```text
-{"columnTypes":["INTEGER","ANY","TIME","STRING","LIST"],"columns":["int","nothing","lt","u","list"],"notifications":[],"planCache":"miss","rows":[{"int":42,"list":[1,2],"lt":"10:15:30","nothing":null,"u":"f066ecfc-5151-4121-8a36-b35e00d72918"}],"timings":{"elapsed_ms":0.515875,"execute_ms":0.346709,"lex_parse_ms":0.023542,"lower_ms":0.043917,"parse_ms":0.11541699999999999,"plan_ms":0.044833000000000005,"result_generation_ms":0.0005,"rewrite_ms":0.006834},"truncated":false}
+{"columns":["int","nothing","lt","u","list"],"columnTypes":["INTEGER","ANY","TIME","STRING","LIST"],"rows":[{"int":42,"nothing":null,"lt":"10:15:30","u":"f066ecfc-5151-4121-8a36-b35e00d72918","list":[1,2]}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.515875,"parse_ms":0.11541699999999999,"plan_ms":0.044833000000000005,"execute_ms":0.346709,"lex_parse_ms":0.023542,"rewrite_ms":0.006834,"lower_ms":0.043917,"result_generation_ms":0.0005},"planCache":"miss"}
 ```
 
 ## See also

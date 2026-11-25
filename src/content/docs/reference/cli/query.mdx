@@ -82,8 +82,8 @@ relate query --database ./team.rl --read-only --mode envelope -c "MATCH (p:Perso
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["people"],"notifications":[],"planCache":"miss","rows":[{"people":3}],"timings":{"elapsed_ms":0.46900000000000003,"execute_ms":0.299875,"lex_parse_ms":0.030875,"lower_ms":0.041832999999999995,"parse_ms":0.106041,"plan_ms":0.055,"result_generation_ms":0.000375,"rewrite_ms":0.008542000000000001},"truncated":false}
-{"columnTypes":["INTEGER"],"columns":["projects"],"notifications":[],"planCache":"miss","rows":[{"projects":2}],"timings":{"elapsed_ms":0.032499999999999994,"execute_ms":0.004459,"lex_parse_ms":0.0055,"lower_ms":0.009209,"parse_ms":0.019167,"plan_ms":0.007541,"result_generation_ms":0.000084,"rewrite_ms":0.00041600000000000003},"truncated":false}
+{"columns":["people"],"columnTypes":["INTEGER"],"rows":[{"people":3}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.46900000000000003,"parse_ms":0.106041,"plan_ms":0.055,"execute_ms":0.299875,"lex_parse_ms":0.030875,"rewrite_ms":0.008542000000000001,"lower_ms":0.041832999999999995,"result_generation_ms":0.000375},"planCache":"miss"}
+{"columns":["projects"],"columnTypes":["INTEGER"],"rows":[{"projects":2}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.032499999999999994,"parse_ms":0.019167,"plan_ms":0.007541,"execute_ms":0.004459,"lex_parse_ms":0.0055,"rewrite_ms":0.00041600000000000003,"lower_ms":0.009209,"result_generation_ms":0.000084},"planCache":"miss"}
 ```
 
 The same two statements as a script on stdin:
@@ -93,8 +93,8 @@ printf 'MATCH (p:Person) RETURN count(p) AS people;\nMATCH (p:Project) RETURN co
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["people"],"notifications":[],"planCache":"miss","rows":[{"people":3}],"timings":{"elapsed_ms":0.468375,"execute_ms":0.283959,"lex_parse_ms":0.028917,"lower_ms":0.052667000000000005,"parse_ms":0.1175,"plan_ms":0.058708,"result_generation_ms":0.00025,"rewrite_ms":0.008084},"truncated":false}
-{"columnTypes":["INTEGER"],"columns":["projects"],"notifications":[],"planCache":"miss","rows":[{"projects":2}],"timings":{"elapsed_ms":0.043417000000000004,"execute_ms":0.003333,"lex_parse_ms":0.007666999999999999,"lower_ms":0.010875,"parse_ms":0.02575,"plan_ms":0.011916999999999999,"result_generation_ms":0.000083,"rewrite_ms":0.00075},"truncated":false}
+{"columns":["people"],"columnTypes":["INTEGER"],"rows":[{"people":3}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.468375,"parse_ms":0.1175,"plan_ms":0.058708,"execute_ms":0.283959,"lex_parse_ms":0.028917,"rewrite_ms":0.008084,"lower_ms":0.052667000000000005,"result_generation_ms":0.00025},"planCache":"miss"}
+{"columns":["projects"],"columnTypes":["INTEGER"],"rows":[{"projects":2}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.043417000000000004,"parse_ms":0.02575,"plan_ms":0.011916999999999999,"execute_ms":0.003333,"lex_parse_ms":0.007666999999999999,"rewrite_ms":0.00075,"lower_ms":0.010875,"result_generation_ms":0.000083},"planCache":"miss"}
 ```
 
 A script that fails at its second statement. The first statement's result prints, the stderr lines say how far the run got, and the error object names the statement:
@@ -105,10 +105,10 @@ echo "exit=$?"
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["people"],"notifications":[],"planCache":"miss","rows":[{"people":3}],"timings":{"elapsed_ms":0.315917,"execute_ms":0.148167,"lex_parse_ms":0.028875,"lower_ms":0.042959,"parse_ms":0.104167,"plan_ms":0.055542,"result_generation_ms":0.00025,"rewrite_ms":0.008542000000000001},"truncated":false}
+{"columns":["people"],"columnTypes":["INTEGER"],"rows":[{"people":3}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.315917,"parse_ms":0.104167,"plan_ms":0.055542,"execute_ms":0.148167,"lex_parse_ms":0.028875,"rewrite_ms":0.008542000000000001,"lower_ms":0.042959,"result_generation_ms":0.00025},"planCache":"miss"}
 type error: / by zero
 statement 2 of 3 failed; 1 completed and committed; 1 not run
-{"error":{"code":"validation_error","committed":1,"exit_code":6,"kind":"type","message":"type error: / by zero","retryable":false,"statement":2,"statements":3}}
+{"error":{"code":"validation_error","exit_code":6,"kind":"type","message":"type error: / by zero","retryable":false,"statement":2,"statements":3,"committed":1}}
 exit=6
 ```
 
@@ -156,7 +156,7 @@ relate query --database ./team.rl --read-only --mode envelope --param name=Grace
 ```
 
 ```text
-{"columnTypes":["STRING","INTEGER"],"columns":["project","since"],"notifications":[],"planCache":"miss","rows":[{"project":"opencypher-tck","since":2022},{"project":"relate","since":2023}],"timings":{"elapsed_ms":0.473833,"execute_ms":0.281583,"lex_parse_ms":0.033209,"lower_ms":0.047208,"parse_ms":0.12095800000000001,"plan_ms":0.06224999999999999,"result_generation_ms":0.00029099999999999997,"rewrite_ms":0.008124999999999999},"truncated":false}
+{"columns":["project","since"],"columnTypes":["STRING","INTEGER"],"rows":[{"project":"opencypher-tck","since":2022},{"project":"relate","since":2023}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.473833,"parse_ms":0.12095800000000001,"plan_ms":0.06224999999999999,"execute_ms":0.281583,"lex_parse_ms":0.033209,"rewrite_ms":0.008124999999999999,"lower_ms":0.047208,"result_generation_ms":0.00029099999999999997},"planCache":"miss"}
 ```
 
 Single quotes keep the shell from expanding `$name`. [Script the CLI](/docs/guides/cli/scripting#pass-parameters) shows typed values and a JSON file.

@@ -180,7 +180,7 @@ echo "exit=$?"
 
 ```text
 warning: env file plain.env is group/world-readable (mode 0640); credentials may be exposed to other local users — run `chmod 600 plain.env`
-Error: refusing to send Basic auth credentials in the clear: Query API URL http://neo4j.example.com:7474/db/neo4j/query/v2 is http:// to a non-loopback host; pass --allow-plaintext to accept the risk, or use an https:// NEO4J_URI
+Error: refusing to send Basic auth credentials in the clear: Query API URL http://neo4j.example.com is http:// to a non-loopback host; pass --allow-plaintext to accept the risk, or use an https:// NEO4J_URI
 exit=1
 ```
 

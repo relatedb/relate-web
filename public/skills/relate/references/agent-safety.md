@@ -31,14 +31,16 @@ transaction. `--read-only` is the fence for that.
   `hybrid-search` (CIP-278 `COMBINE`), `local-callables` (CIP-231
   `DEFINE PROCEDURE`/`DEFINE FUNCTION`), the CIP graph-type trio
   (`graph-type-opt-props`, `graph-type-default-values`,
-  `graph-type-implied-labels`), `obfuscated-literals` (the `******` dummy literal, lexer-gated —
+  `graph-type-implied-labels`), `graph-type-show-variants` (`SHOW CURRENT
+  GRAPH TYPE AS CONSOLIDATED` / `AS FLATTENED` — ADR-0638), `obfuscated-literals` (the `******` dummy literal, lexer-gated —
   ADR-0454), `mixed-label-syntax` (colon-conjunction, GQL label symbols and
   `IS` may mix within a clause's label expressions — ADR-0456),
   `float16-coordinate-types` (FLOAT16/BFLOAT16 vector coordinates —
   ADR-0464), `chronological-comparisons` (the four chronological operators —
   `IS [NOT] BEFORE`, `AFTER`, `SAME INSTANT`, `SAME REPRESENTATION` —
   ADR-0467),
-  `complex-search-patterns` (wider SEARCH MATCH patterns — ADR-0467), and
+  `cypher-annotations` (CIP-281 clause-level `@name(params)` annotations, parsed
+  and discarded; lexer-gated, so the disabled form is a syntax error), and
   `ontology` — the four `db.ontology.*` procedures (ADR-0378); while it is
   disabled they fail with
   `preview feature 'ontology' is not enabled` and `SHOW PROCEDURES` omits

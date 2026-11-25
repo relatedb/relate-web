@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -16,17 +16,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 5,
-          "labels_removed": 0,
           "nodes_created": 5,
           "nodes_deleted": 0,
-          "properties_set": 13,
           "relationships_created": 5,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 13,
+          "labels_added": 5,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -41,12 +41,6 @@
           "anyLabel",
           "isPerson"
         ],
-        "numeric": [
-          true,
-          true,
-          true,
-          true
-        ],
         "rows": [
           [
             "5",
@@ -54,6 +48,12 @@
             "5",
             "3"
           ]
+        ],
+        "numeric": [
+          true,
+          true,
+          true,
+          true
         ],
         "summary": "1 row"
       },
@@ -77,24 +77,24 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "anyLabel": 5,
-            "isPerson": 3,
+            "personOrProject": 5,
             "notPerson": 2,
-            "personOrProject": 5
+            "anyLabel": 5,
+            "isPerson": 3
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -107,10 +107,6 @@
           "type",
           "target"
         ],
-        "numeric": [
-          false,
-          false
-        ],
         "rows": [
           [
             "\"WORKS_ON\"",
@@ -120,6 +116,10 @@
             "\"WORKS_ON\"",
             "\"relate\""
           ]
+        ],
+        "numeric": [
+          false,
+          false
         ],
         "summary": "2 rows"
       },
@@ -139,26 +139,26 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "target": "opencypher-tck",
-            "type": "WORKS_ON"
+            "type": "WORKS_ON",
+            "target": "opencypher-tck"
           },
           {
-            "target": "relate",
-            "type": "WORKS_ON"
+            "type": "WORKS_ON",
+            "target": "relate"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -170,13 +170,13 @@
         "columns": [
           "nodes"
         ],
-        "numeric": [
-          true
-        ],
         "rows": [
           [
             "5"
           ]
+        ],
+        "numeric": [
+          true
         ],
         "summary": "1 row"
       },
@@ -198,17 +198,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -234,10 +234,6 @@
           "person",
           "project"
         ],
-        "numeric": [
-          false,
-          false
-        ],
         "rows": [
           [
             "\"Grace\"",
@@ -247,6 +243,10 @@
             "\"Grace\"",
             "\"relate\""
           ]
+        ],
+        "numeric": [
+          false,
+          false
         ],
         "summary": "2 rows"
       },
@@ -275,17 +275,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -297,10 +297,6 @@
         "columns": [
           "types",
           "reached"
-        ],
-        "numeric": [
-          false,
-          false
         ],
         "rows": [
           [
@@ -320,6 +316,10 @@
             "\"relate\""
           ]
         ],
+        "numeric": [
+          false,
+          false
+        ],
         "summary": "4 rows"
       },
       "graph": null,
@@ -338,44 +338,44 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "reached": "Grace",
             "types": [
               "KNOWS"
-            ]
+            ],
+            "reached": "Grace"
           },
           {
-            "reached": "relate",
             "types": [
               "WORKS_ON"
-            ]
+            ],
+            "reached": "relate"
           },
           {
-            "reached": "opencypher-tck",
-            "types": [
-              "KNOWS",
-              "WORKS_ON"
-            ]
-          },
-          {
-            "reached": "relate",
             "types": [
               "KNOWS",
               "WORKS_ON"
-            ]
+            ],
+            "reached": "opencypher-tck"
+          },
+          {
+            "types": [
+              "KNOWS",
+              "WORKS_ON"
+            ],
+            "reached": "relate"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -387,8 +387,8 @@
       "graph": {
         "nodes": [
           {
-            "id": 5,
             "kind": "node",
+            "id": 5,
             "labels": [
               "Package"
             ],
@@ -397,8 +397,8 @@
             }
           },
           {
-            "id": 7,
             "kind": "node",
+            "id": 7,
             "labels": [
               "Package"
             ],
@@ -407,8 +407,8 @@
             }
           },
           {
-            "id": 9,
             "kind": "node",
+            "id": 9,
             "labels": [
               "Package"
             ],
@@ -417,8 +417,8 @@
             }
           },
           {
-            "id": 8,
             "kind": "node",
+            "id": 8,
             "labels": [
               "Package"
             ],
@@ -427,8 +427,8 @@
             }
           },
           {
-            "id": 10,
             "kind": "node",
+            "id": 10,
             "labels": [
               "Package"
             ],
@@ -437,8 +437,8 @@
             }
           },
           {
-            "id": 6,
             "kind": "node",
+            "id": 6,
             "labels": [
               "Package"
             ],
@@ -449,52 +449,52 @@
         ],
         "rels": [
           {
-            "end_node": 7,
+            "kind": "relationship",
             "id": 6,
-            "kind": "relationship",
-            "properties": {},
+            "type": "DEPENDS_ON",
             "start_node": 5,
-            "type": "DEPENDS_ON"
+            "end_node": 7,
+            "properties": {}
           },
           {
-            "end_node": 9,
+            "kind": "relationship",
             "id": 9,
-            "kind": "relationship",
-            "properties": {},
+            "type": "DEPENDS_ON",
             "start_node": 7,
-            "type": "DEPENDS_ON"
+            "end_node": 9,
+            "properties": {}
           },
           {
-            "end_node": 8,
+            "kind": "relationship",
             "id": 8,
-            "kind": "relationship",
-            "properties": {},
+            "type": "DEPENDS_ON",
             "start_node": 7,
-            "type": "DEPENDS_ON"
-          },
-          {
-            "end_node": 10,
-            "id": 10,
-            "kind": "relationship",
-            "properties": {},
-            "start_node": 8,
-            "type": "DEPENDS_ON"
-          },
-          {
-            "end_node": 6,
-            "id": 5,
-            "kind": "relationship",
-            "properties": {},
-            "start_node": 5,
-            "type": "DEPENDS_ON"
-          },
-          {
             "end_node": 8,
-            "id": 7,
+            "properties": {}
+          },
+          {
             "kind": "relationship",
-            "properties": {},
+            "id": 10,
+            "type": "DEPENDS_ON",
+            "start_node": 8,
+            "end_node": 10,
+            "properties": {}
+          },
+          {
+            "kind": "relationship",
+            "id": 5,
+            "type": "DEPENDS_ON",
+            "start_node": 5,
+            "end_node": 6,
+            "properties": {}
+          },
+          {
+            "kind": "relationship",
+            "id": 7,
+            "type": "DEPENDS_ON",
             "start_node": 6,
-            "type": "DEPENDS_ON"
+            "end_node": 8,
+            "properties": {}
           }
         ]
       },
@@ -513,8 +513,8 @@
           {
             "p": [
               {
-                "id": 5,
                 "kind": "node",
+                "id": 5,
                 "labels": [
                   "Package"
                 ],
@@ -523,16 +523,16 @@
                 }
               },
               {
-                "end_node": 7,
-                "id": 6,
                 "kind": "relationship",
-                "properties": {},
+                "id": 6,
+                "type": "DEPENDS_ON",
                 "start_node": 5,
-                "type": "DEPENDS_ON"
+                "end_node": 7,
+                "properties": {}
               },
               {
-                "id": 7,
                 "kind": "node",
+                "id": 7,
                 "labels": [
                   "Package"
                 ],
@@ -545,8 +545,8 @@
           {
             "p": [
               {
-                "id": 5,
                 "kind": "node",
+                "id": 5,
                 "labels": [
                   "Package"
                 ],
@@ -555,16 +555,16 @@
                 }
               },
               {
-                "end_node": 7,
-                "id": 6,
                 "kind": "relationship",
-                "properties": {},
+                "id": 6,
+                "type": "DEPENDS_ON",
                 "start_node": 5,
-                "type": "DEPENDS_ON"
+                "end_node": 7,
+                "properties": {}
               },
               {
-                "id": 7,
                 "kind": "node",
+                "id": 7,
                 "labels": [
                   "Package"
                 ],
@@ -573,16 +573,16 @@
                 }
               },
               {
-                "end_node": 9,
-                "id": 9,
                 "kind": "relationship",
-                "properties": {},
+                "id": 9,
+                "type": "DEPENDS_ON",
                 "start_node": 7,
-                "type": "DEPENDS_ON"
+                "end_node": 9,
+                "properties": {}
               },
               {
-                "id": 9,
                 "kind": "node",
+                "id": 9,
                 "labels": [
                   "Package"
                 ],
@@ -595,8 +595,8 @@
           {
             "p": [
               {
-                "id": 5,
                 "kind": "node",
+                "id": 5,
                 "labels": [
                   "Package"
                 ],
@@ -605,16 +605,16 @@
                 }
               },
               {
-                "end_node": 7,
-                "id": 6,
                 "kind": "relationship",
-                "properties": {},
+                "id": 6,
+                "type": "DEPENDS_ON",
                 "start_node": 5,
-                "type": "DEPENDS_ON"
+                "end_node": 7,
+                "properties": {}
               },
               {
-                "id": 7,
                 "kind": "node",
+                "id": 7,
                 "labels": [
                   "Package"
                 ],
@@ -623,16 +623,16 @@
                 }
               },
               {
-                "end_node": 8,
-                "id": 8,
                 "kind": "relationship",
-                "properties": {},
+                "id": 8,
+                "type": "DEPENDS_ON",
                 "start_node": 7,
-                "type": "DEPENDS_ON"
+                "end_node": 8,
+                "properties": {}
               },
               {
-                "id": 8,
                 "kind": "node",
+                "id": 8,
                 "labels": [
                   "Package"
                 ],
@@ -645,8 +645,8 @@
           {
             "p": [
               {
-                "id": 5,
                 "kind": "node",
+                "id": 5,
                 "labels": [
                   "Package"
                 ],
@@ -655,16 +655,16 @@
                 }
               },
               {
-                "end_node": 7,
-                "id": 6,
                 "kind": "relationship",
-                "properties": {},
+                "id": 6,
+                "type": "DEPENDS_ON",
                 "start_node": 5,
-                "type": "DEPENDS_ON"
+                "end_node": 7,
+                "properties": {}
               },
               {
-                "id": 7,
                 "kind": "node",
+                "id": 7,
                 "labels": [
                   "Package"
                 ],
@@ -673,16 +673,16 @@
                 }
               },
               {
-                "end_node": 8,
-                "id": 8,
                 "kind": "relationship",
-                "properties": {},
+                "id": 8,
+                "type": "DEPENDS_ON",
                 "start_node": 7,
-                "type": "DEPENDS_ON"
+                "end_node": 8,
+                "properties": {}
               },
               {
-                "id": 8,
                 "kind": "node",
+                "id": 8,
                 "labels": [
                   "Package"
                 ],
@@ -691,16 +691,16 @@
                 }
               },
               {
-                "end_node": 10,
-                "id": 10,
                 "kind": "relationship",
-                "properties": {},
+                "id": 10,
+                "type": "DEPENDS_ON",
                 "start_node": 8,
-                "type": "DEPENDS_ON"
+                "end_node": 10,
+                "properties": {}
               },
               {
-                "id": 10,
                 "kind": "node",
+                "id": 10,
                 "labels": [
                   "Package"
                 ],
@@ -713,8 +713,8 @@
           {
             "p": [
               {
-                "id": 5,
                 "kind": "node",
+                "id": 5,
                 "labels": [
                   "Package"
                 ],
@@ -723,16 +723,16 @@
                 }
               },
               {
-                "end_node": 6,
-                "id": 5,
                 "kind": "relationship",
-                "properties": {},
+                "id": 5,
+                "type": "DEPENDS_ON",
                 "start_node": 5,
-                "type": "DEPENDS_ON"
+                "end_node": 6,
+                "properties": {}
               },
               {
-                "id": 6,
                 "kind": "node",
+                "id": 6,
                 "labels": [
                   "Package"
                 ],
@@ -745,8 +745,8 @@
           {
             "p": [
               {
-                "id": 5,
                 "kind": "node",
+                "id": 5,
                 "labels": [
                   "Package"
                 ],
@@ -755,16 +755,16 @@
                 }
               },
               {
-                "end_node": 6,
-                "id": 5,
                 "kind": "relationship",
-                "properties": {},
+                "id": 5,
+                "type": "DEPENDS_ON",
                 "start_node": 5,
-                "type": "DEPENDS_ON"
+                "end_node": 6,
+                "properties": {}
               },
               {
-                "id": 6,
                 "kind": "node",
+                "id": 6,
                 "labels": [
                   "Package"
                 ],
@@ -773,16 +773,16 @@
                 }
               },
               {
-                "end_node": 8,
-                "id": 7,
                 "kind": "relationship",
-                "properties": {},
+                "id": 7,
+                "type": "DEPENDS_ON",
                 "start_node": 6,
-                "type": "DEPENDS_ON"
+                "end_node": 8,
+                "properties": {}
               },
               {
-                "id": 8,
                 "kind": "node",
+                "id": 8,
                 "labels": [
                   "Package"
                 ],
@@ -795,8 +795,8 @@
           {
             "p": [
               {
-                "id": 5,
                 "kind": "node",
+                "id": 5,
                 "labels": [
                   "Package"
                 ],
@@ -805,16 +805,16 @@
                 }
               },
               {
-                "end_node": 6,
-                "id": 5,
                 "kind": "relationship",
-                "properties": {},
+                "id": 5,
+                "type": "DEPENDS_ON",
                 "start_node": 5,
-                "type": "DEPENDS_ON"
+                "end_node": 6,
+                "properties": {}
               },
               {
-                "id": 6,
                 "kind": "node",
+                "id": 6,
                 "labels": [
                   "Package"
                 ],
@@ -823,16 +823,16 @@
                 }
               },
               {
-                "end_node": 8,
-                "id": 7,
                 "kind": "relationship",
-                "properties": {},
+                "id": 7,
+                "type": "DEPENDS_ON",
                 "start_node": 6,
-                "type": "DEPENDS_ON"
+                "end_node": 8,
+                "properties": {}
               },
               {
-                "id": 8,
                 "kind": "node",
+                "id": 8,
                 "labels": [
                   "Package"
                 ],
@@ -841,16 +841,16 @@
                 }
               },
               {
-                "end_node": 10,
+                "kind": "relationship",
                 "id": 10,
-                "kind": "relationship",
-                "properties": {},
+                "type": "DEPENDS_ON",
                 "start_node": 8,
-                "type": "DEPENDS_ON"
+                "end_node": 10,
+                "properties": {}
               },
               {
-                "id": 10,
                 "kind": "node",
+                "id": 10,
                 "labels": [
                   "Package"
                 ],
@@ -862,17 +862,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -886,11 +886,6 @@
           "via",
           "reached"
         ],
-        "numeric": [
-          false,
-          false,
-          false
-        ],
         "rows": [
           [
             "[\"Ada\", \"Grace\"]",
@@ -902,6 +897,11 @@
             "[\"KNOWS\", \"WORKS_ON\"]",
             "\"relate\""
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false
         ],
         "summary": "2 rows"
       },
@@ -927,36 +927,36 @@
               "Ada",
               "Grace"
             ],
-            "reached": "opencypher-tck",
             "via": [
               "KNOWS",
               "WORKS_ON"
-            ]
+            ],
+            "reached": "opencypher-tck"
           },
           {
             "from": [
               "Ada",
               "Grace"
             ],
-            "reached": "relate",
             "via": [
               "KNOWS",
               "WORKS_ON"
-            ]
+            ],
+            "reached": "relate"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -969,10 +969,6 @@
           "route",
           "hops"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "[\"Noor\", \"relate\", \"Grace\"]",
@@ -982,6 +978,10 @@
             "[\"Noor\", \"relate\", \"Ada\", \"Grace\"]",
             "3"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -1001,35 +1001,35 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "hops": 2,
             "route": [
               "Noor",
               "relate",
               "Grace"
-            ]
+            ],
+            "hops": 2
           },
           {
-            "hops": 3,
             "route": [
               "Noor",
               "relate",
               "Ada",
               "Grace"
-            ]
+            ],
+            "hops": 3
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -1041,8 +1041,8 @@
       "graph": {
         "nodes": [
           {
-            "id": 0,
             "kind": "node",
+            "id": 0,
             "labels": [
               "Person"
             ],
@@ -1052,8 +1052,8 @@
             }
           },
           {
-            "id": 1,
             "kind": "node",
+            "id": 1,
             "labels": [
               "Person"
             ],
@@ -1063,8 +1063,8 @@
             }
           },
           {
-            "id": 4,
             "kind": "node",
+            "id": 4,
             "labels": [
               "Project"
             ],
@@ -1074,8 +1074,8 @@
             }
           },
           {
-            "id": 3,
             "kind": "node",
+            "id": 3,
             "labels": [
               "Project"
             ],
@@ -1085,8 +1085,8 @@
             }
           },
           {
-            "id": 2,
             "kind": "node",
+            "id": 2,
             "labels": [
               "Person"
             ],
@@ -1098,50 +1098,50 @@
         ],
         "rels": [
           {
-            "end_node": 1,
-            "id": 4,
             "kind": "relationship",
-            "properties": {},
+            "id": 4,
+            "type": "KNOWS",
             "start_node": 0,
-            "type": "KNOWS"
+            "end_node": 1,
+            "properties": {}
           },
           {
-            "end_node": 4,
-            "id": 2,
             "kind": "relationship",
+            "id": 2,
+            "type": "WORKS_ON",
+            "start_node": 1,
+            "end_node": 4,
             "properties": {
               "since": 2022
-            },
-            "start_node": 1,
-            "type": "WORKS_ON"
+            }
           },
           {
-            "end_node": 3,
-            "id": 0,
             "kind": "relationship",
+            "id": 0,
+            "type": "WORKS_ON",
+            "start_node": 0,
+            "end_node": 3,
             "properties": {
               "since": 2024
-            },
-            "start_node": 0,
-            "type": "WORKS_ON"
+            }
           },
           {
-            "end_node": 3,
-            "id": 1,
             "kind": "relationship",
+            "id": 1,
+            "type": "WORKS_ON",
+            "start_node": 1,
+            "end_node": 3,
             "properties": {
               "since": 2023
-            },
-            "start_node": 1,
-            "type": "WORKS_ON"
+            }
           },
           {
-            "end_node": 3,
-            "id": 3,
             "kind": "relationship",
-            "properties": {},
+            "id": 3,
+            "type": "MAINTAINS",
             "start_node": 2,
-            "type": "MAINTAINS"
+            "end_node": 3,
+            "properties": {}
           }
         ]
       },
@@ -1162,8 +1162,8 @@
           {
             "p": [
               {
-                "id": 0,
                 "kind": "node",
+                "id": 0,
                 "labels": [
                   "Person"
                 ],
@@ -1173,16 +1173,16 @@
                 }
               },
               {
-                "end_node": 1,
-                "id": 4,
                 "kind": "relationship",
-                "properties": {},
+                "id": 4,
+                "type": "KNOWS",
                 "start_node": 0,
-                "type": "KNOWS"
+                "end_node": 1,
+                "properties": {}
               },
               {
-                "id": 1,
                 "kind": "node",
+                "id": 1,
                 "labels": [
                   "Person"
                 ],
@@ -1192,18 +1192,18 @@
                 }
               },
               {
-                "end_node": 4,
-                "id": 2,
                 "kind": "relationship",
+                "id": 2,
+                "type": "WORKS_ON",
+                "start_node": 1,
+                "end_node": 4,
                 "properties": {
                   "since": 2022
-                },
-                "start_node": 1,
-                "type": "WORKS_ON"
+                }
               },
               {
-                "id": 4,
                 "kind": "node",
+                "id": 4,
                 "labels": [
                   "Project"
                 ],
@@ -1216,8 +1216,8 @@
             "people": [
               [
                 {
-                  "id": 0,
                   "kind": "node",
+                  "id": 0,
                   "labels": [
                     "Person"
                   ],
@@ -1227,18 +1227,18 @@
                   }
                 },
                 {
-                  "end_node": 3,
-                  "id": 0,
                   "kind": "relationship",
+                  "id": 0,
+                  "type": "WORKS_ON",
+                  "start_node": 0,
+                  "end_node": 3,
                   "properties": {
                     "since": 2024
-                  },
-                  "start_node": 0,
-                  "type": "WORKS_ON"
+                  }
                 },
                 {
-                  "id": 3,
                   "kind": "node",
+                  "id": 3,
                   "labels": [
                     "Project"
                   ],
@@ -1250,8 +1250,8 @@
               ],
               [
                 {
-                  "id": 0,
                   "kind": "node",
+                  "id": 0,
                   "labels": [
                     "Person"
                   ],
@@ -1261,16 +1261,16 @@
                   }
                 },
                 {
-                  "end_node": 1,
-                  "id": 4,
                   "kind": "relationship",
-                  "properties": {},
+                  "id": 4,
+                  "type": "KNOWS",
                   "start_node": 0,
-                  "type": "KNOWS"
+                  "end_node": 1,
+                  "properties": {}
                 },
                 {
-                  "id": 1,
                   "kind": "node",
+                  "id": 1,
                   "labels": [
                     "Person"
                   ],
@@ -1282,8 +1282,8 @@
               ],
               [
                 {
-                  "id": 1,
                   "kind": "node",
+                  "id": 1,
                   "labels": [
                     "Person"
                   ],
@@ -1293,18 +1293,18 @@
                   }
                 },
                 {
-                  "end_node": 4,
-                  "id": 2,
                   "kind": "relationship",
+                  "id": 2,
+                  "type": "WORKS_ON",
+                  "start_node": 1,
+                  "end_node": 4,
                   "properties": {
                     "since": 2022
-                  },
-                  "start_node": 1,
-                  "type": "WORKS_ON"
+                  }
                 },
                 {
-                  "id": 4,
                   "kind": "node",
+                  "id": 4,
                   "labels": [
                     "Project"
                   ],
@@ -1316,8 +1316,8 @@
               ],
               [
                 {
-                  "id": 1,
                   "kind": "node",
+                  "id": 1,
                   "labels": [
                     "Person"
                   ],
@@ -1327,18 +1327,18 @@
                   }
                 },
                 {
-                  "end_node": 3,
-                  "id": 1,
                   "kind": "relationship",
+                  "id": 1,
+                  "type": "WORKS_ON",
+                  "start_node": 1,
+                  "end_node": 3,
                   "properties": {
                     "since": 2023
-                  },
-                  "start_node": 1,
-                  "type": "WORKS_ON"
+                  }
                 },
                 {
-                  "id": 3,
                   "kind": "node",
+                  "id": 3,
                   "labels": [
                     "Project"
                   ],
@@ -1350,8 +1350,8 @@
               ],
               [
                 {
-                  "id": 2,
                   "kind": "node",
+                  "id": 2,
                   "labels": [
                     "Person"
                   ],
@@ -1361,16 +1361,16 @@
                   }
                 },
                 {
-                  "end_node": 3,
-                  "id": 3,
                   "kind": "relationship",
-                  "properties": {},
+                  "id": 3,
+                  "type": "MAINTAINS",
                   "start_node": 2,
-                  "type": "MAINTAINS"
+                  "end_node": 3,
+                  "properties": {}
                 },
                 {
-                  "id": 3,
                   "kind": "node",
+                  "id": 3,
                   "labels": [
                     "Project"
                   ],
@@ -1384,17 +1384,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -1406,8 +1406,8 @@
       "graph": {
         "nodes": [
           {
-            "id": 2,
             "kind": "node",
+            "id": 2,
             "labels": [
               "Person"
             ],
@@ -1417,8 +1417,8 @@
             }
           },
           {
-            "id": 3,
             "kind": "node",
+            "id": 3,
             "labels": [
               "Project"
             ],
@@ -1428,8 +1428,8 @@
             }
           },
           {
-            "id": 1,
             "kind": "node",
+            "id": 1,
             "labels": [
               "Person"
             ],
@@ -1439,8 +1439,8 @@
             }
           },
           {
-            "id": 0,
             "kind": "node",
+            "id": 0,
             "labels": [
               "Person"
             ],
@@ -1450,8 +1450,8 @@
             }
           },
           {
-            "id": 4,
             "kind": "node",
+            "id": 4,
             "labels": [
               "Project"
             ],
@@ -1463,50 +1463,50 @@
         ],
         "rels": [
           {
-            "end_node": 3,
-            "id": 3,
             "kind": "relationship",
-            "properties": {},
+            "id": 3,
+            "type": "MAINTAINS",
             "start_node": 2,
-            "type": "MAINTAINS"
+            "end_node": 3,
+            "properties": {}
           },
           {
-            "end_node": 3,
-            "id": 1,
             "kind": "relationship",
+            "id": 1,
+            "type": "WORKS_ON",
+            "start_node": 1,
+            "end_node": 3,
             "properties": {
               "since": 2023
-            },
-            "start_node": 1,
-            "type": "WORKS_ON"
+            }
           },
           {
-            "end_node": 3,
-            "id": 0,
             "kind": "relationship",
+            "id": 0,
+            "type": "WORKS_ON",
+            "start_node": 0,
+            "end_node": 3,
             "properties": {
               "since": 2024
-            },
-            "start_node": 0,
-            "type": "WORKS_ON"
+            }
           },
           {
-            "end_node": 1,
+            "kind": "relationship",
             "id": 4,
-            "kind": "relationship",
-            "properties": {},
+            "type": "KNOWS",
             "start_node": 0,
-            "type": "KNOWS"
+            "end_node": 1,
+            "properties": {}
           },
           {
-            "end_node": 4,
-            "id": 2,
             "kind": "relationship",
+            "id": 2,
+            "type": "WORKS_ON",
+            "start_node": 1,
+            "end_node": 4,
             "properties": {
               "since": 2022
-            },
-            "start_node": 1,
-            "type": "WORKS_ON"
+            }
           }
         ]
       },
@@ -1527,11 +1527,10 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "hops": 2,
             "p": [
               {
-                "id": 2,
                 "kind": "node",
+                "id": 2,
                 "labels": [
                   "Person"
                 ],
@@ -1541,16 +1540,16 @@
                 }
               },
               {
-                "end_node": 3,
-                "id": 3,
                 "kind": "relationship",
-                "properties": {},
+                "id": 3,
+                "type": "MAINTAINS",
                 "start_node": 2,
-                "type": "MAINTAINS"
+                "end_node": 3,
+                "properties": {}
               },
               {
-                "id": 3,
                 "kind": "node",
+                "id": 3,
                 "labels": [
                   "Project"
                 ],
@@ -1560,18 +1559,18 @@
                 }
               },
               {
-                "end_node": 3,
-                "id": 1,
                 "kind": "relationship",
+                "id": 1,
+                "type": "WORKS_ON",
+                "start_node": 1,
+                "end_node": 3,
                 "properties": {
                   "since": 2023
-                },
-                "start_node": 1,
-                "type": "WORKS_ON"
+                }
               },
               {
-                "id": 1,
                 "kind": "node",
+                "id": 1,
                 "labels": [
                   "Person"
                 ],
@@ -1581,11 +1580,12 @@
                 }
               }
             ],
+            "hops": 2,
             "people": [
               [
                 {
-                  "id": 0,
                   "kind": "node",
+                  "id": 0,
                   "labels": [
                     "Person"
                   ],
@@ -1595,18 +1595,18 @@
                   }
                 },
                 {
-                  "end_node": 3,
-                  "id": 0,
                   "kind": "relationship",
+                  "id": 0,
+                  "type": "WORKS_ON",
+                  "start_node": 0,
+                  "end_node": 3,
                   "properties": {
                     "since": 2024
-                  },
-                  "start_node": 0,
-                  "type": "WORKS_ON"
+                  }
                 },
                 {
-                  "id": 3,
                   "kind": "node",
+                  "id": 3,
                   "labels": [
                     "Project"
                   ],
@@ -1618,8 +1618,8 @@
               ],
               [
                 {
-                  "id": 0,
                   "kind": "node",
+                  "id": 0,
                   "labels": [
                     "Person"
                   ],
@@ -1629,16 +1629,16 @@
                   }
                 },
                 {
-                  "end_node": 1,
-                  "id": 4,
                   "kind": "relationship",
-                  "properties": {},
+                  "id": 4,
+                  "type": "KNOWS",
                   "start_node": 0,
-                  "type": "KNOWS"
+                  "end_node": 1,
+                  "properties": {}
                 },
                 {
-                  "id": 1,
                   "kind": "node",
+                  "id": 1,
                   "labels": [
                     "Person"
                   ],
@@ -1650,8 +1650,8 @@
               ],
               [
                 {
-                  "id": 1,
                   "kind": "node",
+                  "id": 1,
                   "labels": [
                     "Person"
                   ],
@@ -1661,18 +1661,18 @@
                   }
                 },
                 {
-                  "end_node": 4,
-                  "id": 2,
                   "kind": "relationship",
+                  "id": 2,
+                  "type": "WORKS_ON",
+                  "start_node": 1,
+                  "end_node": 4,
                   "properties": {
                     "since": 2022
-                  },
-                  "start_node": 1,
-                  "type": "WORKS_ON"
+                  }
                 },
                 {
-                  "id": 4,
                   "kind": "node",
+                  "id": 4,
                   "labels": [
                     "Project"
                   ],
@@ -1684,8 +1684,8 @@
               ],
               [
                 {
-                  "id": 1,
                   "kind": "node",
+                  "id": 1,
                   "labels": [
                     "Person"
                   ],
@@ -1695,18 +1695,18 @@
                   }
                 },
                 {
-                  "end_node": 3,
-                  "id": 1,
                   "kind": "relationship",
+                  "id": 1,
+                  "type": "WORKS_ON",
+                  "start_node": 1,
+                  "end_node": 3,
                   "properties": {
                     "since": 2023
-                  },
-                  "start_node": 1,
-                  "type": "WORKS_ON"
+                  }
                 },
                 {
-                  "id": 3,
                   "kind": "node",
+                  "id": 3,
                   "labels": [
                     "Project"
                   ],
@@ -1718,8 +1718,8 @@
               ],
               [
                 {
-                  "id": 2,
                   "kind": "node",
+                  "id": 2,
                   "labels": [
                     "Person"
                   ],
@@ -1729,16 +1729,16 @@
                   }
                 },
                 {
-                  "end_node": 3,
-                  "id": 3,
                   "kind": "relationship",
-                  "properties": {},
+                  "id": 3,
+                  "type": "MAINTAINS",
                   "start_node": 2,
-                  "type": "MAINTAINS"
+                  "end_node": 3,
+                  "properties": {}
                 },
                 {
-                  "id": 3,
                   "kind": "node",
+                  "id": 3,
                   "labels": [
                     "Project"
                   ],
@@ -1752,17 +1752,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -1787,17 +1787,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -1810,15 +1810,15 @@
           "route",
           "hops"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "[\"Noor\", \"relate\", \"Ada\", \"Grace\"]",
             "3"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "1 row"
       },
@@ -1838,27 +1838,27 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "hops": 3,
             "route": [
               "Noor",
               "relate",
               "Ada",
               "Grace"
-            ]
+            ],
+            "hops": 3
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -1871,15 +1871,15 @@
           "trail",
           "acyclic"
         ],
-        "numeric": [
-          true,
-          true
-        ],
         "rows": [
           [
             "2",
             "0"
           ]
+        ],
+        "numeric": [
+          true,
+          true
         ],
         "summary": "1 row"
       },
@@ -1899,22 +1899,22 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "acyclic": 0,
-            "trail": 2
+            "trail": 2,
+            "acyclic": 0
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -1927,15 +1927,15 @@
           "differentRelationships",
           "repeatableElements"
         ],
-        "numeric": [
-          true,
-          true
-        ],
         "rows": [
           [
             "2",
             "7"
           ]
+        ],
+        "numeric": [
+          true,
+          true
         ],
         "summary": "1 row"
       },
@@ -1960,17 +1960,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -1997,17 +1997,17 @@
           "hopsTo33",
           "hopsTo34"
         ],
-        "numeric": [
-          true,
-          true,
-          true
-        ],
         "rows": [
           [
             "39",
             "32",
             "null"
           ]
+        ],
+        "numeric": [
+          true,
+          true,
+          true
         ],
         "summary": "1 row · nodes created: 40, relationships created: 39, properties set: 40, labels added: 40"
       },
@@ -2029,23 +2029,23 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "longestWalk": 39,
             "hopsTo33": 32,
-            "hopsTo34": null,
-            "longestWalk": 39
+            "hopsTo34": null
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false

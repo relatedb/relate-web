@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -16,17 +16,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 5,
-          "labels_removed": 0,
           "nodes_created": 5,
           "nodes_deleted": 0,
-          "properties_set": 13,
           "relationships_created": 5,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 13,
+          "labels_added": 5,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -38,10 +38,6 @@
         "columns": [
           "person",
           "project"
-        ],
-        "numeric": [
-          false,
-          false
         ],
         "rows": [
           [
@@ -56,6 +52,10 @@
             "\"Noor\"",
             "null"
           ]
+        ],
+        "numeric": [
+          false,
+          false
         ],
         "summary": "3 rows"
       },
@@ -88,17 +88,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -111,10 +111,6 @@
           "person",
           "coworker"
         ],
-        "numeric": [
-          false,
-          false
-        ],
         "rows": [
           [
             "\"Ada\"",
@@ -124,6 +120,10 @@
             "\"Grace\"",
             "\"Ada\""
           ]
+        ],
+        "numeric": [
+          false,
+          false
         ],
         "summary": "2 rows"
       },
@@ -143,26 +143,26 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "coworker": "Grace",
-            "person": "Ada"
+            "person": "Ada",
+            "coworker": "Grace"
           },
           {
-            "coworker": "Ada",
-            "person": "Grace"
+            "person": "Grace",
+            "coworker": "Ada"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -174,13 +174,13 @@
         "columns": [
           "people"
         ],
-        "numeric": [
-          true
-        ],
         "rows": [
           [
             "0"
           ]
+        ],
+        "numeric": [
+          true
         ],
         "summary": "1 row"
       },
@@ -202,17 +202,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -224,10 +224,6 @@
         "columns": [
           "person",
           "since"
-        ],
-        "numeric": [
-          false,
-          true
         ],
         "rows": [
           [
@@ -246,6 +242,10 @@
             "\"Grace\"",
             "2022"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "4 rows"
       },
@@ -282,17 +282,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -303,9 +303,6 @@
       "table": {
         "columns": [
           "value"
-        ],
-        "numeric": [
-          false
         ],
         "rows": [
           [
@@ -329,6 +326,9 @@
           [
             "null"
           ]
+        ],
+        "numeric": [
+          false
         ],
         "summary": "7 rows"
       },
@@ -372,17 +372,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -395,15 +395,15 @@
           "role",
           "people"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"engineer\"",
             "2"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "1 row"
       },
@@ -423,22 +423,22 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "people": 2,
-            "role": "engineer"
+            "role": "engineer",
+            "people": 2
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -450,13 +450,13 @@
         "columns": [
           "name"
         ],
-        "numeric": [
-          false
-        ],
         "rows": [
           [
             "\"Grace\""
           ]
+        ],
+        "numeric": [
+          false
         ],
         "summary": "1 row"
       },
@@ -478,17 +478,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -513,9 +513,6 @@
         "columns": [
           "name"
         ],
-        "numeric": [
-          false
-        ],
         "rows": [
           [
             "\"Noor\""
@@ -523,6 +520,9 @@
           [
             "\"Grace\""
           ]
+        ],
+        "numeric": [
+          false
         ],
         "summary": "2 rows"
       },
@@ -547,17 +547,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -569,9 +569,6 @@
         "columns": [
           "value"
         ],
-        "numeric": [
-          false
-        ],
         "rows": [
           [
             "1"
@@ -582,6 +579,9 @@
           [
             "\"solo\""
           ]
+        ],
+        "numeric": [
+          false
         ],
         "summary": "3 rows"
       },
@@ -609,17 +609,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -632,15 +632,15 @@
           "name",
           "projects"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"Ada\"",
             "1"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "1 row"
       },
@@ -665,17 +665,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false

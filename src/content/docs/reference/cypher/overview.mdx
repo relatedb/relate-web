@@ -71,7 +71,6 @@ A :term[preview feature]{id=preview-feature} ships in the engine and stays off u
 | `mixed-label-syntax` | Mixing `:A:B`, GQL label symbols and `IS` across one clause's label expressions | `syntax error: parse error: InvalidLabelExpression: mixing label expression symbols (\|, &, !, and %) with colon (:) between labels is not allowed`, or for `IS`, `syntax error: parse error: MixedIsAndColonConjunction: cannot mix the IS introducer with colon-conjunction within the same clause` |
 | `float16-coordinate-types` | `FLOAT16` and `BFLOAT16` vector coordinates | The preview message |
 | `chronological-comparisons` | `IS [NOT] BEFORE`, `AFTER`, `SAME INSTANT` and `SAME REPRESENTATION` | The preview message |
-| `complex-search-patterns` | `SEARCH` on a `MATCH` with more than one node or hop | The `MATCH` shape errors in the [search rules](/docs/reference/cypher/search#rules-of-the-search-clause): `SearchClauseTooComplexPattern` or `SearchClauseMultipleBoundVariables` |
 | `coll-zip` | The `coll.zip` function (name gate) | `syntax error: UnknownFunction: unknown function coll.zip()` |
 | `coll-has` | The `coll.hasAnyOf`, `coll.hasAllOf` and `coll.hasNoneOf` functions (name gate) | `syntax error: UnknownFunction: unknown function <name>()` |
 | `gql-stddev-aliases` | The `stddev_samp` and `stddev_pop` spellings (name gate) | `syntax error: UnknownFunction: unknown function <name>()` |
@@ -158,7 +157,7 @@ RELATE_PREVIEW=local-callables relate --mode envelope "DEFINE FUNCTION twice(x) 
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["answer"],"notifications":[],"planCache":"miss","rows":[{"answer":42}],"timings":{"elapsed_ms":0.438125,"execute_ms":0.246333,"lex_parse_ms":0.025042,"lower_ms":0.042208,"parse_ms":0.113125,"plan_ms":0.07037500000000001,"result_generation_ms":0.00020800000000000001,"rewrite_ms":0.020583},"truncated":false}
+{"columns":["answer"],"columnTypes":["INTEGER"],"rows":[{"answer":42}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.438125,"parse_ms":0.113125,"plan_ms":0.07037500000000001,"execute_ms":0.246333,"lex_parse_ms":0.025042,"rewrite_ms":0.020583,"lower_ms":0.042208,"result_generation_ms":0.00020800000000000001},"planCache":"miss"}
 ```
 
 ## See also

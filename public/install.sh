@@ -57,6 +57,72 @@ RELEASES_JSON_URL='https://relatedb.ai/releases.json'
 # release_channel's REPO) by the harness's section-0 guard.
 DOWNLOAD_BASE='https://github.com/relatedb/relate/releases/download'
 
+# The package-managed marker: a package that ships relate writes
+# `.relate-package-managed` beside the real binary, in JSON
+# `{"manager": "<id>", "upgrade": "<command>"}`. `relate upgrade` reads it and
+# refuses to replace the install; this script reads it the same way, so a
+# curl|sh install never overwrites a package's binary.
+MARKER_NAME=.relate-package-managed
+
+# The JSON string value of key $2 in file $1: empty when the key is absent.
+# The marker is one small object written by a package recipe (never nested),
+# so the scan takes the first `"key": "value"` pair; a backslash escape is
+# unwrapped one character, and an unterminated value prints nothing.
+marker_value() { # $1 = file, $2 = key
+	awk -v key="$2" '
+	BEGIN { pat = "\"" key "\"[[:space:]]*:[[:space:]]*\"" }
+	match($0, pat) {
+		rest = substr($0, RSTART + RLENGTH)
+		value = ""
+		while (rest != "") {
+			c = substr(rest, 1, 1)
+			rest = substr(rest, 2)
+			if (c == "\\" && rest != "") {
+				c = substr(rest, 1, 1)
+				rest = substr(rest, 2)
+			} else if (c == "\"") {
+				print value
+				exit
+			}
+			value = value c
+		}
+	}
+	' "$1"
+}
+
+# Refuse when $INSTALL_DIR/$BIN_NAME is owned by a package manager: the real
+# file's directory carries the marker. The install path is usually the
+# package's PATH symlink into its own directory, so the link chain is
+# followed first (a relative target is rebased on the link's directory); no
+# marker at the real path means an unmanaged install, which this script
+# replaces exactly as it always did.
+refuse_package_managed() {
+	pm_target=$INSTALL_DIR/$BIN_NAME
+	[ -e "$pm_target" ] || [ -L "$pm_target" ] || return 0
+	pm_real=$pm_target
+	pm_hops=0
+	while [ -L "$pm_real" ] && [ "$pm_hops" -lt 40 ]; do
+		pm_link=$(readlink "$pm_real") || break
+		case "$pm_link" in
+		/*) pm_real=$pm_link ;;
+		*) pm_real=$(dirname "$pm_real")/$pm_link ;;
+		esac
+		pm_hops=$((pm_hops + 1))
+	done
+	pm_dir=$(CDPATH= cd -P "$(dirname "$pm_real")" 2>/dev/null && pwd -P) || return 0
+	pm_marker=$pm_dir/$MARKER_NAME
+	[ -e "$pm_marker" ] || [ -L "$pm_marker" ] || return 0
+	if [ -L "$pm_marker" ] || [ ! -f "$pm_marker" ]; then
+		die "relate is package-managed; marker $pm_marker is unreadable/invalid: not a regular file"
+	fi
+	pm_manager=$(marker_value "$pm_marker" manager)
+	pm_upgrade=$(marker_value "$pm_marker" upgrade)
+	if [ -z "$pm_manager" ] || [ -z "$pm_upgrade" ]; then
+		die "relate is package-managed; marker $pm_marker is unreadable/invalid: manager and upgrade must be non-empty strings"
+	fi
+	die "relate was installed by $pm_manager; upgrade it with: $pm_upgrade"
+}
+
 # True when the X.Y.Z version $1 is greater than $2. Unparseable input counts
 # as greater, so the caller takes the fail-closed branch.
 version_gt() {
@@ -110,6 +176,10 @@ command -v curl >/dev/null 2>&1 ||
 
 command -v ssh-keygen >/dev/null 2>&1 ||
 	die "ssh-keygen (openssh-client) is required to verify release signatures; install openssh-client and retry."
+
+# All preflight gates passed; the package-managed refusal needs no network,
+# and it must land before the first request (see refuse_package_managed).
+refuse_package_managed
 
 tmp=$(mktemp -d)
 tmp_out=""
@@ -175,15 +245,17 @@ asset="${ASSET_PREFIX}-${os}-${arch}"
 # brace; a deeper-indented "tag" (the prerelease slot, the releases
 # window) never matches. The parser owns its three outcomes, so the
 # caller never matches a sentinel value: exit 0 prints the latest.tag
-# on stdout, validated as vX.Y.Z; exit 2 = latest is null; exit 3 = no
-# readable latest.tag; exit 4 = a latest.tag outside the vX.Y.Z shape,
-# printed on stdout for the caller's message. No outcome ever falls
-# back to a guessed tag.
+# on stdout, validated as vX.Y.Z; exit 10 = latest is null; exit 11 = no
+# readable latest.tag; exit 12 = a latest.tag outside the vX.Y.Z shape,
+# printed on stdout for the caller's message. The failure codes sit
+# clear of awk's own statuses (1 = usage, 2 = fatal error), so an awk
+# failure never reads as an outcome. No outcome ever falls back to a
+# guessed tag.
 latest_tag_of() {
 	awk '
-		BEGIN { status = 3 }
+		BEGIN { status = 11 }
 		!latest && /^  "latest"[[:space:]]*:[[:space:]]*null/ {
-			status = 2
+			status = 10
 			exit
 		}
 		!latest && /^  "latest"[[:space:]]*:[[:space:]]*\{/ {
@@ -199,7 +271,7 @@ latest_tag_of() {
 				if (s ~ /^v[0-9]+\.[0-9]+\.[0-9]+$/) {
 					status = 0
 				} else {
-					status = 4
+					status = 12
 				}
 				print s
 				exit
@@ -223,7 +295,7 @@ latest_tag_of() {
 metadata_url=${RELATE_RELEASES_JSON_URL:-$RELEASES_JSON_URL}
 # The asset-download base resolves beside the metadata seam, so both
 # seams' contracts are checked before the first request. The https://
-# gate (Oplane REQ-00358639, CWE-295) is deliberately narrower than the
+# gate (CWE-295) is deliberately narrower than the
 # seam's canonical predicate on the CLI side (release_channel http.rs's
 # approved_transport, which admits plain http on the loopback interface
 # for dev/test fixtures): the installer is the end-user curl|sh surface,
@@ -250,9 +322,10 @@ latest_tag=$(latest_tag_of <"$tmp/releases.json") ||
 	latest_status=$?
 case "$latest_status" in
 0) tag=$latest_tag ;;
-2) die "$metadata_fail: latest is null: no stable release is published" ;;
-4) die "$metadata_fail: latest.tag '$latest_tag' is not a vX.Y.Z release tag" ;;
-*) die "$metadata_fail: the document is malformed: no latest.tag" ;;
+10) die "$metadata_fail: latest is null: no stable release is published" ;;
+11) die "$metadata_fail: the document is malformed: no latest.tag" ;;
+12) die "$metadata_fail: latest.tag '$latest_tag' is not a vX.Y.Z release tag" ;;
+*) die "internal error: latest_tag_of exited with unexpected status $latest_status" ;;
 esac
 
 echo "Installing relate $tag ($os/$arch) to $INSTALL_DIR"

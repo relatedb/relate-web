@@ -443,7 +443,7 @@ A team with data in Neo4j or Aura often wants part of it local: for an agent to 
 - **Surfaces:** `cli`, `bolt`, `http`
 - **Guides:** [Pull a subgraph from Neo4j](/docs/guides/neo4j/pull-from-neo4j), [Push a subgraph to Neo4j](/docs/guides/neo4j/push-to-neo4j), [Migrate from Neo4j](/docs/guides/migrate/from-neo4j)
 - **Reference:** [relate pull](/docs/reference/cli/pull), [relate push](/docs/reference/cli/push), [Differences from Neo4j](/docs/reference/cypher/differences-from-neo4j), [Where relate fits](/docs/concepts/where-relate-fits)
-- **Verified by:** the `bash verify` step 3 on [Push a subgraph to Neo4j](/docs/guides/neo4j/push-to-neo4j#give-each-label-a-merge-key), whose recorded output begins `{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":1.072917000000000`; the CLI check replays it against a relate binary
+- **Verified by:** the `bash verify` step 3 on [Push a subgraph to Neo4j](/docs/guides/neo4j/push-to-neo4j#give-each-label-a-merge-key), whose recorded output begins `{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":1.0729170000000001`; the CLI check replays it against a relate binary
 
 ## Shared store across processes
 

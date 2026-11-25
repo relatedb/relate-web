@@ -52,6 +52,70 @@ imported by copying it to `<dir>/graph.json` before opening.
 - Inside one process, use transactions (`.begin` / `.commit` /
   `.rollback`) to make a group of writes atomic; `.rollback` discards them.
 
+## Large writes in one go: the two memory knobs
+
+A bulk load can hit two different memory bounds, and they are set by two
+independent knobs — size both when you want one big commit:
+
+- **How large each commit may be** — the per-commit WAL record cap
+  (ADR-0650). Default **256 MiB**. One commit whose serialized record
+  crosses it is refused with the message that names the remedy:
+
+  ```sh
+  RELATE_WAL_PAYLOAD_LIMIT=512mb relate --database ./mydata
+  ```
+
+  The alternative to raising it is the statement-level form the refusal
+  names: `LOAD CSV … CALL (r) { … } IN TRANSACTIONS OF n ROWS`, which
+  commits every n rows as its own record — usually the better choice for
+  very large loads.
+- **How many large commits may run at once** — the concurrent
+  logical-workspace pool (ADR-0452). Off by default; a big single commit
+  needs headroom in it once enabled:
+
+  ```sh
+  RELATE_CONCURRENT_LOGICAL_WORKSPACE_LIMIT=2g relate --database ./mydata
+  ```
+
+Both read the same `SIZE` grammar (bytes, or `mb`/`mib`/`gb`/`gib`); a
+zero or unparseable value fails the open naming the variable, never a
+silent default. Embedded callers set the same knobs as
+`OpenOptions::wal_payload_limit` and
+`OpenOptions::concurrent_logical_workspace_limit`.
+
+## Opening a large store: the load thread count
+
+Opening a checkpointed store decodes the snapshot and rebuilds the
+adjacency structures on a shared pool of load threads, and the temporary
+memory of that load scales with the thread count. `RELATE_LOAD_THREADS`
+caps the threads (default: the machine's available parallelism):
+
+```sh
+RELATE_LOAD_THREADS=2 relate --database ./mydata
+```
+
+A zero, non-integer, or non-UTF-8 value fails the open naming the variable,
+before the store is leased; a still-set pre-rename spelling of the variable
+fails the open naming `RELATE_LOAD_THREADS` (ADR-0517, ADR-0664). Embedded callers set
+`OpenOptions::load_threads` and read what the open actually used from
+`Database::open_peak_transient_bytes()` — the peak temporary bytes of the
+latest load (`0` for an empty `:memory:` store; a follower's gap reload
+refreshes it). It is a measurement, not a limit.
+
+## Memo budget (advanced)
+
+The executor memoises repeated pure checks within one statement under a shared
+budget, default **16 MiB** (ADR-0657). Lower it on a tight host, or set `0` for a
+no-memo control run; results never change, only speed and memory:
+
+```sh
+RELATE_EXPRESSION_MEMO_BUDGET=4 relate --database ./mydata
+```
+
+A plain whole-MiB integer; a negative or unparsable value fails the open naming
+the variable. Embedded callers set `OpenOptions::expression_memo_budget`. No CLI
+flag.
+
 ## Ontology as a query-steering source
 
 Before generating Cypher from a natural-language request, load the ontology
@@ -62,17 +126,12 @@ first: `RELATE_PREVIEW=ontology relate query "CALL db.ontology.get()"
 set RELATE_PREVIEW=ontology`, and `SHOW PROCEDURES` does not list them.
 With the opt-in, `CALL db.ontology.get()` returns the stored ontology
 document as YAML (labels, relationship types, property names with types);
-`get('json')` converts to JSON. Steer the generated Cypher's labels,
-relationship types, and property names from it. The document is main's
-graph-spec shape (ADR-0364): `version` is a string,
-node/relationship/property ids are map keys, property existence is
-`must_exist`, and constraints are id-keyed maps
-with `type: EXISTS | KEY | UNIQUE | PROPERTY_TYPE`. A document exists only
-after `CALL db.ontology.set($ontology)` stored one — `set` accepts only the
-exact `schema` URI
-`https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json`, so a
-pre-bump document fails and must be resubmitted in the new shape — and
-`null` means none is set.
+`get('json')` returns it as JSON. Steer the generated Cypher's labels,
+relationship types, and property names from it. The procedures' contracts
+are revised (ADR-0667); the accepted document
+is the published Ontology Graph Spec 1.1.0 shape, and `null` from `get`
+means none is set — a document exists only after `CALL
+db.ontology.set($ontology)` stored one.
 The procedures act on the session database and only `neo4j` holds the
 ontology, so stay on the default session. If `get` returns `null`, the call
 errors, or you cannot set the opt-in, fall back to the schema discovery

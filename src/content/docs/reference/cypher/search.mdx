@@ -83,10 +83,9 @@ An unknown key fails with `semantic error: InvalidInputValue`. A property whose 
 | Search variable | The variable after `SEARCH`, declared by the `MATCH` pattern; the query cannot refer to it | Same | `syntax error: SelfReferencingSearch: the search query cannot reference the binding variable '<var>'` |
 | Index kind | A vector index | A full-text index | `WrongIndexType: <name>` |
 | Index exists | Required | Required | `IndexDoesNotExist: <name>` |
-| `MATCH` shape | One path pattern: one node, or one relationship hop, with one variable | Same | Several patterns: `syntax error: SyntaxError: SearchClauseTooComplexPattern: a SEARCH clause's MATCH statement must be a single path pattern`. More than one hop: `syntax error: SyntaxError: SearchClauseTooComplexPattern: a SEARCH clause's MATCH statement must be a single node or single-hop relationship pattern`. More than one variable: `syntax error: SyntaxError: SearchClauseMultipleBoundVariables: a SEARCH clause's MATCH statement may bind only one variable` |
 | Searches per `MATCH` | One | One | `syntax error: parse error: unexpected token "SEARCH"` |
 
-`RELATE_PREVIEW=complex-search-patterns` lifts the `MATCH` shape rule. A `WHERE` after the `SEARCH` clause, or a property map in the `MATCH` pattern, filters only the rows the search returned, so the result can hold fewer than `LIMIT` rows.
+The `MATCH` before `SEARCH` may be any pattern the general pattern machinery accepts. A `WHERE` after the `SEARCH` clause, a property map in the `MATCH` pattern and earlier labels and variables narrow the candidates before the `LIMIT` window, so the search returns `LIMIT` rows whenever that many candidates qualify. `SKIP` and `LIMIT` page over the entities the whole statement keeps.
 
 ## Full-text matching
 

@@ -1,6 +1,6 @@
 {
   "$schema_note": "Every error an agent can meet, for /docs/reference/errors and explain_error (DOCS-PLAN.md §2, §8 check 3d). `id` is a stable anchor (#<id>); renaming one needs a redirect. `message` is quoted character for character, from the binary where `recorded` holds a run of it (replayed by `npm run docs:cli-check`; see cli.json `recording`), otherwise from upstream; `<name>` marks a variable part and `…` an elision. null means the sources do not say. `verify` marks what the release binary cannot show.",
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "upstream": {
     "repo": "relatedb/relate",
     "commit": "5e77ee6706821065804a9b77eb66ffd2985d1ac4",
@@ -32,13 +32,13 @@
       "recorded": [
         {
           "command": "relate --mode envelope \"RETURN )\"",
-          "stdout": "{\"error\":{\"code\":\"validation_error\",\"column\":8,\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: unexpected token \\\")\\\" (RightParen) at line 1, col 8   RETURN )          ^\",\"retryable\":false,\"source\":\"RETURN )\"}}\n",
+          "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: unexpected token \\\")\\\" (RightParen) at line 1, col 8   RETURN )          ^\",\"retryable\":false,\"column\":8,\"source\":\"RETURN )\"}}\n",
           "stderr": "syntax error: parse error: unexpected token \")\" (RightParen) at line 1, col 8\n  RETURN )\n         ^\n",
           "exit": 6
         },
         {
           "command": "relate --mode envelope \"MATCH (n RETURN n\"",
-          "stdout": "{\"error\":{\"code\":\"validation_error\",\"column\":10,\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: expected RightParen, got \\\"RETURN\\\" (RETURN)   MATCH (n RETURN n            ^\",\"retryable\":false,\"source\":\"MATCH (n RETURN n\"}}\n",
+          "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: expected RightParen, got \\\"RETURN\\\" (RETURN)   MATCH (n RETURN n            ^\",\"retryable\":false,\"column\":10,\"source\":\"MATCH (n RETURN n\"}}\n",
           "stderr": "syntax error: parse error: expected RightParen, got \"RETURN\" (RETURN)\n  MATCH (n RETURN n\n           ^\n",
           "exit": 6
         }
@@ -947,8 +947,8 @@
       "note": "The error object's `message` drops the `Failed to open Relate: ` prefix.",
       "recorded": {
         "command": "RELATE_PREVIEW=telepathy relate --mode envelope \"RETURN 1 AS ok\"",
-        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"semantic\",\"message\":\"semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'telepathy' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, complex-search-patterns, coll-zip, coll-has, gql-stddev-aliases)\",\"retryable\":false}}\n",
-        "stderr": "Failed to open Relate: semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'telepathy' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, complex-search-patterns, coll-zip, coll-has, gql-stddev-aliases)\n",
+        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"semantic\",\"message\":\"semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'telepathy' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation)\",\"retryable\":false}}\n",
+        "stderr": "Failed to open Relate: semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'telepathy' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation)\n",
         "exit": 1
       }
     },
@@ -1069,7 +1069,7 @@
       ],
       "recorded": {
         "command": "printf '.begin\\nCREATE (:Draft);\\n' | relate query --database ./s.rl --mode envelope",
-        "stdout": "{\"columnTypes\":[],\"columns\":[],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[],\"timings\":{\"elapsed_ms\":0.326208,\"execute_ms\":0.206833,\"lex_parse_ms\":0.0027089999999999996,\"lower_ms\":0.001708,\"parse_ms\":0.113917,\"plan_ms\":0.001375,\"result_generation_ms\":0.000041,\"rewrite_ms\":0.000292},\"truncated\":false}\n",
+        "stdout": "{\"columns\":[],\"columnTypes\":[],\"rows\":[],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.244055,\"parse_ms\":0.13854899999999998,\"plan_ms\":0.0017230000000000001,\"execute_ms\":0.09464600000000001,\"lex_parse_ms\":0.002594,\"rewrite_ms\":0.00033999999999999997,\"lower_ms\":0.005159,\"result_generation_ms\":0.000301},\"planCache\":\"miss\"}\n",
         "stderr": "Warning: exiting with an open transaction; rolling back uncommitted changes. Use .commit before exiting to persist them.\n",
         "exit": 1
       }
@@ -1302,7 +1302,7 @@
       "severity": "warning",
       "recorded": {
         "command": "CLAUDECODE=1 relate --mode envelope \"UNWIND range(1, 250) AS x RETURN x\"",
-        "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"x\"],\"notifications\":[],\"planCache\":\"miss\",\"rowCap\":{\"kept\":100,\"total\":250},\"rows\":[{\"x\":1},{\"x\":2},{\"x\":3},{\"x\":4},{\"x\":5},{\"x\":6},{\"x\":7},{\"x\":8},{\"x\":9},{\"x\":10},{\"x\":11},{\"x\":12},{\"x\":13},{\"x\":14},{\"x\":15},{\"x\":16},{\"x\":17},{\"x\":18},{\"x\":19},{\"x\":20},{\"x\":21},{\"x\":22},{\"x\":23},{\"x\":24},{\"x\":25},{\"x\":26},{\"x\":27},{\"x\":28},{\"x\":29},{\"x\":30},{\"x\":31},{\"x\":32},{\"x\":33},{\"x\":34},{\"x\":35},{\"x\":36},{\"x\":37},{\"x\":38},{\"x\":39},{\"x\":40},{\"x\":41},{\"x\":42},{\"x\":43},{\"x\":44},{\"x\":45},{\"x\":46},{\"x\":47},{\"x\":48},{\"x\":49},{\"x\":50},{\"x\":51},{\"x\":52},{\"x\":53},{\"x\":54},{\"x\":55},{\"x\":56},{\"x\":57},{\"x\":58},{\"x\":59},{\"x\":60},{\"x\":61},{\"x\":62},{\"x\":63},{\"x\":64},{\"x\":65},{\"x\":66},{\"x\":67},{\"x\":68},{\"x\":69},{\"x\":70},{\"x\":71},{\"x\":72},{\"x\":73},{\"x\":74},{\"x\":75},{\"x\":76},{\"x\":77},{\"x\":78},{\"x\":79},{\"x\":80},{\"x\":81},{\"x\":82},{\"x\":83},{\"x\":84},{\"x\":85},{\"x\":86},{\"x\":87},{\"x\":88},{\"x\":89},{\"x\":90},{\"x\":91},{\"x\":92},{\"x\":93},{\"x\":94},{\"x\":95},{\"x\":96},{\"x\":97},{\"x\":98},{\"x\":99},{\"x\":100}],\"timings\":{\"elapsed_ms\":0.45175,\"execute_ms\":0.306375,\"lex_parse_ms\":0.024666999999999998,\"lower_ms\":0.038792,\"parse_ms\":0.096667,\"plan_ms\":0.041791,\"result_generation_ms\":0.0011250000000000001,\"rewrite_ms\":0.006834},\"truncated\":true}\n",
+        "stdout": "{\"columns\":[\"x\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"x\":1},{\"x\":2},{\"x\":3},{\"x\":4},{\"x\":5},{\"x\":6},{\"x\":7},{\"x\":8},{\"x\":9},{\"x\":10},{\"x\":11},{\"x\":12},{\"x\":13},{\"x\":14},{\"x\":15},{\"x\":16},{\"x\":17},{\"x\":18},{\"x\":19},{\"x\":20},{\"x\":21},{\"x\":22},{\"x\":23},{\"x\":24},{\"x\":25},{\"x\":26},{\"x\":27},{\"x\":28},{\"x\":29},{\"x\":30},{\"x\":31},{\"x\":32},{\"x\":33},{\"x\":34},{\"x\":35},{\"x\":36},{\"x\":37},{\"x\":38},{\"x\":39},{\"x\":40},{\"x\":41},{\"x\":42},{\"x\":43},{\"x\":44},{\"x\":45},{\"x\":46},{\"x\":47},{\"x\":48},{\"x\":49},{\"x\":50},{\"x\":51},{\"x\":52},{\"x\":53},{\"x\":54},{\"x\":55},{\"x\":56},{\"x\":57},{\"x\":58},{\"x\":59},{\"x\":60},{\"x\":61},{\"x\":62},{\"x\":63},{\"x\":64},{\"x\":65},{\"x\":66},{\"x\":67},{\"x\":68},{\"x\":69},{\"x\":70},{\"x\":71},{\"x\":72},{\"x\":73},{\"x\":74},{\"x\":75},{\"x\":76},{\"x\":77},{\"x\":78},{\"x\":79},{\"x\":80},{\"x\":81},{\"x\":82},{\"x\":83},{\"x\":84},{\"x\":85},{\"x\":86},{\"x\":87},{\"x\":88},{\"x\":89},{\"x\":90},{\"x\":91},{\"x\":92},{\"x\":93},{\"x\":94},{\"x\":95},{\"x\":96},{\"x\":97},{\"x\":98},{\"x\":99},{\"x\":100}],\"truncated\":true,\"rowCap\":{\"kept\":100,\"total\":250},\"notifications\":[],\"timings\":{\"elapsed_ms\":0.515501,\"parse_ms\":0.112069,\"plan_ms\":0.05005299999999999,\"execute_ms\":0.339904,\"lex_parse_ms\":0.031228,\"rewrite_ms\":0.0028550000000000003,\"lower_ms\":0.035957,\"result_generation_ms\":0.000401},\"planCache\":\"miss\"}\n",
         "stderr": "warning: result truncated to 100 rows (the statement returned 250); pass --max-rows 0 for all rows, or page with SKIP/LIMIT\n",
         "exit": 0
       }
@@ -1329,13 +1329,13 @@
       "recorded": [
         {
           "command": "relate --mode envelope \"MATCH (n:Nobody) SET n.seen = true\"",
-          "stdout": "{\"columnTypes\":[],\"columns\":[],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[],\"timings\":{\"elapsed_ms\":0.39625,\"execute_ms\":0.254792,\"lex_parse_ms\":0.00325,\"lower_ms\":0.004458,\"parse_ms\":0.13362500000000002,\"plan_ms\":0.004208,\"result_generation_ms\":0.000083,\"rewrite_ms\":0.00029099999999999997},\"truncated\":false}\n",
+          "stdout": "{\"columns\":[],\"columnTypes\":[],\"rows\":[],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.325556,\"parse_ms\":0.201184,\"plan_ms\":0.004698,\"execute_ms\":0.11218900000000001,\"lex_parse_ms\":0.00482,\"rewrite_ms\":0.000591,\"lower_ms\":0.009408,\"result_generation_ms\":0.00022},\"planCache\":\"miss\"}\n",
           "stderr": "note: write statement changed nothing; the graph is unchanged\n",
           "exit": 0
         },
         {
           "command": "printf '.begin\\nMATCH (n:Nobody) SET n.seen = true;\\n.commit\\n' | relate query --database ./s.rl --mode envelope",
-          "stdout": "{\"columnTypes\":[],\"columns\":[],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[],\"timings\":{\"elapsed_ms\":0.28170799999999996,\"execute_ms\":0.149083,\"lex_parse_ms\":0.002417,\"lower_ms\":0.004083,\"parse_ms\":0.123833,\"plan_ms\":0.005208,\"result_generation_ms\":0.000041,\"rewrite_ms\":0.00025},\"truncated\":false}\n",
+          "stdout": "{\"columns\":[],\"columnTypes\":[],\"rows\":[],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.26383100000000004,\"parse_ms\":0.16718200000000003,\"plan_ms\":0.005079,\"execute_ms\":0.084618,\"lex_parse_ms\":0.0046489999999999995,\"rewrite_ms\":0.000521,\"lower_ms\":0.009687999999999999,\"result_generation_ms\":0.00022},\"planCache\":\"miss\"}\n",
           "stderr": "note: write statement 2 of 3 changed nothing; the graph is unchanged\nnote: .commit changed nothing; the transaction applied no changes\n",
           "exit": 0
         }
@@ -1791,7 +1791,7 @@
         "command": "relate pull --from p.env --query 'MATCH (n) RETURN n' --database ./p.rl",
         "setup": "printf 'NEO4J_URI=http://neo4j.example.com:7474\\nNEO4J_USERNAME=neo4j\\nNEO4J_PASSWORD=x\\n' > p.env && chmod 600 p.env",
         "stdout": "",
-        "stderr": "Error: refusing to send Basic auth credentials in the clear: Query API URL http://neo4j.example.com:7474/db/neo4j/query/v2 is http:// to a non-loopback host; pass --allow-plaintext to accept the risk, or use an https:// NEO4J_URI\n",
+        "stderr": "Error: refusing to send Basic auth credentials in the clear: Query API URL http://neo4j.example.com is http:// to a non-loopback host; pass --allow-plaintext to accept the risk, or use an https:// NEO4J_URI\n",
         "exit": 1
       }
     },
@@ -2651,8 +2651,8 @@
       "retryable": false,
       "gql_status": null,
       "neo4j_code": "Neo.ClientError.General.TransactionOutOfMemoryError",
-      "message": "This statement tried to commit a single WAL record of at least <used>. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is <limit> (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).",
-      "cause": "One commit is over the 64 MiB per-commit WAL payload cap; nothing is written.",
+      "message": "This statement tried to commit a single WAL record of at least <used>. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is <limit> (ADR-0650); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).",
+      "cause": "One commit is over the 256 MiB per-commit WAL payload cap (64 MiB before 1.3.0), set at open by `RELATE_WAL_PAYLOAD_LIMIT`; nothing is written.",
       "remedy": "Commit the data in smaller transactions: `CALL { … } IN TRANSACTIONS OF <n> ROWS`, or batches sent by the client.",
       "python_class": "DataError",
       "http_status": 507,
@@ -2664,9 +2664,9 @@
       ],
       "note": "Up to and including 1.0.1 the message wrote the 64 MiB (67,108,864-byte) cap as `64 MB`, called it the per-record cap, and named no remedy beyond smaller transactions.",
       "recorded": {
-        "command": "relate --mode envelope \"WITH reduce(s = 'a', i IN range(1, 26) | s + s) AS s CREATE (:Blob {s: s})\"",
-        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"capacity\",\"message\":\"This statement tried to commit a single WAL record of at least 64 MiB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 64 MiB (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).\",\"retryable\":false}}\n",
-        "stderr": "This statement tried to commit a single WAL record of at least 64 MiB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 64 MiB (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).\n",
+        "command": "relate --mode envelope \"WITH reduce(s = 'a', i IN range(1, 27) | s + s) AS s UNWIND range(1, 3) AS k CREATE (:Blob {k: k, s: s})\"",
+        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"capacity\",\"message\":\"This statement tried to commit a single WAL record of at least 256 MB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 256 MB (ADR-0650); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).\",\"retryable\":false}}\n",
+        "stderr": "This statement tried to commit a single WAL record of at least 256 MB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 256 MB (ADR-0650); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).\n",
         "exit": 1
       }
     },
@@ -2817,7 +2817,7 @@
       ],
       "recorded": {
         "command": "relate --mode envelope \"CYPHER 5 RETURN 1 AS one\"",
-        "stdout": "{\"error\":{\"code\":\"validation_error\",\"column\":8,\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: UnsupportedCypherVersion: 5 is not a valid option for cypher version. Valid options are: 25   CYPHER 5 RETURN 1 AS one          ^\",\"retryable\":false,\"source\":\"CYPHER 5 RETURN 1 AS one\"}}\n",
+        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: UnsupportedCypherVersion: 5 is not a valid option for cypher version. Valid options are: 25   CYPHER 5 RETURN 1 AS one          ^\",\"retryable\":false,\"column\":8,\"source\":\"CYPHER 5 RETURN 1 AS one\"}}\n",
         "stderr": "syntax error: parse error: UnsupportedCypherVersion: 5 is not a valid option for cypher version. Valid options are: 25\n  CYPHER 5 RETURN 1 AS one\n         ^\n",
         "exit": 6
       }
@@ -3131,7 +3131,7 @@
       "recorded": {
         "command": "relate query --mode envelope < nest.cypher",
         "setup": "printf 'RETURN %s1%s AS x;\\n' \"$(printf '(%.0s' $(seq 501))\" \"$(printf ')%.0s' $(seq 501))\" > nest.cypher",
-        "stdout": "{\"error\":{\"code\":\"validation_error\",\"column\":122,\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: maximum nesting depth of 500 exceeded   …(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((1)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))…                                                                                                                            ^\",\"retryable\":false,\"source\":\"…(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((1)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))…\"}}\n",
+        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: maximum nesting depth of 500 exceeded   …(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((1)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))…                                                                                                                            ^\",\"retryable\":false,\"column\":122,\"source\":\"…(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((1)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))…\"}}\n",
         "stderr": "syntax error: parse error: maximum nesting depth of 500 exceeded\n  …(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((1)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))…\n                                                                                                                           ^\n",
         "exit": 6
       }
@@ -3171,8 +3171,8 @@
       "retryable": false,
       "gql_status": null,
       "neo4j_code": "Neo.ClientError.Statement.SemanticError",
-      "message": "NestedEvaluationBudgetExceeded: nested evaluation exceeds 100000 passes per statement; nested subqueries compound per level (security budget).",
-      "cause": "Nested subqueries, conditional branches and `FOREACH` lists would exceed 100,000 evaluation passes in one statement.",
+      "message": "NestedEvaluationBudgetExceeded: nested evaluation exceeds 1000000 passes per statement; nested subqueries compound per level (security budget).",
+      "cause": "Nested subqueries, conditional branches and `FOREACH` lists would exceed 1,000,000 evaluation passes (100,000 before 1.3.0) in one statement.",
       "remedy": "Flatten the nesting or split the statement.",
       "python_class": null,
       "http_status": null,
@@ -3181,11 +3181,11 @@
         "docs/api/bolt/spec.md",
         "relate 1.0.0 (b02f283), release build"
       ],
-      "note": "A `CALL` subquery runs once per input row and each run counts against the budget, so a `CALL { … }` over more than 100,000 rows fails, `IN TRANSACTIONS` included; the same statement over 99,999 rows succeeds.",
+      "note": "A `CALL` subquery runs once per input row and each run counts against the budget, so a `CALL { … }` over more than 1,000,000 rows fails, `IN TRANSACTIONS` included; the same statement over 1,000,000 rows succeeds.",
       "recorded": {
-        "command": "relate --mode envelope \"UNWIND range(1, 100001) AS i CALL (i) { RETURN i AS j } RETURN count(*) AS c\"",
-        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"execution\",\"message\":\"NestedEvaluationBudgetExceeded: nested evaluation exceeds 100000 passes per statement; nested subqueries compound per level (security budget).\",\"retryable\":false}}\n",
-        "stderr": "NestedEvaluationBudgetExceeded: nested evaluation exceeds 100000 passes per statement; nested subqueries compound per level (security budget).\n",
+        "command": "relate --mode envelope \"UNWIND range(1, 1000001) AS i CALL (i) { RETURN i AS j } RETURN count(*) AS c\"",
+        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"execution\",\"message\":\"NestedEvaluationBudgetExceeded: nested evaluation exceeds 1000000 passes per statement; nested subqueries compound per level (security budget).\",\"retryable\":false}}\n",
+        "stderr": "NestedEvaluationBudgetExceeded: nested evaluation exceeds 1000000 passes per statement; nested subqueries compound per level (security budget).\n",
         "exit": 1
       }
     },
@@ -3326,7 +3326,7 @@
       ],
       "recorded": {
         "command": "relate --mode envelope \"CREATE VECTOR INDEX a FOR (p:Person) ON (p.focus) WITH [p.role]; CREATE VECTOR INDEX b FOR (p:Person) ON (p.focus) WITH [p.role] OPTIONS {indexConfig: {\\`vector.dimensions\\`: 4}}\"",
-        "stdout": "{\"columnTypes\":[],\"columns\":[],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[],\"timings\":{\"elapsed_ms\":0.4075,\"execute_ms\":0.288875,\"lex_parse_ms\":0.003875,\"lower_ms\":0.0011250000000000001,\"parse_ms\":0.113458,\"plan_ms\":0.001333,\"result_generation_ms\":0.000167,\"rewrite_ms\":0.000209},\"truncated\":false}\n{\"error\":{\"code\":\"validation_error\",\"committed\":1,\"exit_code\":6,\"kind\":\"semantic\",\"message\":\"semantic error: EquivalentSchemaRuleAlreadyExists\",\"retryable\":false,\"statement\":2,\"statements\":2}}\n",
+        "stdout": "{\"columns\":[],\"columnTypes\":[],\"rows\":[],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.330666,\"parse_ms\":0.152224,\"plan_ms\":0.001312,\"execute_ms\":0.170087,\"lex_parse_ms\":0.007484,\"rewrite_ms\":0.00027,\"lower_ms\":0.002515,\"result_generation_ms\":0.00014000000000000001},\"planCache\":\"miss\"}\n{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"semantic\",\"message\":\"semantic error: EquivalentSchemaRuleAlreadyExists\",\"retryable\":false,\"statement\":2,\"statements\":2,\"committed\":1}}\n",
         "stderr": "semantic error: EquivalentSchemaRuleAlreadyExists\nstatement 2 of 2 failed; 1 completed and committed; 0 not run\n",
         "exit": 6
       }
@@ -3350,7 +3350,7 @@
       ],
       "recorded": {
         "command": "relate --mode envelope \"CREATE INDEX i FOR (p:P) ON (p.x); CREATE INDEX i FOR (p:P) ON (p.x)\"",
-        "stdout": "{\"columnTypes\":[],\"columns\":[],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[],\"timings\":{\"elapsed_ms\":0.395916,\"execute_ms\":0.28774999999999995,\"lex_parse_ms\":0.003125,\"lower_ms\":0.000958,\"parse_ms\":0.10270800000000001,\"plan_ms\":0.0011250000000000001,\"result_generation_ms\":0.000209,\"rewrite_ms\":0.00020800000000000001},\"truncated\":false}\n{\"error\":{\"code\":\"validation_error\",\"committed\":1,\"exit_code\":6,\"kind\":\"semantic\",\"message\":\"semantic error: IndexAlreadyExists\",\"retryable\":false,\"statement\":2,\"statements\":2}}\n",
+        "stdout": "{\"columns\":[],\"columnTypes\":[],\"rows\":[],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.184604,\"parse_ms\":0.07659300000000001,\"plan_ms\":0.001112,\"execute_ms\":0.103073,\"lex_parse_ms\":0.002715,\"rewrite_ms\":0.00019999999999999998,\"lower_ms\":0.0014320000000000001,\"result_generation_ms\":0.000081},\"planCache\":\"miss\"}\n{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"semantic\",\"message\":\"semantic error: IndexAlreadyExists\",\"retryable\":false,\"statement\":2,\"statements\":2,\"committed\":1}}\n",
         "stderr": "semantic error: IndexAlreadyExists\nstatement 2 of 2 failed; 1 completed and committed; 0 not run\n",
         "exit": 6
       }
@@ -3797,12 +3797,12 @@
       "id": "engine-ontology-unsupported-version",
       "surface": "engine",
       "code": "validation_error",
-      "kind": "semantic",
+      "kind": "argument",
       "exit_code": 6,
       "retryable": false,
       "gql_status": null,
       "neo4j_code": null,
-      "message": "semantic error: Unsupported ontology spec version: '<uri>'. This version of Relate supports up to Ontology Graph Spec 1.1.0 ('https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json').",
+      "message": "semantic error: The ontology document uses an unsupported graph-spec version. The document names '<uri>'; This version of Relate supports up to Ontology Graph Spec 1.1.0 ('https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json').",
       "cause": "`db.ontology.set` got a document whose `schema` names a spec version this build does not support (preview: `RELATE_PREVIEW=ontology`).",
       "remedy": "Write the document against Ontology Graph Spec 1.1.0 or earlier.",
       "python_class": null,
@@ -3812,8 +3812,8 @@
       ],
       "recorded": {
         "command": "RELATE_PREVIEW=ontology relate --mode envelope --param 'ontology=schema: https://example.com/schema.json' 'CALL db.ontology.set($ontology)'",
-        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"semantic\",\"message\":\"semantic error: Unsupported ontology spec version: 'https://example.com/schema.json'. This version of Relate supports up to Ontology Graph Spec 1.1.0 ('https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json').\",\"retryable\":false}}\n",
-        "stderr": "semantic error: Unsupported ontology spec version: 'https://example.com/schema.json'. This version of Relate supports up to Ontology Graph Spec 1.1.0 ('https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json').\n",
+        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"argument\",\"message\":\"semantic error: The ontology document uses an unsupported graph-spec version. The document names 'https://example.com/schema.json'; This version of Relate supports up to Ontology Graph Spec 1.1.0 ('https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json').\",\"retryable\":false}}\n",
+        "stderr": "semantic error: The ontology document uses an unsupported graph-spec version. The document names 'https://example.com/schema.json'; This version of Relate supports up to Ontology Graph Spec 1.1.0 ('https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json').\n",
         "exit": 6
       }
     },
@@ -4193,7 +4193,7 @@
       "recorded": {
         "command": "printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"check\",\"version\":\"0\"}}}' '{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}' '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"write_cypher\",\"arguments\":{\"query\":\"CREATE (:B)\"}}}' | relate serve --mcp stdio --database ./graph.rl --read-only",
         "setup": "relate --database ./graph.rl \"CREATE (:A)\"",
-        "stdout": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"capabilities\":{\"tools\":{}},\"protocolVersion\":\"2025-06-18\",\"serverInfo\":{\"name\":\"relate-mcp\",\"version\":\"1.2.0\"}}}\n{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"text\":\"unknown tool 'write_cypher'\",\"type\":\"text\"}],\"isError\":true}}\n",
+        "stdout": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"tools\":{}},\"serverInfo\":{\"name\":\"relate-mcp\",\"version\":\"1.3.0\"}}}\n{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"unknown tool 'write_cypher'\"}],\"isError\":true}}\n",
         "stderr": "serve: opened the store read-only — no writer lease and never creates the store; every write fails\nserve: MCP (stdio) serving on stdin/stdout (auth: none)\nserve: stdin closed, shutting down\n",
         "exit": 0
       }
@@ -5276,5 +5276,5 @@
       "engine-unsupported-administration-command"
     ]
   },
-  "recorded_with": "relate 1.2.0 (e0ea536), release build"
+  "recorded_with": "relate 1.3.0 (6e55309), release build"
 }

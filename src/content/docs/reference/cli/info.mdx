@@ -150,7 +150,7 @@ relate info --database ./catalog.rl --json
 ```
 
 ```text
-{"checkpoint_lsn":4,"codec":"parquet","commit_ts":4,"constraints":[{"enforced_label":null,"kind":"exists","label":"Project","name":"project_name","properties":["name"],"property_type":null,"relationship":false},{"enforced_label":null,"kind":"propertyType","label":"WORKS_ON","name":"works_since","properties":["since"],"property_type":"INTEGER","relationship":true}],"format_version":5,"indexes":[{"label":"Person","name":"person_name","property":"name"}],"layout":"bundle","node_count":2,"rel_count":1,"superblock_version":1,"total_bytes":45056,"wal_segments":1}
+{"layout":"bundle","superblock_version":1,"codec":"parquet","format_version":5,"checkpoint_lsn":4,"commit_ts":4,"total_bytes":45056,"wal_segments":1,"node_count":2,"rel_count":1,"indexes":[{"name":"person_name","label":"Person","property":"name"}],"constraints":[{"name":"project_name","kind":"exists","label":"Project","relationship":false,"properties":["name"],"property_type":null,"enforced_label":null},{"name":"works_since","kind":"propertyType","label":"WORKS_ON","relationship":true,"properties":["since"],"property_type":"INTEGER","enforced_label":null}]}
 ```
 
 A `json`-codec copy of `./team`, made with `relate clone`, reports what its manifest holds:

@@ -321,7 +321,7 @@ relate query --database ./memory.rl --read-only --mode envelope --param 'vector=
 ```
 
 ```text
-{"columnTypes":["STRING","FLOAT","STRING","LIST"],"columns":["memory","score","evidence","replaced"],"notifications":[],"planCache":"miss","rows":[{"evidence":"read_file CODEOWNERS: release/ @ada","memory":"Ada reviews each relate release.","replaced":["Grace reviews each relate release."],"score":0.999},{"evidence":"Noor goes through new relate issues every Monday.","memory":"Noor triages new relate issues on Mondays.","replaced":[],"score":0.6178}],"timings":{"elapsed_ms":0.654417,"execute_ms":0.407083,"lex_parse_ms":0.048834,"lower_ms":0.06183400000000001,"parse_ms":0.1575,"plan_ms":0.0795,"result_generation_ms":0.00025,"rewrite_ms":0.009041},"truncated":false}
+{"columns":["memory","score","evidence","replaced"],"columnTypes":["STRING","FLOAT","STRING","LIST"],"rows":[{"memory":"Ada reviews each relate release.","score":0.999,"evidence":"read_file CODEOWNERS: release/ @ada","replaced":["Grace reviews each relate release."]},{"memory":"Noor triages new relate issues on Mondays.","score":0.6178,"evidence":"Noor goes through new relate issues every Monday.","replaced":[]}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.654417,"parse_ms":0.1575,"plan_ms":0.0795,"execute_ms":0.407083,"lex_parse_ms":0.048834,"rewrite_ms":0.009041,"lower_ms":0.06183400000000001,"result_generation_ms":0.00025},"planCache":"miss"}
 ```
 
 A question embedded with the wrong model has the wrong length. The statement fails before it runs: the message goes to stderr, the error object to stdout, and the exit code is 6:

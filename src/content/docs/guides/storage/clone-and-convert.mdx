@@ -137,8 +137,8 @@ relate clone ./team.rl ./team-compact.rl
 
 ```text
 total bytes: 36864
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":66.759917,"execute_ms":66.566792,"lex_parse_ms":0.006292,"lower_ms":0.007292,"parse_ms":0.182708,"plan_ms":0.005332999999999999,"result_generation_ms":0.000125,"rewrite_ms":0.000375},"truncated":false}
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":21.065709,"execute_ms":20.903374999999997,"lex_parse_ms":0.002333,"lower_ms":0.0029579999999999997,"parse_ms":0.154167,"plan_ms":0.003583,"result_generation_ms":0.000417,"rewrite_ms":0.00020800000000000001},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":66.759917,"parse_ms":0.182708,"plan_ms":0.005332999999999999,"execute_ms":66.566792,"lex_parse_ms":0.006292,"rewrite_ms":0.000375,"lower_ms":0.007292,"result_generation_ms":0.000125},"planCache":"miss"}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":21.065709,"parse_ms":0.154167,"plan_ms":0.003583,"execute_ms":20.903374999999997,"lex_parse_ms":0.002333,"rewrite_ms":0.00020800000000000001,"lower_ms":0.0029579999999999997,"result_generation_ms":0.000417},"planCache":"miss"}
 ```
 
 The method: `relate info` prints each store's size on disk as `total bytes`, read without opening the store. The loop prints it for the bloated file, its clone, and the three copies made in [Change the codec](#change-the-codec) and [Change the layout](#change-the-layout):
@@ -175,7 +175,7 @@ relate --database ./team-md --read-only --mode envelope "MATCH (p:Person)-[:WORK
 ```
 
 ```text
-{"columnTypes":["STRING","STRING"],"columns":["name","project"],"notifications":[],"planCache":"miss","rows":[{"name":"Ada","project":"relate"},{"name":"Grace","project":"opencypher-tck"},{"name":"Grace","project":"relate"}],"timings":{"elapsed_ms":0.55875,"execute_ms":0.382,"lex_parse_ms":0.033417,"lower_ms":0.039709,"parse_ms":0.1085,"plan_ms":0.058542000000000004,"result_generation_ms":0.000375,"rewrite_ms":0.008291999999999999},"truncated":false}
+{"columns":["name","project"],"columnTypes":["STRING","STRING"],"rows":[{"name":"Ada","project":"relate"},{"name":"Grace","project":"opencypher-tck"},{"name":"Grace","project":"relate"}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.55875,"parse_ms":0.1085,"plan_ms":0.058542000000000004,"execute_ms":0.382,"lex_parse_ms":0.033417,"rewrite_ms":0.008291999999999999,"lower_ms":0.039709,"result_generation_ms":0.000375},"planCache":"miss"}
 ```
 
 ## If it goes wrong

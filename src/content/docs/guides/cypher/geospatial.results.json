@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -16,17 +16,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 8,
-          "labels_removed": 0,
           "nodes_created": 8,
           "nodes_deleted": 0,
-          "properties_set": 24,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 24,
+          "labels_added": 8,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -40,12 +40,6 @@
           "kind",
           "latitude",
           "longitude"
-        ],
-        "numeric": [
-          false,
-          false,
-          true,
-          true
         ],
         "rows": [
           [
@@ -97,6 +91,12 @@
             "-122.6765"
           ]
         ],
+        "numeric": [
+          false,
+          false,
+          true,
+          true
+        ],
         "summary": "8 rows"
       },
       "graph": null,
@@ -119,66 +119,66 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "name": "Bean There",
             "kind": "cafe",
             "latitude": 45.5262,
-            "longitude": -122.6789,
-            "name": "Bean There"
+            "longitude": -122.6789
           },
           {
+            "name": "Eastside Cafe",
             "kind": "cafe",
             "latitude": 45.5155,
-            "longitude": -122.6205,
-            "name": "Eastside Cafe"
+            "longitude": -122.6205
           },
           {
+            "name": "Ferry Cafe",
             "kind": "cafe",
             "latitude": 45.5122,
-            "longitude": -122.6587,
-            "name": "Ferry Cafe"
+            "longitude": -122.6587
           },
           {
+            "name": "Harbor Library",
             "kind": "library",
             "latitude": 45.519,
-            "longitude": -122.673,
-            "name": "Harbor Library"
+            "longitude": -122.673
           },
           {
+            "name": "Hilltop Roasters",
             "kind": "cafe",
             "latitude": 45.5428,
-            "longitude": -122.7011,
-            "name": "Hilltop Roasters"
+            "longitude": -122.7011
           },
           {
+            "name": "North Library",
             "kind": "library",
             "latitude": 47.6205,
-            "longitude": -122.3493,
-            "name": "North Library"
+            "longitude": -122.3493
           },
           {
+            "name": "Pier Cafe",
             "kind": "cafe",
             "latitude": 47.6097,
-            "longitude": -122.3331,
-            "name": "Pier Cafe"
+            "longitude": -122.3331
           },
           {
+            "name": "Riverside Office",
             "kind": "office",
             "latitude": 45.5231,
-            "longitude": -122.6765,
-            "name": "Riverside Office"
+            "longitude": -122.6765
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -193,12 +193,6 @@
           "latitude",
           "longitude"
         ],
-        "numeric": [
-          true,
-          false,
-          true,
-          true
-        ],
         "rows": [
           [
             "4326",
@@ -206,6 +200,12 @@
             "45.5231",
             "-122.6765"
           ]
+        ],
+        "numeric": [
+          true,
+          false,
+          true,
+          true
         ],
         "summary": "1 row"
       },
@@ -229,24 +229,24 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "srid": 4326,
             "crs": "wgs-84",
             "latitude": 45.5231,
-            "longitude": -122.6765,
-            "srid": 4326
+            "longitude": -122.6765
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -258,13 +258,13 @@
         "columns": [
           "km"
         ],
-        "numeric": [
-          true
-        ],
         "rows": [
           [
             "233.8"
           ]
+        ],
+        "numeric": [
+          true
         ],
         "summary": "1 row"
       },
@@ -286,17 +286,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -309,11 +309,6 @@
           "name",
           "kind",
           "meters"
-        ],
-        "numeric": [
-          false,
-          false,
-          true
         ],
         "rows": [
           [
@@ -337,6 +332,11 @@
             "1844.0"
           ]
         ],
+        "numeric": [
+          false,
+          false,
+          true
+        ],
         "summary": "4 rows"
       },
       "graph": null,
@@ -357,38 +357,38 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "name": "Riverside Office",
             "kind": "office",
-            "meters": 0,
-            "name": "Riverside Office"
+            "meters": 0
           },
           {
+            "name": "Bean There",
             "kind": "cafe",
-            "meters": 393,
-            "name": "Bean There"
+            "meters": 393
           },
           {
+            "name": "Harbor Library",
             "kind": "library",
-            "meters": 532,
-            "name": "Harbor Library"
+            "meters": 532
           },
           {
+            "name": "Ferry Cafe",
             "kind": "cafe",
-            "meters": 1844,
-            "name": "Ferry Cafe"
+            "meters": 1844
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -400,10 +400,6 @@
         "columns": [
           "cafe",
           "km"
-        ],
-        "numeric": [
-          false,
-          true
         ],
         "rows": [
           [
@@ -418,6 +414,10 @@
             "\"Hilltop Roasters\"",
             "2.9"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "3 rows"
       },
@@ -450,17 +450,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -471,9 +471,6 @@
       "table": {
         "columns": [
           "name"
-        ],
-        "numeric": [
-          false
         ],
         "rows": [
           [
@@ -488,6 +485,9 @@
           [
             "\"Riverside Office\""
           ]
+        ],
+        "numeric": [
+          false
         ],
         "summary": "4 rows"
       },
@@ -518,17 +518,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -547,17 +547,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 1,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 1,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -573,13 +573,6 @@
           "properties",
           "state"
         ],
-        "numeric": [
-          false,
-          false,
-          false,
-          false,
-          false
-        ],
         "rows": [
           [
             "\"place_loc\"",
@@ -588,6 +581,13 @@
             "[\"loc\"]",
             "\"ONLINE\""
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false,
+          false,
+          false
         ],
         "summary": "1 row"
       },
@@ -613,29 +613,29 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "name": "place_loc",
+            "type": "POINT",
             "labelsOrTypes": [
               "Place"
             ],
-            "name": "place_loc",
             "properties": [
               "loc"
             ],
-            "state": "ONLINE",
-            "type": "POINT"
+            "state": "ONLINE"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false

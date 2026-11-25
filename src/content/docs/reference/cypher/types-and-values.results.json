@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "value-types": {
       "kind": "table",
@@ -16,16 +16,6 @@
           "duration",
           "vector"
         ],
-        "numeric": [
-          false,
-          false,
-          false,
-          false,
-          false,
-          false,
-          false,
-          false
-        ],
         "rows": [
           [
             "\"INTEGER NOT NULL\"",
@@ -37,6 +27,16 @@
             "\"DURATION NOT NULL\"",
             "\"VECTOR<INTEGER8 NOT NULL>(2) NOT NULL\""
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
         ],
         "summary": "1 row"
       },
@@ -68,28 +68,28 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "duration": "DURATION NOT NULL",
-            "float": "FLOAT NOT NULL",
             "int": "INTEGER NOT NULL",
+            "float": "FLOAT NOT NULL",
+            "string": "STRING NOT NULL",
+            "nothing": "NULL",
             "list": "LIST<INTEGER NOT NULL> NOT NULL",
             "map": "MAP NOT NULL",
-            "nothing": "NULL",
-            "string": "STRING NOT NULL",
+            "duration": "DURATION NOT NULL",
             "vector": "VECTOR<INTEGER8 NOT NULL>(2) NOT NULL"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -106,14 +106,6 @@
           "exponent",
           "truncated"
         ],
-        "numeric": [
-          true,
-          true,
-          true,
-          true,
-          true,
-          true
-        ],
         "rows": [
           [
             "9223372036854775807",
@@ -123,6 +115,14 @@
             "1000.0",
             "-3"
           ]
+        ],
+        "numeric": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
         ],
         "summary": "1 row"
       },
@@ -150,26 +150,26 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "exponent": 1000,
-            "grouped": 1000,
-            "hex": 31,
             "max_int": 9223372036854776000,
+            "hex": 31,
             "octal": 15,
+            "grouped": 1000,
+            "exponent": 1000,
             "truncated": -3
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -183,17 +183,17 @@
           "type",
           "empty"
         ],
-        "numeric": [
-          false,
-          false,
-          false
-        ],
         "rows": [
           [
             "[1.0, 2.0]",
             "\"LIST<FLOAT NOT NULL> NOT NULL\"",
             "[]"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false
         ],
         "summary": "1 row · nodes created: 1, properties set: 3, labels added: 1"
       },
@@ -215,26 +215,26 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "empty": [],
             "floats": [
               1,
               2
             ],
-            "type": "LIST<FLOAT NOT NULL> NOT NULL"
+            "type": "LIST<FLOAT NOT NULL> NOT NULL",
+            "empty": []
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 1,
-          "labels_removed": 0,
           "nodes_created": 1,
           "nodes_deleted": 0,
-          "properties_set": 3,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 3,
+          "labels_added": 1,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -261,17 +261,17 @@
           "rel_id",
           "namespace"
         ],
-        "numeric": [
-          false,
-          false,
-          false
-        ],
         "rows": [
           [
             "\"4:rl-id:n1\"",
             "\"5:rl-id:r0\"",
             "\"neo4j\""
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false
         ],
         "summary": "1 row · nodes created: 2, relationships created: 1, properties set: 2, labels added: 2"
       },
@@ -293,23 +293,23 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "namespace": "neo4j",
             "node_id": "4:rl-id:n1",
-            "rel_id": "5:rl-id:r0"
+            "rel_id": "5:rl-id:r0",
+            "namespace": "neo4j"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 2,
-          "labels_removed": 0,
           "nodes_created": 2,
           "nodes_deleted": 0,
-          "properties_set": 2,
           "relationships_created": 1,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 2,
+          "labels_added": 2,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -325,13 +325,6 @@
           "kept_apart",
           "weekday"
         ],
-        "numeric": [
-          false,
-          false,
-          false,
-          false,
-          true
-        ],
         "rows": [
           [
             "\"2026-02-28\"",
@@ -340,6 +333,13 @@
             "\"P1DT25H\"",
             "7"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false,
+          false,
+          true
         ],
         "summary": "1 row"
       },
@@ -365,25 +365,25 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "month_end": "2026-02-28",
+            "later": "2026-11-08T11:30:00Z",
             "between": "P10M7D",
             "kept_apart": "P1DT25H",
-            "later": "2026-11-08T11:30:00Z",
-            "month_end": "2026-02-28",
             "weekday": 7
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -397,17 +397,17 @@
           "geo_srid",
           "distance"
         ],
-        "numeric": [
-          false,
-          true,
-          true
-        ],
         "rows": [
           [
             "point({crs: \"cartesian\", srid: 7203, x: 1.0, y: 2.0})",
             "4326",
             "5.0"
           ]
+        ],
+        "numeric": [
+          false,
+          true,
+          true
         ],
         "summary": "1 row"
       },
@@ -430,27 +430,27 @@
         "rows": [
           {
             "cartesian": {
-              "crs": "cartesian",
               "srid": 7203,
+              "crs": "cartesian",
               "x": 1,
               "y": 2
             },
-            "distance": 5,
-            "geo_srid": 4326
+            "geo_srid": 4326,
+            "distance": 5
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -465,12 +465,6 @@
           "type",
           "dims"
         ],
-        "numeric": [
-          false,
-          false,
-          false,
-          true
-        ],
         "rows": [
           [
             "vector([1, 2, 3], 3, INTEGER8)",
@@ -478,6 +472,12 @@
             "\"VECTOR<FLOAT32 NOT NULL>(2) NOT NULL\"",
             "3"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false,
+          true
         ],
         "summary": "1 row"
       },
@@ -501,39 +501,39 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "dims": 3,
-            "from_string": {
-              "dim": 2,
-              "type": "FLOAT32",
-              "values": [
-                1.5,
-                2.5
-              ]
-            },
             "small": {
-              "dim": 3,
               "type": "INTEGER8",
+              "dim": 3,
               "values": [
                 1,
                 2,
                 3
               ]
             },
-            "type": "VECTOR<FLOAT32 NOT NULL>(2) NOT NULL"
+            "from_string": {
+              "type": "FLOAT32",
+              "dim": 2,
+              "values": [
+                1.5,
+                2.5
+              ]
+            },
+            "type": "VECTOR<FLOAT32 NOT NULL>(2) NOT NULL",
+            "dims": 3
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -547,17 +547,17 @@
           "from_halves",
           "type"
         ],
-        "numeric": [
-          false,
-          false,
-          false
-        ],
         "rows": [
           [
             "\"f066ecfc-5151-4121-8a36-b35e00d72918\"",
             "\"00000000-0000-0000-0000-000000000001\"",
             "\"UUID NOT NULL\""
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false
         ],
         "summary": "1 row"
       },
@@ -579,23 +579,23 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "from_halves": "00000000-0000-0000-0000-000000000001",
             "parsed": "f066ecfc-5151-4121-8a36-b35e00d72918",
+            "from_halves": "00000000-0000-0000-0000-000000000001",
             "type": "UUID NOT NULL"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false

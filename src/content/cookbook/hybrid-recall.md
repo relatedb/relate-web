@@ -249,12 +249,13 @@ ORDER BY fs DESC, id LIMIT $k
 The procedure form, `CALL db.index.fulltext.queryNodes('note_t', $q)`,
 returns the same notes with the same scores.
 
-## Filter inside the search, not after it
+## Filter inside the search or after it
 
-`SEARCH` takes its `LIMIT` window from the whole index first. A `WHERE` after
-the clause only filters that window, and so does a property in the `MATCH`
-pattern (`MATCH (n:Note {session: $session})`). Both silently return fewer
-than `k` rows.
+Since relate 1.3.0 a `WHERE` after the clause, and a property in the `MATCH`
+pattern (`MATCH (n:Note {session: $session})`), narrow the candidates before
+the `LIMIT` window, as a `WHERE` inside a vector search does. Every form below
+returns `k` rows when `k` notes qualify. Before 1.3.0 the window came from the
+whole index first, so a filter placed after it could return fewer rows.
 
 Here the scope is session 2 from 10:00 on, which holds nine notes, and the
 question is `kafka` with `k = 3`:
@@ -304,15 +305,17 @@ RETURN 'full-text: LIMIT $k * 3, WHERE, LIMIT $k' AS filter, ids
 | filter                                     | ids                   |
 |--------------------------------------------|-----------------------|
 | "vector: WHERE inside SEARCH"              | ["n18", "n19", "n23"] |
-| "vector: WHERE after SEARCH"               | ["n18"]               |
-| "full-text: LIMIT $k, then WHERE"          | []                    |
+| "vector: WHERE after SEARCH"               | ["n18", "n19", "n23"] |
+| "full-text: LIMIT $k, then WHERE"          | ["n17", "n18", "n19"] |
 | "full-text: LIMIT $k * 3, WHERE, LIMIT $k" | ["n17", "n18", "n19"] |
 4 rows
 ```
 
-Only the first and last forms return `k` notes. The three best full-text
-matches for `kafka` are notes from sessions 1 and 3, so filtering them
-afterwards leaves nothing.
+All four forms return `k` notes. The three best full-text matches for `kafka`
+are notes from sessions 1 and 3, yet the filter after the full-text search
+still finds the three that fit the scope. The vector form can filter inside the
+search only on properties the index declares in `WITH [...]`; a filter after
+the clause works on any property, and on a full-text search it is the only way.
 
 ## Fuse the two lists by reciprocal rank
 

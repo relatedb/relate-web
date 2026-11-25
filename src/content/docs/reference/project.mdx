@@ -28,7 +28,7 @@ relate --version
 ```
 
 ```text
-Relate v1.2.0
+Relate v1.3.0
 License: Apache 2.0 (binary)
 ```
 
@@ -69,8 +69,8 @@ RELATE_PREVIEW=time-travel relate "RETURN 1 AS ok"
 ```
 
 ```text
-Failed to open Relate: semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'time-travel' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, complex-search-patterns, coll-zip, coll-has, gql-stddev-aliases)
-{"error":{"code":"fatal_error","exit_code":1,"kind":"semantic","message":"semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'time-travel' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, complex-search-patterns, coll-zip, coll-has, gql-stddev-aliases)","retryable":false}}
+Failed to open Relate: semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'time-travel' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation)
+{"error":{"code":"fatal_error","exit_code":1,"kind":"semantic","message":"semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'time-travel' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation)","retryable":false}}
 ```
 
 The first line is stderr. The second is the error object on stdout, which a run with piped output prints after the message.

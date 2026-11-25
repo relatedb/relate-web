@@ -78,7 +78,7 @@ rows[2]{x}:
   1
   2
 timings:
-  {"elapsed_ms":0.378,"execute_ms":0.220834,"lex_parse_ms":0.031875,"lower_ms":0.031792,"parse_ms":0.1065,"plan_ms":0.041665999999999995,"result_generation_ms":0.000167,"rewrite_ms":0.0067079999999999996}
+  {"elapsed_ms":0.378,"parse_ms":0.1065,"plan_ms":0.041665999999999995,"execute_ms":0.220834,"lex_parse_ms":0.031875,"rewrite_ms":0.0067079999999999996,"lower_ms":0.031792,"result_generation_ms":0.000167}
 planCache:
   miss
 ```
@@ -117,7 +117,7 @@ rows[2]{x}:
   1
   2
 timings:
-  {"elapsed_ms":0.47974999999999995,"execute_ms":0.335833,"lex_parse_ms":0.023125,"lower_ms":0.032541,"parse_ms":0.095875,"plan_ms":0.038583,"result_generation_ms":0.00020800000000000001,"rewrite_ms":0.005667}
+  {"elapsed_ms":0.47974999999999995,"parse_ms":0.095875,"plan_ms":0.038583,"execute_ms":0.335833,"lex_parse_ms":0.023125,"rewrite_ms":0.005667,"lower_ms":0.032541,"result_generation_ms":0.00020800000000000001}
 planCache:
   miss
 ```
@@ -169,7 +169,7 @@ rows[100]{x}:
 rowCap:
   {"kept":100,"total":250}
 timings:
-  {"elapsed_ms":0.44983399999999996,"execute_ms":0.30124999999999996,"lex_parse_ms":0.024457999999999997,"lower_ms":0.033833,"parse_ms":0.093125,"plan_ms":0.047667,"result_generation_ms":0.001209,"rewrite_ms":0.007833}
+  {"elapsed_ms":0.44983399999999996,"parse_ms":0.093125,"plan_ms":0.047667,"execute_ms":0.30124999999999996,"lex_parse_ms":0.024457999999999997,"rewrite_ms":0.007833,"lower_ms":0.033833,"result_generation_ms":0.001209}
 planCache:
   miss
 ```
@@ -183,7 +183,7 @@ relate --mode envelope "RETURN 1 AS a, [1, 2] AS l, {k: 'v'} AS m, null AS z"
 ```
 
 ```text
-{"columnTypes":["INTEGER","LIST","MAP","ANY"],"columns":["a","l","m","z"],"notifications":[],"planCache":"miss","rows":[{"a":1,"l":[1,2],"m":{"k":"v"},"z":null}],"timings":{"elapsed_ms":0.3515,"execute_ms":0.198667,"lex_parse_ms":0.02425,"lower_ms":0.030792,"parse_ms":0.1025,"plan_ms":0.040958,"result_generation_ms":0.000334,"rewrite_ms":0.007084},"truncated":false}
+{"columns":["a","l","m","z"],"columnTypes":["INTEGER","LIST","MAP","ANY"],"rows":[{"a":1,"l":[1,2],"m":{"k":"v"},"z":null}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.3515,"parse_ms":0.1025,"plan_ms":0.040958,"execute_ms":0.198667,"lex_parse_ms":0.02425,"rewrite_ms":0.007084,"lower_ms":0.030792,"result_generation_ms":0.000334},"planCache":"miss"}
 ```
 
 | Field | Type | Present | Meaning |
@@ -207,7 +207,7 @@ relate --mode envelope "MATCH (p:Person) RETURN p"
 ```
 
 ```text
-{"columnTypes":["ANY"],"columns":["p"],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":0.382083,"execute_ms":0.227458,"lex_parse_ms":0.027834,"lower_ms":0.04075,"parse_ms":0.098458,"plan_ms":0.048708,"result_generation_ms":0.000292,"rewrite_ms":0.007500000000000001},"truncated":false}
+{"columns":["p"],"columnTypes":["ANY"],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.382083,"parse_ms":0.098458,"plan_ms":0.048708,"execute_ms":0.227458,"lex_parse_ms":0.027834,"rewrite_ms":0.007500000000000001,"lower_ms":0.04075,"result_generation_ms":0.000292},"planCache":"miss"}
 ```
 
 A cut result has `rowCap` and `"truncated":true`. In this run `--max-rows 2` sets the cap; agent mode's default cut looks the same with `"kept":100`:
@@ -218,7 +218,7 @@ relate --mode envelope --max-rows 2 "UNWIND range(1, 5) AS x RETURN x"
 
 ```text
 warning: result truncated to 2 rows (the statement returned 5); pass --max-rows 0 for all rows, or page with SKIP/LIMIT
-{"columnTypes":["INTEGER"],"columns":["x"],"notifications":[],"planCache":"miss","rowCap":{"kept":2,"total":5},"rows":[{"x":1},{"x":2}],"timings":{"elapsed_ms":0.34175,"execute_ms":0.20358400000000001,"lex_parse_ms":0.021709,"lower_ms":0.032666,"parse_ms":0.08629200000000001,"plan_ms":0.044333,"result_generation_ms":0.0011250000000000001,"rewrite_ms":0.007042},"truncated":true}
+{"columns":["x"],"columnTypes":["INTEGER"],"rows":[{"x":1},{"x":2}],"truncated":true,"rowCap":{"kept":2,"total":5},"notifications":[],"timings":{"elapsed_ms":0.34175,"parse_ms":0.08629200000000001,"plan_ms":0.044333,"execute_ms":0.20358400000000001,"lex_parse_ms":0.021709,"rewrite_ms":0.007042,"lower_ms":0.032666,"result_generation_ms":0.0011250000000000001},"planCache":"miss"}
 ```
 
 A failed statement in `envelope`, `json`, `jsonl` or `speedscope` prints the error object instead, with the same keys in each; its fields are on the [exit codes page](/docs/reference/cli/exit-codes-and-errors#the-error-object). New envelope fields may be added; existing ones are never renamed.
@@ -248,7 +248,7 @@ CLAUDECODE=1 relate "EXPLAIN MATCH (p:Persn) RETURN p.name AS name" | tail -6 | 
 
 ```text
 notifications:
-  [{"category":"UNRECOGNIZED","code":"Neo.ClientNotification.Statement.UnknownLabelWarning","description":"The label `Persn` does not exist in this database.","gql_status":"01N50","remedy":"Check the spelling; the label exists after the first write that creates it, and no index or constraint uses the unknown name.","severity":"WARNING","title":"Unknown label"},{"category":"UNRECOGNIZED","code":"Neo.ClientNotification.Statement.UnknownPropertyKeyWarning","description":"The property key `name` does not exist in this database.","gql_status":"01N52","remedy":"Check the spelling; the key exists after the first write that sets it.","severity":"WARNING","title":"Unknown property key"}]
+  [{"code":"Neo.ClientNotification.Statement.UnknownLabelWarning","gql_status":"01N50","severity":"WARNING","category":"UNRECOGNIZED","title":"Unknown label","description":"The label `Persn` does not exist in this database.","remedy":"Check the spelling; the label exists after the first write that creates it, and no index or constraint uses the unknown name."},{"code":"Neo.ClientNotification.Statement.UnknownPropertyKeyWarning","gql_status":"01N52","severity":"WARNING","category":"UNRECOGNIZED","title":"Unknown property key","description":"The property key `name` does not exist in this database.","remedy":"Check the spelling; the key exists after the first write that sets it."}]
 ```
 
 Each entry has `category`, `code`, `description`, `gql_status`, `remedy`, `severity` and `title`, plus `operator_id` when it concerns one plan operator. The `envelope` mode carries the same list in `notifications`; `json` prints one `{"notifications":[…],"plan":{…},"planCache":…,"timings":{…}}` object; `jsonl` prints one `{"notifications":[…],"plan":{…}}` line, then the timing line with `--timings`; `table` and `markdown` print a `Notifications:` block; `csv` and `cypher` print none. The [errors reference](/docs/reference/errors#notifications) lists every notification.

@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "terminal",
-  "hash": "140b5ee6022816b6c19b07e8d039908f68e6f0f65670e47eb679730dfc8f6a86",
+  "hash": "87b02529e69bd61b7d48e740a9a30906537054b7d26c7c1c20b6f263840b244b",
   "inputs": [
     "src/content/docs/_data/cli.json",
     "src/content/docs/_data/errors.json",
@@ -9,9 +9,9 @@
   ],
   "live": "the statement runs in your browser on an empty read-only database, as `relate --read-only` opens one, and the pane shows what relate prints in the mode you pick, with the exit code and, under \"Run as an agent harness\", the row cap; the statement can be edited or swapped for a preset.",
   "engine": true,
-  "text": "The statement as relate 1.2.0 prints it in four of its output modes, rendered from this page's recorded result by the terminal's renderers, which match the relate 1.2.0 binary byte for byte on the recorded runs, timing values aside. The recording keeps no timings, so each one shows as `<ms>`; relate prints the milliseconds of its own run, and the live terminal prints the engine's. Exit code 6, as relate 1.2.0 returns it.\n\nrelate classes this failure as `validation_error`, kind `type`, retryable `false` ([engine-division-by-zero](/docs/reference/errors#engine-division-by-zero)).\n\n`--mode table` prints one line on stderr:\n\n```bash\nrelate --read-only --mode table 'RETURN 1/0 AS x'\n```\n\n```text\ntype error: / by zero\n```\n\n`--mode envelope` prints one line on stderr, then one on stdout:\n\n```bash\nrelate --read-only --mode envelope 'RETURN 1/0 AS x'\n```\n\n```text\ntype error: / by zero\n{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"type\",\"message\":\"type error: / by zero\",\"retryable\":false}}\n```\n\n`--mode jsonl` prints one line on stderr, then one on stdout:\n\n```bash\nrelate --read-only --mode jsonl 'RETURN 1/0 AS x'\n```\n\n```text\ntype error: / by zero\n{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"type\",\"message\":\"type error: / by zero\",\"retryable\":false}}\n```\n\n`--mode toon` prints one line on stderr:\n\n```bash\nrelate --read-only --mode toon 'RETURN 1/0 AS x'\n```\n\n```text\ntype error: / by zero\n```",
+  "text": "The statement as relate 1.3.0 prints it in four of its output modes, rendered from this page's recorded result by the terminal's renderers, which match the relate 1.3.0 binary byte for byte on the recorded runs, timing values aside. The recording keeps no timings, so each one shows as `<ms>`; relate prints the milliseconds of its own run, and the live terminal prints the engine's. Exit code 6, as relate 1.3.0 returns it.\n\nrelate classes this failure as `validation_error`, kind `type`, retryable `false` ([engine-division-by-zero](/docs/reference/errors#engine-division-by-zero)).\n\n`--mode table` prints one line on stderr:\n\n```bash\nrelate --read-only --mode table 'RETURN 1/0 AS x'\n```\n\n```text\ntype error: / by zero\n```\n\n`--mode envelope` prints one line on stderr, then one on stdout:\n\n```bash\nrelate --read-only --mode envelope 'RETURN 1/0 AS x'\n```\n\n```text\ntype error: / by zero\n{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"type\",\"message\":\"type error: / by zero\",\"retryable\":false}}\n```\n\n`--mode jsonl` prints one line on stderr, then one on stdout:\n\n```bash\nrelate --read-only --mode jsonl 'RETURN 1/0 AS x'\n```\n\n```text\ntype error: / by zero\n{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"type\",\"message\":\"type error: / by zero\",\"retryable\":false}}\n```\n\n`--mode toon` prints one line on stderr:\n\n```bash\nrelate --read-only --mode toon 'RETURN 1/0 AS x'\n```\n\n```text\ntype error: / by zero\n```",
   "caption": null,
   "svg": false,
   "svgSha256": null,
-  "textSha256": "e52e44c81b2f45883d263f4dc275f87a52b08ebb1cd476fe1aa29eab0c26c851"
+  "textSha256": "bf0e0aa7157f08d49745db3922f169c2ba9c49f7c87211688ba4a301b194fe51"
 }

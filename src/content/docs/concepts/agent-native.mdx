@@ -44,7 +44,7 @@ The first line is the warning on stderr; the envelope on stdout names both count
 
 ```text
 warning: result truncated to 2 rows (the statement returned 3); pass --max-rows 0 for all rows, or page with SKIP/LIMIT
-{"columnTypes":["STRING"],"columns":["name"],"notifications":[],"planCache":"miss","rowCap":{"kept":2,"total":3},"rows":[{"name":"Ada"},{"name":"Grace"}],"timings":{"elapsed_ms":0.678416,"execute_ms":0.5296660000000001,"lex_parse_ms":0.023083,"lower_ms":0.032458,"parse_ms":0.098,"plan_ms":0.041625,"result_generation_ms":0.00041600000000000003,"rewrite_ms":0.007083},"truncated":true}
+{"columns":["name"],"columnTypes":["STRING"],"rows":[{"name":"Ada"},{"name":"Grace"}],"truncated":true,"rowCap":{"kept":2,"total":3},"notifications":[],"timings":{"elapsed_ms":0.678416,"parse_ms":0.098,"plan_ms":0.041625,"execute_ms":0.5296660000000001,"lex_parse_ms":0.023083,"rewrite_ms":0.007083,"lower_ms":0.032458,"result_generation_ms":0.00041600000000000003},"planCache":"miss"}
 ```
 
 **Harness detection.** relate turns on :term[agent mode]{id=agent-mode} when it sees an agent harness's environment variable, such as `CLAUDECODE` or `CURSOR_AGENT`, and stdout is not a terminal. Agent mode sets two defaults: the 100-row cap, and TOON as the piped output: one header line, then one line per row, then the statement's timings and plan-cache outcome. The same statement, run plainly and then as Claude Code would run it; both modes close with the [timing record](/docs/reference/cli/output-modes#timings-and-the-plan-cache):
@@ -63,7 +63,7 @@ rows[3]{name}:
   Grace
   Noor
 timings:
-  {"elapsed_ms":0.38104099999999996,"execute_ms":0.222542,"lex_parse_ms":0.024708,"lower_ms":0.034208999999999996,"parse_ms":0.10475,"plan_ms":0.043292,"result_generation_ms":0.0005,"rewrite_ms":0.007500000000000001}
+  {"elapsed_ms":0.38104099999999996,"parse_ms":0.10475,"plan_ms":0.043292,"execute_ms":0.222542,"lex_parse_ms":0.024708,"rewrite_ms":0.007500000000000001,"lower_ms":0.034208999999999996,"result_generation_ms":0.0005}
 planCache:
   miss
 ```

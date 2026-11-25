@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -16,17 +16,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 7,
-          "labels_removed": 0,
           "nodes_created": 7,
           "nodes_deleted": 0,
-          "properties_set": 28,
           "relationships_created": 6,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 28,
+          "labels_added": 7,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -45,17 +45,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 1,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 1,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -67,8 +67,8 @@
       "graph": {
         "nodes": [
           {
-            "id": 0,
             "kind": "node",
+            "id": 0,
             "labels": [
               "Folder"
             ],
@@ -79,8 +79,8 @@
             }
           },
           {
-            "id": 2,
             "kind": "node",
+            "id": 2,
             "labels": [
               "Folder"
             ],
@@ -91,8 +91,8 @@
             }
           },
           {
-            "id": 6,
             "kind": "node",
+            "id": 6,
             "labels": [
               "File"
             ],
@@ -104,8 +104,8 @@
             }
           },
           {
-            "id": 1,
             "kind": "node",
+            "id": 1,
             "labels": [
               "Folder"
             ],
@@ -116,8 +116,8 @@
             }
           },
           {
-            "id": 3,
             "kind": "node",
+            "id": 3,
             "labels": [
               "File"
             ],
@@ -130,8 +130,8 @@
             }
           },
           {
-            "id": 4,
             "kind": "node",
+            "id": 4,
             "labels": [
               "File"
             ],
@@ -144,8 +144,8 @@
             }
           },
           {
-            "id": 5,
             "kind": "node",
+            "id": 5,
             "labels": [
               "File"
             ],
@@ -160,52 +160,52 @@
         ],
         "rels": [
           {
-            "end_node": 2,
+            "kind": "relationship",
             "id": 3,
-            "kind": "relationship",
-            "properties": {},
+            "type": "CONTAINS",
             "start_node": 0,
-            "type": "CONTAINS"
+            "end_node": 2,
+            "properties": {}
           },
           {
-            "end_node": 6,
+            "kind": "relationship",
             "id": 2,
-            "kind": "relationship",
-            "properties": {},
+            "type": "CONTAINS",
             "start_node": 0,
-            "type": "CONTAINS"
+            "end_node": 6,
+            "properties": {}
           },
           {
-            "end_node": 1,
+            "kind": "relationship",
             "id": 1,
-            "kind": "relationship",
-            "properties": {},
+            "type": "CONTAINS",
             "start_node": 0,
-            "type": "CONTAINS"
+            "end_node": 1,
+            "properties": {}
           },
           {
-            "end_node": 3,
+            "kind": "relationship",
             "id": 0,
-            "kind": "relationship",
-            "properties": {},
+            "type": "CONTAINS",
             "start_node": 0,
-            "type": "CONTAINS"
+            "end_node": 3,
+            "properties": {}
           },
           {
-            "end_node": 4,
+            "kind": "relationship",
             "id": 4,
-            "kind": "relationship",
-            "properties": {},
+            "type": "CONTAINS",
             "start_node": 1,
-            "type": "CONTAINS"
+            "end_node": 4,
+            "properties": {}
           },
           {
-            "end_node": 5,
-            "id": 5,
             "kind": "relationship",
-            "properties": {},
+            "id": 5,
+            "type": "CONTAINS",
             "start_node": 2,
-            "type": "CONTAINS"
+            "end_node": 5,
+            "properties": {}
           }
         ]
       },
@@ -226,29 +226,9 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "c": {
-              "end_node": 2,
-              "id": 3,
-              "kind": "relationship",
-              "properties": {},
-              "start_node": 0,
-              "type": "CONTAINS"
-            },
-            "child": {
-              "id": 2,
-              "kind": "node",
-              "labels": [
-                "Folder"
-              ],
-              "properties": {
-                "depth": 1,
-                "name": "src",
-                "path": "team/src"
-              }
-            },
             "folder": {
-              "id": 0,
               "kind": "node",
+              "id": 0,
               "labels": [
                 "Folder"
               ],
@@ -257,20 +237,52 @@
                 "name": "team",
                 "path": "team"
               }
+            },
+            "c": {
+              "kind": "relationship",
+              "id": 3,
+              "type": "CONTAINS",
+              "start_node": 0,
+              "end_node": 2,
+              "properties": {}
+            },
+            "child": {
+              "kind": "node",
+              "id": 2,
+              "labels": [
+                "Folder"
+              ],
+              "properties": {
+                "depth": 1,
+                "name": "src",
+                "path": "team/src"
+              }
             }
           },
           {
+            "folder": {
+              "kind": "node",
+              "id": 0,
+              "labels": [
+                "Folder"
+              ],
+              "properties": {
+                "depth": 0,
+                "name": "team",
+                "path": "team"
+              }
+            },
             "c": {
-              "end_node": 6,
-              "id": 2,
               "kind": "relationship",
-              "properties": {},
+              "id": 2,
+              "type": "CONTAINS",
               "start_node": 0,
-              "type": "CONTAINS"
+              "end_node": 6,
+              "properties": {}
             },
             "child": {
-              "id": 6,
               "kind": "node",
+              "id": 6,
               "labels": [
                 "File"
               ],
@@ -280,10 +292,12 @@
                 "path": "team/logo.bin",
                 "size_bytes": 3
               }
-            },
+            }
+          },
+          {
             "folder": {
-              "id": 0,
               "kind": "node",
+              "id": 0,
               "labels": [
                 "Folder"
               ],
@@ -292,20 +306,18 @@
                 "name": "team",
                 "path": "team"
               }
-            }
-          },
-          {
+            },
             "c": {
-              "end_node": 1,
-              "id": 1,
               "kind": "relationship",
-              "properties": {},
+              "id": 1,
+              "type": "CONTAINS",
               "start_node": 0,
-              "type": "CONTAINS"
+              "end_node": 1,
+              "properties": {}
             },
             "child": {
-              "id": 1,
               "kind": "node",
+              "id": 1,
               "labels": [
                 "Folder"
               ],
@@ -314,10 +326,12 @@
                 "name": "docs",
                 "path": "team/docs"
               }
-            },
+            }
+          },
+          {
             "folder": {
-              "id": 0,
               "kind": "node",
+              "id": 0,
               "labels": [
                 "Folder"
               ],
@@ -326,20 +340,18 @@
                 "name": "team",
                 "path": "team"
               }
-            }
-          },
-          {
+            },
             "c": {
-              "end_node": 3,
-              "id": 0,
               "kind": "relationship",
-              "properties": {},
+              "id": 0,
+              "type": "CONTAINS",
               "start_node": 0,
-              "type": "CONTAINS"
+              "end_node": 3,
+              "properties": {}
             },
             "child": {
-              "id": 3,
               "kind": "node",
+              "id": 3,
               "labels": [
                 "File"
               ],
@@ -350,32 +362,32 @@
                 "path": "team/README.md",
                 "size_bytes": 43
               }
-            },
+            }
+          },
+          {
             "folder": {
-              "id": 0,
               "kind": "node",
+              "id": 1,
               "labels": [
                 "Folder"
               ],
               "properties": {
-                "depth": 0,
-                "name": "team",
-                "path": "team"
+                "depth": 1,
+                "name": "docs",
+                "path": "team/docs"
               }
-            }
-          },
-          {
+            },
             "c": {
-              "end_node": 4,
-              "id": 4,
               "kind": "relationship",
-              "properties": {},
+              "id": 4,
+              "type": "CONTAINS",
               "start_node": 1,
-              "type": "CONTAINS"
+              "end_node": 4,
+              "properties": {}
             },
             "child": {
-              "id": 4,
               "kind": "node",
+              "id": 4,
               "labels": [
                 "File"
               ],
@@ -386,32 +398,32 @@
                 "path": "team/docs/roadmap.md",
                 "size_bytes": 47
               }
-            },
+            }
+          },
+          {
             "folder": {
-              "id": 1,
               "kind": "node",
+              "id": 2,
               "labels": [
                 "Folder"
               ],
               "properties": {
                 "depth": 1,
-                "name": "docs",
-                "path": "team/docs"
+                "name": "src",
+                "path": "team/src"
               }
-            }
-          },
-          {
+            },
             "c": {
-              "end_node": 5,
-              "id": 5,
               "kind": "relationship",
-              "properties": {},
+              "id": 5,
+              "type": "CONTAINS",
               "start_node": 2,
-              "type": "CONTAINS"
+              "end_node": 5,
+              "properties": {}
             },
             "child": {
-              "id": 5,
               "kind": "node",
+              "id": 5,
               "labels": [
                 "File"
               ],
@@ -422,33 +434,21 @@
                 "path": "team/src/main.rs",
                 "size_bytes": 37
               }
-            },
-            "folder": {
-              "id": 2,
-              "kind": "node",
-              "labels": [
-                "Folder"
-              ],
-              "properties": {
-                "depth": 1,
-                "name": "src",
-                "path": "team/src"
-              }
             }
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -460,13 +460,13 @@
         "columns": [
           "file"
         ],
-        "numeric": [
-          false
-        ],
         "rows": [
           [
             "\"team/docs/roadmap.md\""
           ]
+        ],
+        "numeric": [
+          false
         ],
         "summary": "1 row"
       },
@@ -488,17 +488,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -511,11 +511,6 @@
           "extension",
           "files",
           "bytes"
-        ],
-        "numeric": [
-          false,
-          true,
-          true
         ],
         "rows": [
           [
@@ -533,6 +528,11 @@
             "1",
             "37"
           ]
+        ],
+        "numeric": [
+          false,
+          true,
+          true
         ],
         "summary": "3 rows"
       },
@@ -554,33 +554,33 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "bytes": 90,
             "extension": "md",
-            "files": 2
+            "files": 2,
+            "bytes": 90
           },
           {
-            "bytes": 3,
             "extension": "bin",
-            "files": 1
+            "files": 1,
+            "bytes": 3
           },
           {
-            "bytes": 37,
             "extension": "rs",
-            "files": 1
+            "files": 1,
+            "bytes": 37
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -592,10 +592,6 @@
         "columns": [
           "file",
           "levels"
-        ],
-        "numeric": [
-          false,
-          true
         ],
         "rows": [
           [
@@ -614,6 +610,10 @@
             "\"team/src/main.rs\"",
             "2"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "4 rows"
       },
@@ -650,17 +650,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -673,15 +673,15 @@
           "file",
           "bytes"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"team/logo.bin\"",
             "3"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "1 row"
       },
@@ -701,22 +701,22 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "bytes": 3,
-            "file": "team/logo.bin"
+            "file": "team/logo.bin",
+            "bytes": 3
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false

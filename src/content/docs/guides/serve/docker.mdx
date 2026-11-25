@@ -141,7 +141,7 @@ wait $server
 
 ```text
 200
-{"data":{"fields":["people"],"values":[[3]]},"bookmarks":[],"timings":{"elapsed_ms":0.529209,"execute_ms":0.350083,"lex_parse_ms":0.032125,"lower_ms":0.043042,"parse_ms":0.110791,"plan_ms":0.056208999999999995,"result_generation_ms":0.000292,"rewrite_ms":0.007375},"planCache":"miss"}
+{"data":{"fields":["people"],"values":[[3]]},"bookmarks":[],"timings":{"elapsed_ms":0.529209,"parse_ms":0.110791,"plan_ms":0.056208999999999995,"execute_ms":0.350083,"lex_parse_ms":0.032125,"rewrite_ms":0.007375,"lower_ms":0.043042,"result_generation_ms":0.000292},"planCache":"miss"}
 ```
 
 Against the container, the same two `curl` commands go to `http://127.0.0.1:7474/`, with `-u "$RELATE_AUTH"` or the token from `docker logs`.

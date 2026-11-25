@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -16,17 +16,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 5,
-          "labels_removed": 0,
           "nodes_created": 5,
           "nodes_deleted": 0,
-          "properties_set": 13,
           "relationships_created": 5,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 13,
+          "labels_added": 5,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -38,10 +38,6 @@
         "columns": [
           "name",
           "type"
-        ],
-        "numeric": [
-          false,
-          false
         ],
         "rows": [
           [
@@ -56,6 +52,10 @@
             "\"Noor\"",
             "\"VECTOR<FLOAT32 NOT NULL>(3) NOT NULL\""
           ]
+        ],
+        "numeric": [
+          false,
+          false
         ],
         "summary": "3 rows · properties set: 3"
       },
@@ -88,17 +88,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 3,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 3,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -117,17 +117,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 1,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 1,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -140,10 +140,6 @@
           "name",
           "score"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"Grace\"",
@@ -153,6 +149,10 @@
             "\"Noor\"",
             "0.7151"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -181,17 +181,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -204,10 +204,6 @@
           "name",
           "score"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"Grace\"",
@@ -217,6 +213,10 @@
             "\"Ada\"",
             "0.6184"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -245,17 +245,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -268,15 +268,15 @@
           "name",
           "projects"
         ],
-        "numeric": [
-          false,
-          false
-        ],
         "rows": [
           [
             "\"Noor\"",
             "[\"relate\"]"
           ]
+        ],
+        "numeric": [
+          false,
+          false
         ],
         "summary": "1 row"
       },
@@ -303,17 +303,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -326,15 +326,15 @@
           "notes",
           "sessions"
         ],
-        "numeric": [
-          true,
-          true
-        ],
         "rows": [
           [
             "40",
             "3"
           ]
+        ],
+        "numeric": [
+          true,
+          true
         ],
         "summary": "1 row · nodes created: 40, properties set: 200, labels added: 40, indexes added: 1"
       },
@@ -359,17 +359,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -383,12 +383,6 @@
           "session",
           "score",
           "text"
-        ],
-        "numeric": [
-          false,
-          false,
-          true,
-          false
         ],
         "rows": [
           [
@@ -422,6 +416,12 @@
             "\"Each tenant gets its own Kafka topic for ticket events.\""
           ]
         ],
+        "numeric": [
+          false,
+          false,
+          true,
+          false
+        ],
         "summary": "5 rows"
       },
       "graph": null,
@@ -445,47 +445,47 @@
         "rows": [
           {
             "id": "n02",
-            "score": 0.6252,
             "session": "session-1",
+            "score": 0.6252,
             "text": "Customer login goes through Auth0; refresh tokens live in HttpOnly cookies."
           },
           {
             "id": "n25",
-            "score": 0.5692,
             "session": "session-2",
+            "score": 0.5692,
             "text": "Refresh tokens rotate on every use once Okta is live."
           },
           {
             "id": "n03",
-            "score": 0.5585,
             "session": "session-1",
+            "score": 0.5585,
             "text": "OAuth callbacks are published to Kafka so the audit service sees every login."
           },
           {
             "id": "n15",
-            "score": 0.5536,
             "session": "session-2",
+            "score": 0.5536,
             "text": "Migrate customer login from Auth0 to Okta before the April renewal."
           },
           {
             "id": "n04",
-            "score": 0.5435,
             "session": "session-1",
+            "score": 0.5435,
             "text": "Each tenant gets its own Kafka topic for ticket events."
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -499,12 +499,6 @@
           "session",
           "score",
           "text"
-        ],
-        "numeric": [
-          false,
-          false,
-          true,
-          false
         ],
         "rows": [
           [
@@ -538,6 +532,12 @@
             "\"Deploy freeze for the billing launch starts on the 23rd.\""
           ]
         ],
+        "numeric": [
+          false,
+          false,
+          true,
+          false
+        ],
         "summary": "5 rows"
       },
       "graph": null,
@@ -561,47 +561,47 @@
         "rows": [
           {
             "id": "n31",
-            "score": 0.5386,
             "session": "session-3",
+            "score": 0.5386,
             "text": "Magic-link login is requested by three enterprise customers."
           },
           {
             "id": "n35",
-            "score": 0.5383,
             "session": "session-3",
+            "score": 0.5383,
             "text": "Tempo retention is fourteen days; older traces are sampled out."
           },
           {
             "id": "n29",
-            "score": 0.5287,
             "session": "session-3",
+            "score": 0.5287,
             "text": "Okta cutover is done; Auth0 stays read-only for thirty days."
           },
           {
             "id": "n26",
-            "score": 0.5279,
             "session": "session-3",
+            "score": 0.5279,
             "text": "Incident KAFKA-142: a broker disk filled overnight because retention on the audit stream was unbounded; retention is now capped and a disk alert pages the on-call engineer."
           },
           {
             "id": "n34",
-            "score": 0.5271,
             "session": "session-3",
+            "score": 0.5271,
             "text": "Deploy freeze for the billing launch starts on the 23rd."
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -615,12 +615,6 @@
           "session",
           "score",
           "text"
-        ],
-        "numeric": [
-          false,
-          false,
-          true,
-          false
         ],
         "rows": [
           [
@@ -654,6 +648,12 @@
             "\"Each tenant gets its own Kafka topic for ticket events.\""
           ]
         ],
+        "numeric": [
+          false,
+          false,
+          true,
+          false
+        ],
         "summary": "5 rows"
       },
       "graph": null,
@@ -677,47 +677,47 @@
         "rows": [
           {
             "id": "n02",
-            "score": 0.4001,
             "session": "session-1",
+            "score": 0.4001,
             "text": "Customer login goes through Auth0; refresh tokens live in HttpOnly cookies."
           },
           {
             "id": "n25",
-            "score": 0.3672,
             "session": "session-2",
+            "score": 0.3672,
             "text": "Refresh tokens rotate on every use once Okta is live."
           },
           {
             "id": "n03",
-            "score": 0.3615,
             "session": "session-1",
+            "score": 0.3615,
             "text": "OAuth callbacks are published to Kafka so the audit service sees every login."
           },
           {
             "id": "n15",
-            "score": 0.359,
             "session": "session-2",
+            "score": 0.359,
             "text": "Migrate customer login from Auth0 to Okta before the April renewal."
           },
           {
             "id": "n04",
-            "score": 0.3539,
             "session": "session-1",
+            "score": 0.3539,
             "text": "Each tenant gets its own Kafka topic for ticket events."
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -733,13 +733,6 @@
           "euclidean",
           "distance"
         ],
-        "numeric": [
-          true,
-          true,
-          true,
-          true,
-          true
-        ],
         "rows": [
           [
             "1.0",
@@ -748,6 +741,13 @@
             "0.03846153989434242",
             "5.0"
           ]
+        ],
+        "numeric": [
+          true,
+          true,
+          true,
+          true,
+          true
         ],
         "summary": "1 row"
       },
@@ -773,25 +773,25 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "distance": 5,
-            "euclidean": 0.03846153989434242,
-            "opposite": 0,
+            "same": 1,
             "orthogonal": 0.5,
-            "same": 1
+            "opposite": 0,
+            "euclidean": 0.03846153989434242,
+            "distance": 5
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -806,13 +806,6 @@
           "labelsOrTypes",
           "properties",
           "state"
-        ],
-        "numeric": [
-          false,
-          false,
-          false,
-          false,
-          false
         ],
         "rows": [
           [
@@ -829,6 +822,13 @@
             "[\"focus\", \"role\"]",
             "\"ONLINE\""
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false,
+          false,
+          false
         ],
         "summary": "2 rows"
       },
@@ -854,42 +854,42 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "name": "note_embedding",
+            "type": "VECTOR",
             "labelsOrTypes": [
               "Note"
             ],
-            "name": "note_embedding",
             "properties": [
               "embedding",
               "session"
             ],
-            "state": "ONLINE",
-            "type": "VECTOR"
+            "state": "ONLINE"
           },
           {
+            "name": "person_focus",
+            "type": "VECTOR",
             "labelsOrTypes": [
               "Person"
             ],
-            "name": "person_focus",
             "properties": [
               "focus",
               "role"
             ],
-            "state": "ONLINE",
-            "type": "VECTOR"
+            "state": "ONLINE"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
