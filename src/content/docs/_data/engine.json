@@ -1,12 +1,12 @@
 {
-  "version": "1.2.0",
-  "verified": "1.2.0",
-  "date": "2026-11-20",
-  "commit": "e0ea536",
+  "version": "1.3.0",
+  "verified": "1.3.0",
+  "date": "2026-11-25",
+  "commit": "6e55309",
   "version_check": {
     "recorded": {
       "command": "relate --version",
-      "stdout": "Relate v1.2.0\nLicense: Apache 2.0 (binary)\n",
+      "stdout": "Relate v1.3.0\nLicense: Apache 2.0 (binary)\n",
       "stderr": "",
       "exit": 0
     }
@@ -14,7 +14,7 @@
   "envelope_check": {
     "recorded": {
       "command": "relate --mode envelope \"RETURN 1 AS ok\"",
-      "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"ok\"],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[{\"ok\":1}],\"timings\":{\"elapsed_ms\":1.415375,\"execute_ms\":0.534667,\"lex_parse_ms\":0.110791,\"lower_ms\":0.16258399999999998,\"parse_ms\":0.5491670000000001,\"plan_ms\":0.276625,\"result_generation_ms\":0.000125,\"rewrite_ms\":0.054666},\"truncated\":false}\n",
+      "stdout": "{\"columns\":[\"ok\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"ok\":1}],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.237923,\"parse_ms\":0.10145900000000001,\"plan_ms\":0.039202999999999995,\"execute_ms\":0.086571,\"lex_parse_ms\":0.025737,\"rewrite_ms\":0.0054399999999999995,\"lower_ms\":0.027542,\"result_generation_ms\":0.0006810000000000001},\"planCache\":\"miss\"}\n",
       "stderr": "",
       "exit": 0
     }

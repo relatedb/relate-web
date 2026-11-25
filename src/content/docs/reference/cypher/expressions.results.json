@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "precedence": {
       "kind": "table",
@@ -15,15 +15,6 @@
           "grouped",
           "xor_and"
         ],
-        "numeric": [
-          true,
-          true,
-          true,
-          false,
-          false,
-          false,
-          false
-        ],
         "rows": [
           [
             "4.0",
@@ -34,6 +25,15 @@
             "true",
             "true"
           ]
+        ],
+        "numeric": [
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false
         ],
         "summary": "1 row"
       },
@@ -63,27 +63,27 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "chained": false,
-            "grouped": true,
-            "in_binds_tighter": false,
-            "left_assoc": 64,
             "neg_first": 4,
             "pow_first": -4,
+            "left_assoc": 64,
+            "in_binds_tighter": false,
+            "chained": false,
+            "grouped": true,
             "xor_and": true
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -100,14 +100,6 @@
           "power",
           "ieee"
         ],
-        "numeric": [
-          true,
-          true,
-          true,
-          true,
-          true,
-          true
-        ],
         "rows": [
           [
             "3",
@@ -117,6 +109,14 @@
             "8.0",
             "0.30000000000000004"
           ]
+        ],
+        "numeric": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
         ],
         "summary": "1 row"
       },
@@ -144,26 +144,26 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "float_div": 3.5,
-            "ieee": 0.30000000000000004,
             "int_div": 3,
-            "power": 8,
+            "truncates": -3,
             "remainder": -1,
-            "truncates": -3
+            "float_div": 3.5,
+            "power": 8,
+            "ieee": 0.30000000000000004
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -195,16 +195,6 @@
           "null_inside",
           "regex"
         ],
-        "numeric": [
-          false,
-          false,
-          true,
-          false,
-          false,
-          false,
-          true,
-          false
-        ],
         "rows": [
           [
             "true",
@@ -216,6 +206,16 @@
             "null",
             "true"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          true,
+          false,
+          false,
+          false,
+          true,
+          false
         ],
         "summary": "1 row"
       },
@@ -247,28 +247,28 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "code_point": true,
-            "cross_type": false,
             "int_float": true,
+            "cross_type": false,
+            "unordered": null,
+            "code_point": true,
             "lists": true,
             "nan": false,
             "null_inside": null,
-            "regex": true,
-            "unordered": null
+            "regex": true
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -287,16 +287,6 @@
           "found",
           "first"
         ],
-        "numeric": [
-          true,
-          false,
-          true,
-          false,
-          false,
-          true,
-          false,
-          true
-        ],
         "rows": [
           [
             "null",
@@ -308,6 +298,16 @@
             "true",
             "1"
           ]
+        ],
+        "numeric": [
+          true,
+          false,
+          true,
+          false,
+          false,
+          true,
+          false,
+          true
         ],
         "summary": "1 row"
       },
@@ -339,28 +339,28 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "and_null": null,
             "eq": null,
-            "false_and": false,
-            "first": 1,
-            "found": true,
             "is_null": true,
+            "and_null": null,
+            "false_and": false,
+            "or_null": true,
             "maybe": null,
-            "or_null": true
+            "found": true,
+            "first": 1
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -378,15 +378,6 @@
           "normalized",
           "interpolated"
         ],
-        "numeric": [
-          false,
-          false,
-          false,
-          false,
-          false,
-          false,
-          false
-        ],
         "rows": [
           [
             "\"relate\"",
@@ -397,6 +388,15 @@
             "true",
             "\"2 items\""
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
         ],
         "summary": "1 row"
       },
@@ -426,27 +426,27 @@
         "plan_cache": "bypassed",
         "rows": [
           {
-            "concat": "relate",
-            "contains": true,
-            "interpolated": "2 items",
-            "mixed": "a1",
-            "normalized": true,
             "plus": "relate",
-            "starts": true
+            "concat": "relate",
+            "mixed": "a1",
+            "starts": true,
+            "contains": true,
+            "normalized": true,
+            "interpolated": "2 items"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -464,15 +464,6 @@
           "past_end",
           "nested"
         ],
-        "numeric": [
-          false,
-          false,
-          true,
-          true,
-          false,
-          true,
-          false
-        ],
         "rows": [
           [
             "[1, 2, 3]",
@@ -483,6 +474,15 @@
             "null",
             "true"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          true,
+          true,
+          false,
+          true,
+          false
         ],
         "summary": "1 row"
       },
@@ -512,37 +512,37 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "plus": [
+              1,
+              2,
+              3
+            ],
             "append": [
               1,
               2
             ],
             "first": 1,
             "last": 3,
-            "nested": true,
-            "past_end": null,
-            "plus": [
-              1,
-              2,
-              3
-            ],
             "slice": [
               2,
               3
-            ]
+            ],
+            "past_end": null,
+            "nested": true
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -557,12 +557,6 @@
           "comparison",
           "no_else"
         ],
-        "numeric": [
-          false,
-          false,
-          false,
-          true
-        ],
         "rows": [
           [
             "\"two\"",
@@ -570,6 +564,12 @@
             "\"above three\"",
             "null"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false,
+          true
         ],
         "summary": "1 row"
       },
@@ -593,24 +593,24 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "comparison": "above three",
-            "no_else": null,
+            "simple": "two",
             "several": "small",
-            "simple": "two"
+            "comparison": "above three",
+            "no_else": null
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -629,17 +629,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 5,
-          "labels_removed": 0,
           "nodes_created": 5,
           "nodes_deleted": 0,
-          "properties_set": 13,
           "relationships_created": 5,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 13,
+          "labels_added": 5,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -652,15 +652,15 @@
           "even_squares",
           "recent_projects"
         ],
-        "numeric": [
-          false,
-          false
-        ],
         "rows": [
           [
             "[4, 16, 36, 64, 100]",
             "[\"relate\"]"
           ]
+        ],
+        "numeric": [
+          false,
+          false
         ],
         "summary": "1 row"
       },
@@ -693,17 +693,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -715,9 +715,6 @@
         "columns": [
           "person"
         ],
-        "numeric": [
-          false
-        ],
         "rows": [
           [
             "{name: \"Ada\", projects: [\"relate\"], role: \"engineer\"}"
@@ -728,6 +725,9 @@
           [
             "{name: \"Noor\", projects: [], role: \"maintainer\"}"
           ]
+        ],
+        "numeric": [
+          false
         ],
         "summary": "3 rows"
       },
@@ -772,17 +772,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -795,15 +795,15 @@
           "total",
           "stays_under_five"
         ],
-        "numeric": [
-          true,
-          false
-        ],
         "rows": [
           [
             "10",
             "false"
           ]
+        ],
+        "numeric": [
+          true,
+          false
         ],
         "summary": "1 row"
       },
@@ -823,22 +823,22 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "stays_under_five": false,
-            "total": 10
+            "total": 10,
+            "stays_under_five": false
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -855,14 +855,6 @@
           "empty_all",
           "unknown"
         ],
-        "numeric": [
-          false,
-          false,
-          false,
-          false,
-          false,
-          true
-        ],
         "rows": [
           [
             "true",
@@ -872,6 +864,14 @@
             "true",
             "null"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          true
         ],
         "summary": "1 row"
       },
@@ -901,24 +901,24 @@
           {
             "all_positive": true,
             "any_big": true,
-            "empty_all": true,
             "none_huge": true,
             "one_big": true,
+            "empty_all": true,
             "unknown": null
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -935,14 +935,6 @@
           "list_type",
           "mixed"
         ],
-        "numeric": [
-          false,
-          false,
-          false,
-          false,
-          false,
-          false
-        ],
         "rows": [
           [
             "true",
@@ -952,6 +944,14 @@
             "true",
             "\"LIST<STRING NOT NULL | INTEGER NOT NULL> NOT NULL\""
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
         ],
         "summary": "1 row"
       },
@@ -980,25 +980,25 @@
         "rows": [
           {
             "int": true,
-            "list_type": true,
-            "mixed": "LIST<STRING NOT NULL | INTEGER NOT NULL> NOT NULL",
-            "not_null": false,
             "null_is_int": true,
-            "union_type": true
+            "not_null": false,
+            "union_type": true,
+            "list_type": true,
+            "mixed": "LIST<STRING NOT NULL | INTEGER NOT NULL> NOT NULL"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -1012,17 +1012,17 @@
           "known",
           "names"
         ],
-        "numeric": [
-          true,
-          false,
-          false
-        ],
         "rows": [
           [
             "2",
             "true",
             "[\"opencypher-tck\", \"relate\"]"
           ]
+        ],
+        "numeric": [
+          true,
+          false,
+          false
         ],
         "summary": "1 row"
       },
@@ -1044,26 +1044,26 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "projects": 2,
             "known": true,
             "names": [
               "opencypher-tck",
               "relate"
-            ],
-            "projects": 2
+            ]
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false

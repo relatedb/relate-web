@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -16,17 +16,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 5,
-          "labels_removed": 0,
           "nodes_created": 5,
           "nodes_deleted": 0,
-          "properties_set": 13,
           "relationships_created": 5,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 13,
+          "labels_added": 5,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -39,11 +39,6 @@
           "nodeType",
           "propertyName",
           "propertyTypes"
-        ],
-        "numeric": [
-          false,
-          false,
-          false
         ],
         "rows": [
           [
@@ -66,6 +61,11 @@
             "\"name\"",
             "[\"STRING NOT NULL\"]"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false
         ],
         "summary": "4 rows"
       },
@@ -116,17 +116,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -139,11 +139,6 @@
           "relType",
           "propertyName",
           "propertyTypes"
-        ],
-        "numeric": [
-          false,
-          false,
-          false
         ],
         "rows": [
           [
@@ -161,6 +156,11 @@
             "\"since\"",
             "[\"INTEGER NOT NULL\"]"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false
         ],
         "summary": "3 rows"
       },
@@ -182,35 +182,35 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "relType": "[:KNOWS]",
             "propertyName": null,
-            "propertyTypes": [],
-            "relType": "[:KNOWS]"
+            "propertyTypes": []
           },
           {
+            "relType": "[:MAINTAINS]",
             "propertyName": null,
-            "propertyTypes": [],
-            "relType": "[:MAINTAINS]"
+            "propertyTypes": []
           },
           {
+            "relType": "[:WORKS_ON]",
             "propertyName": "since",
             "propertyTypes": [
               "INTEGER NOT NULL"
-            ],
-            "relType": "[:WORKS_ON]"
+            ]
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -223,11 +223,6 @@
           "source",
           "type",
           "target"
-        ],
-        "numeric": [
-          false,
-          false,
-          false
         ],
         "rows": [
           [
@@ -245,6 +240,11 @@
             "\"WORKS_ON\"",
             "[\"Project\"]"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false
         ],
         "summary": "3 rows"
       },
@@ -269,42 +269,42 @@
             "source": [
               "Person"
             ],
+            "type": "KNOWS",
             "target": [
               "Person"
-            ],
-            "type": "KNOWS"
+            ]
           },
           {
             "source": [
               "Person"
             ],
+            "type": "MAINTAINS",
             "target": [
               "Project"
-            ],
-            "type": "MAINTAINS"
+            ]
           },
           {
             "source": [
               "Person"
             ],
+            "type": "WORKS_ON",
             "target": [
               "Project"
-            ],
-            "type": "WORKS_ON"
+            ]
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -333,62 +333,66 @@
         "error": null,
         "notifications": [
           {
-            "category": "UNRECOGNIZED",
             "code": "Neo.ClientNotification.Statement.UnknownLabelWarning",
-            "description": "The label `Company` does not exist in this database.",
             "gql_status": "01N50",
-            "remedy": "Check the spelling; the label exists after the first write that creates it, and no index or constraint uses the unknown name.",
             "severity": "WARNING",
-            "title": "Unknown label"
+            "category": "UNRECOGNIZED",
+            "title": "Unknown label",
+            "description": "The label `Company` does not exist in this database.",
+            "remedy": "Check the spelling; the label exists after the first write that creates it, and no index or constraint uses the unknown name."
           },
           {
-            "category": "UNRECOGNIZED",
             "code": "Neo.ClientNotification.Statement.UnknownRelationshipTypeWarning",
-            "description": "The relationship type `WORKS_AT` does not exist in this database.",
             "gql_status": "01N51",
-            "remedy": "Check the spelling; the type exists after the first write that creates it.",
             "severity": "WARNING",
-            "title": "Unknown relationship type"
+            "category": "UNRECOGNIZED",
+            "title": "Unknown relationship type",
+            "description": "The relationship type `WORKS_AT` does not exist in this database.",
+            "remedy": "Check the spelling; the type exists after the first write that creates it."
           }
         ],
         "plan": {
+          "schema": "relate.plan/v1",
           "profiled": false,
+          "statement": "MATCH (p:Person)-[:WORKS_AT]->(c:Company) RETURN c.name AS company, count(p) AS people",
           "root": {
+            "operator": "EagerAggregation",
+            "details": "2 item(s), keys: company, aggregation",
+            "identifiers": [],
+            "estimated_rows": null,
             "actual": null,
+            "fused_into": null,
+            "fused_metrics": null,
             "children": [
               {
-                "actual": null,
-                "children": [],
-                "details": "(c:Company)<-[:WORKS_AT]-(p:Person)",
-                "estimated_rows": null,
-                "identifiers": [],
                 "operator": "Expand",
+                "details": "(c:Company)<-[:WORKS_AT]-(p:Person)",
+                "identifiers": [],
+                "estimated_rows": null,
+                "actual": null,
+                "fused_into": null,
+                "fused_metrics": null,
+                "children": [],
                 "warnings": []
               }
             ],
-            "details": "2 item(s), keys: company, aggregation",
-            "estimated_rows": null,
-            "identifiers": [],
-            "operator": "EagerAggregation",
             "warnings": []
-          },
-          "schema": "relate.plan/v1",
-          "statement": "MATCH (p:Person)-[:WORKS_AT]->(c:Company) RETURN c.name AS company, count(p) AS people"
+          }
         },
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -401,10 +405,6 @@
           "project",
           "people"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"relate\"",
@@ -414,6 +414,10 @@
             "\"opencypher-tck\"",
             "1"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -433,26 +437,26 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "people": 2,
-            "project": "relate"
+            "project": "relate",
+            "people": 2
           },
           {
-            "people": 1,
-            "project": "opencypher-tck"
+            "project": "opencypher-tck",
+            "people": 1
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -463,7 +467,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.2.0",
+      "verified": "1.3.0",
       "source_sha256": "84be8aa8782914557eff937c45947f2627066aacf364ad4658d48fdf5220affc"
     }
   }

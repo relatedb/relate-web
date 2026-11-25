@@ -1,7 +1,7 @@
 {
   "$schema_note": "Facts about the relate CLI for the docs pipeline (DOCS-PLAN.md §8 check 3, the <ExitCodes>/<Flags>/<EnvVars> components). Summaries are paraphrases; strings in `messages` and in backticks are quoted from the binary or the sources character for character. Facts the sources disagreed on were settled against the binary named in `recorded_with` (`settled_by`); before launch that is a source build, not a published release (engine.json `source_build`). `verify` marks what the binary cannot show. `recorded` holds a replayable run of the binary (see `recording`); `help` and `agent_context` hold the recorded `--help` pages and agent briefings.",
   "binary": "relate",
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "upstream": {
     "repo": "relatedb/relate",
     "commit": "5e77ee6706821065804a9b77eb66ffd2985d1ac4",
@@ -1387,7 +1387,7 @@
       "command_id": "upgrade",
       "recorded": {
         "command": "relate upgrade --help",
-        "stdout": "Usage: relate upgrade [--yes] [--check]\n       relate update  [--yes] [--check]  (alias of upgrade)\n\nupgrade checks the latest release listed by the website's releases.json\nand replaces the running binary (macOS and Linux only);\n`update` is an alias.\n  --yes    Auto-accept the post-upgrade skill refresh\n  --check  Report current-vs-latest only; download and modify nothing\n\nExamples:\n  # See whether a newer release exists, without installing it\n  relate upgrade --check\n",
+        "stdout": "Usage: relate upgrade [--yes] [--check]\n       relate update  [--yes] [--check]  (alias of upgrade)\n\nupgrade checks the latest release listed by the website's releases.json\nand replaces the running binary (macOS and Linux only);\n`update` is an alias. An install owned by a package manager (its\n.relate-package-managed marker sits beside the binary) is never\nreplaced: upgrade names the package's own upgrade command instead.\n  --yes    Install the skill when none is installed, without asking\n           (installed skills update regardless)\n  --check  Report current-vs-latest only; download and modify nothing\n\nExamples:\n  # See whether a newer release exists, without installing it\n  relate upgrade --check\n",
         "stderr": "",
         "exit": 0
       }
@@ -1469,7 +1469,7 @@
       "command_id": null,
       "recorded": {
         "command": "relate agent-context",
-        "stdout": "relate v1.2.0 — agent context\n\nCommands (detail: relate agent-context <COMMAND>):\n  query           Run a statement session (oneshot, stdin, or shell)\n  clone           Copy a database into a new store and exit\n  info            Print store metadata for a database without opening it\n  pull            Copy a Neo4j/Aura subgraph into a database\n  push            Copy a database subgraph into Neo4j/Aura\n  skill           Install, inspect, or remove the embedded agent skill bundle\n  upgrade         Update the relate binary (alias: update)\n  telemetry       Manage anonymous usage metrics (on, off, status)\n  feedback        File a GitHub issue about CLI friction, or manage the agent grant (enable, disable)\n  agent-feedback  Send one consented feedback report (agent surface)\n  run             Run an installed extension action into a store the host owns\n  serve           Host the HTTP Query API and MCP surfaces on a database\n  agent-context   Print the compact agent briefing (commands, flags, exit codes)\n  extension       Scaffold, install, check, list, or remove command extensions\n\nQuery-run flags (relate [OPTIONS] [QUERY]):\n  --help --version --database --json --csv --markdown --jsonl --toon --noheader --mode --format --pretty --timings --param --fetch-params --snapshot-format --markdown-body-properties --wal-dir --checkpoint-interval-secs --durability-mode --logical-graph-size-limit --expression-memory-limit --concurrent-logical-workspace-limit --max-traversal-depth --safe --no-safe --agent-mode --no-agent-mode --max-rows --width --timeout --load --read-only --load-csv-dir --namespace --command\n\nExit codes:\n  0  success: success, including an empty result\n  1  fatal_error: runtime failure: store open or I/O error, capacity limit, query execution failure, internal error\n  2  usage_error: unknown flag, bad or missing value, extra positional\n  5  conflict: write-write conflict, or the store is locked by another opener\n  6  validation_error: the statement is rejected: syntax, semantic or type error\n  7  timeout: a statement exceeded --timeout\n",
+        "stdout": "relate v1.3.0 — agent context\n\nCommands (detail: relate agent-context <COMMAND>):\n  query           Run a statement session (oneshot, stdin, or shell)\n  clone           Copy a database into a new store and exit\n  info            Print store metadata for a database without opening it\n  pull            Copy a Neo4j/Aura subgraph into a database\n  push            Copy a database subgraph into Neo4j/Aura\n  skill           Install, inspect, or remove the embedded agent skill bundle\n  upgrade         Update the relate binary (alias: update)\n  telemetry       Manage anonymous usage metrics (on, off, status)\n  feedback        File a GitHub issue about CLI friction, or manage the agent grant (enable, disable)\n  agent-feedback  Send one consented feedback report (agent surface)\n  run             Run an installed extension action into a store the host owns\n  serve           Host the HTTP Query API and MCP surfaces on a database\n  agent-context   Print the compact agent briefing (commands, flags, exit codes)\n  extension       Scaffold, install, check, list, or remove command extensions\n\nQuery-run flags (relate [OPTIONS] [QUERY]):\n  --help --version --database --json --csv --markdown --jsonl --toon --noheader --mode --format --pretty --timings --param --fetch-params --snapshot-format --markdown-body-properties --wal-dir --checkpoint-interval-secs --durability-mode --logical-graph-size-limit --expression-memory-limit --concurrent-logical-workspace-limit --max-traversal-depth --safe --no-safe --agent-mode --no-agent-mode --max-rows --width --timeout --load --read-only --load-csv-dir --namespace --command\n\nExit codes:\n  0  success: success, including an empty result\n  1  fatal_error: runtime failure: store open or I/O error, capacity limit, query execution failure, internal error\n  2  usage_error: unknown flag, bad or missing value, extra positional\n  5  conflict: write-write conflict, or the store is locked by another opener\n  6  validation_error: the statement is rejected: syntax, semantic or type error\n  7  timeout: a statement exceeded --timeout\n",
         "stderr": "",
         "exit": 0
       }
@@ -1676,7 +1676,7 @@
       "settled_by": "relate 1.0.0 (b02f283), release build",
       "recorded": {
         "command": "relate --agent-mode \"UNWIND [1, 2] AS x RETURN x\"",
-        "stdout": "rows[2]{x}:\n  1\n  2\ntimings:\n  {\"elapsed_ms\":0.402167,\"execute_ms\":0.253083,\"lex_parse_ms\":0.022500000000000003,\"lower_ms\":0.029042000000000002,\"parse_ms\":0.09725,\"plan_ms\":0.042583,\"result_generation_ms\":0.000375,\"rewrite_ms\":0.008416}\nplanCache:\n  miss\n",
+        "stdout": "rows[2]{x}:\n  1\n  2\ntimings:\n  {\"elapsed_ms\":0.260305,\"parse_ms\":0.112891,\"plan_ms\":0.043611,\"execute_ms\":0.09121,\"lex_parse_ms\":0.025237,\"rewrite_ms\":0.0036669999999999997,\"lower_ms\":0.033451999999999996,\"result_generation_ms\":0.00043099999999999996}\nplanCache:\n  miss\n",
         "stderr": "relate agent mode on: --agent-mode (--no-agent-mode to turn off)\n",
         "exit": 0
       }
@@ -1700,7 +1700,7 @@
       "recorded": [
         {
           "command": "relate --format envelope \"RETURN 1 AS ok\"",
-          "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"ok\"],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[{\"ok\":1}],\"timings\":{\"elapsed_ms\":0.320042,\"execute_ms\":0.18725,\"lex_parse_ms\":0.019792,\"lower_ms\":0.026333,\"parse_ms\":0.08524999999999999,\"plan_ms\":0.039,\"result_generation_ms\":0.00029099999999999997,\"rewrite_ms\":0.006583},\"truncated\":false}\n",
+          "stdout": "{\"columns\":[\"ok\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"ok\":1}],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.218056,\"parse_ms\":0.080981,\"plan_ms\":0.061014000000000006,\"execute_ms\":0.068247,\"lex_parse_ms\":0.020729,\"rewrite_ms\":0.001452,\"lower_ms\":0.017904,\"result_generation_ms\":0.00039000000000000005},\"planCache\":\"miss\"}\n",
           "stderr": "",
           "exit": 0
         },
@@ -1726,7 +1726,7 @@
       ],
       "recorded": {
         "command": "relate --json \"RETURN 1 AS ok, [1, 2] AS list\"",
-        "stdout": "{\"data\":[{\"list\":[1,2],\"ok\":1}],\"planCache\":\"miss\",\"timings\":{\"elapsed_ms\":0.352,\"execute_ms\":0.211334,\"lex_parse_ms\":0.020583,\"lower_ms\":0.026208000000000002,\"parse_ms\":0.091667,\"plan_ms\":0.04025,\"result_generation_ms\":0.000292,\"rewrite_ms\":0.006833}}\n",
+        "stdout": "{\"data\":[{\"ok\":1,\"list\":[1,2]}],\"timings\":{\"elapsed_ms\":0.232333,\"parse_ms\":0.104324,\"plan_ms\":0.037870999999999995,\"execute_ms\":0.078526,\"lex_parse_ms\":0.020939,\"rewrite_ms\":0.0016229999999999999,\"lower_ms\":0.02707,\"result_generation_ms\":0.00037099999999999996},\"planCache\":\"miss\"}\n",
         "stderr": "",
         "exit": 0
       }
@@ -1783,7 +1783,7 @@
       "settled_by": "relate 1.0.0 (b02f283), release build",
       "recorded": {
         "command": "relate --toon \"UNWIND [1, 2] AS x RETURN x, {a: x} AS m\"",
-        "stdout": "rows[2]{x,m}:\n  1,{\"a\":1}\n  2,{\"a\":2}\ntimings:\n  {\"elapsed_ms\":0.376417,\"execute_ms\":0.216292,\"lex_parse_ms\":0.022625000000000003,\"lower_ms\":0.033874999999999995,\"parse_ms\":0.10370800000000001,\"plan_ms\":0.047167,\"result_generation_ms\":0.00033299999999999996,\"rewrite_ms\":0.006666}\nplanCache:\n  miss\n",
+        "stdout": "rows[2]{x,m}:\n  1,{\"a\":1}\n  2,{\"a\":2}\ntimings:\n  {\"elapsed_ms\":0.22922599999999999,\"parse_ms\":0.105447,\"plan_ms\":0.035435999999999995,\"execute_ms\":0.079578,\"lex_parse_ms\":0.024946000000000003,\"rewrite_ms\":0.003607,\"lower_ms\":0.031359000000000005,\"result_generation_ms\":0.00048100000000000004}\nplanCache:\n  miss\n",
         "stderr": "",
         "exit": 0
       }
@@ -1801,7 +1801,7 @@
       "settled_by": "relate 1.0.0 (b02f283), release build",
       "recorded": {
         "command": "relate --json --pretty \"RETURN 1 AS ok, [1, 2] AS list\"",
-        "stdout": "{\n  \"data\": [\n    {\n      \"list\": [\n        1,\n        2\n      ],\n      \"ok\": 1\n    }\n  ],\n  \"planCache\": \"miss\",\n  \"timings\": {\n    \"elapsed_ms\": 0.319625,\n    \"execute_ms\": 0.1865,\n    \"lex_parse_ms\": 0.019458,\n    \"lower_ms\": 0.025208,\n    \"parse_ms\": 0.08662500000000001,\n    \"plan_ms\": 0.037667,\n    \"result_generation_ms\": 0.00025,\n    \"rewrite_ms\": 0.006291000000000001\n  }\n}\n",
+        "stdout": "{\n  \"data\": [\n    {\n      \"ok\": 1,\n      \"list\": [\n        1,\n        2\n      ]\n    }\n  ],\n  \"timings\": {\n    \"elapsed_ms\": 0.199802,\n    \"parse_ms\": 0.07890699999999999,\n    \"plan_ms\": 0.028783,\n    \"execute_ms\": 0.084217,\n    \"lex_parse_ms\": 0.017492,\n    \"rewrite_ms\": 0.002334,\n    \"lower_ms\": 0.017252999999999998,\n    \"result_generation_ms\": 0.000381\n  },\n  \"planCache\": \"miss\"\n}\n",
         "stderr": "",
         "exit": 0
       }
@@ -1818,7 +1818,7 @@
       "settled_by": "relate 1.0.1 (ef436ce), release build",
       "recorded": {
         "command": "relate --jsonl --timings \"RETURN 1 AS ok\"",
-        "stdout": "{\"ok\":1}\n{\"planCache\":\"miss\",\"timings\":{\"elapsed_ms\":0.315,\"execute_ms\":0.190916,\"lex_parse_ms\":0.017,\"lower_ms\":0.027208,\"parse_ms\":0.081167,\"plan_ms\":0.035625,\"result_generation_ms\":0.00020800000000000001,\"rewrite_ms\":0.005292000000000001}}\n",
+        "stdout": "{\"ok\":1}\n{\"timings\":{\"elapsed_ms\":0.161411,\"parse_ms\":0.070161,\"plan_ms\":0.027852000000000002,\"execute_ms\":0.057628,\"lex_parse_ms\":0.018505,\"rewrite_ms\":0.000671,\"lower_ms\":0.014477,\"result_generation_ms\":0.000221},\"planCache\":\"miss\"}\n",
         "stderr": "",
         "exit": 0
       }
@@ -1853,7 +1853,7 @@
       "recorded": [
         {
           "command": "relate --mode envelope --param name=Eli --param n=3 --param 'tags=[\"a\",\"b\"]' 'RETURN $name AS name, $n AS n, $tags AS tags'",
-          "stdout": "{\"columnTypes\":[\"STRING\",\"INTEGER\",\"LIST\"],\"columns\":[\"name\",\"n\",\"tags\"],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[{\"n\":3,\"name\":\"Eli\",\"tags\":[\"a\",\"b\"]}],\"timings\":{\"elapsed_ms\":0.309209,\"execute_ms\":0.191375,\"lex_parse_ms\":0.02075,\"lower_ms\":0.023125,\"parse_ms\":0.074125,\"plan_ms\":0.036125,\"result_generation_ms\":0.000375,\"rewrite_ms\":0.00625},\"truncated\":false}\n",
+          "stdout": "{\"columns\":[\"name\",\"n\",\"tags\"],\"columnTypes\":[\"STRING\",\"INTEGER\",\"LIST\"],\"rows\":[{\"name\":\"Eli\",\"n\":3,\"tags\":[\"a\",\"b\"]}],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.187218,\"parse_ms\":0.06611399999999999,\"plan_ms\":0.045284000000000005,\"execute_ms\":0.069018,\"lex_parse_ms\":0.018104000000000002,\"rewrite_ms\":0.000822,\"lower_ms\":0.018144,\"result_generation_ms\":0.00035},\"planCache\":\"miss\"}\n",
           "stderr": "",
           "exit": 0
         },
@@ -1865,7 +1865,7 @@
         },
         {
           "command": "relate --mode envelope --param 'x=\"2026-11-07\"' 'RETURN $x AS x'",
-          "stdout": "{\"columnTypes\":[\"STRING\"],\"columns\":[\"x\"],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[{\"x\":\"2026-11-07\"}],\"timings\":{\"elapsed_ms\":0.317,\"execute_ms\":0.191916,\"lex_parse_ms\":0.019875,\"lower_ms\":0.027459,\"parse_ms\":0.077583,\"plan_ms\":0.039,\"result_generation_ms\":0.00033299999999999996,\"rewrite_ms\":0.006541},\"truncated\":false}\n",
+          "stdout": "{\"columns\":[\"x\"],\"columnTypes\":[\"STRING\"],\"rows\":[{\"x\":\"2026-11-07\"}],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.256097,\"parse_ms\":0.13137500000000002,\"plan_ms\":0.040725,\"execute_ms\":0.074599,\"lex_parse_ms\":0.052127,\"rewrite_ms\":0.002204,\"lower_ms\":0.035957,\"result_generation_ms\":0.000451},\"planCache\":\"miss\"}\n",
           "stderr": "",
           "exit": 0
         }
@@ -1888,7 +1888,7 @@
         {
           "command": "relate --mode envelope --fetch-params people=people.json 'UNWIND $people AS p RETURN count(p) AS n'",
           "setup": "printf '[{\"name\": \"Ines\"}, {\"name\": \"Kofi\"}]\\n' > people.json",
-          "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"n\"],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[{\"n\":2}],\"timings\":{\"elapsed_ms\":0.396833,\"execute_ms\":0.25033299999999997,\"lex_parse_ms\":0.022584,\"lower_ms\":0.031292,\"parse_ms\":0.09016700000000001,\"plan_ms\":0.046917,\"result_generation_ms\":0.000458,\"rewrite_ms\":0.006875},\"truncated\":false}\n",
+          "stdout": "{\"columns\":[\"n\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"n\":2}],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.237142,\"parse_ms\":0.098914,\"plan_ms\":0.04304,\"execute_ms\":0.086952,\"lex_parse_ms\":0.024897,\"rewrite_ms\":0.003557,\"lower_ms\":0.036567999999999996,\"result_generation_ms\":0.000341},\"planCache\":\"miss\"}\n",
           "stderr": "",
           "exit": 0
         },
@@ -2135,13 +2135,13 @@
       "recorded": [
         {
           "command": "CLAUDECODE=1 relate --mode envelope \"UNWIND range(1, 250) AS x RETURN x\"",
-          "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"x\"],\"notifications\":[],\"planCache\":\"miss\",\"rowCap\":{\"kept\":100,\"total\":250},\"rows\":[{\"x\":1},{\"x\":2},{\"x\":3},{\"x\":4},{\"x\":5},{\"x\":6},{\"x\":7},{\"x\":8},{\"x\":9},{\"x\":10},{\"x\":11},{\"x\":12},{\"x\":13},{\"x\":14},{\"x\":15},{\"x\":16},{\"x\":17},{\"x\":18},{\"x\":19},{\"x\":20},{\"x\":21},{\"x\":22},{\"x\":23},{\"x\":24},{\"x\":25},{\"x\":26},{\"x\":27},{\"x\":28},{\"x\":29},{\"x\":30},{\"x\":31},{\"x\":32},{\"x\":33},{\"x\":34},{\"x\":35},{\"x\":36},{\"x\":37},{\"x\":38},{\"x\":39},{\"x\":40},{\"x\":41},{\"x\":42},{\"x\":43},{\"x\":44},{\"x\":45},{\"x\":46},{\"x\":47},{\"x\":48},{\"x\":49},{\"x\":50},{\"x\":51},{\"x\":52},{\"x\":53},{\"x\":54},{\"x\":55},{\"x\":56},{\"x\":57},{\"x\":58},{\"x\":59},{\"x\":60},{\"x\":61},{\"x\":62},{\"x\":63},{\"x\":64},{\"x\":65},{\"x\":66},{\"x\":67},{\"x\":68},{\"x\":69},{\"x\":70},{\"x\":71},{\"x\":72},{\"x\":73},{\"x\":74},{\"x\":75},{\"x\":76},{\"x\":77},{\"x\":78},{\"x\":79},{\"x\":80},{\"x\":81},{\"x\":82},{\"x\":83},{\"x\":84},{\"x\":85},{\"x\":86},{\"x\":87},{\"x\":88},{\"x\":89},{\"x\":90},{\"x\":91},{\"x\":92},{\"x\":93},{\"x\":94},{\"x\":95},{\"x\":96},{\"x\":97},{\"x\":98},{\"x\":99},{\"x\":100}],\"timings\":{\"elapsed_ms\":0.429292,\"execute_ms\":0.297625,\"lex_parse_ms\":0.020665999999999997,\"lower_ms\":0.032833,\"parse_ms\":0.081083,\"plan_ms\":0.043542,\"result_generation_ms\":0.000834,\"rewrite_ms\":0.0053750000000000004},\"truncated\":true}\n",
+          "stdout": "{\"columns\":[\"x\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"x\":1},{\"x\":2},{\"x\":3},{\"x\":4},{\"x\":5},{\"x\":6},{\"x\":7},{\"x\":8},{\"x\":9},{\"x\":10},{\"x\":11},{\"x\":12},{\"x\":13},{\"x\":14},{\"x\":15},{\"x\":16},{\"x\":17},{\"x\":18},{\"x\":19},{\"x\":20},{\"x\":21},{\"x\":22},{\"x\":23},{\"x\":24},{\"x\":25},{\"x\":26},{\"x\":27},{\"x\":28},{\"x\":29},{\"x\":30},{\"x\":31},{\"x\":32},{\"x\":33},{\"x\":34},{\"x\":35},{\"x\":36},{\"x\":37},{\"x\":38},{\"x\":39},{\"x\":40},{\"x\":41},{\"x\":42},{\"x\":43},{\"x\":44},{\"x\":45},{\"x\":46},{\"x\":47},{\"x\":48},{\"x\":49},{\"x\":50},{\"x\":51},{\"x\":52},{\"x\":53},{\"x\":54},{\"x\":55},{\"x\":56},{\"x\":57},{\"x\":58},{\"x\":59},{\"x\":60},{\"x\":61},{\"x\":62},{\"x\":63},{\"x\":64},{\"x\":65},{\"x\":66},{\"x\":67},{\"x\":68},{\"x\":69},{\"x\":70},{\"x\":71},{\"x\":72},{\"x\":73},{\"x\":74},{\"x\":75},{\"x\":76},{\"x\":77},{\"x\":78},{\"x\":79},{\"x\":80},{\"x\":81},{\"x\":82},{\"x\":83},{\"x\":84},{\"x\":85},{\"x\":86},{\"x\":87},{\"x\":88},{\"x\":89},{\"x\":90},{\"x\":91},{\"x\":92},{\"x\":93},{\"x\":94},{\"x\":95},{\"x\":96},{\"x\":97},{\"x\":98},{\"x\":99},{\"x\":100}],\"truncated\":true,\"rowCap\":{\"kept\":100,\"total\":250},\"notifications\":[],\"timings\":{\"elapsed_ms\":0.480956,\"parse_ms\":0.111828,\"plan_ms\":0.052267,\"execute_ms\":0.303887,\"lex_parse_ms\":0.030166,\"rewrite_ms\":0.002835,\"lower_ms\":0.03763,\"result_generation_ms\":0.00042100000000000004},\"planCache\":\"miss\"}\n",
           "stderr": "warning: result truncated to 100 rows (the statement returned 250); pass --max-rows 0 for all rows, or page with SKIP/LIMIT\n",
           "exit": 0
         },
         {
           "command": "relate --max-rows 2 --mode envelope \"UNWIND range(1, 5) AS x RETURN x\"",
-          "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"x\"],\"notifications\":[],\"planCache\":\"miss\",\"rowCap\":{\"kept\":2,\"total\":5},\"rows\":[{\"x\":1},{\"x\":2}],\"timings\":{\"elapsed_ms\":0.393791,\"execute_ms\":0.242417,\"lex_parse_ms\":0.023667,\"lower_ms\":0.040083999999999995,\"parse_ms\":0.096292,\"plan_ms\":0.047416,\"result_generation_ms\":0.001167,\"rewrite_ms\":0.006584},\"truncated\":true}\n",
+          "stdout": "{\"columns\":[\"x\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"x\":1},{\"x\":2}],\"truncated\":true,\"rowCap\":{\"kept\":2,\"total\":5},\"notifications\":[],\"timings\":{\"elapsed_ms\":0.233755,\"parse_ms\":0.08477799999999999,\"plan_ms\":0.040846,\"execute_ms\":0.09881400000000001,\"lex_parse_ms\":0.024245,\"rewrite_ms\":0.001483,\"lower_ms\":0.024395,\"result_generation_ms\":0.0003},\"planCache\":\"miss\"}\n",
           "stderr": "warning: result truncated to 2 rows (the statement returned 5); pass --max-rows 0 for all rows, or page with SKIP/LIMIT\n",
           "exit": 0
         }
@@ -2262,7 +2262,7 @@
       ],
       "recorded": {
         "command": "relate --agent-mode \"RETURN 1 AS x\"",
-        "stdout": "rows[1]{x}:\n  1\ntimings:\n  {\"elapsed_ms\":0.31108399999999997,\"execute_ms\":0.180375,\"lex_parse_ms\":0.01875,\"lower_ms\":0.025875,\"parse_ms\":0.08354199999999999,\"plan_ms\":0.0385,\"result_generation_ms\":0.00025,\"rewrite_ms\":0.005917}\nplanCache:\n  miss\n",
+        "stdout": "rows[1]{x}:\n  1\ntimings:\n  {\"elapsed_ms\":0.258362,\"parse_ms\":0.09757199999999999,\"plan_ms\":0.066423,\"execute_ms\":0.082224,\"lex_parse_ms\":0.022632,\"rewrite_ms\":0.003677,\"lower_ms\":0.02678,\"result_generation_ms\":0.000471}\nplanCache:\n  miss\n",
         "stderr": "relate agent mode on: --agent-mode (--no-agent-mode to turn off)\n",
         "exit": 0
       }
@@ -2295,13 +2295,13 @@
       "recorded": [
         {
           "command": "relate --version",
-          "stdout": "Relate v1.2.0\nLicense: Apache 2.0 (binary)\n",
+          "stdout": "Relate v1.3.0\nLicense: Apache 2.0 (binary)\n",
           "stderr": "",
           "exit": 0
         },
         {
           "command": "relate -v",
-          "stdout": "Relate v1.2.0\nLicense: Apache 2.0 (binary)\n",
+          "stdout": "Relate v1.3.0\nLicense: Apache 2.0 (binary)\n",
           "stderr": "",
           "exit": 0
         }
@@ -2838,7 +2838,7 @@
       "row_cap_in_band": "a \"rowCap\" key beside \"data\": {\"data\":[...],\"planCache\":...,\"rowCap\":{\"kept\":100,\"total\":250},\"timings\":{...}}",
       "recorded": {
         "command": "relate --max-rows 2 --mode json \"UNWIND range(1, 5) AS x RETURN x\"",
-        "stdout": "{\"data\":[{\"x\":1},{\"x\":2}],\"planCache\":\"miss\",\"rowCap\":{\"kept\":2,\"total\":5},\"timings\":{\"elapsed_ms\":0.39391699999999996,\"execute_ms\":0.245083,\"lex_parse_ms\":0.025833000000000002,\"lower_ms\":0.036875000000000005,\"parse_ms\":0.095167,\"plan_ms\":0.046709,\"result_generation_ms\":0.000875,\"rewrite_ms\":0.006834}}\n",
+        "stdout": "{\"data\":[{\"x\":1},{\"x\":2}],\"rowCap\":{\"kept\":2,\"total\":5},\"timings\":{\"elapsed_ms\":0.298426,\"parse_ms\":0.129221,\"plan_ms\":0.043551,\"execute_ms\":0.114534,\"lex_parse_ms\":0.039844,\"rewrite_ms\":0.0059510000000000006,\"lower_ms\":0.032821,\"result_generation_ms\":0.000321},\"planCache\":\"miss\"}\n",
         "stderr": "warning: result truncated to 2 rows (the statement returned 5); pass --max-rows 0 for all rows, or page with SKIP/LIMIT\n",
         "exit": 0
       }
@@ -2864,13 +2864,13 @@
       "recorded": [
         {
           "command": "relate --max-rows 2 --mode envelope \"UNWIND range(1, 5) AS x RETURN x\"",
-          "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"x\"],\"notifications\":[],\"planCache\":\"miss\",\"rowCap\":{\"kept\":2,\"total\":5},\"rows\":[{\"x\":1},{\"x\":2}],\"timings\":{\"elapsed_ms\":0.3045,\"execute_ms\":0.19487500000000002,\"lex_parse_ms\":0.016792,\"lower_ms\":0.029625,\"parse_ms\":0.07050000000000001,\"plan_ms\":0.034165999999999995,\"result_generation_ms\":0.000917,\"rewrite_ms\":0.004208},\"truncated\":true}\n",
+          "stdout": "{\"columns\":[\"x\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"x\":1},{\"x\":2}],\"truncated\":true,\"rowCap\":{\"kept\":2,\"total\":5},\"notifications\":[],\"timings\":{\"elapsed_ms\":0.240378,\"parse_ms\":0.087653,\"plan_ms\":0.037661,\"execute_ms\":0.105667,\"lex_parse_ms\":0.028243,\"rewrite_ms\":0.002856,\"lower_ms\":0.027351,\"result_generation_ms\":0.000321},\"planCache\":\"miss\"}\n",
           "stderr": "warning: result truncated to 2 rows (the statement returned 5); pass --max-rows 0 for all rows, or page with SKIP/LIMIT\n",
           "exit": 0
         },
         {
           "command": "relate --mode envelope \"RETURN 1 AS a; RETURN 2 AS b\"",
-          "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"a\"],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[{\"a\":1}],\"timings\":{\"elapsed_ms\":0.467625,\"execute_ms\":0.325125,\"lex_parse_ms\":0.019458,\"lower_ms\":0.034875,\"parse_ms\":0.093875,\"plan_ms\":0.039875,\"result_generation_ms\":0.00025,\"rewrite_ms\":0.006458},\"truncated\":false}\n{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"b\"],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[{\"b\":2}],\"timings\":{\"elapsed_ms\":0.021916,\"execute_ms\":0.004916,\"lex_parse_ms\":0.003792,\"lower_ms\":0.002875,\"parse_ms\":0.011875,\"plan_ms\":0.0037500000000000003,\"result_generation_ms\":0.000125,\"rewrite_ms\":0.00033299999999999996},\"truncated\":false}\n",
+          "stdout": "{\"columns\":[\"a\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"a\":1}],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.19390100000000002,\"parse_ms\":0.08571000000000001,\"plan_ms\":0.028924,\"execute_ms\":0.071413,\"lex_parse_ms\":0.022352,\"rewrite_ms\":0.0030359999999999996,\"lower_ms\":0.020649,\"result_generation_ms\":0.000401},\"planCache\":\"miss\"}\n{\"columns\":[\"b\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"b\":2}],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.051616,\"parse_ms\":0.026189,\"plan_ms\":0.009177000000000001,\"execute_ms\":0.012674,\"lex_parse_ms\":0.0046890000000000005,\"rewrite_ms\":0.0009620000000000001,\"lower_ms\":0.011049999999999999,\"result_generation_ms\":0.000201},\"planCache\":\"miss\"}\n",
           "stderr": "",
           "exit": 0
         }
@@ -2902,7 +2902,7 @@
       "settled_by": "relate 1.0.0 (b02f283), release build",
       "recorded": {
         "command": "relate --max-rows 2 --mode toon \"UNWIND range(1, 5) AS x RETURN x\"",
-        "stdout": "rows[2]{x}:\n  1\n  2\nrowCap:\n  {\"kept\":2,\"total\":5}\ntimings:\n  {\"elapsed_ms\":0.368334,\"execute_ms\":0.232792,\"lex_parse_ms\":0.02225,\"lower_ms\":0.0335,\"parse_ms\":0.085959,\"plan_ms\":0.042833,\"result_generation_ms\":0.000959,\"rewrite_ms\":0.0053750000000000004}\nplanCache:\n  miss\n",
+        "stdout": "rows[2]{x}:\n  1\n  2\nrowCap:\n  {\"kept\":2,\"total\":5}\ntimings:\n  {\"elapsed_ms\":0.222255,\"parse_ms\":0.081301,\"plan_ms\":0.036779,\"execute_ms\":0.09396499999999999,\"lex_parse_ms\":0.023554,\"rewrite_ms\":0.002885,\"lower_ms\":0.022041,\"result_generation_ms\":0.00019}\nplanCache:\n  miss\n",
         "stderr": "warning: result truncated to 2 rows (the statement returned 5); pass --max-rows 0 for all rows, or page with SKIP/LIMIT\n",
         "exit": 0
       }
@@ -2986,7 +2986,7 @@
     "recorded": [
       {
         "command": "relate --mode envelope \"MATCH (n RETURN n\"",
-        "stdout": "{\"error\":{\"code\":\"validation_error\",\"column\":10,\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: expected RightParen, got \\\"RETURN\\\" (RETURN)   MATCH (n RETURN n            ^\",\"retryable\":false,\"source\":\"MATCH (n RETURN n\"}}\n",
+        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: expected RightParen, got \\\"RETURN\\\" (RETURN)   MATCH (n RETURN n            ^\",\"retryable\":false,\"column\":10,\"source\":\"MATCH (n RETURN n\"}}\n",
         "stderr": "syntax error: parse error: expected RightParen, got \"RETURN\" (RETURN)\n  MATCH (n RETURN n\n           ^\n",
         "exit": 6
       },
@@ -3007,7 +3007,7 @@
       "reserved": false,
       "recorded": {
         "command": "relate --mode envelope \"RETURN 1 AS ok\"",
-        "stdout": "{\"columnTypes\":[\"INTEGER\"],\"columns\":[\"ok\"],\"notifications\":[],\"planCache\":\"miss\",\"rows\":[{\"ok\":1}],\"timings\":{\"elapsed_ms\":0.34495800000000004,\"execute_ms\":0.206708,\"lex_parse_ms\":0.018459,\"lower_ms\":0.028541999999999998,\"parse_ms\":0.08904200000000001,\"plan_ms\":0.040667,\"result_generation_ms\":0.00025,\"rewrite_ms\":0.009208000000000001},\"truncated\":false}\n",
+        "stdout": "{\"columns\":[\"ok\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"ok\":1}],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":0.211825,\"parse_ms\":0.098914,\"plan_ms\":0.026229,\"execute_ms\":0.07935700000000001,\"lex_parse_ms\":0.046347,\"rewrite_ms\":0.000841,\"lower_ms\":0.016912,\"result_generation_ms\":0.00032},\"planCache\":\"miss\"}\n",
         "stderr": "",
         "exit": 0
       }
@@ -3075,7 +3075,7 @@
       "reserved": false,
       "recorded": {
         "command": "relate --mode envelope \"MATCH (n RETURN n\"",
-        "stdout": "{\"error\":{\"code\":\"validation_error\",\"column\":10,\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: expected RightParen, got \\\"RETURN\\\" (RETURN)   MATCH (n RETURN n            ^\",\"retryable\":false,\"source\":\"MATCH (n RETURN n\"}}\n",
+        "stdout": "{\"error\":{\"code\":\"validation_error\",\"exit_code\":6,\"kind\":\"syntax\",\"message\":\"syntax error: parse error: expected RightParen, got \\\"RETURN\\\" (RETURN)   MATCH (n RETURN n            ^\",\"retryable\":false,\"column\":10,\"source\":\"MATCH (n RETURN n\"}}\n",
         "stderr": "syntax error: parse error: expected RightParen, got \"RETURN\" (RETURN)\n  MATCH (n RETURN n\n           ^\n",
         "exit": 6
       }
@@ -3142,25 +3142,25 @@
     "recorded": [
       {
         "command": "CLAUDECODE=1 relate \"UNWIND [1, 2] AS x RETURN x\"",
-        "stdout": "rows[2]{x}:\n  1\n  2\ntimings:\n  {\"elapsed_ms\":0.48470799999999997,\"execute_ms\":0.34658300000000003,\"lex_parse_ms\":0.019375,\"lower_ms\":0.029416,\"parse_ms\":0.09112500000000001,\"plan_ms\":0.038167,\"result_generation_ms\":0.00025,\"rewrite_ms\":0.006084}\nplanCache:\n  miss\n",
+        "stdout": "rows[2]{x}:\n  1\n  2\ntimings:\n  {\"elapsed_ms\":0.264904,\"parse_ms\":0.115405,\"plan_ms\":0.047488999999999996,\"execute_ms\":0.08860499999999999,\"lex_parse_ms\":0.022832,\"rewrite_ms\":0.001934,\"lower_ms\":0.035256,\"result_generation_ms\":0.00048100000000000004}\nplanCache:\n  miss\n",
         "stderr": "",
         "exit": 0
       },
       {
         "command": "AI_AGENT=1 relate \"UNWIND [1, 2] AS x RETURN x\"",
-        "stdout": "rows[2]{x}:\n  1\n  2\ntimings:\n  {\"elapsed_ms\":0.489959,\"execute_ms\":0.352334,\"lex_parse_ms\":0.01875,\"lower_ms\":0.028084,\"parse_ms\":0.090083,\"plan_ms\":0.038917,\"result_generation_ms\":0.00025,\"rewrite_ms\":0.006291000000000001}\nplanCache:\n  miss\n",
+        "stdout": "rows[2]{x}:\n  1\n  2\ntimings:\n  {\"elapsed_ms\":0.24133,\"parse_ms\":0.103322,\"plan_ms\":0.041457,\"execute_ms\":0.084417,\"lex_parse_ms\":0.02179,\"rewrite_ms\":0.002204,\"lower_ms\":0.027672,\"result_generation_ms\":0.00039000000000000005}\nplanCache:\n  miss\n",
         "stderr": "",
         "exit": 0
       },
       {
         "command": "RELATE_AGENT_MODE=1 relate \"UNWIND [1, 2] AS x RETURN x\"",
-        "stdout": "rows[2]{x}:\n  1\n  2\ntimings:\n  {\"elapsed_ms\":0.2965,\"execute_ms\":0.174917,\"lex_parse_ms\":0.017625000000000002,\"lower_ms\":0.025542,\"parse_ms\":0.078542,\"plan_ms\":0.035417000000000004,\"result_generation_ms\":0.000209,\"rewrite_ms\":0.0051660000000000005}\nplanCache:\n  miss\n",
+        "stdout": "rows[2]{x}:\n  1\n  2\ntimings:\n  {\"elapsed_ms\":0.26275000000000004,\"parse_ms\":0.124843,\"plan_ms\":0.041777,\"execute_ms\":0.083917,\"lex_parse_ms\":0.025828,\"rewrite_ms\":0.003286,\"lower_ms\":0.028733,\"result_generation_ms\":0.000391}\nplanCache:\n  miss\n",
         "stderr": "relate agent mode on: RELATE_AGENT_MODE=1 (--no-agent-mode to turn off)\n",
         "exit": 0
       },
       {
         "command": "relate --agent-mode \"UNWIND [1, 2] AS x RETURN x\"",
-        "stdout": "rows[2]{x}:\n  1\n  2\ntimings:\n  {\"elapsed_ms\":0.34775,\"execute_ms\":0.19854200000000002,\"lex_parse_ms\":0.023125,\"lower_ms\":0.029334,\"parse_ms\":0.097834,\"plan_ms\":0.041709,\"result_generation_ms\":0.00025,\"rewrite_ms\":0.006834}\nplanCache:\n  miss\n",
+        "stdout": "rows[2]{x}:\n  1\n  2\ntimings:\n  {\"elapsed_ms\":0.215251,\"parse_ms\":0.094897,\"plan_ms\":0.037218999999999995,\"execute_ms\":0.074539,\"lex_parse_ms\":0.022302000000000002,\"rewrite_ms\":0.003366,\"lower_ms\":0.02734,\"result_generation_ms\":0.000531}\nplanCache:\n  miss\n",
         "stderr": "relate agent mode on: --agent-mode (--no-agent-mode to turn off)\n",
         "exit": 0
       },
@@ -3180,558 +3180,12 @@
     "hint_note": "With agent mode on, a run that fails prints the hint line on stderr once, after its error; a run with agent mode off never prints it, and neither does a usage error found before the mode resolves."
   },
   "recording": "Each `recorded` run: the bash command line in `command`, with the binary on PATH as `relate`, in a fresh empty directory, with a fresh HOME and an environment of PATH, HOME, TMPDIR and DO_NOT_TRACK=1 only; `setup` runs first, `hold` keeps a second process on the store while `command` runs. In the output the directory is written `<dir>` and the home directory `<home>`. `npm run docs:cli-check` replays every one against a binary.",
-  "recorded_with": "relate 1.2.0 (e0ea536), release build",
+  "recorded_with": "relate 1.3.0 (6e55309), release build",
   "page_steps": {
-    "concepts/agent-native.mdx": [
-      {
-        "command": "relate --mode envelope --max-rows 2 \"UNWIND ['Ada', 'Grace', 'Noor'] AS name RETURN name\"",
-        "expected_sha256": "b5bde055a7d1556f81f67705765b73263195c8b8b34746b9d0de07d6b59f6570"
-      },
-      {
-        "command": "relate \"UNWIND ['Ada', 'Grace', 'Noor'] AS name RETURN name\"\nCLAUDECODE=1 relate \"UNWIND ['Ada', 'Grace', 'Noor'] AS name RETURN name\"",
-        "expected_sha256": "c797737280dcc144db4d6180088727702cfa18bf1799bae46d54110fbaf74683"
-      }
-    ],
     "concepts/architecture.mdx": [
       {
         "command": "relate --mode table \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEXPLAIN MATCH (p:Person {name: 'Ada'})-[:WORKS_ON]->(r:Project) RETURN r.name AS project;\nCREATE INDEX person_name FOR (p:Person) ON (p.name);\nEXPLAIN MATCH (p:Person {name: 'Ada'})-[:WORKS_ON]->(r:Project) RETURN r.name AS project\"",
         "expected_sha256": "021c293a039ee7a98f20fb5c848554d865f576f023187387a832731a9e1788a6"
-      }
-    ],
-    "concepts/cypher-dialect.mdx": [
-      {
-        "command": "RELATE_PREVIEW=chronological-comparisons relate --mode envelope \"RETURN datetime('2026-01-01T12:00+01:00') IS SAME INSTANT datetime('2026-01-01T11:00Z') AS same\"",
-        "expected_sha256": "02dfa6103f5c5615f9dde4f6a37b17c31ad4c42e237e241b2ab0921afc50ec76"
-      }
-    ],
-    "get-started/agent-memory.mdx": [
-      {
-        "command": "cat > memory.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nMATCH (n) WHERE n:Person OR n:Project SET n:Entity, n.key = toLower(n.name);\nCREATE CONSTRAINT entity_key IF NOT EXISTS FOR (e:Entity) REQUIRE e.key IS UNIQUE;\nCREATE CONSTRAINT episode_id IF NOT EXISTS FOR (ep:Episode) REQUIRE ep.id IS UNIQUE;\nCREATE CONSTRAINT fact_id IF NOT EXISTS FOR (f:Fact) REQUIRE f.id IS UNIQUE;\nCREATE INDEX fact_slot IF NOT EXISTS FOR (f:Fact) ON (f.slot);\nCREATE VECTOR INDEX fact_embedding IF NOT EXISTS\n  FOR (f:Fact) ON (f.embedding) WITH [f.closedAt]\n  OPTIONS {indexConfig: {`vector.dimensions`: 4, `vector.similarity_function`: 'cosine'}};\nMATCH (e:Entity) RETURN e.key AS key ORDER BY key;\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./memory.rl --mode table < memory.cypher",
-        "expected_sha256": "f85cfc9cae936fb542461f04bfb9ef3202b2a3452856b09087b5a2392071b8bf"
-      },
-      {
-        "command": "cat > remember.cypher <<'EOF'\nUNWIND $episodes AS m\nCREATE (ep:Episode {id: m.id, session: m.session, kind: m.kind, at: datetime(m.at), text: m.text})\nCREATE (f:Fact {id: m.factId, text: m.fact, slot: m.slot, validFrom: datetime(m.validFrom),\n                recordedAt: datetime(m.at), embedding: vector(m.embedding, 4, FLOAT32)})\nCREATE (f)-[:FROM]->(ep)\nWITH ep, f, m\nCALL (ep, f, m) {\n  UNWIND m.about AS key\n  MATCH (n:Entity {key: key})\n  CREATE (ep)-[:MENTIONS]->(n), (f)-[:ABOUT]->(n)\n}\nCALL (f) {\n  MATCH (old:Fact {slot: f.slot}) WHERE old.recordedAt < f.recordedAt AND old.closedAt IS NULL\n  SET old.validTo = f.validFrom, old.closedAt = f.recordedAt\n  CREATE (f)-[:SUPERSEDES]->(old)\n  RETURN count(old) AS replaced\n}\nRETURN ep.id AS episode, f.text AS fact, replaced;\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "cat > session1.json <<'EOF'\n[\n  {\"id\": \"e1\", \"session\": \"s1\", \"kind\": \"message\", \"at\": \"2026-03-02T10:00:00Z\",\n   \"text\": \"Grace does the release review for relate.\", \"about\": [\"grace\", \"relate\"],\n   \"factId\": \"f1\", \"fact\": \"Grace reviews each relate release.\", \"slot\": \"relate/release-reviewer\",\n   \"validFrom\": \"2026-01-05T00:00:00Z\", \"embedding\": [0.9, 0.1, 0.0, 0.2]},\n  {\"id\": \"e2\", \"session\": \"s1\", \"kind\": \"message\", \"at\": \"2026-03-02T10:05:00Z\",\n   \"text\": \"Noor goes through new relate issues every Monday.\", \"about\": [\"noor\", \"relate\"],\n   \"factId\": \"f2\", \"fact\": \"Noor triages new relate issues on Mondays.\", \"slot\": \"relate/triage\",\n   \"validFrom\": \"2026-02-02T00:00:00Z\", \"embedding\": [0.1, 0.9, 0.2, 0.0]}\n]\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./memory.rl --mode table --fetch-params episodes=session1.json < remember.cypher",
-        "expected_sha256": "aa5f930fa7825e5254e0389c33bf78bbc115f1d816eb15b46e799930fc1043c8"
-      },
-      {
-        "command": "cat > requests.jsonl <<'EOF'\n{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"shell\",\"version\":\"0\"}}}\n{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}\n{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"write_cypher\",\"arguments\":{\"statement\":\"UNWIND $episodes AS m CREATE (ep:Episode {id: m.id, session: m.session, kind: m.kind, at: datetime(m.at), text: m.text}) CREATE (f:Fact {id: m.factId, text: m.fact, slot: m.slot, validFrom: datetime(m.validFrom), recordedAt: datetime(m.at), embedding: vector(m.embedding, 4, FLOAT32)}) CREATE (f)-[:FROM]->(ep) WITH ep, f, m CALL (ep, f, m) { UNWIND m.about AS key MATCH (n:Entity {key: key}) CREATE (ep)-[:MENTIONS]->(n), (f)-[:ABOUT]->(n) } CALL (f) { MATCH (old:Fact {slot: f.slot}) WHERE old.recordedAt < f.recordedAt AND old.closedAt IS NULL SET old.validTo = f.validFrom, old.closedAt = f.recordedAt CREATE (f)-[:SUPERSEDES]->(old) RETURN count(old) AS replaced } RETURN ep.id AS episode, f.text AS fact, replaced\",\"parameters\":{\"episodes\":[{\"id\":\"e3\",\"session\":\"s2\",\"kind\":\"tool_call\",\"at\":\"2026-03-20T09:00:00Z\",\"text\":\"read_file CODEOWNERS: release/ @ada\",\"about\":[\"ada\",\"relate\"],\"factId\":\"f3\",\"fact\":\"Ada reviews each relate release.\",\"slot\":\"relate/release-reviewer\",\"validFrom\":\"2026-03-10T00:00:00Z\",\"embedding\":[0.85,0.15,0.05,0.25]}]}}}}\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate serve --mcp stdio --database ./memory.rl < requests.jsonl > replies.jsonl",
-        "expected_sha256": "a8e9c736fd4392fb96ba5a55848e030c5640288b88b0dc988203dbff2e73a598"
-      },
-      {
-        "command": "relate --database ./memory.rl --read-only --mode table \"MATCH (f:Fact)-[:FROM]->(ep:Episode) RETURN ep.id AS episode, ep.kind AS kind, f.text AS fact, f.closedAt IS NULL AS current ORDER BY episode\"",
-        "expected_sha256": "2d7f8f84bd3cf87e04ce9938affb7889db398c7c8003dbbba583bc19f5cd920f"
-      },
-      {
-        "command": "cat > recall.cypher <<'EOF'\nMATCH (f:Fact)\nSEARCH f IN (VECTOR INDEX fact_embedding FOR $vector WHERE f.closedAt IS NULL LIMIT $k) SCORE AS score\nMATCH (f)-[:FROM]->(ep:Episode)\nRETURN f.text AS memory, round(score, 4) AS score, ep.text AS evidence,\n       COLLECT { MATCH (f)-[:SUPERSEDES]->(old:Fact) RETURN old.text } AS replaced\nORDER BY score DESC;\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./memory.rl --read-only --mode table --param 'vector=[0.88,0.12,0.02,0.22]' --param k=2 < recall.cypher",
-        "expected_sha256": "9800cc433e8487ee0a00bd17e9bb2e95f0e3eaff1c0104502984db576f0b6cfc"
-      },
-      {
-        "command": "relate query --database ./memory.rl --read-only --mode envelope --param 'vector=[0.88,0.12,0.02,0.22]' --param k=2 < recall.cypher",
-        "expected_sha256": "168552da7dc3bbb6c05bf0ad1d1f9e58ee10d427892a7b13303a37ecb54a8b98"
-      },
-      {
-        "command": "relate query --database ./memory.rl --read-only --mode envelope --param 'vector=[0.88,0.12,0.02]' --param k=2 < recall.cypher\necho \"exit=$?\"",
-        "expected_sha256": "0229c6c4d2e5b2fc634ffd83847230a9165d0f92c50bd288fc78a73b6905b592"
-      }
-    ],
-    "get-started/agent-quickstart.mdx": [
-      {
-        "command": "relate --mode envelope \"RETURN 1 AS ok\"",
-        "expected_sha256": "43b651e7dc4d89cef73389a091b9455c1532143cc85f491b6eed24943b598420"
-      },
-      {
-        "command": "relate skill install --agent claude-code",
-        "expected_sha256": "a5c5b4b19d67b5c005488a4f618bf9384d5039d5d6703b0e5325b0fe0b87c242"
-      },
-      {
-        "command": "relate agent-context",
-        "expected_sha256": "7d42bd1c7cfb2768e9057e5b02b9b53d5da461c7d097cb9bfab9c367238255f9"
-      },
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "sha256sum team.cypher",
-        "expected_sha256": "b0593e6223fd309a069800feda759de6b4005e0379b681fce3d72c1d5c2411a0"
-      },
-      {
-        "command": "relate query --database ./team.rl --mode envelope < team.cypher",
-        "expected_sha256": "35cb699c5197403ad74572b42b3d56273ca8bf8331ae9d2ff63b8a01280d6cee"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person)-[w:WORKS_ON]->(j:Project) RETURN p.name AS person, j.name AS project ORDER BY person, project\"",
-        "expected_sha256": "b525ff7b1bd95e4389223d9f0bbf9d72dd848f5ede09deddacbc726fc51da07b"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table --param name=Noor --param project=opencypher-tck 'EXPLAIN MATCH (p:Person {name: $name}), (j:Project {name: $project}) MERGE (p)-[w:WORKS_ON]->(j) SET w.since = 2026 RETURN p.name AS person, j.name AS project'",
-        "expected_sha256": "fe6e31db8e994432233ffe3df61f2abf6c85f1be96878d9d3664c562c826b94b"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --safe --mode envelope \"MATCH (p:Person) RETURN p.name AS name\"",
-        "expected_sha256": "feebf8d701f6a4d63945e55f2af84889048aac52bc91944079110deb792800c1"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --safe --mode envelope \"MATCH (p:Person) RETURN p.name AS name ORDER BY name LIMIT 3\"",
-        "expected_sha256": "e2db32d858db59a086f9adf21c36856e19c87716d9e1db6d59df81a7bf3422f8"
-      },
-      {
-        "command": "relate --load ./team.rl --database ./rehearsal.rl --mode envelope --param name=Noor --param project=opencypher-tck 'MATCH (p:Person {name: $name}), (j:Project {name: $project}) MERGE (p)-[w:WORKS_ON]->(j) SET w.since = 2026 RETURN p.name AS person, j.name AS project, w.since AS since'",
-        "expected_sha256": "ce9e76374f7cbb159f0e8def2a4ff06ddbbc0e79662fa4b373d2e8b058bae776"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (:Person {name: 'Noor'})-[w:WORKS_ON]->() RETURN count(w) AS projects\"",
-        "expected_sha256": "7728e9af2bc8fd34e12ee4d8ca1c341b71b9c0b840f8fa9336a209906ebb4fe7"
-      },
-      {
-        "command": "rm ./rehearsal.rl",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl --mode envelope --param name=Noor --param project=opencypher-tck 'MATCH (p:Person {name: $name}), (j:Project {name: $project}) MERGE (p)-[w:WORKS_ON]->(j) SET w.since = 2026 RETURN p.name AS person, j.name AS project, w.since AS since'",
-        "expected_sha256": "455c8bb580402df8d42b4eb3e4d61dae9d3eb9131145ea4d7db22071bc25b71a"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person)-[w:WORKS_ON]->(j:Project) RETURN p.name AS person, j.name AS project ORDER BY person, project\"",
-        "expected_sha256": "2c7c615f6d12e38a8f9d9020c8be3001e68cd7b18ba73b09a1ad899f84137f4c"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table 'MATCH (p:Person {name: $name}) RETURN p.role AS role'\necho \"exit=$?\"",
-        "expected_sha256": "a83f3ad30028166688edccf709b643702e6067b479a8a69b7d99658ff9ea4112"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table --param name=Noor 'MATCH (p:Person {name: $name}) RETURN p.role AS role'",
-        "expected_sha256": "e157ffe4aef0510f9bc8daf60df633a8d8a53669b1aa80f85a3e6d4907c8cf52"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope 'MATCH (p:Person {name: $name}) RETURN p.role AS role'\necho \"exit=$?\"",
-        "expected_sha256": "4270b82f01d08c325ba12ff4166c445dc702c3a0a08717fc794f82d2f964988f"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope --param name=Noor 'MATCH (p:Person {name: $name}) RETURN p.role AS role'",
-        "expected_sha256": "e74963f5f54a8531ada97e4cc4feec0d6162f0cd9de3d4ed02ff7ad0b268ad88"
-      }
-    ],
-    "get-started/first-graph.mdx": [
-      {
-        "command": "cat > seed.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nMATCH (n) RETURN count(n) AS nodes;\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./team.rl --mode table < seed.cypher",
-        "expected_sha256": "c8c82e51e1a569c769d5b953e2bdc060a3d20e27f4dff454c51b7e2feef6b94c"
-      },
-      {
-        "command": "ls",
-        "expected_sha256": "c321357a1d97c4b097fd20e5621b4ee8f856add9faae45b42d8a901d50e82821"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table \"MATCH (p:Person)-[w:WORKS_ON]->(proj:Project) RETURN p.name AS person, proj.name AS project, w.since AS since ORDER BY since\"",
-        "expected_sha256": "81b33dcd93c8090e0f8056999e70670642aa9a324e4cb740bfc76a3c5e9a07e3"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table --param name=Grace 'MATCH (:Person {name: $name})-[:WORKS_ON]->(proj:Project) RETURN proj.name AS project, proj.language AS language ORDER BY project'",
-        "expected_sha256": "cc578d97ee080e9017567c5616de7c864aa8df19202058a582b0fced91ff65f6"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table \"EXPLAIN MATCH (p:Person)-[:WORKS_ON]->(proj:Project {name: 'relate'}) RETURN p.name AS person ORDER BY person\"",
-        "expected_sha256": "02e29e8ce8cc23b836e47848589ebe31199d38fd09627ff6531cf8ffca554b55"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --json --param name=Grace 'MATCH (:Person {name: $name})-[:WORKS_ON]->(proj:Project) RETURN proj.name AS project, proj.language AS language ORDER BY project'",
-        "expected_sha256": "247758b8c14c8da9ebaf4372c2d0162835256d166019b6d6c901a7f7cb4acf40"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope --param name=Grace 'MATCH (:Person {name: $name})-[:WORKS_ON]->(proj:Project) RETURN proj.name AS project, proj.language AS language ORDER BY project'",
-        "expected_sha256": "6741de5bf0c4212da7f30de656d8067c2868b29d7b84d604284d81d0d3d6d010"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope --param name=Zed 'MATCH (:Person {name: $name})-[:WORKS_ON]->(proj:Project) RETURN proj.name AS project ORDER BY project'",
-        "expected_sha256": "894c9eab54f10b845452d75f3f578a14dd0717376dcf710f63e98ec6f6e3e050"
-      }
-    ],
-    "get-started/install.mdx": [
-      {
-        "command": "relate --version",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --mode table \"RETURN 1 AS ok\"",
-        "expected_sha256": "30469e7c745c9804ceec92251435d8b5aff0f97f6d9666cd9ceeaa49e81c712f"
-      },
-      {
-        "command": "relate --mode envelope \"RETURN 1 AS ok\"\necho \"exit=$?\"",
-        "expected_sha256": "0e549ba89bc78dd2c4a22eaf0fec6f865637fcd4ad4a335da9d1145b9beaa240"
-      }
-    ],
-    "guides/agents/agent-safety.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./team.rl --mode envelope < team.cypher",
-        "expected_sha256": "2efc60515e1e667bbdc964a456613334f82525f16a2bc3be457c312421997488"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"CREATE (:Person {name: 'Eve'})\"",
-        "expected_sha256": "66b6344282de4cf9ef9babb4e859c5b3f4f6d1a985505f7edf4581155a0e783e"
-      },
-      {
-        "command": "relate --safe --mode envelope \"CREATE (n {name: 'Eve'}) RETURN n.name AS name\"",
-        "expected_sha256": "503c3cc846800e1e7fab846b32c09fc6a0029de185687b5e2003e81496590396"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --safe --mode envelope 'MATCH (p:Person) RETURN collect(p.name) AS names'",
-        "expected_sha256": "71e5f222b0db243c5e84fed34e5c29259d542c5a3299b093a66a0d3bd3eb6e21"
-      },
-      {
-        "command": "relate clone ./team.rl ./team-backup.rl",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team-backup.rl --read-only --mode envelope 'MATCH (n) RETURN count(n) AS nodes'",
-        "expected_sha256": "b9fb16f86fc46094d31a56e13ba6399cdf63e432a9252ce8d5e8563cb23c1773"
-      },
-      {
-        "command": "relate query --database ./team.rl --mode envelope <<'EOF'\n.begin\nMATCH (p:Project {name: 'opencypher-tck'}) DETACH DELETE p;\nMATCH (p:Project) RETURN count(p) AS projects;\n.rollback\nMATCH (p:Project) RETURN count(p) AS projects;\nEOF",
-        "expected_sha256": "33e6a2b8c40c212832ce4865caef957c26110f5548b7859a003534f1223a4294"
-      },
-      {
-        "command": "relate --database ./team.rl --mode envelope \"MATCH (p:Person {name: 'Zed'}) SET p.role = 'maintainer'\"",
-        "expected_sha256": "fd0067d92e960e83e562dca3054824d525ebe3a518e4205c8ded279990692a1a"
-      },
-      {
-        "command": "mkdir -p imports\nprintf 'name,role\\nOla,engineer\\n' > imports/people.csv",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --mode envelope \"LOAD CSV WITH HEADERS FROM 'people.csv' AS row RETURN row.name AS name\"",
-        "expected_sha256": "121ff6fdb69b1a31c86883808523caec3f5383506fbf1b3783f896cc48a9ff3e"
-      },
-      {
-        "command": "relate --load-csv-dir ./imports --mode envelope \"LOAD CSV WITH HEADERS FROM 'people.csv' AS row RETURN row.name AS name\"",
-        "expected_sha256": "6800914506680f45f64cd6fcb4b7d0017ade8e7c58d00bd6be89e027de593254"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --safe --mode envelope 'MATCH (p:Person) DETACH DELETE p'\necho \"exit=$?\"",
-        "expected_sha256": "613c8853f52bab0be85b343cd078edc51235257e9aed2de8f907b8c3f1bbe8ca"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --safe --mode envelope 'MATCH (p:Person) RETURN count(p) AS people'",
-        "expected_sha256": "d37d48a1da14a0dd6faf5efae4eeb03ec96ccd5ec00c2f3f792827321a35a365"
-      }
-    ],
-    "guides/agents/connect-over-mcp.mdx": [
-      {
-        "command": "relate --database ./graph.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"shell\",\"version\":\"0\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/list\",\"params\":{}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"CREATE (:Person {name: \\\"Eve\\\"})\"}}}' \\\n  | relate serve --mcp stdio --database ./graph.rl --read-only 2>/dev/null",
-        "expected_sha256": "6adcc3bbc80697987d21701750236d8a977c9b8134a09204f3844d95fed5f03f"
-      }
-    ],
-    "guides/agents/diffable-memory.mdx": [
-      {
-        "command": "git init -q\ngit config user.name \"relate docs\"\ngit config user.email \"docs@example.com\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./memory --snapshot-format json --mode envelope <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nls -A memory memory/wal memory/.relate/schema",
-        "expected_sha256": "a2179ccf4fca553568dca4f19bade46f9784ba1fde9580ebfc674f5fb8d56884"
-      },
-      {
-        "command": "jq -c '.nodes[0], .relationships[0]' memory/graph.json",
-        "expected_sha256": "4efe12a003180e1bacb32d990fdcd2d33e64d0db8ac8743fe8950adcfb6f3d18"
-      },
-      {
-        "command": "printf 'memory/graph.json diff=relate-json\\n' > .gitattributes\ngit config diff.relate-json.textconv \"jq .\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "git add .gitattributes memory\ngit commit -q -m \"Seed the team memory\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./memory --read-only --mode envelope \"MATCH (n) RETURN count(n) AS nodes\"\ngit status --short",
-        "expected_sha256": "0a04462d711a47dc93a5025337b9026c455bfac9b521ad64a6bc818fee502376"
-      },
-      {
-        "command": "relate --database ./memory --mode envelope \"MATCH (ada:Person {name: 'Ada'}) MERGE (docs:Project {name: 'docs', language: 'Markdown'}) MERGE (ada)-[:WORKS_ON {since: 2026}]->(docs)\"\nrelate --database ./memory --mode envelope \"MATCH (ada:Person {name: 'Ada'}) MERGE (docs:Project {name: 'docs', language: 'Markdown'}) MERGE (ada)-[:WORKS_ON {since: 2026}]->(docs)\"",
-        "expected_sha256": "189855828ed0e879cc52120b2734cd1b69814b3fc72fc5c27d31fb736d52d1db"
-      },
-      {
-        "command": "git status --short\ngit diff --stat",
-        "expected_sha256": "af501f7c9b7d1eb56c8b237bd2fc1dcc2ffaf196e68bd5b015c5ebf8cd7e4ec4"
-      },
-      {
-        "command": "git diff memory/graph.json",
-        "expected_sha256": "9c86073528e60d3d6b0ecd8fc2071ba3c8648fdda2a6471495b227f2e079056d"
-      },
-      {
-        "command": "git add memory\ngit commit -q -m \"Ada works on docs\"\nrelate --database ./memory --read-only --mode envelope \"MATCH (:Person {name: 'Ada'})-[w:WORKS_ON]->(p:Project) RETURN p.name AS project, w.since AS since ORDER BY since\"\ngit status --short",
-        "expected_sha256": "fd58b0eeaa3b181780881f802e7c34ecf554d91f5348f03bf420fcd0476449a1"
-      }
-    ],
-    "guides/agents/drive-relate-from-an-agent.mdx": [
-      {
-        "command": "relate agent-context | tail -7",
-        "expected_sha256": "f4bc53166089db5eda5c9357bf2683cb08cccd389e8065669ce143e68cdd523f"
-      },
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./team.rl --mode envelope < team.cypher",
-        "expected_sha256": "b8f6755a53fe08af422c244fd25e94dc4f54171b0300d6698ec7a7876f1c6a6c"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope 'MATCH (p:Person)-[w:WORKS_ON]->(j:Project) RETURN p.name AS person, j.name AS project, w.since AS since ORDER BY since'",
-        "expected_sha256": "879b8c73d5838926b0e45d27b43ea02323c3336bf567f7d3b16ecb382b10e980"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person {name: 'Zed'}) RETURN p.role AS role\"",
-        "expected_sha256": "a12fb9edc40bfefb4bc3117c6191c4ae157778dcc6f4a7f7437f30d9ba439703"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope --param 'names=[\"Ada\",\"Noor\"]' --param since=2023 'MATCH (p:Person)-[w:WORKS_ON]->(j:Project) WHERE p.name IN $names AND w.since >= $since RETURN p.name AS person, j.name AS project'",
-        "expected_sha256": "64c5347d24d8f5806d7682ac3bf88414b7d8fda64febc7383af4eccfed9bcb40"
-      },
-      {
-        "command": "printf '%s\\n' '{\"names\": [\"Grace\"], \"since\": 2022}' > filter.json\nrelate --database ./team.rl --read-only --mode envelope --fetch-params filter=./filter.json 'MATCH (p:Person)-[w:WORKS_ON]->(j:Project) WHERE p.name IN $filter.names AND w.since >= $filter.since RETURN p.name AS person, j.name AS project ORDER BY project'",
-        "expected_sha256": "0412c2ad89045723d65c30caf43a6636375f9578ba39cea5639af08fd849b526"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope 'MATCH (p:Person {name: $name}) RETURN p.role AS role'\necho \"exit=$?\"",
-        "expected_sha256": "4270b82f01d08c325ba12ff4166c445dc702c3a0a08717fc794f82d2f964988f"
-      },
-      {
-        "command": "relate --mode envelope 'RETURN 1 AS a; RETRN 2; RETURN 3 AS c'\necho \"exit=$?\"",
-        "expected_sha256": "e3472127ccac46e656005d11eef1a62b38da16f21ac52b4e75f9652cf6ac9088"
-      },
-      {
-        "command": "CLAUDECODE=1 relate --mode jsonl 'UNWIND range(1, 250) AS x RETURN x' 2>/dev/null | grep '\"rowCap\"'",
-        "expected_sha256": "37b2205dd105a6b8f8d2311c8226914d96b1ec08237e570cd0272b59d63bbfd8"
-      },
-      {
-        "command": "CLAUDECODE=1 relate --mode envelope --max-rows 2 'UNWIND range(1, 250) AS x RETURN x'",
-        "expected_sha256": "803d2eab93391aff36a4dc91680416f52c26529f4f5cc9cd3901fecdf6227990"
-      },
-      {
-        "command": "CLAUDECODE=1 relate --database ./team.rl --read-only 'MATCH (p:Person) RETURN p.name AS name, p.role AS role ORDER BY name'",
-        "expected_sha256": "7a0f287f08c7f1164d7317621e47f20f61054b857ea7f390948f5e6f1fc6a90d"
-      },
-      {
-        "command": "relate --mode envelope --timeout 100ms 'UNWIND range(1, 20000) AS a UNWIND range(1, 20000) AS b RETURN count(*) AS pairs'\necho \"exit=$?\"",
-        "expected_sha256": "a956106332d504ed4b7b2792bae75474f4ec2695be860aa77652f356937e4856"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope 'MATCH (p:Person) RETURN count(p) AS people'\necho \"exit=$?\"",
-        "expected_sha256": "3fd2bdf867762a8ab9806e18949b303948328ce52cdfa16f3362126c631b36a9"
-      }
-    ],
-    "guides/agents/install-the-skill.mdx": [
-      {
-        "command": "relate skill install --agent claude-code",
-        "expected_sha256": "a5c5b4b19d67b5c005488a4f618bf9384d5039d5d6703b0e5325b0fe0b87c242"
-      },
-      {
-        "command": "relate skill list",
-        "expected_sha256": "810e70b8668a984815abbd355e8bb61799d5a45bf3df8836ffc122ce021f16ee"
-      },
-      {
-        "command": "relate skill check",
-        "expected_sha256": "e13d8d1072c45d2cef2f7482140efe2ce2276fa65917b8b970e7b9e01aa9195d"
-      },
-      {
-        "command": "ls -A \"$HOME/.claude/skills/relate\"",
-        "expected_sha256": "facce8b97aa1e7429b52ef53ab72835fba80a37bb5c8c32ee9c33dbf9ad5212b"
-      },
-      {
-        "command": "grep -E '^(name|version):' \"$HOME/.claude/skills/relate/SKILL.md\"",
-        "expected_sha256": "42c90aa0d5a04f5ce3bfbd010f96b420fa56dc2b8fcf3c8a7c46d5068bf2fb69"
-      }
-    ],
-    "guides/agents/run-in-a-sandbox.mdx": [
-      {
-        "command": "DO_NOT_TRACK=1 relate telemetry status",
-        "expected_sha256": "1221056224b1fcd01c0349d19793413c6fad02c9e7d205ba46c742c04f527b03"
-      },
-      {
-        "command": "relate --mode envelope \"CREATE (:Note {text: 'kept?'})\"\nrelate --mode envelope \"MATCH (n:Note) RETURN count(n) AS notes\"",
-        "expected_sha256": "2a0a23fda72922f44fcb494944eed14c64371b1ec3f802a1556dc34995d7f721"
-      },
-      {
-        "command": "relate --database ./work.rl --mode envelope \"CREATE (:Note {text: 'kept'})\"\nrelate --database ./work.rl --read-only --mode envelope \"MATCH (n:Note) RETURN count(n) AS notes\"",
-        "expected_sha256": "8332c257fbdc82628468dbc4536057969700765eef2fcdb988ff0d7663794027"
-      }
-    ],
-    "guides/agents/text-to-cypher.mdx": [
-      {
-        "command": "relate query --database ./team.rl --mode envelope <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF",
-        "expected_sha256": "69e94e847c4a5e4bf926ed7fbf3be56f95094de8f6e5d8642630ecee6cfc88f1"
-      },
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"shell\",\"version\":\"0\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"get_schema\",\"arguments\":{}}}' \\\n  | relate serve --mcp stdio --database ./team.rl --read-only 2>/dev/null",
-        "expected_sha256": "ef60ea0871fbcf9561641ced20a740bd7efbb8a55383fc7e3b4e13e0a799df14"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"EXPLAIN MATCH (p:Person)-[:WORKS_AT]->(c:Company) RETURN c.name AS company, count(p) AS people\" | jq -c '.notifications[] | {gql_status, description}'",
-        "expected_sha256": "50f5fc10cea9b4a33b7b949afe3a2e832ffac0add733cf92f1f74381a2abc0bf"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"EXPLAIN MATCH (p:Person)-[:WORKS_ON]->(proj:Project) RETURN proj.name AS project, count(p) AS people ORDER BY people DESC\" | jq -c '.notifications'",
-        "expected_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
-      }
-    ],
-    "guides/agents/use-in-ci.mdx": [
-      {
-        "command": "relate query --database ./deps.rl --mode envelope <<'EOF'\nCREATE (app:Version:Root {key: 'NPM/team-api@1.4.0', name: 'team-api', version: '1.4.0'}),\n       (router:Version {key: 'NPM/route-kit@2.3.1', name: 'route-kit', version: '2.3.1'}),\n       (parser:Version {key: 'NPM/path-match@0.1.7', name: 'path-match', version: '0.1.7'}),\n       (signer:Version {key: 'NPM/token-sign@8.5.1', name: 'token-sign', version: '8.5.1'}),\n       (app)-[:DEPENDS_ON {requirement: '^2.3.0'}]->(router),\n       (router)-[:DEPENDS_ON {requirement: '0.1.7'}]->(parser),\n       (app)-[:DEPENDS_ON {requirement: '^8.5.0'}]->(signer),\n       (parser)-[:AFFECTED_BY]->(:Advisory {id: 'ADV-2026-0007', title: 'Backtracking on crafted paths', cvss3: 7.5}),\n       (signer)-[:AFFECTED_BY]->(:Advisory {id: 'ADV-2026-0012', title: 'Weak default algorithm', cvss3: 8.1}),\n       (router)-[:AFFECTED_BY]->(:Advisory {id: 'ADV-2026-0019', title: 'Verbose error pages', cvss3: 4.3});\nEOF",
-        "expected_sha256": "75bc4589c2f1edb4392d1a8a8a85f63eecbb55c904f62dc348f7a1e036af3a2e"
-      },
-      {
-        "command": "cat > gate.cypher <<'EOF'\nMATCH p = SHORTEST 1 (r:Root)-[:DEPENDS_ON]->{0,12}(v:Version)\nMATCH (v)-[:AFFECTED_BY]->(a:Advisory)\nWHERE a.cvss3 >= $minCvss AND NOT a.id IN $allow\nRETURN a.id AS advisory, a.cvss3 AS cvss, v.key AS version,\n       [n IN nodes(p) | n.name] AS path\nORDER BY cvss DESC, advisory, version;\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./deps.rl --read-only --mode json --max-rows 0 --timeout 30s --param minCvss=7.5 --param 'allow=[]' < gate.cypher > findings.json\necho \"relate exit=$?\"\ncat findings.json\njq -e '.data | length == 0' findings.json\necho \"gate exit=$?\"",
-        "expected_sha256": "3cde319f4dce1d94884296376aa136492a3b6ad07f64a19a8a5a6a34523272c5"
-      },
-      {
-        "command": "relate query --database ./deps.rl --read-only --mode json --max-rows 0 --timeout 30s --param minCvss=7.5 --param 'allow=[\"ADV-2026-0007\",\"ADV-2026-0012\"]' < gate.cypher > findings.json\njq -e '.data | length == 0' findings.json\necho \"gate exit=$?\"",
-        "expected_sha256": "976ffd9a7337f630958141c4deeff73f7c58e110ed79854781f406718e6d6ee1"
-      },
-      {
-        "command": "DO_NOT_TRACK=1 relate telemetry status",
-        "expected_sha256": "1221056224b1fcd01c0349d19793413c6fad02c9e7d205ba46c742c04f527b03"
-      },
-      {
-        "command": "relate --version",
-        "expected_sha256": "585291832daf8aac99ea8da71c537d1554ca5d4f376069936566262d3b85aee9"
-      }
-    ],
-    "guides/cli/interactive-shell.mdx": [
-      {
-        "command": "cat > seed.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team.rl < seed.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "printf 'MATCH (p:Person)-[w:WORKS_ON]->(proj:Project)\\nWHERE w.since >= 2023\\nRETURN p.name AS person, proj.name AS project\\nORDER BY person;\\n' | relate query --database ./team.rl --read-only --mode table",
-        "expected_sha256": "864d71478c1885e04ea3a2b84d7c0a34fee06410370c0266c917d2a0fd5e768c"
-      },
-      {
-        "command": "printf 'MATCH (p:Person {name: $name})-[w:WORKS_ON]->(proj:Project)\\nRETURN proj.name AS project, w.since AS since\\nORDER BY since;\\n' | relate query --database ./team.rl --read-only --param name=Grace --mode table",
-        "expected_sha256": "6f85534e86cb9f29eee62cff28f0c4af9f6ea5f60ec3978bf523bfb15bec8592"
-      },
-      {
-        "command": "cat > ines.cypher <<'EOF'\n.begin\nMATCH (proj:Project {name: 'relate'})\nMERGE (i:Person {name: 'Ines', role: 'engineer'})\nMERGE (i)-[:WORKS_ON {since: 2026}]->(proj);\n.commit\nEOF\nrelate query --database ./team.rl --mode envelope < ines.cypher",
-        "expected_sha256": "3ee095e6fe8a660747278d0b81a6d8ee47c9b1ce3f28fd6f68a5846725f4b398"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table \"MATCH (p:Person)-[:WORKS_ON]->(:Project {name: 'relate'}) RETURN p.name AS name ORDER BY name\"",
-        "expected_sha256": "f32d18d69ebc45c80bea97d0ae317d34880f3cdbb7a511a6dc97642461e24b2f"
-      }
-    ],
-    "guides/cli/output-formats.mdx": [
-      {
-        "command": "cat > seed.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team.rl < seed.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --jsonl \"MATCH (p:Person) RETURN p.name AS name, p.role AS role ORDER BY name\" | jq -r 'select(.role == \"engineer\") | .name'",
-        "expected_sha256": "df31c6c23f54a602b9d47d5afe4051ea16f3e311a92c97a59cfd8f942a0b7509"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person)-[:WORKS_ON]->(proj:Project) RETURN proj.name AS project, count(p) AS people ORDER BY project\" | jq -c '{columns, columnTypes, truncated, rows: (.rows | length)}'",
-        "expected_sha256": "d7ac270f9e82761f8eff0dac372594873286ac58c4a6a262464885e950692fbc"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --csv \"MATCH (p:Person) OPTIONAL MATCH (p)-[:WORKS_ON]->(proj:Project) RETURN p.name AS name, p.role AS role, count(proj) AS projects ORDER BY name\" > people.csv\ncat people.csv",
-        "expected_sha256": "fff49a7e724bf9a56bb382fb2959316544c00fcd37a247cd352e7b4d71a7e3c1"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --markdown \"MATCH (proj:Project)<-[:WORKS_ON]-(p:Person) RETURN proj.name AS project, collect(p.name) AS people ORDER BY project\"",
-        "expected_sha256": "f5d21eb719c44beae51744bb15d6225fc4d970c9bb80766d3415f425793e6b20"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --toon \"MATCH (p:Person)-[w:WORKS_ON]->(proj:Project) RETURN p.name AS person, proj.name AS project, w.since AS since ORDER BY since\"",
-        "expected_sha256": "094513523e051cf56c0a17c0ad172ccffcda2b6dbc854803315658753e329be1"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode speedscope \"PROFILE MATCH (p:Person)-[:WORKS_ON]->(proj:Project) RETURN p.name AS person, proj.name AS project\" > profile.json\njq -r '.shared.frames[].name' profile.json",
-        "expected_sha256": "8919f3e4517919bf402712aaf86c3f701ec0699fa2f52f41a95111630969be52"
-      },
-      {
-        "command": "head -n 1 people.csv\njq -r '.profiles[0].type, .profiles[0].unit' profile.json",
-        "expected_sha256": "99d09389f5996c7beab32e64f8588553427c1d9d748202d6d1c63e35783beaf5"
-      }
-    ],
-    "guides/cli/scripting.mdx": [
-      {
-        "command": "cat > seed.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nMATCH (n) RETURN count(n) AS nodes;\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./team.rl --mode envelope < seed.cypher",
-        "expected_sha256": "9cd77fb1666f2e68104b4aa707571039da4ed1cbb5fd9b211fbe97c279006bdd"
-      },
-      {
-        "command": "printf 'MATCH (p:Person) RETURN count(p) AS people;\\nMATCH (p:Project) RETURN count(p) AS projects;\\n' | relate query --database ./team.rl --read-only --mode envelope",
-        "expected_sha256": "54f2043146acfdb8b590f80d78ce078ab33078018f2df8e9083ad23e542eceb5"
-      },
-      {
-        "command": "relate --mode envelope --param name=Ines --param since=2026 --param 'tags=[\"graph\",\"cli\"]' 'RETURN $name AS name, $since AS since, $tags AS tags'",
-        "expected_sha256": "bda3290a9bfbe26411b049260ac3479dab5660c6745a49f8f6244c8b91dd3836"
-      },
-      {
-        "command": "printf '[{\"name\": \"Ines\", \"role\": \"engineer\"}, {\"name\": \"Kofi\", \"role\": \"maintainer\"}]\\n' > people.json\nrelate --database ./team.rl --mode envelope --fetch-params people=people.json 'UNWIND $people AS p MERGE (n:Person {name: p.name}) SET n.role = p.role RETURN count(n) AS merged'",
-        "expected_sha256": "586b8309fb700b27c51dddacf0cf5145967832a5aa0328c5ca19dc811e59b2f8"
-      },
-      {
-        "command": "relate --mode envelope --timeout 100ms \"UNWIND range(1, 20000) AS a UNWIND range(1, 20000) AS b RETURN count(*) AS pairs\"\necho \"exit=$?\"",
-        "expected_sha256": "a956106332d504ed4b7b2792bae75474f4ec2695be860aa77652f356937e4856"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"CREATE (:Person {name: 'Zed'})\"\necho \"exit=$?\"",
-        "expected_sha256": "613c8853f52bab0be85b343cd078edc51235257e9aed2de8f907b8c3f1bbe8ca"
-      },
-      {
-        "command": "status=0\nrelate --database ./team.rl --read-only --mode envelope --timeout 5s \"MATCH (p:Person) RETRUN p.name\" > result.jsonl 2> error.txt || status=$?\ncase \"$status\" in\n  0) echo \"ok\" ;;\n  5) echo \"conflict\" ;;\n  6) echo \"rejected: $(head -n 1 error.txt)\" ;;\n  7) echo \"timed out\" ;;\n  *) echo \"failed with exit code $status\" ;;\nesac",
-        "expected_sha256": "36fda7906ec30e5d9f7b5c7d3458c24689b82701bdf62ca95bc6260bb950174e"
-      },
-      {
-        "command": "mkdir -p migrations\ncat > migrations/001-ines.cypher <<'EOF'\n.begin\nMATCH (p:Person {name: 'Ines'}), (proj:Project {name: 'relate'})\nMERGE (p)-[:WORKS_ON {since: 2026}]->(proj);\n.commit\nEOF\ncat > migrations/002-teams.cypher <<'EOF'\n.begin\nMATCH (p:Person) SET p.team = 'core';\nMATCH (p:Person) RETRUN count(p) AS people;\n.commit\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "cat > migrate.sh <<'EOF'\nset -e\nfor f in migrations/*.cypher; do\n  echo \"applying $f\"\n  relate query --database ./team.rl --mode envelope < \"$f\"\ndone\necho \"all migrations applied\"\nEOF\nbash migrate.sh\necho \"exit=$?\"",
-        "expected_sha256": "84c4ef8d67edfb4012616ae51ef99c2f397b7749bb2efb9c65bc407275a45e1d"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope -c \"MATCH (:Person {name: 'Ines'})-[w:WORKS_ON]->(proj:Project) RETURN proj.name AS project, w.since AS since; MATCH (p:Person) WHERE p.team IS NOT NULL RETURN count(p) AS with_team\"",
-        "expected_sha256": "1ab7d89783f4a45e84a332875f57b2723baf3547fb551e7c81848a859e18c523"
       }
     ],
     "guides/cypher/geospatial.mdx": [
@@ -3822,78 +3276,6 @@
         "expected_sha256": "d1427638e33cb47c84174fd92ad7cd9143468e5a66cdf7eb5c4ac4857200fa0f"
       }
     ],
-    "guides/cypher/ontology.mdx": [
-      {
-        "command": "cat > team.yaml <<'YAML'\nschema: https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json\nid: team\nversion: \"1\"\ndescription: Who works on which project, and since when.\nnodes:\n  Person:\n    label: Person\n    description: Someone on the team.\n    properties:\n      name: {type: STRING, key: true}\n      role: {type: STRING, must_exist: true, description: \"engineer or maintainer\"}\n  Project:\n    label: Project\n    description: A code repository the team works on.\n    properties:\n      name: {type: STRING, key: true}\n      language: {type: STRING}\nrelationships:\n  WORKS_ON:\n    type: WORKS_ON\n    description: A person contributes to a project.\n    from: {node: Person}\n    to: {node: Project}\n    properties:\n      since: {type: INTEGER, description: \"the year the person started\"}\nYAML",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table \"CALL db.ontology.get() YIELD ontology RETURN ontology\"",
-        "expected_sha256": "6e5d1a580e5a0106a26889ed48b64798168da8a9edf21e2174ce42bf224ac860"
-      },
-      {
-        "command": "RELATE_PREVIEW=ontology relate --database ./team.rl --param \"ontology=$(cat team.yaml)\" 'CALL db.ontology.set($ontology)'",
-        "expected_sha256": null
-      },
-      {
-        "command": "RELATE_PREVIEW=ontology relate --database ./team.rl --read-only --mode jsonl \"CALL db.ontology.get('json') YIELD ontology RETURN ontology\"",
-        "expected_sha256": "b8e9f65cda1d33cf37e968ac74796c2ed9249ee4a04e2385b0442a41a97e6680"
-      },
-      {
-        "command": "RELATE_PREVIEW=ontology relate --database ./team.rl \"CALL db.ontology.apply()\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table \"SHOW CONSTRAINTS YIELD name, type, labelsOrTypes, properties RETURN name, type, labelsOrTypes, properties ORDER BY labelsOrTypes, type\"",
-        "expected_sha256": "2fa80928153d85d466dd9831b73b10448158d679451c446313a7ca4d0d8f42bd"
-      },
-      {
-        "command": "relate --database ./team.rl --mode table \"CREATE (:Person {name: 'Eli'})\"",
-        "expected_sha256": "9d0a1b00214be6c711abc239ab9c4fdd099a2d802481f2fe8801ec8cff8ec297"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --namespace system_ontologies --mode table \"MATCH (n) RETURN count(n) AS nodes\"",
-        "expected_sha256": "954370dfcdd584beeb7a7647070f473aff92fd79f7130161755b1a54a6a68b86"
-      },
-      {
-        "command": "RELATE_PREVIEW=ontology relate --database ./team.rl \"CALL db.ontology.drop()\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "RELATE_PREVIEW=ontology relate --database ./team.rl --read-only --mode table \"CALL db.ontology.get() YIELD ontology RETURN ontology IS NULL AS unset\"",
-        "expected_sha256": "672491db3dd53c9f73c5abedf5bb9de730beae120602093d5ebe358642935263"
-      }
-    ],
-    "guides/cypher/parameters.mdx": [
-      {
-        "command": "relate --database ./team.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table --param name=Grace 'MATCH (p:Person {name: $name})-[w:WORKS_ON]->(proj:Project) RETURN proj.name AS project, w.since AS since ORDER BY since'",
-        "expected_sha256": "6f85534e86cb9f29eee62cff28f0c4af9f6ea5f60ec3978bf523bfb15bec8592"
-      },
-      {
-        "command": "relate --read-only --param day=2026-11-08 'RETURN date($day) AS day'",
-        "expected_sha256": "e33e2bd880845dfe8cd46c034bddc13902c1129bf3dca1187afabc7b4f1d5ba0"
-      },
-      {
-        "command": "relate --read-only --mode table --param 'day=\"2026-11-08\"' 'RETURN date($day) AS day'",
-        "expected_sha256": "e5cbc140cfc7f44c52499409be2c26c6af41543658a4cce00f3e3305ddfa63f6"
-      },
-      {
-        "command": "relate --read-only --mode table --param 'loc={\"latitude\": 45.5231, \"longitude\": -122.6765}' --param 'day=\"2026-11-08\"' --param 'at=\"2026-11-08T09:30:00Z\"' --param 'span=\"PT90M\"' --param 'focus=[0.9, 0.1, 0.2]' --param 'tags=[\"graph\", \"rust\"]' --param 'meta={\"source\": \"cli\", \"rank\": 1}' 'RETURN valueType(point($loc)) AS loc, valueType(date($day)) AS day, valueType(datetime($at)) AS at, valueType(duration($span)) AS span, valueType(vector($focus, 3, FLOAT32)) AS focus, valueType($tags) AS tags, valueType($meta) AS meta'",
-        "expected_sha256": "d6ba54b5d635d9d50589a47aea4702ead47648654f0603b7f62f300a8bd6a854"
-      },
-      {
-        "command": "relate --read-only --mode envelope --param name=Grace --param since=2023 'RETURN $name AS name, $since AS since'",
-        "expected_sha256": "99b931de2ed96ca530387cb129ef39a245dedb73992afa7aaedc60e351fa3a34"
-      }
-    ],
     "guides/cypher/tune-a-query.mdx": [
       {
         "command": "relate --database ./team.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
@@ -3914,132 +3296,6 @@
       {
         "command": "relate --database ./team.rl --read-only --mode table \"SHOW INDEXES YIELD name, type, labelsOrTypes, properties, state RETURN name, type, labelsOrTypes, properties, state\"",
         "expected_sha256": "fe87eaab8ef77854c8ff9a309dd39e837a8d08ebcf3fd014137998a3bcd319b7"
-      }
-    ],
-    "guides/extensions/install-and-run.mdx": [
-      {
-        "command": "relate extension init greet",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate extension install greet --from ./greet",
-        "expected_sha256": "0175128266111a991e3d297d3bc920b8416f053389f03c9adf69faf8d34aae0d"
-      },
-      {
-        "command": "relate extension install word-count --url http://example.com/word-count-0.1.0.tar.gz",
-        "expected_sha256": "0da0706296bdb5c462053c5b5d43df6098b93bcb00ba21195f03504541cf4327"
-      },
-      {
-        "command": "relate extension install greet --github relatedb/greet",
-        "expected_sha256": "c9ac88ec1ab844a454a5cc39ade869c5cdc27b712ba57a2523fd9b34072d3529"
-      },
-      {
-        "command": "relate extension list",
-        "expected_sha256": "ea1494ade41be8275b9802044b9782433dfb8d0307b3f15ee1e8e110cac66847"
-      },
-      {
-        "command": "ls -A \"$HOME/.config/relate/extensions/greet\"",
-        "expected_sha256": "08d00e0331de53eedbf20f747da62d10a2b778240968a388e39722894122b0b9"
-      },
-      {
-        "command": "cat \"$HOME/.config/relate/extensions/greet/.relate-provenance.json\"",
-        "expected_sha256": "47b5348148eecb109f2a82b229cb81a71975638bad1aa0ac260d92fb75de15ac"
-      },
-      {
-        "command": "relate extension check ./greet",
-        "expected_sha256": "3f069193f7bd49d9194f230a05ef4cbec7459e1540f5e8e4105d2cb9f91dc090"
-      },
-      {
-        "command": "relate run greet --help",
-        "expected_sha256": "e0f186908aa4c79fb61e6c58c0db5a332cf1807dd9865f3ce18692c3033f6181"
-      },
-      {
-        "command": "relate run greet --name Ada -d ./team.rl",
-        "expected_sha256": "9652050ddcba0ea491d945764c70aa713f49cb8ed5e92dafb4eb4e1bdb4cf80e"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table \"MATCH (n:Scaffold) RETURN n.id AS id, n.note AS note\"",
-        "expected_sha256": "13e5da34add513bc2a824a1589ffd2dbadf8613c01d1f3db7e0f674ec0963f71"
-      },
-      {
-        "command": "relate extension remove greet",
-        "expected_sha256": "7d93e7c82096913ca0c8f3a2511c036b5df6e6806abe9e92c738a0895d7a7979"
-      },
-      {
-        "command": "relate extension install greet --from ./greet\nrelate extension check \"$HOME/.config/relate/extensions/greet\"",
-        "expected_sha256": "679158168a1726d76c574a75078c6d495000424ddb8ae5c4a27b30a74d5d1f73"
-      }
-    ],
-    "guides/extensions/write-an-extension.mdx": [
-      {
-        "command": "relate extension init word-count",
-        "expected_sha256": "b1709e8b089299f9f6c2ba405f78b653aa42cefce942089efe9224d59332f0c0"
-      },
-      {
-        "command": "ls word-count",
-        "expected_sha256": "4c2fbb332d2a669f88c5fed31dca81639832d9f6e75a9a848ed94ae9118c8e3a"
-      },
-      {
-        "command": "cat word-count/extension.json",
-        "expected_sha256": "d408b2848be55695e499eea6a332bcd57e45c1c4e5a810fbbd3de66b14e1a090"
-      },
-      {
-        "command": "cat > word-count/extension.json <<'EOF'\n{\n  \"kind\": \"command\",\n  \"name\": \"word-count\",\n  \"version\": \"0.1.0\",\n  \"protocol\": \"2025-06-18\",\n  \"flags\": [\n    {\"kind\": \"integer\", \"name\": \"min-length\", \"default\": 4}\n  ],\n  \"positional\": {\"name\": \"DIR\"},\n  \"commit\": \"whole-import\",\n  \"executable\": \"word-count.py\"\n}\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "cat > walk.py <<'EOF'\nWRITE = \"\"\"UNWIND $rows AS row\nMERGE (f:File {path: row.file})\nMERGE (w:Word {text: row.word})\nMERGE (f)-[m:MENTIONS]->(w)\nSET m.count = row.count\"\"\"\n\nREAD = \"\"\"MATCH (f:File)-[m:MENTIONS]->(w:Word)\nRETURN count(DISTINCT f) AS files, count(DISTINCT w) AS words\"\"\"\n\n\ndef walk(client: Client, envelope: dict[str, Any]) -> None:\n    \"\"\"Count the words in every Markdown file under DIR.\"\"\"\n    import re\n    from collections import Counter\n    from pathlib import Path\n\n    root = Path(envelope.get(\"DIR\", \".\"))\n    min_length = envelope[\"min-length\"]\n    rows = []\n    for path in sorted(root.rglob(\"*.md\")):\n        words = re.findall(r\"[a-z]+\", path.read_text().lower())\n        counts = Counter(w for w in words if len(w) >= min_length)\n        for word, count in sorted(counts.items()):\n            rows.append({\"file\": path.relative_to(root).as_posix(), \"word\": word, \"count\": count})\n    chunk = client.caps.get(\"maxRowsPerStatement\", 1000)\n    for start in range(0, len(rows), chunk):\n        batch = rows[start:start + chunk]\n        client.call(\"write_cypher\", {\"statement\": WRITE, \"parameters\": {\"rows\": batch}})\n    found = client.call(\"read_cypher\", {\"statement\": READ})[\"rows\"][0]\n    client.call(\n        \"report_output\",\n        {\n            \"text\": f\"{NAME}: {found['files']} files, {found['words']} distinct words\",\n            \"starters\": [\n                \"MATCH (:File)-[m:MENTIONS]->(w:Word) \"\n                \"RETURN w.text AS word, sum(m.count) AS uses ORDER BY uses DESC, word LIMIT 5\"\n            ],\n        },\n    )\nEOF\npython3 - <<'EOF'\nfrom pathlib import Path\nexe = Path(\"word-count/word-count.py\")\nsrc = exe.read_text()\nstart, end = src.index('WRITE = \"\"\"'), src.index(\"def main(\")\nexe.write_text(src[:start] + Path(\"walk.py\").read_text() + \"\\n\\n\" + src[end:])\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate extension check ./word-count",
-        "expected_sha256": "ac15c51e66dc84d649ffc5758963338587b0ede47f6ec9a1c112e7d0e01f2ea2"
-      },
-      {
-        "command": "mkdir notes\nprintf 'Ada fixed the planner bug.\\nGrace reviewed the planner change and the parser change.\\n' > notes/standup.md\nprintf 'The parser tests pass.\\nNoor wants planner examples before the release.\\n' > notes/retro.md",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate extension install word-count --from ./word-count",
-        "expected_sha256": "8566ff023200c7470fb32b183ec693fdd07f850543793c3cba80c53fd281c210"
-      },
-      {
-        "command": "relate run word-count notes -d ./words.rl",
-        "expected_sha256": "1e37048a093ec2ffeff057fb13ba48b30f6b3344ef640cd9495f5cd4780f99b5"
-      },
-      {
-        "command": "relate --database ./words.rl --read-only --mode table \"MATCH (:File)-[m:MENTIONS]->(w:Word) RETURN w.text AS word, sum(m.count) AS uses ORDER BY uses DESC, word LIMIT 3\"",
-        "expected_sha256": "0089ff89707fda4f480f8a9a92e9219ddb24c84da88f554dc0a22f27b3d22973"
-      },
-      {
-        "command": "relate run word-count notes --min-length 7 -d ./long.rl",
-        "expected_sha256": "dbc0ed750d3689eee26e46fc30c2560bee1f35a8bc72b02889b89a11907f4717"
-      }
-    ],
-    "guides/integrations/claude-agent-sdk.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./team --mode envelope < team.cypher",
-        "expected_sha256": "1e80762d65f4a90e51da17a987c3ce16d10c914553f964696e54ad4347cbee65"
-      },
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"check\",\"version\":\"0\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/list\",\"params\":{}}' \\\n  | relate serve --mcp stdio --database ./team --read-only 2>/dev/null",
-        "expected_sha256": "80550705f483ba881c09f2604ab1bb8bbeafd3837b6a9701509da333a9b6e8a3"
-      },
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: $project}) RETURN p.name AS name, w.since AS since ORDER BY since\",\"parameters\":{\"project\":\"relate\"}}}}' \\\n  | relate serve --mcp stdio --database ./team --read-only 2>/dev/null \\\n  | grep -o '\\\\\"rows\\\\\":\\[[^]]*\\]'",
-        "expected_sha256": "2983218e5ac2835cda0afe31c859847a07fe0930b21c8882709998515c8edb8f"
-      },
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"MATCH (p:Person {name: $name}) DETACH DELETE p\",\"parameters\":{\"name\":\"Ada\"}}}}' \\\n  | relate serve --mcp stdio --database ./team --read-only 2>/dev/null",
-        "expected_sha256": "a98ae868e7803ae934190e236f5d579f597d748840bbf0b91c916ac92fd79345"
-      },
-      {
-        "command": "relate --database ./team --read-only --mode envelope \"MATCH (p:Person) RETURN count(p) AS people\"",
-        "expected_sha256": "07aa9bb1f593f6e0fad1d2ccf65e49b2dbc2915ce87738b667580efaf9712f72"
       }
     ],
     "guides/migrate/from-json-files.mdx": [
@@ -4152,220 +3408,10 @@
         "expected_sha256": "2147cfcfca0eb0c6abf7b871b2c11882bffad33279c774d5094fd98d4da5553c"
       }
     ],
-    "guides/neo4j/pull-from-neo4j.mdx": [
-      {
-        "command": "cat > neo4j.env <<'EOF'\nNEO4J_URI=neo4j+s://<instance-id>.databases.neo4j.io\nNEO4J_USERNAME=neo4j\nNEO4J_PASSWORD=<password>\nNEO4J_DATABASE=neo4j\nEOF\nchmod 600 neo4j.env",
-        "expected_sha256": null
-      },
-      {
-        "command": "NEO4J_URI=neo4j://neo4j.invalid:7687 NEO4J_USERNAME=neo4j NEO4J_PASSWORD='<password>' relate pull --query \"MATCH (n) RETURN n\" --database ./plaintext-check",
-        "expected_sha256": "018430dd01b450b81f0a8c9293a178bfc8199acb96603325ae2ab64a19bf7af4"
-      },
-      {
-        "command": "relate pull --from neo4j.env --query \"MATCH (p:Person) RETURN p.name\" --database ./names",
-        "expected_sha256": "6c19a9bcde4e8a7a42d478e4309503ce2f049b2bc81b07b5e98b2679c3cb18f4"
-      },
-      {
-        "command": "relate --database ./team --mode envelope \"CREATE (:Person {name: 'Ada', role: 'engineer'})\"\nrelate pull --from neo4j.env --query \"MATCH (p:Person) RETURN p\" --database ./team",
-        "expected_sha256": "050d7acdf7b678a143d60654dd62811ed15af948455ca104f4090fa510ca79b5"
-      },
-      {
-        "command": "NEO4J_URI=http://127.0.0.1:9 NEO4J_USERNAME=neo4j NEO4J_PASSWORD='<password>' relate pull --query \"MATCH (n) RETURN n\" --database ./mirror 2>&1 | sed -E 's/ \\(os error [0-9]+\\)$//'",
-        "expected_sha256": "c8a719505c06fc8036215ef9e0d0dc5359cb45f0f6b938b3013fb1d8e27ce130"
-      }
-    ],
-    "guides/neo4j/push-to-neo4j.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team < team.cypher\ncat > neo4j.env <<'EOF'\nNEO4J_URI=neo4j+s://<instance-id>.databases.neo4j.io\nNEO4J_USERNAME=neo4j\nNEO4J_PASSWORD=<password>\nNEO4J_DATABASE=neo4j\nEOF\nchmod 600 neo4j.env",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate push --to neo4j.env --database ./team --dry-run",
-        "expected_sha256": "8fca77cbda0c1e552bfa34ee518681298094e9b9854a41331eef315f59a51ce8"
-      },
-      {
-        "command": "relate --database ./team --mode envelope \"CREATE CONSTRAINT person_name IF NOT EXISTS FOR (p:Person) REQUIRE p.name IS UNIQUE\"\nrelate --database ./team --mode envelope \"CREATE CONSTRAINT project_name IF NOT EXISTS FOR (p:Project) REQUIRE p.name IS UNIQUE\"\nrelate push --to neo4j.env --database ./team --dry-run",
-        "expected_sha256": "5d5fa98b9f517af7bd0588228c11d8b24c68887d20a94d55866e84ed8d6cdeb5"
-      },
-      {
-        "command": "relate push --to neo4j.env --database ./team --labels Person --dry-run",
-        "expected_sha256": "22c35750778eb1c1c4d193c858499332f176ac301bd72e42cb45d60f8cb24b27"
-      },
-      {
-        "command": "relate push --to neo4j.env --database ./team --labels Person --types WORKS_ON",
-        "expected_sha256": "e20a79b9355f2414ee4036453d27ffa9c73de908fdf82aa4721cbd523fb53794"
-      }
-    ],
-    "guides/operate/crash-and-recovery.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team.rl < team.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "cat > work.cypher <<'EOF'\nMATCH (noor:Person {name: 'Noor'}), (tck:Project {name: 'opencypher-tck'}) CREATE (noor)-[:MAINTAINS]->(tck);\nUNWIND range(1, 100000) AS a RETURN sum(reduce(s = 0, x IN range(1, 10000) | s + x)) AS total;\nEOF\nrelate query --database ./team.rl < work.cypher > /dev/null &\nsleep 1\nkill -9 $!\nwait $! 2>/dev/null\necho \"exit=$?\"",
-        "expected_sha256": "9ef53a3d1ef2c99d4705653679d82c3a306a2bf0e466a142324c7dcc5eae59e5"
-      },
-      {
-        "command": "relate info --database ./team.rl",
-        "expected_sha256": "2b58c20a86d58307d17d63c344964f72e95dc7ccee8340f315d94479a8d2ac62"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person)-[:MAINTAINS]->(project:Project) RETURN p.name AS person, project.name AS project ORDER BY project\"",
-        "expected_sha256": "449bd22ddec4a06aae1b91cb2f0a952fcfa5a8b8b564455e6db4d3076aec950a"
-      },
-      {
-        "command": "relate --database ./team.rl --mode envelope \"MATCH ()-[m:MAINTAINS]->() RETURN count(m) AS maintains\"",
-        "expected_sha256": "7bf7cca57953cb3964439a57a5916eae7bab36a435d9df17bf5e0b179460a560"
-      },
-      {
-        "command": "relate info --database ./team.rl",
-        "expected_sha256": "40be374f11311661f1c5f36b1f94db9c1622931258c006d7897756fafbf6f0a6"
-      }
-    ],
-    "guides/operate/durability-modes.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team.rl < team.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl --durability-mode everysecond --mode envelope \"MATCH (noor:Person {name: 'Noor'}), (tck:Project {name: 'opencypher-tck'}) CREATE (noor)-[:MAINTAINS]->(tck) RETURN noor.name AS person, tck.name AS project\"",
-        "expected_sha256": "ccbcff5fe8fe687041013ef48e5c03e476ad2c6796a0e6f47e94289bbd75316a"
-      },
-      {
-        "command": "RELATE_DURABILITY_MODE=snapshot relate --database ./team.rl --mode envelope \"MATCH (grace:Person {name: 'Grace'}), (r:Project {name: 'relate'}) CREATE (grace)-[:MAINTAINS]->(r) RETURN grace.name AS person, r.name AS project\"",
-        "expected_sha256": "5a4078d72b276c5b32ab7021a74a7c053c15aabe6af0bbb72e344ec52feb4bb5"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person)-[:MAINTAINS]->(project:Project) RETURN p.name AS person, project.name AS project ORDER BY person, project\"",
-        "expected_sha256": "8f2faf789ea005a9dc009ceac7eaeffb2ea0cbfc95935121c7de565ec28efaea"
-      }
-    ],
-    "guides/operate/sizing-and-memory.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team.rl < team.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate info --database ./team.rl",
-        "expected_sha256": "2b58c20a86d58307d17d63c344964f72e95dc7ccee8340f315d94479a8d2ac62"
-      },
-      {
-        "command": "relate --load ./team.rl --database ./probe.rl --logical-graph-size-limit 1 --mode envelope \"CREATE (:Probe)\"",
-        "expected_sha256": "f045626dbfe78735c6c3ed3f9eba5367337a604295548938998977be34f7e4d8"
-      },
-      {
-        "command": "rm ./probe.rl",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl --logical-graph-size-limit 6500 --mode envelope \"CREATE (:Person {name: 'Ines', role: 'engineer'})\"\necho \"exit=$?\"",
-        "expected_sha256": "6f90975371a25f57ac6f5f27b13a8edaa2d4ae65c19b4a2a9119956d17674ff3"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --logical-graph-size-limit 6500 --mode envelope \"MATCH (p:Person) RETURN count(p) AS people\"",
-        "expected_sha256": "b5a7857ced07dc51534a92d92ae3dee0117869be1ea80536fb1832d6e4f22c49"
-      }
-    ],
-    "guides/operate/troubleshooting.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team.rl < team.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./tema.rl --read-only --mode envelope \"MATCH (p:Person) RETURN count(p) AS people\"\necho \"exit=$?\"",
-        "expected_sha256": "4a2e6c8eae198933b164c26350d19f8278f773f479ac112b8a32436cacc8cf10"
-      },
-      {
-        "command": "relate --version",
-        "expected_sha256": "585291832daf8aac99ea8da71c537d1554ca5d4f376069936566262d3b85aee9"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person) RETURN count(p) AS people\"\necho \"exit=$?\"",
-        "expected_sha256": "213d5a78c75b839b33a04a39b9056e80abb1005562bd19885e8ebe707c4ba89d"
-      }
-    ],
-    "guides/operate/two-processes-one-store.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team.rl < team.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "# a first process keeps team.rl open for 3 seconds\nsleep 3 | relate query --database ./team.rl > /dev/null &\nsleep 1\nrelate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person) RETURN count(p) AS people\"\necho \"exit=$?\"\nwait",
-        "expected_sha256": "ff1d01ea14d2c392d41535db3ce30abd44777f413037ba0339cc0c9a0d8e3a83"
-      },
-      {
-        "command": "relate clone ./team.rl ./team",
-        "expected_sha256": null
-      },
-      {
-        "command": "# a first process keeps the team directory open for 3 seconds\nsleep 3 | relate query --database ./team > /dev/null &\nsleep 1\nrelate --database ./team --read-only --mode envelope \"MATCH (p:Person) RETURN count(p) AS people\"\necho \"exit=$?\"\nwait",
-        "expected_sha256": "4df9c0ae7fcbddface7453c8283715c085cff56a6cb2a8369e60c5ff75470840"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person) RETURN count(p) AS people\"",
-        "expected_sha256": "5d7169f596f267fe117b12c0881d5ecbacfdb8bd6ceae18094a36170c9f37e01"
-      }
-    ],
-    "guides/operate/upgrade-a-store.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team.rl < team.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate info --database ./team.rl",
-        "expected_sha256": "2b58c20a86d58307d17d63c344964f72e95dc7ccee8340f315d94479a8d2ac62"
-      },
-      {
-        "command": "relate clone ./team.rl ./team-backup.rl",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --version",
-        "expected_sha256": "585291832daf8aac99ea8da71c537d1554ca5d4f376069936566262d3b85aee9"
-      },
-      {
-        "command": "relate --database ./team.rl --mode envelope \"MATCH (n) RETURN count(n) AS nodes\"",
-        "expected_sha256": "5cef2b5d785c232384ac63d03f20d4c94b8058130210eaef4c45aa8fc5ec483c"
-      },
-      {
-        "command": "relate info --database ./team.rl --json",
-        "expected_sha256": "076942cfdeac1400c513d1e3cfb863324d8f14771149ca3fcccad19fc888d338"
-      }
-    ],
     "guides/serve/auth-and-tls.mdx": [
       {
         "command": "relate --database ./graph.rl \"CREATE (:Person {name: 'Ada', role: 'engineer'})\" > /dev/null\nrelate serve --http 8842 --database ./graph.rl --read-only 2> first.log &\nserver=$!\nuntil curl -s -o /dev/null http://127.0.0.1:8842/; do sleep 0.1; done\nkill $server\nwait $server\nls -l graph.rl.auth-token | cut -c1-10\ncut -d: -f1 graph.rl.auth-token\nrelate serve --http 8842 --database ./graph.rl --read-only 2> second.log &\nserver=$!\nuntil curl -s -o /dev/null http://127.0.0.1:8842/; do sleep 0.1; done\ncurl -s -o /dev/null -w '%{http_code}\\n' -u \"$(cat graph.rl.auth-token)\" \\\n  -H 'Content-Type: application/json' -d '{\"statement\": \"RETURN 1 AS ok\"}' \\\n  http://127.0.0.1:8842/db/neo4j/query/v2\ncurl -s -o /dev/null -w '%{http_code}\\n' -u relate:wrong \\\n  -H 'Content-Type: application/json' -d '{\"statement\": \"RETURN 1 AS ok\"}' \\\n  http://127.0.0.1:8842/db/neo4j/query/v2\nkill $server\nwait $server\ngrep '^auth:' second.log\nrelate serve --http 8842 --database ./graph.rl --read-only --auth ada\necho \"exit=$?\"",
         "expected_sha256": "7ced5bd79ad8ab08ed959b19caa131f59a23851e77e8abc4ca162fc2dbb7f404"
-      }
-    ],
-    "guides/serve/bolt.mdx": [
-      {
-        "command": "relate --database ./graph.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate serve --bolt 8843 --http 8842 --database ./graph.rl --read-only 2> serve.log &\nserver=$!\nuntil curl -s -o /dev/null http://127.0.0.1:8842/; do sleep 0.1; done\ncurl -s -w '\\n' http://127.0.0.1:8842/\nexec 3<>/dev/tcp/127.0.0.1/8843\nprintf '\\x60\\x60\\xb0\\x17\\x00\\x00\\x04\\x05\\x00\\x00\\x04\\x04\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00' >&3\nhead -c 4 <&3 > reply.bin\nexec 3>&-\nprintf '\\x00\\x00\\x04\\x05' | cmp -s - reply.bin && echo \"Bolt 5.4 agreed\"\nkill $server\nwait $server",
-        "expected_sha256": "08dec0a86180c01a5bd64a9eee93634198bce103cfb632faa9c62c24f8f6fb4d"
-      }
-    ],
-    "guides/serve/docker.mdx": [
-      {
-        "command": "relate serve --database ./data/graph --read-only --http 8842\necho \"exit=$?\"",
-        "expected_sha256": "d144c4cc6cd906c9714bae9e8f5b60997dc03c04b0468455d7d0a1349dd716cd"
-      },
-      {
-        "command": "relate --database ./data/graph \"UNWIND ['Ada', 'Grace', 'Noor'] AS name CREATE (:Person {name: name})\" > /dev/null\nrelate serve --database ./data/graph --read-only --http 8842 --bolt 8843 --mcp 8844 2> serve.log &\nserver=$!\nuntil curl -s -o /dev/null http://127.0.0.1:8842/; do sleep 0.1; done\ncurl -s -o /dev/null -w '%{http_code}\\n' http://127.0.0.1:8842/\ncurl -s -u \"$(cat data/graph.auth-token)\" -H 'Content-Type: application/json' \\\n  -d '{\"statement\": \"MATCH (p:Person) RETURN count(p) AS people\"}' \\\n  -w '\\n' http://127.0.0.1:8842/db/neo4j/query/v2\nkill $server\nwait $server",
-        "expected_sha256": "9d8ad120aa1bd81469710c487dea46ab89de4cf4df69d86e441825f1cdeb021d"
-      }
-    ],
-    "guides/serve/http-query-api.mdx": [
-      {
-        "command": "relate --database ./graph.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate serve --http 8842 --database ./graph.rl --read-only 2> serve.log &\nserver=$!\nuntil curl -s -o /dev/null http://127.0.0.1:8842/; do sleep 0.1; done\ncurl -s -w '\\n' http://127.0.0.1:8842/\ncurl -s -u \"$(cat graph.rl.auth-token)\" -H 'Content-Type: application/json' \\\n  -d '{\"statement\": \"MATCH (p:Person)-[:WORKS_ON]->(:Project {name: $project}) RETURN p.name AS name ORDER BY name\", \"parameters\": {\"project\": \"relate\"}}' \\\n  -w '\\n%{http_code}\\n' http://127.0.0.1:8842/db/neo4j/query/v2\ncurl -s -u \"$(cat graph.rl.auth-token)\" -H 'Content-Type: application/json' \\\n  -d '{\"statement\": \"CREATE (:Person {name: $name})\", \"parameters\": {\"name\": \"Eve\"}}' \\\n  -w '\\n%{http_code}\\n' http://127.0.0.1:8842/db/neo4j/query/v2\ncurl -s -H 'Content-Type: application/json' -d '{\"statement\": \"RETURN 1 AS ok\"}' \\\n  -w '\\n%{http_code}\\n' http://127.0.0.1:8842/db/neo4j/query/v2\nkill $server\nwait $server",
-        "expected_sha256": "4662d679803aeabd3542e25199d07fd12f5426084fb96569e49c5d0c7f9b92d0"
       }
     ],
     "guides/serve/mcp.mdx": [
@@ -4384,330 +3430,6 @@
       {
         "command": "printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"MATCH (p:Person)-[:WORKS_ON]->(:Project {name: $project}) RETURN p.name AS name ORDER BY name\",\"parameters\":{\"project\":\"relate\"}}}}' \\\n  | relate serve --mcp stdio --database ./graph.rl --read-only 2>/dev/null \\\n  | grep -o '\\\\\"rows\\\\\":\\[[^]]*\\]'",
         "expected_sha256": "891720b100e664b5aca035201405e203228506aee03283e04458edc9a75c93d6"
-      }
-    ],
-    "guides/storage/backup-and-restore.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team --mode envelope < team.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "mkdir backups\nrelate clone ./team ./backups/team-2026-11-07.rl",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./backups/team-2026-11-07.rl --read-only --mode envelope \"MATCH (n) RETURN count(n) AS nodes\"",
-        "expected_sha256": "7b33a567ae6ea01065cc39ad2e99c5ecafdce75693ef0c233f27150ddc8c4656"
-      },
-      {
-        "command": "relate info --database ./backups/team-2026-11-07.rl",
-        "expected_sha256": "bdb091d88227fb1465a4d55136149bf893f02f5f5696ed2bbfb21c2a7f1871a2"
-      },
-      {
-        "command": "mv ./team ./team-damaged\nrelate clone ./backups/team-2026-11-07.rl ./team",
-        "expected_sha256": null
-      },
-      {
-        "command": "cp -R ./team ./backups/team-folder-copy\nls ./backups/team-folder-copy",
-        "expected_sha256": "e2ef03b97f2b745a68333638bb1313f72474523fe72c640a25ff0a553823e1bd"
-      },
-      {
-        "command": "relate --database ./team --read-only --mode envelope \"MATCH (p:Person) RETURN p.name AS name ORDER BY name\"",
-        "expected_sha256": "ecdf3017224800a20125486fe2ac6c456a015c45444790125b2a8dfefc7377e2"
-      },
-      {
-        "command": "relate clone ./team ./backups/team-2026-11-07.rl",
-        "expected_sha256": "30127bf2fb29578a1e6d2cc151e673c57428e778d18122a200498b443736a3ad"
-      }
-    ],
-    "guides/storage/choose-a-store-layout.mdx": [
-      {
-        "command": "relate --mode envelope \"RETURN 1 AS ok\"",
-        "expected_sha256": "2ef94723ebfe18c2cb6b566fd8701ab647ea53a185166bc4dcf990ffc2c2dee6"
-      },
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./team.rl --mode envelope < team.cypher",
-        "expected_sha256": "fcd47553e14e7d4d4c7a52de2c8dfef53908cb82e3af78942b27325bd77d7660"
-      },
-      {
-        "command": "relate info --database ./team.rl",
-        "expected_sha256": "2b58c20a86d58307d17d63c344964f72e95dc7ccee8340f315d94479a8d2ac62"
-      },
-      {
-        "command": "relate --load ./team.rl --mode envelope \"MATCH (p:Person) RETURN count(p) AS people\"",
-        "expected_sha256": "279eebf56cf2e9bdfac4b3845ba7930aaa1b0bb7b174b273625e58e95fba1fef"
-      },
-      {
-        "command": "relate query --database ./team --mode envelope < team.cypher",
-        "expected_sha256": "99adbab951e6c7058f1c0563a608962a61c78f88db457411bc8bbb002146b5cb"
-      },
-      {
-        "command": "ls team",
-        "expected_sha256": "e2ef03b97f2b745a68333638bb1313f72474523fe72c640a25ff0a553823e1bd"
-      },
-      {
-        "command": "relate query --database ./team-json --snapshot-format json --mode envelope < team.cypher",
-        "expected_sha256": "14baf1f7a4a652dfb9326bbcc37e12cba8ebc78730d8742ac4f32ef88305c253"
-      },
-      {
-        "command": "ls team-json",
-        "expected_sha256": "6390231d449a5240759beeed59dc7e14efcc6efce003061ff590da3af25600ee"
-      },
-      {
-        "command": "relate --database ./team-json --read-only --mode envelope \"MATCH (p:Person) RETURN p.name AS name ORDER BY name\"",
-        "expected_sha256": "dc59dc9993fb5d7e7ff2a653d4303f989bf10a64134698708e017f840fcd8944"
-      },
-      {
-        "command": "relate clone ./team.rl ./team-copy",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate clone --to-snapshot-format json ./team-copy ./team-copy-json",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate info --database ./team-copy-json | head -n 2",
-        "expected_sha256": "a158d46ed55429efb1b19292c6cf4b51b75636b998b32f3b933171d6ab399cdb"
-      },
-      {
-        "command": "relate --database ./team-json --snapshot-format parquet --read-only --mode envelope \"RETURN 1 AS ok\"",
-        "expected_sha256": "09079f978e8fee7edcbad71e311d2708f61ff85127e519f509aae7631087cd90"
-      }
-    ],
-    "guides/storage/clone-and-convert.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team.rl < team.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate clone ./team.rl ./team\nrelate clone ./team ./team-copy.rl",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate clone --to-snapshot-format json ./team ./team-json\nrelate clone --to-snapshot-format markdown ./team ./team-md",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate info --database ./team-md | head -n 2",
-        "expected_sha256": "bbc2db504fa49f837a23c656a031120f6c59632d8f423dda5579d50f3abade65"
-      },
-      {
-        "command": "ls team-json team-md team-md/Person",
-        "expected_sha256": "cad84db6eecd85525e0cd601dd38be874fc0a15758aab85023eaaef52faf3e76"
-      },
-      {
-        "command": "cat > graph-check.cypher <<'EOF'\nMATCH (n) RETURN labels(n) AS labels, properties(n) AS props ORDER BY n.name;\nMATCH (a)-[r]->(b) RETURN a.name AS from, type(r) AS type, properties(r) AS props, b.name AS to ORDER BY from, type, to;\nEOF\nrelate clone --to-snapshot-format parquet ./team-md ./team-roundtrip.rl\nrelate query --database ./team.rl --read-only --mode jsonl < graph-check.cypher | grep -v '\"timings\"' > before.jsonl\nrelate query --database ./team-roundtrip.rl --read-only --mode jsonl < graph-check.cypher | grep -v '\"timings\"' > after.jsonl\ncmp before.jsonl after.jsonl && echo \"same graph: $(wc -l < after.jsonl | tr -d ' ') rows\"",
-        "expected_sha256": "625cbe22ecb08df7e136656d2b4c3f247035056dbd606d87556b9662c7d59409"
-      },
-      {
-        "command": "relate info --database ./team.rl | grep 'total bytes'\nrelate --database ./team.rl --mode envelope \"UNWIND range(1, 20000) AS i CREATE (:Draft {id: i, text: 'draft note ' + toString(i)})\"\nrelate --database ./team.rl --mode envelope \"MATCH (d:Draft) DELETE d\"\nrelate clone ./team.rl ./team-compact.rl",
-        "expected_sha256": "73bc79e453128dea0b234e91678883a3c788210ea97fc5304c1673dbee8632b5"
-      },
-      {
-        "command": "for store in team.rl team-compact.rl team team-json team-md; do printf '%s: ' \"$store\"; relate info --database \"./$store\" | grep 'total bytes'; done",
-        "expected_sha256": "7a0b8f85e26001b9f9ee74adc35bfef5efcc13355eb6d857bff558db2550809f"
-      },
-      {
-        "command": "relate --database ./team-md --read-only --mode envelope \"MATCH (p:Person)-[:WORKS_ON]->(proj:Project) RETURN p.name AS name, proj.name AS project ORDER BY name, project\"",
-        "expected_sha256": "e924a9991e7da9bcf3ceb1ae9e625c5f081727a3028aaa3dfdc6e7ac99de7398"
-      },
-      {
-        "command": "relate clone --snapshot-format json ./team ./team-json2",
-        "expected_sha256": "1e7027e4d66eac9dbd5df52f04bb696b7df5f1fe0237110457c0c380f869673e"
-      }
-    ],
-    "guides/storage/obsidian-vault.mdx": [
-      {
-        "command": "mkdir -p team-vault/Person team-vault/Project\ncat > team-vault/Person/Ada.md <<'EOF'\n---\nrole: engineer\nWORKS_ON:\n  - \"[[Project/relate]]\"\nKNOWS:\n  - \"[[Person/Grace]]\"\n---\n\nWrites the planner.\nEOF\ncat > team-vault/Person/Grace.md <<'EOF'\n---\nrole: engineer\nWORKS_ON:\n  - \"[[Project/relate]]\"\n  - \"[[Project/opencypher-tck]]\"\n---\n\nKeeps the conformance tests green.\nEOF\ncat > team-vault/Person/Noor.md <<'EOF'\n---\nrole: maintainer\nMAINTAINS:\n  - \"[[Project/relate]]\"\n---\nEOF\ncat > team-vault/Project/relate.md <<'EOF'\n---\nlanguage: Rust\n---\n\nAn embedded graph database.\nEOF",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team-vault --snapshot-format markdown --mode envelope \"MATCH (n) RETURN labels(n)[0] AS label, n.name AS name ORDER BY label, name\"",
-        "expected_sha256": "6e3276d490e5e05aac128b11428c9c28155b20fbb2c284ea5959322c03c55095"
-      },
-      {
-        "command": "ls team-vault team-vault/Person team-vault/Project",
-        "expected_sha256": "a26e0fd4578ef9f340e51d01aa123a0974a572a090dc2af6db0ea6903f2207d4"
-      },
-      {
-        "command": "cat team-vault/Person/Ada.md",
-        "expected_sha256": "be6644132d5d27cdad5154282b210b1067ca34a264631c93993add98338d3b24"
-      },
-      {
-        "command": "relate --database ./team-vault --read-only --mode envelope \"MATCH (p:Person)-[r]->(x) RETURN p.name AS person, type(r) AS rel, x.name AS target ORDER BY person, rel, target\"",
-        "expected_sha256": "576939b0616660c91f79f8c88fbc56b838dee849f462cbf825004fb1eb409bcd"
-      },
-      {
-        "command": "relate --database ./team-vault --mode envelope \"MATCH (r:Project {name: 'relate'}) CREATE (:Person {name: 'Ines', role: 'engineer', body: 'Joined to work on the planner.'})-[:WORKS_ON]->(r)\"\ncat team-vault/Person/Ines.md",
-        "expected_sha256": "ee04a3482370b1d21e0b81911de9c2df6e4abdd9c494e3e27a9fc39ae047d6e0"
-      },
-      {
-        "command": "cat > team-vault/Person/Noor.md <<'EOF'\n---\ntype: Person\nname: Noor\nrole: maintainer\nMAINTAINS:\n  - \"[[Project/relate]]\"\n  - \"[[Project/opencypher-tck]]\"\n---\n\nReviews every release.\nEOF\nrelate --database ./team-vault --read-only --mode envelope \"MATCH (p:Person {name: 'Noor'})-[:MAINTAINS]->(x) RETURN p.body AS body, collect(x.name) AS maintains\"",
-        "expected_sha256": "ba7ecd962c4fed95f4d19513575b5efcc23c824142499c463d28e44053b6b16f"
-      },
-      {
-        "command": "relate --database ./team-vault --markdown-body-properties \"body,notes\" --mode envelope \"MATCH (p:Person {name: 'Ada'}) SET p.notes = 'Prefers small commits.'\"\ncat team-vault/Person/Ada.md",
-        "expected_sha256": "0d8090ca57509217f9b8c093215be20f073f9f01f8869da4743d7a85bcf9e06e"
-      },
-      {
-        "command": "relate clone --to-snapshot-format parquet ./team-vault ./team.rl\nrelate clone --to-snapshot-format markdown --markdown-body-properties \"body,notes\" ./team.rl ./team-vault-copy\ndiff -r team-vault/Person team-vault-copy/Person && diff -r team-vault/Project team-vault-copy/Project && echo \"same notes\"",
-        "expected_sha256": "3ff563bfb2a761415d34edd30b7bc63e658c1099c8656375613ef52a897dcdf2"
-      },
-      {
-        "command": "relate --database ./team-vault --read-only --mode envelope \"MATCH (n) RETURN labels(n)[0] AS label, count(*) AS notes ORDER BY label\"",
-        "expected_sha256": "9784d091d5033eab71ac71c4b92e94e29ebcb554616f1d94a84269986dfc7921"
-      },
-      {
-        "command": "relate --database ./team-vault --mode envelope \"CREATE (:Person {role: 'reviewer'})\"\necho \"exit=$?\"",
-        "expected_sha256": "df7759fa424bb9383cfb88c9a3f9af7ee5ee3ad0d32c9cfb8daac29a31fe9dc4"
-      },
-      {
-        "command": "relate --database ./team-vault --mode envelope \"MATCH (p:Person) WHERE p.name IS NULL SET p.name = 'Jun'\"\nls team-vault/Person",
-        "expected_sha256": "83868edf1fb3c161a966226a035c868bd61eb23d100116198d3fce38944ca2b4"
-      }
-    ],
-    "guides/storage/read-only-and-follow.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team < team.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team --read-only --mode envelope \"MATCH (p:Person) RETURN p.name AS name ORDER BY name\"",
-        "expected_sha256": "aa831eb08564c7e373d50aa46d264ae1df33caad9446d598ce65adb2b7d5f39d"
-      },
-      {
-        "command": "relate --database ./team --read-only --mode envelope \"CREATE (:Person {name: 'Ines', role: 'engineer'})\"\necho \"exit=$?\"",
-        "expected_sha256": "613c8853f52bab0be85b343cd078edc51235257e9aed2de8f907b8c3f1bbe8ca"
-      },
-      {
-        "command": "# the reader opens team now and runs its statement after 2 seconds\n{ sleep 2; echo \"MATCH (p:Person) RETURN count(p) AS people;\"; } | relate query --database ./team --read-only --mode envelope &\nsleep 1\nrelate --database ./team --mode envelope \"CREATE (:Person {name: 'Ines', role: 'engineer'})\"\nwait",
-        "expected_sha256": "daf560e4be74794144daf73e33ed908c8f0d651cd67e6481ab249b4dc4113bf9"
-      },
-      {
-        "command": "# the follower opens team now and runs its statement after 2 seconds\n{ sleep 2; echo \"MATCH (p:Person) RETURN count(p) AS people;\"; } | relate query --database ./team --read-only=live --mode envelope &\nsleep 1\nrelate --database ./team --mode envelope \"CREATE (:Person {name: 'Jun', role: 'engineer'})\"\nwait",
-        "expected_sha256": "e2ac4fc1390690f7d5f1c61ab154354185f18da646b444857f3aaffadb6e2b37"
-      },
-      {
-        "command": "relate clone ./team ./team.rl\nrelate --database ./team.rl --read-only=live --mode envelope \"RETURN 1 AS ok\"\necho \"exit=$?\"",
-        "expected_sha256": "4c957366c2457cdfa9caef30060140cca024899807a0da7c59d5d718d04a07a6"
-      },
-      {
-        "command": "relate --database ./team --read-only --mode envelope \"MATCH (p:Person) RETURN count(p) AS people\"",
-        "expected_sha256": "ac3f582aa49bd43a9d5fe8847d3ac3694aabe92af5afe54cb88826bb62f0633d"
-      }
-    ],
-    "guides/storage/schema-as-files.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team < team.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "ls -A team/.relate/schema",
-        "expected_sha256": "82a97685de2cf037bab3047745f3b56ff9a9b68d7f358eabf0b97e8c4900fbfa"
-      },
-      {
-        "command": "relate --database ./team --mode envelope \"CREATE CONSTRAINT person_name IF NOT EXISTS FOR (p:Person) REQUIRE p.name IS UNIQUE\"\nrelate --database ./team --mode envelope \"CREATE INDEX person_role IF NOT EXISTS FOR (p:Person) ON (p.role)\"",
-        "expected_sha256": "82f32191fb04765f57ba3d282615facb4a98bf1c3edcc0839e25176f8f3b65f3"
-      },
-      {
-        "command": "cat team/.relate/schema/schema.cypher",
-        "expected_sha256": "9b6904ebd03c13f28e59e2cdafe971cdec1e91fbf3769c6e8004e40010157e8a"
-      },
-      {
-        "command": "cp team/.relate/schema/schema.cypher schema-before.cypher\nrelate --database ./team --mode envelope \"CREATE FULLTEXT INDEX project_search IF NOT EXISTS FOR (p:Project) ON EACH [p.name, p.language]\"\ndiff schema-before.cypher team/.relate/schema/schema.cypher",
-        "expected_sha256": "621caefc6348ad51abdb36f630d237f377fcac97ed0f6d686c0289f59f6c20b9"
-      },
-      {
-        "command": "relate query --database ./team-staging --mode envelope < team/.relate/schema/schema.cypher\ncmp team/.relate/schema/schema.cypher team-staging/.relate/schema/schema.cypher && echo \"same schema\"",
-        "expected_sha256": "518e2e1d84ce48945a47c6a49cb6cd9373577460b00b825e214fbabe587d5efb"
-      },
-      {
-        "command": "cp -R team team-edited\necho \"CREATE INDEX person_age FOR (n:Person) ON (n.age);\" >> team-edited/.relate/schema/schema.cypher\nrelate --database ./team-edited --read-only --mode envelope \"RETURN 1 AS ok\"\necho \"exit=$?\"",
-        "expected_sha256": "3b0b0f74c72ca039b0116a677146f5383e55d4989158d6ffa473a66e55ada77a"
-      },
-      {
-        "command": "rm -r team-edited/.relate/schema\nrelate --database ./team-edited --mode envelope \"RETURN 1 AS ok\"\ncat team-edited/.relate/schema/schema.cypher",
-        "expected_sha256": "9d302420aeb490f2d36c3f361d367d393124a2f1ecc74637a21022ac4511a692"
-      },
-      {
-        "command": "relate clone --to-snapshot-format json ./team ./team-json\nls -A team-json team-json/.relate/schema",
-        "expected_sha256": "a9c290662a7c1956e6d6678292531f79427c6ecbac454cecb52e8dd99ab9b136"
-      },
-      {
-        "command": "relate --database ./team --read-only --mode envelope \"SHOW INDEXES YIELD name, type RETURN name, type ORDER BY name\"",
-        "expected_sha256": "2f22e2ba7facd8e45c8651c269397beec47b249526fc460da160356dfbf72d7b"
-      }
-    ],
-    "reference/cli/agent-context.mdx": [
-      {
-        "command": "relate agent-context",
-        "expected_sha256": "7d42bd1c7cfb2768e9057e5b02b9b53d5da461c7d097cb9bfab9c367238255f9"
-      },
-      {
-        "command": "relate agent-context info",
-        "expected_sha256": "84f27c1e0a6c0d24d5de70b147c689c4feda05dec0772dc2e64a45779358432c"
-      },
-      {
-        "command": "relate agent-context --json\necho \"exit=$?\"",
-        "expected_sha256": "7339d0d78179931a872575ed39250e256fbeb18d7bf79098cb3e8c2a1ec05127"
-      },
-      {
-        "command": "relate agent-context telemetry",
-        "expected_sha256": "4566db1b1ca44febca7bf7fd28394b2b373f8d1d49b458af4093fc20b4126c7e"
-      }
-    ],
-    "reference/cli/agent-mode.mdx": [
-      {
-        "command": "CLAUDECODE=1 relate \"UNWIND [1, 2] AS x RETURN x\"",
-        "expected_sha256": "53076f3928836f3f7ead495ee7bf3c5bb36308f393d94fc14f2fbe2a18879d04"
-      },
-      {
-        "command": "CLAUDECODE=1 relate --no-agent-mode \"UNWIND [1, 2] AS x RETURN x\"",
-        "expected_sha256": "006102965f8a8992e60dc158e6c02ab53ccd375b7a3cd6c36c0dcf568f84482b"
-      },
-      {
-        "command": "CLAUDECODE=1 relate --mode jsonl \"UNWIND [1, 2] AS x RETURN x\"",
-        "expected_sha256": "006102965f8a8992e60dc158e6c02ab53ccd375b7a3cd6c36c0dcf568f84482b"
-      },
-      {
-        "command": "RELATE_AGENT_MODE=1 relate \"UNWIND [1, 2] AS x RETURN x\"",
-        "expected_sha256": "7256ee8f3e17e5a61be8ff801db92217ab11e405558479ee323ee00d540b23c4"
-      },
-      {
-        "command": "RELATE_AGENT_MODE=yes relate \"RETURN 1 AS x\"\necho \"exit=$?\"",
-        "expected_sha256": "628e74b14b48957a3fdf456a5243212636330ed43a2062b2bc693782e57755fb"
-      },
-      {
-        "command": "CLAUDECODE=1 relate \"UNWIND range(1, 250) AS x RETURN x\" 2>/dev/null | head -2\nCLAUDECODE=1 relate \"UNWIND range(1, 250) AS x RETURN x\" 2>/dev/null | tail -7",
-        "expected_sha256": "a1e5421718f4141385569388df23a71eaa5af60294c6667a247e38dd3bb57554"
-      },
-      {
-        "command": "relate --mode envelope \"RETURN 1 AS a, [1, 2] AS l, {k: 'v'} AS m, null AS z\"",
-        "expected_sha256": "deaa642853219c6d302bfdbfca3f4d083ff9f711d1cdbb222884f91bab54b4ab"
-      },
-      {
-        "command": "relate --mode envelope \"MATCH (p:Person) RETURN p\"",
-        "expected_sha256": "febc8926b8e320c6183f8d8416ff3a8e8d36338bf8eaeed29c2d9a270e6a4786"
-      },
-      {
-        "command": "relate --mode envelope --max-rows 2 \"UNWIND range(1, 5) AS x RETURN x\"",
-        "expected_sha256": "459a11c1575ce26d0cc784f80e9648913af94309b11de678214ac7f9823e08e5"
-      },
-      {
-        "command": "CLAUDECODE=1 relate \"RETURN 1/0 AS x\"\necho \"exit=$?\"",
-        "expected_sha256": "bdba3edbcf0bcb6bf845c25c6c463b8612e4c0f45d0442de216f31b9e389bd6d"
-      },
-      {
-        "command": "CLAUDECODE=1 relate \"EXPLAIN MATCH (p:Persn) RETURN p.name AS name\" | tail -6 | head -2",
-        "expected_sha256": "3d073a4d87b947ee439e04909dd07babb118d979b72845c435878f74b7018b14"
-      },
-      {
-        "command": "relate agent-context clone",
-        "expected_sha256": "8e0194a3531b3a187d89c57a934fef0f35633e6e09331ddc46c59e984e0643b5"
       }
     ],
     "reference/cli/clone.mdx": [
@@ -4782,92 +3504,6 @@
         "expected_sha256": "582c27cb1c2a9eb4eec78296c93741151cc34089ad83b3ccdb95863946c76b3f"
       }
     ],
-    "reference/cli/environment-variables.mdx": [
-      {
-        "command": "RELATE_MAX_ROWS=1 relate --mode jsonl \"UNWIND [1, 2, 3] AS x RETURN x\"\nRELATE_MAX_ROWS=1 relate --mode jsonl --max-rows 0 \"UNWIND [1, 2, 3] AS x RETURN x\"",
-        "expected_sha256": "cd4193ed37bfd57b56ee0f834975f2496c9c06bc9adf90c5122293d785592290"
-      },
-      {
-        "command": "CYPHERLITE_MAX_ROWS=1 relate \"RETURN 1 AS x\"\necho \"exit=$?\"",
-        "expected_sha256": "f6dba542a8f42406c2a55a407d0cee7ba5d526ab887c9bae8fb7a04a23f9404e"
-      },
-      {
-        "command": "RELATE_PREVIEW=coll-zip relate --mode envelope \"RETURN coll.zip([1, 2], ['a', 'b']) AS pairs\"",
-        "expected_sha256": "764a3b30897113be0ce897d81618d16b67331bfeeacef86814cc479711195bce"
-      },
-      {
-        "command": "RELATE_PREVIEW=bogus relate --mode jsonl \"RETURN 1 AS ok\"\necho \"exit=$?\"",
-        "expected_sha256": "ce6409e1e9f747878847306b2a6dfeabb651dfe389419156b763e6eb03dc5591"
-      },
-      {
-        "command": "DO_NOT_TRACK=1 RELATE_TELEMETRY=1 relate telemetry status",
-        "expected_sha256": "1221056224b1fcd01c0349d19793413c6fad02c9e7d205ba46c742c04f527b03"
-      },
-      {
-        "command": "mkdir -p cfg/relate\nprintf '{\"telemetry\":false}\\n' > cfg/relate/config.json\nenv -u DO_NOT_TRACK XDG_CONFIG_HOME=\"$PWD/cfg\" relate telemetry status",
-        "expected_sha256": "fdf93d25c02c4494196de258326eb702e79e6c75fdbca09f784d26ee742f109d"
-      },
-      {
-        "command": "COLUMNS=20 relate --mode table \"UNWIND ['engineer', 'maintainer'] AS role RETURN role, size(role) AS len\"",
-        "expected_sha256": "10bfe00ab4936bd899e449e6981c604863e5d67744563ad412011566bd9e6902"
-      }
-    ],
-    "reference/cli/exit-codes-and-errors.mdx": [
-      {
-        "command": "relate --mode envelope \"MATCH (n RETURN n\"\necho \"exit=$?\"",
-        "expected_sha256": "1a7ff2c7f64be532bcaf4ac1c2ebede7a3c26b31dc21b63ae70e62f8b1cfea01"
-      },
-      {
-        "command": "relate --mode envelope \"RETURN 1 AS ok\"\necho \"exit=$?\"\nrelate --mode envelope \"MATCH (n:Nope) RETURN n.p AS p\"\necho \"exit=$?\"",
-        "expected_sha256": "462c93fa47d7985cd68d82731b8d203e2575015e28a0736ee1d21a0d730dec8e"
-      },
-      {
-        "command": "relate --database ./missing.rl --read-only --mode envelope \"RETURN 1 AS ok\"\necho \"exit=$?\"",
-        "expected_sha256": "5fa62004ab46c09be0e53ee91818f102ebeffa71513469a1aa32f6aa00cb48b1"
-      },
-      {
-        "command": "relate --mode envelope --bogus \"RETURN 1 AS ok\"\necho \"exit=$?\"",
-        "expected_sha256": "f5c061bebe9b29457229ae0ef37569e2afb497c50dea0b4777b7f94ba3e4bfad"
-      },
-      {
-        "command": "relate --mode envelope \"RETURN 1/0 AS x\"\necho \"exit=$?\"",
-        "expected_sha256": "75e06f9e99b0bbfc01aeb7159ecf9ae1109456cf4acd88eecd94ab22140f6a5e"
-      },
-      {
-        "command": "relate --mode envelope --timeout 100ms \"UNWIND range(1, 20000) AS a UNWIND range(1, 20000) AS b RETURN count(*) AS pairs\"\necho \"exit=$?\"",
-        "expected_sha256": "a956106332d504ed4b7b2792bae75474f4ec2695be860aa77652f356937e4856"
-      },
-      {
-        "command": "relate --mode envelope \"CREATE (:T {n: 1}); RETRN 2; RETURN 3 AS x\"\necho \"exit=$?\"",
-        "expected_sha256": "a92b8b024eeded9995468b034ce96cf8967aeb7f476da8cb8c50f2cea7a4a2cc"
-      }
-    ],
-    "reference/cli/extension.mdx": [
-      {
-        "command": "relate extension list\necho \"exit=$?\"",
-        "expected_sha256": "804cb8b0d0ccd96791ae5eed231de68f307bffbdf3522e93d8bc0ec856db38de"
-      },
-      {
-        "command": "relate extension init team-import --lang sh",
-        "expected_sha256": "3e7c790d2f2ebdaf5a699ceb37a8df7ef0ca97e2a4779c71a02a9ddc89d9f023"
-      },
-      {
-        "command": "relate extension check team-import",
-        "expected_sha256": "6fc6b9304bddcb9b1281fc5807aa508400d7b2e101a546368a3911fc41706ff6"
-      },
-      {
-        "command": "relate extension install team-import --from ./team-import\nrelate extension list",
-        "expected_sha256": "c1a20ba0b8a01961662fa728a96af5207fc6135564de114017e22ff51f804ff2"
-      },
-      {
-        "command": "relate extension install other-import --url http://example.com/other-import.tar.gz\necho \"exit=$?\"",
-        "expected_sha256": "c3b3d317d1477a874017d6caee122f9ad01a767dda95ddafa902bedc0f047441"
-      },
-      {
-        "command": "relate extension remove team-import",
-        "expected_sha256": "d008959400ff12c30516030e1f227be7bdf7e60417acf2f4fb270a85ebf0d987"
-      }
-    ],
     "reference/cli/feedback.mdx": [
       {
         "command": "relate feedback",
@@ -4896,154 +3532,6 @@
         "expected_sha256": "6ef54255df73890e42e190a53f03181b0f6ebb33116747ee129e337c83425eb2"
       }
     ],
-    "reference/cli/index.mdx": [
-      {
-        "command": "relate --mode envelope \"RETURN 1 AS ok\"",
-        "expected_sha256": "d99c0b0d38177e6ed76d88a544d11386905d46782beddf76f51ed83fa2f63e2c"
-      },
-      {
-        "command": "printf 'RETURN 1 AS a;\\nRETURN 2 AS b;\\n' | relate query --mode envelope",
-        "expected_sha256": "b708692836c557ec6c4c3cc01c027f18186972ab36aea0f630d27a10c06ffc87"
-      },
-      {
-        "command": "relate --version",
-        "expected_sha256": "585291832daf8aac99ea8da71c537d1554ca5d4f376069936566262d3b85aee9"
-      }
-    ],
-    "reference/cli/info.mdx": [
-      {
-        "command": "relate --database ./team \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate info --database ./team",
-        "expected_sha256": "5ec89e6bb6617677a685ea4a372569bf27cee3e8209221960ff46748608a80e3"
-      },
-      {
-        "command": "relate --database ./catalog.rl \"CREATE (:Person {name: 'Ada'})-[:WORKS_ON {since: 2024}]->(:Project {name: 'relate'})\"\nrelate --database ./catalog.rl \"CREATE INDEX person_name FOR (p:Person) ON (p.name)\"\nrelate --database ./catalog.rl \"CREATE CONSTRAINT project_name FOR (p:Project) REQUIRE p.name IS NOT NULL\"\nrelate --database ./catalog.rl \"CREATE CONSTRAINT works_since FOR ()-[w:WORKS_ON]-() REQUIRE w.since IS :: INTEGER\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate info --database ./catalog.rl",
-        "expected_sha256": "5970ec0fd2e9ca7dc4d723126ebf878681f7d2ffb4b3eaf20c883e3926b7fd87"
-      },
-      {
-        "command": "relate info --database ./catalog.rl --json",
-        "expected_sha256": "f4f22e7c73265c540953eb67814892d29bf86aa01d4ce6abb79ad68a14c71ca4"
-      },
-      {
-        "command": "relate clone --to-snapshot-format json ./team ./team-json\nrelate info --database ./team-json",
-        "expected_sha256": "aa421d1de4e3d69be7cde81b6c6f383055b619dca4ba556f995befa24436a322"
-      },
-      {
-        "command": "relate info --database ./missing\necho \"exit=$?\"",
-        "expected_sha256": "ffdb72141e119164fbba783305248d4a7ccc793f93f9a7dc3961a775a6bfb61d"
-      }
-    ],
-    "reference/cli/output-modes.mdx": [
-      {
-        "command": "relate --mode yaml \"RETURN 1 AS ok\"\necho \"exit=$?\"",
-        "expected_sha256": "d5cbf2c6516548764fb14cccb28623d73304bf4b3b2cdee75ed2d2d93c3b0c21"
-      },
-      {
-        "command": "cat > seed.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF\nrelate query --database ./team.rl < seed.cypher",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table \"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: 'relate'}) RETURN p.name AS name, w.since AS since ORDER BY since\"",
-        "expected_sha256": "7545827c676559300f0d904607fe1a0fcd5a48cbc1c135cab95a0a8e722cdada"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --csv \"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: 'relate'}) RETURN p.name AS name, w.since AS since ORDER BY since\"",
-        "expected_sha256": "40b609be45317f030c0e2011859a8a0856fb387dedcc9e348801dd80411c23a3"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --json \"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: 'relate'}) RETURN p.name AS name, w.since AS since ORDER BY since\"",
-        "expected_sha256": "944847f66ed3424c290acec35b47007a5d92795ce0dafe3c97f2226712d91065"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --jsonl \"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: 'relate'}) RETURN p.name AS name, w.since AS since ORDER BY since\"",
-        "expected_sha256": "5a43e13eb1fb5c42af91d3aa681f4e6c3a66a3f0e03ea9ca7a58c50eb1cf0ab2"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: 'relate'}) RETURN p.name AS name, w.since AS since ORDER BY since\"",
-        "expected_sha256": "0d4cb3c29ba9544cbb87d1d6f3a00126009776cdbf9b433f197404a009bb6031"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --markdown \"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: 'relate'}) RETURN p.name AS name, w.since AS since ORDER BY since\"",
-        "expected_sha256": "cc8cc4a7f3015aed07f30d9f1f0f2f7c8e680adb2446a3d52a84a70df37dd5e7"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode cypher \"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: 'relate'}) RETURN p.name AS name, w.since AS since ORDER BY since\"",
-        "expected_sha256": "668ad05ee4af3a378ea1a6409ab677ccde7494528cc6470c61469425fe219708"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --toon \"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: 'relate'}) RETURN p.name AS name, w.since AS since ORDER BY since\"",
-        "expected_sha256": "5290ab816fff7d649650f94c3af35b7a17736fe4a0ae1fcdcd8c5a7a603f1977"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode speedscope \"PROFILE MATCH (p:Person) RETURN p.name AS name\" | grep -o '\"name\":\"[^\"]*\"'",
-        "expected_sha256": "0a5f012b7efd12503ecaba24c04121d6f02eb7cf5126cb75ad06676abe4766c0"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode speedscope \"MATCH (p:Person) RETURN p.name AS name\"\necho \"exit=$?\"",
-        "expected_sha256": "2d56a0ead6f2b54e5c1eaade5eb87cb63aadab3f0731027cd42779f3ec91f54a"
-      },
-      {
-        "command": "relate --database ./sp --mode speedscope \"CREATE (:Run)\"\necho \"exit=$?\"\nrelate --database ./sp --read-only --mode jsonl \"MATCH (r:Run) RETURN count(r) AS runs\"",
-        "expected_sha256": "b11d0dee27757800806649f9f23945245120dd60ea11056f394661608b4b7776"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode jsonl \"MATCH (p:Person {name: 'Ada'}) RETURN p\"",
-        "expected_sha256": "b25b67bbff745bb55f6e1d8589e54f67f551ba50083a5e4d006fa5acac027437"
-      },
-      {
-        "command": "relate --csv \"RETURN -5 AS n, '=1+1' AS formula\"",
-        "expected_sha256": "380242af20c9916e0573aee4fed2f657a941aaeaded10457ea166e0872ecd628"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person {name: 'Zed'}) RETURN p.name AS name\"",
-        "expected_sha256": "881808f92e0e0627610a1993fdc9e73fed67f0e9511f5b03afd2a77032cf8bd6"
-      },
-      {
-        "command": "relate --jsonl --timings \"RETURN 1 AS a; RETURN 2 AS a; RETURN 2 AS a\" | jq -r 'select(.planCache) | .planCache'",
-        "expected_sha256": "0080d2be8f14135b0a55f88e7e8cafba9bc62893fa5114c44694b8590e990785"
-      },
-      {
-        "command": "relate --mode jsonl \"RETRN 1\"\necho \"exit=$?\"",
-        "expected_sha256": "5bc1d142f5aa679a1cee46c10efa6e312a1309a76d9d08f784c2ec0311fbb657"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --csv --noheader \"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: 'relate'}) RETURN p.name AS name, w.since AS since ORDER BY since\"",
-        "expected_sha256": "1ff30b0d8701e24f07070d28be21aa6a26beff82fcad195f331b57e848b99ef9"
-      },
-      {
-        "command": "relate --json --pretty \"RETURN 'Ada' AS name, 2024 AS since\"",
-        "expected_sha256": "45e7c198bc5d30fe4349dfebcf6f3434abf8c2d49370c93bdbd5ffd882d78629"
-      }
-    ],
-    "reference/cli/pull.mdx": [
-      {
-        "command": "printf 'NEO4J_URI=https://neo4j.example.com:7473\\nNEO4J_USERNAME=neo4j\\nNEO4J_PASSWORD=<password>\\n' > neo4j.env\nchmod 600 neo4j.env\nrelate --database ./team.rl \"CREATE (:Person {name: 'Ada', role: 'engineer'})\" > /dev/null",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate pull --from neo4j.env --query 'MATCH (n) RETURN n' --database ./team.rl\necho \"exit=$?\"",
-        "expected_sha256": "edd23f640d817a07868d16e6d422cd059d9954d6770f8e36711d6c35d4997de1"
-      },
-      {
-        "command": "relate pull --from neo4j.env --query 'MATCH (n) RETURN count(n) AS nodes' --database ./mirror.rl\necho \"exit=$?\"",
-        "expected_sha256": "88eeb0f64827157580da84d8b72b97b931b72a17f57702c4a0d9757ec41693f9"
-      },
-      {
-        "command": "printf 'NEO4J_URI=http://neo4j.example.com:7474\\nNEO4J_USERNAME=neo4j\\nNEO4J_PASSWORD=<password>\\n' > plain.env\nchmod 640 plain.env\nrelate pull --from plain.env --query 'MATCH (n) RETURN n' --database ./mirror.rl\necho \"exit=$?\"",
-        "expected_sha256": "ba10f65a8b0f1c95e3cdfe92f63b80e8b8f81456e9600747588c9e5d83740b25"
-      },
-      {
-        "command": "relate pull --from neo4j.env --query 'MATCH (n) RETURN n' --database :memory:\necho \"exit=$?\"",
-        "expected_sha256": "0bed5b1c102eeb3374cb143e33df7f5c9a1712f1da47886b70b94e6d68f3f956"
-      }
-    ],
     "reference/cli/push.mdx": [
       {
         "command": "printf 'NEO4J_URI=https://neo4j.example.com:7473\\nNEO4J_USERNAME=neo4j\\nNEO4J_PASSWORD=<password>\\n' > neo4j.env\nchmod 600 neo4j.env\nrelate --database ./team.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\" > /dev/null",
@@ -5064,74 +3552,6 @@
       {
         "command": "relate push --to neo4j.env --database ./team.rl --labels Person --types KNOWS\necho \"exit=$?\"",
         "expected_sha256": "b71e3cb43a737e05479ca005442ee1ba5aa32a20cd5245774c6cda48217a0013"
-      }
-    ],
-    "reference/cli/query.mdx": [
-      {
-        "command": "relate query --database ./team.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate query --database ./team.rl --read-only \"MATCH (p:Person) RETURN p.name AS name ORDER BY name\"",
-        "expected_sha256": "a8b8f53b948d4289a57a36528fcf8f75ef24a22ae1f31092ee6ae9330925e5b2"
-      },
-      {
-        "command": "relate query --database ./team.rl --read-only --mode envelope -c \"MATCH (p:Person) RETURN count(p) AS people; MATCH (p:Project) RETURN count(p) AS projects\"",
-        "expected_sha256": "8a9427128e3be8d2bca50e84b1e467cd0452e791eb6c7c6452a4e744041ce036"
-      },
-      {
-        "command": "printf 'MATCH (p:Person) RETURN count(p) AS people;\\nMATCH (p:Project) RETURN count(p) AS projects;\\n' | relate query --database ./team.rl --read-only --mode envelope",
-        "expected_sha256": "9ddf279a885dc3e1e87af9d6b943d169c77966aee8eafa95296c03f8bfe77775"
-      },
-      {
-        "command": "printf 'MATCH (p:Person) RETURN count(p) AS people;\\nRETURN 1/0 AS boom;\\nRETURN 3 AS never;\\n' | relate query --database ./team.rl --read-only --mode envelope\necho \"exit=$?\"",
-        "expected_sha256": "18cf4d593ebbfa3d721b2cddd1254a67723d9404ba0c2f003c22914691efceec"
-      },
-      {
-        "command": "relate query --database ./team.rl --read-only --mode table \"MATCH (p:Person) RETURN p.name AS name, p.role AS role ORDER BY name\"",
-        "expected_sha256": "1c60ad6e8199047f5ea15eeb0950457bc2a9c8674ec547ff61931f39eb4797b6"
-      },
-      {
-        "command": "relate query --database ./team.rl --read-only --mode envelope --param name=Grace 'MATCH (p:Person {name: $name})-[w:WORKS_ON]->(r:Project) RETURN r.name AS project, w.since AS since ORDER BY since'",
-        "expected_sha256": "c821cef4124462ef447c9abac3ca7e0f7f233b53f8f3235e90bdd2716cb85200"
-      },
-      {
-        "command": "relate query --database ./team.rl --read-only --mode envelope \"CREATE (:Person {name: 'Zed'})\"\necho \"exit=$?\"",
-        "expected_sha256": "613c8853f52bab0be85b343cd078edc51235257e9aed2de8f907b8c3f1bbe8ca"
-      },
-      {
-        "command": "relate query --read-only --mode envelope --timeout 100ms \"UNWIND range(1, 20000) AS a UNWIND range(1, 20000) AS b RETURN count(*) AS pairs\"\necho \"exit=$?\"",
-        "expected_sha256": "a956106332d504ed4b7b2792bae75474f4ec2695be860aa77652f356937e4856"
-      },
-      {
-        "command": "relate query --database ./team.rl --read-only --csv \"MATCH (p:Person)-[w:WORKS_ON]->(r:Project) RETURN p.name AS person, r.name AS project, w.since AS since ORDER BY since\" > who.csv\necho \"exit=$?\"\ncat who.csv",
-        "expected_sha256": "1ade73ee8ce7735a8ef9c45ab7be6c69c7130a56e5dec8d91b0f24d0005c4fe0"
-      }
-    ],
-    "reference/cli/run.mdx": [
-      {
-        "command": "relate run\necho \"exit=$?\"",
-        "expected_sha256": "00e8063fd6812d965124de7ec70a5e5bb21307d772b2b7fbc8aff9a10ceaf5e7"
-      },
-      {
-        "command": "relate extension init team-import --lang sh > /dev/null\nrelate extension install team-import --from ./team-import > /dev/null",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate run team-import -d ./team.rl --name Ada",
-        "expected_sha256": "2770527ab7b5efa2316e1d77a335ca9637b4deca3945ce9036cceec3eb7564f9"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (n:Scaffold) RETURN n.id AS id, n.note AS note\"",
-        "expected_sha256": "8dac32814e7b7e3f49a48b5463ea2e7b4c3863682493b555334f14a67941a96d"
-      },
-      {
-        "command": "relate run team-import --nam Ada\necho \"exit=$?\"",
-        "expected_sha256": "d5b86a5438fe57445393e9f8fe28e5f424cb9ecb2d930f73294816a1f74fd2c0"
-      },
-      {
-        "command": "relate run git-to-graph\necho \"exit=$?\"",
-        "expected_sha256": "55bcc19ed08bb8c7a32215da7bc3386084a8c28b218c1398d5cfb0b64dd493af"
       }
     ],
     "reference/cli/serve.mdx": [
@@ -5194,16 +3614,6 @@
         "expected_sha256": "dac863f26d120300cd46d108b67cf3f5bebbd59f4afec008eb79f067dc60964e"
       }
     ],
-    "reference/cypher/cypher-versions.mdx": [
-      {
-        "command": "RELATE_PREVIEW=chronological-comparisons relate --mode table \"RETURN datetime('2026-01-01T00:00Z') IS BEFORE datetime('2026-06-01T00:00Z') AS earlier\"",
-        "expected_sha256": "424bad6f2f8e86ae84977e8b09baaf03ff37fa6f97bfcd3041a976cf3a82bc09"
-      },
-      {
-        "command": "RELATE_PREVIEW=chronological relate --mode table \"RETURN 1 AS one\"",
-        "expected_sha256": "1fda3ce28d69becd7805dc445b6738f5392d841856e47aedf186ee548bec5c4a"
-      }
-    ],
     "reference/cypher/differences-from-neo4j.mdx": [
       {
         "command": "relate --database bolt://localhost:7687 --mode envelope \"RETURN 1 AS ok\"",
@@ -5212,34 +3622,6 @@
       {
         "command": "mkdir import\nrelate --load-csv-dir ./import --mode envelope \"LOAD CSV FROM 'https://example.com/people.csv' AS row RETURN row\"",
         "expected_sha256": "121ff6fdb69b1a31c86883808523caec3f5383506fbf1b3783f896cc48a9ff3e"
-      }
-    ],
-    "reference/cypher/explain-and-profile.mdx": [
-      {
-        "command": "relate --mode speedscope \"EXPLAIN RETURN 1 AS one\"",
-        "expected_sha256": "f3f104d9f849a9a05f4750df772e36f696838054241a2b8081ab601eef5706b6"
-      },
-      {
-        "command": "relate --database ./team.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nCREATE INDEX person_name FOR (p:Person) ON (p.name)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table \"EXPLAIN MATCH (p:Person)-[:WORKS_ON]->(proj:Project) WITH proj, count(p) AS people WHERE people > 1 RETURN proj.name AS project, people ORDER BY people DESC LIMIT 5\"",
-        "expected_sha256": "8325e607d94b72a46f1967085c41aad8b793e6dbd0a3747e0e84afe5c72ceb16"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode table \"EXPLAIN MATCH (p:Person) WHERE p.name >= 'G' RETURN p.name AS name\"",
-        "expected_sha256": "608ff60443b6bf6febd88e9d5c97bb606eaa1307e203a4e15bfd04490e9715e3"
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode json \"EXPLAIN MATCH (p:Person)-[:KNOWS]->(f:Person) RETURN f.name AS friend\"",
-        "expected_sha256": "b05db648d6244871e690dbd38f0ba1fe36f3ffac5ad3821f1795122aab3d16ce"
-      }
-    ],
-    "reference/cypher/functions.mdx": [
-      {
-        "command": "RELATE_PREVIEW=coll-zip,coll-has,gql-stddev-aliases relate --mode jsonl \"RETURN coll.zip([1, 2], ['a']) AS zipped, coll.hasAnyOf([1, 2], [2]) AS any_of, coll.hasAllOf([1, 2], [1, 3]) AS all_of, coll.hasNoneOf([1, 2], [5]) AS none_of\"",
-        "expected_sha256": "61eb10abf68b16ec01c4ef11a9c79a8fd3a43441f0c059204ad7e58034a19433"
       }
     ],
     "reference/cypher/notifications.mdx": [
@@ -5272,38 +3654,10 @@
         "expected_sha256": "bf5b5a53e5959292f2d645062067d11560916aad71483e80b13f90ab25fece84"
       }
     ],
-    "reference/cypher/overview.mdx": [
-      {
-        "command": "RELATE_PREVIEW=local-callables relate --mode envelope \"DEFINE FUNCTION twice(x) = x * 2 RETURN twice(21) AS answer\"",
-        "expected_sha256": "4f2261fa27a099741197e7b9a2bd56e467003340c5d267a80d1a259811057179"
-      }
-    ],
     "reference/cypher/patterns.mdx": [
       {
         "command": "relate --max-traversal-depth 1000 --mode table \"MATCH (:Person)-[:KNOWS*1..1000]->(b) RETURN count(b) AS reached\"",
         "expected_sha256": "a26c08c9d61146a3b6edb0fa625d6fe9fe02bef2dfcbd49d5a921fa8dcead17a"
-      }
-    ],
-    "reference/cypher/procedures.mdx": [
-      {
-        "command": "relate --database ./team.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "RELATE_PREVIEW=ontology relate --database ./team.rl \"CALL db.ontology.set('{\\\"schema\\\": \\\"https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json\\\", \\\"version\\\": \\\"1\\\", \\\"id\\\": \\\"team\\\", \\\"nodes\\\": {\\\"Person\\\": {\\\"label\\\": \\\"Person\\\", \\\"properties\\\": {\\\"name\\\": {\\\"type\\\": \\\"STRING\\\", \\\"must_exist\\\": true}}}}}')\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "RELATE_PREVIEW=ontology relate --database ./team.rl --read-only --mode jsonl \"CALL db.ontology.get() YIELD ontology RETURN ontology\"",
-        "expected_sha256": "d2bcfeee0a2a81907227cdd11dc7f26b6c1cc0ae4f1217eb32f5332630cade24"
-      },
-      {
-        "command": "RELATE_PREVIEW=ontology relate --database ./team.rl \"CALL db.ontology.apply()\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate --database ./team.rl --read-only --mode jsonl \"SHOW CURRENT GRAPH TYPE\"",
-        "expected_sha256": "daffb917d729c82080d303631b652775fb59685c6c8a30667936699619b5131e"
       }
     ],
     "reference/cypher/reading-clauses.mdx": [
@@ -5320,44 +3674,6 @@
       {
         "command": "RELATE_PREVIEW=hybrid-search relate --database ./search.rl --read-only --mode table \"MATCH (p:Person) SEARCH p IN (COMBINE (VECTOR INDEX person_focus FOR [0.1, 0.9, 0.1] LIMIT 3 WEIGHT 0.7, FULLTEXT INDEX person_bio FOR 'docs tests' LIMIT 3 WEIGHT 0.3) USING WRRF WITH CONSTANT 60 LIMIT 3) SCORE AS score RETURN p.name AS name, score\"",
         "expected_sha256": "a1b5289cd31288beab71797acfe16f580bec044a00546050092f717c7a6f2fba"
-      }
-    ],
-    "reference/cypher/types-and-values.mdx": [
-      {
-        "command": "relate --mode json \"RETURN 42 AS int, 3.5 AS float, 'Ada' AS string, true AS bool, null AS nothing, [1, 'two'] AS list, {k: 1} AS map\"",
-        "expected_sha256": "3334291b431d8687eb54b449d7dd4fab0882a21c4d694d130bfa40815deb4dd1"
-      },
-      {
-        "command": "relate --mode toon \"RETURN 42 AS int, 3.5 AS float, 'Ada' AS string, true AS bool, null AS nothing, [1, 'two'] AS list, {k: 1} AS map\"",
-        "expected_sha256": "98bc919576be5c6338db221b6d24bcd4fa5bcfa920350ab4a09458aecfca4b28"
-      },
-      {
-        "command": "relate --mode csv \"RETURN 42 AS int, 3.5 AS float, 'Ada' AS string, true AS bool, null AS nothing, [1, 'two'] AS list, {k: 1} AS map\"",
-        "expected_sha256": "157b3473f76735bdcf9313ff716a2b689cfd11654dc460ed1c13a34d5e108f86"
-      },
-      {
-        "command": "relate --mode jsonl \"RETURN date('2026-11-08') AS d, localtime('10:15:30') AS lt, time('10:15:30+01:00') AS t, localdatetime('2026-11-08T10:15:30') AS ldt, datetime('2026-11-08T10:15:30[Europe/Paris]') AS dt, duration('P1DT2H30M') AS dur\"",
-        "expected_sha256": "781b59798d786529172032fcd98c118f85155d3bcda95c7c453ce7b34e160dae"
-      },
-      {
-        "command": "relate --mode csv \"RETURN date('2026-11-08') AS d, localtime('10:15:30') AS lt, time('10:15:30+01:00') AS t, localdatetime('2026-11-08T10:15:30') AS ldt, datetime('2026-11-08T10:15:30[Europe/Paris]') AS dt, duration('P1DT2H30M') AS dur\"",
-        "expected_sha256": "d746a91c80ad8952651987b3c8e3e0daa3118be702da68a4ed41b0a46c274af9"
-      },
-      {
-        "command": "relate --mode jsonl \"RETURN point({x: 1, y: 2}) AS xy, point({latitude: 51.5, longitude: -0.1}) AS geo, vector([1, 2, 3], 3, INT8) AS v, uuid('f066ecfc-5151-4121-8a36-b35e00d72918') AS u\"",
-        "expected_sha256": "8852a000bd32a34df63afbc3abfa9512798a0560871fa10f7f065313d90adcae"
-      },
-      {
-        "command": "relate --mode csv \"RETURN point({x: 1, y: 2}) AS xy, point({latitude: 51.5, longitude: -0.1}) AS geo, vector([1, 2, 3], 3, INT8) AS v, uuid('f066ecfc-5151-4121-8a36-b35e00d72918') AS u\"",
-        "expected_sha256": "5410d535b959d0d229c0adab1d59b636ef70bbf867e08377ae0ac96f9d79a09f"
-      },
-      {
-        "command": "relate --mode jsonl \"CREATE p = (a:Person {name: 'Ada'})-[r:KNOWS {since: 2024}]->(b:Person {name: 'Grace'}) RETURN a, r, p\"",
-        "expected_sha256": "ce9222ae48452a99ae2590184bd5ecfe1a3a41c0253c92d5c09882104095a078"
-      },
-      {
-        "command": "relate --mode envelope \"RETURN 42 AS int, null AS nothing, localtime('10:15:30') AS lt, uuid('f066ecfc-5151-4121-8a36-b35e00d72918') AS u, [1, 2] AS list\"",
-        "expected_sha256": "a2e5a6dabeca94f979134435c36c3bfac6e091efaafe71a90f7a7fa7404a4d26"
       }
     ],
     "reference/cypher/writing-clauses.mdx": [
@@ -5386,16 +3702,6 @@
         "expected_sha256": "3305d37ee0059d53eaeab51d9b2f645e1e5737aadec6ebf3ed71ffde4b820644"
       }
     ],
-    "reference/project.mdx": [
-      {
-        "command": "relate --version",
-        "expected_sha256": "585291832daf8aac99ea8da71c537d1554ca5d4f376069936566262d3b85aee9"
-      },
-      {
-        "command": "RELATE_PREVIEW=time-travel relate \"RETURN 1 AS ok\"",
-        "expected_sha256": "fe8fd8358e79fda9a621092b01df3c35bedfb26b630ae28648b3b85756917e2f"
-      }
-    ],
     "reference/security.mdx": [
       {
         "command": "echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHgv/GHY5mtv/HopH/J/T7KrTT7eOVFEG2ueT4iRKwbK relate-release' > release-signing-key.pub\nssh-keygen -lf release-signing-key.pub",
@@ -5412,98 +3718,6 @@
       {
         "command": "relate serve --database :memory: --http 7474 --read-only --origin example.com\necho \"exit=$?\"",
         "expected_sha256": "e9224838a44faff314c20413a5c731825d444e37986f23f83ed9a4b2cb20a1f0"
-      }
-    ],
-    "reference/server/mcp.mdx": [
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"shell\",\"version\":\"0\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/list\"}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"ping\"}' \\\n  | relate serve --mcp stdio --database :memory: 2>/dev/null",
-        "expected_sha256": "ebdc65b34f8f65d16e3089e48f7ea47f3b0146a65a632ea4b93b6bd55967ad43"
-      },
-      {
-        "command": "relate --database ./team.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"get_schema\",\"arguments\":{}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"get_schema\",\"arguments\":{\"sample_size\":1}}}' \\\n  | relate serve --mcp stdio --database ./team.rl --read-only 2>/dev/null",
-        "expected_sha256": "3d9262320aee5f379bef567719ff5c852fa6a59736710eea0740e97ffaa430fc"
-      },
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: $project}) RETURN p.name AS name, w.since AS since ORDER BY since\",\"parameters\":{\"project\":\"relate\"}}}}' \\\n  | relate serve --mcp stdio --database ./team.rl --read-only 2>/dev/null \\\n  | sed -E 's/(_ms\\\\\":)[0-9.e-]+/\\1<ms>/g'",
-        "expected_sha256": "0148aaeb8f673419c94e6c89b1aafd08db0b5e1f3bc8df8bc30b2131fc0d231d"
-      },
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"write_cypher\",\"arguments\":{\"statement\":\"CREATE (:Person {name: $name, role: $role})\",\"parameters\":{\"name\":\"Ada\",\"role\":\"engineer\"}}}}' \\\n  | relate serve --mcp stdio --database :memory: 2>/dev/null \\\n  | sed -E 's/(_ms\\\\\":)[0-9.e-]+/\\1<ms>/g'",
-        "expected_sha256": "008fecf3adb0b2ac8f69066e446859a19ed3d39a2571e7f5943297cddd8073ab"
-      },
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"MATCH (p:Person {name: $name}) DETACH DELETE p\",\"parameters\":{\"name\":\"Ada\"}}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"CREATE INDEX person_name FOR (p:Person) ON (p.name)\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"write_cypher\",\"arguments\":{\"statement\":\"CREATE (:Person {name: \\\"Eve\\\"})\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"query\":\"MATCH (p:Person) RETURN count(p) AS people\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":5,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"RETURN $limit AS n\",\"parameters\":\"10\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"RETURN $limit AS n\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"tools/call\",\"params\":{\"name\":\"get_schema\",\"arguments\":{\"sample_size\":-2}}}' \\\n  | relate serve --mcp stdio --database ./team.rl --read-only 2>/dev/null",
-        "expected_sha256": "53f07a51f3561933fed07d6dbc42acfa52c9f42237fafa40d056ff9374018c9d"
-      },
-      {
-        "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"resources/list\"}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"ping\",\"extra\":true}' \\\n  '{\"jsonrpc\":\"1.0\",\"id\":4,\"method\":\"ping\"}' \\\n  'not json' \\\n  | relate serve --mcp stdio --database ./team.rl --read-only 2>/dev/null",
-        "expected_sha256": "5d97384051e977e53c8403c6d335af02f316aa492b11dbeb800610099e5b30a4"
-      }
-    ],
-    "reference/storage/formats.mdx": [
-      {
-        "command": "relate --database ./wide \"CREATE (:Person {name: 'Ada', role: 'engineer'}), (:Person {name: 'Grace', role: 'engineer'})\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "relate info --database ./wide | head -n 3",
-        "expected_sha256": "9121da04256bcac58445ba8165b1ec501b5f73f0320bb8a1b844986e5abe55fe"
-      },
-      {
-        "command": "relate --database ./people --mode envelope \"CREATE CONSTRAINT person_name IF NOT EXISTS FOR (p:Person) REQUIRE p.name IS UNIQUE\"\nrelate --database ./people --mode envelope \"CREATE INDEX person_role IF NOT EXISTS FOR (p:Person) ON (p.role)\"",
-        "expected_sha256": null
-      },
-      {
-        "command": "cat people/.relate/schema/schema.cypher",
-        "expected_sha256": "9b6904ebd03c13f28e59e2cdafe971cdec1e91fbf3769c6e8004e40010157e8a"
-      },
-      {
-        "command": "echo \"// edited\" >> people/.relate/schema/schema.cypher\nrelate --database ./people --read-only --mode envelope \"RETURN 1 AS ok\"\necho \"exit=$?\"",
-        "expected_sha256": "3b0b0f74c72ca039b0116a677146f5383e55d4989158d6ffa473a66e55ada77a"
-      },
-      {
-        "command": "relate --database ./items --mode envelope \"UNWIND range(1, 100000) AS i CREATE (:Item {id: i, name: 'item-' + toString(i), score: i * 0.5})\"\nrelate --database ./items-json --snapshot-format json --mode envelope \"UNWIND range(1, 100000) AS i CREATE (:Item {id: i, name: 'item-' + toString(i), score: i * 0.5})\"\nrelate --database ./items.rl --mode envelope \"UNWIND range(1, 100000) AS i CREATE (:Item {id: i, name: 'item-' + toString(i), score: i * 0.5})\"\nrelate clone ./items.rl ./items-clone.rl",
-        "expected_sha256": "073cb9817130ad824528cdd3220ce4f11b428092a83c601cc351dc9cefefdf34"
-      },
-      {
-        "command": "for store in items items-json items.rl items-clone.rl; do printf '%s: ' \"$store\"; relate info --database \"./$store\" | grep 'total bytes'; done",
-        "expected_sha256": "0e6772189c6582397a11ddffc37c1ac952e14f20eeadf1f160acaea7659bb1fd"
-      }
-    ],
-    "reference/storage/limits-and-sizing.mdx": [
-      {
-        "command": "relate --mode envelope --logical-graph-size-limit 1mb \"UNWIND range(1, 20000) AS i CREATE (:Item {i: i})\"\nrelate --mode envelope --logical-graph-size-limit 1mib \"UNWIND range(1, 20000) AS i CREATE (:Item {i: i})\"",
-        "expected_sha256": "3a3ba7096d032fd393f1c32e438f057eaebb8d608b0fce8e2ff6396b60ba1b9b"
-      },
-      {
-        "command": "relate --logical-graph-size-limit 64kb \"RETURN 1 AS ok\"",
-        "expected_sha256": "7950a6a6bc2afa052bf14049c083e09e6c1e3c05b4bf8ed927f224d4d6ca8552"
-      },
-      {
-        "command": "relate --mode envelope \"WITH reduce(s = 'a', i IN range(1, 26) | s + s) AS s CREATE (:Blob {s: s})\"",
-        "expected_sha256": "6b2c4d47e4fea9d5a0fc008085dc0d6f5f8a6492ec381f7755b4d840b3fa8a5b"
-      },
-      {
-        "command": "relate --mode envelope \"WITH reduce(s = 'a', i IN range(1, 25) | s + s) AS s CREATE (:Blob {s: s}) RETURN size(s) AS characters\"",
-        "expected_sha256": "189e2b16d9d054ca0e55d889a5b04d4c1b8da37947ed08b6c41c44054326f89a"
-      }
-    ],
-    "reference/storage/wal-and-checkpoints.mdx": [
-      {
-        "command": "cat > team.cypher <<'EOF'\nCREATE (:Person {name: 'Ada', role: 'engineer'});\nCREATE (:Person {name: 'Grace', role: 'engineer'});\nCREATE (:Person {name: 'Noor', role: 'maintainer'});\nEOF\nrelate query --database ./team < team.cypher\nrelate info --database ./team\nls -A team/wal\ncat team/wal/00000002.log; echo",
-        "expected_sha256": "d7523866f35f7d14737924c64f52b218b56a349b79cf29694adfeeda8f3e3487"
-      },
-      {
-        "command": "cat > checkpoint.cypher <<'EOF'\nMATCH (a:Person {name: 'Ada'}), (g:Person {name: 'Grace'}) CREATE (a)-[:KNOWS]->(g);\n.info\n.checkpoint\n.info\nEOF\nrelate query --database ./team < checkpoint.cypher | grep -E '^(checkpoint LSN|total bytes|wal segments)'",
-        "expected_sha256": "cb877c5a0b5b5337551a24f9e9119e8513d3c1ca63e0dd70d444672131aff4cb"
-      },
-      {
-        "command": "relate query --database ./batch <<'EOF' | grep -E '^(checkpoint LSN|nodes)'\nUNWIND range(1, 10001) AS i CALL (i) { CREATE (:Item {i: i}) } IN TRANSACTIONS OF 1 ROWS;\n.info\nEOF\nrelate info --database ./batch | grep -E '^(checkpoint LSN|nodes)'",
-        "expected_sha256": "7154cf05c7e6eec19e3582c1c27fa994065a64f237e700a3861185e8009c1172"
       }
     ]
   }

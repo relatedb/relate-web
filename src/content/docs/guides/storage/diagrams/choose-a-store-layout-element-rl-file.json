@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "storage-animator",
-  "hash": "9b83a0fe66e0095aa2f3af5ecaa1407a5939b404e384f73a5da34285e2da3712",
+  "hash": "f5dedba33806a57517e60c171792026eaed7c3eea063486780a8a2eab64536fb",
   "inputs": [
     "src/content/docs/_data/cli.json"
   ],
@@ -11,8 +11,8 @@
   "caption": "The parts of one .rl file, as relate documents it",
   "svg": true,
   "svgSha256": {
-    "light": "47f050b94cd0165a30b8a53a9d9ae98cb950f77a365e003378f906f739fc99b3",
-    "dark": "32cb18bd683dd509d1900175513b66d1567792a8d4214c157a1eb522af3bbd71"
+    "light": "a56a16e12e4bcda72a7a2c4fe9f73546fe07472be20e042020e596a0bdc03d70",
+    "dark": "39dfab007f52314ab03708a8258875342eb7365dbf68138029a000a799d73528"
   },
   "textSha256": "7a0769823ff16cf2ddd3989dd21204bf42788bb8b85ca12073ab122ff769430d"
 }

@@ -304,8 +304,8 @@ RETURN 'full-text: LIMIT $k * 3, WHERE, LIMIT $k' AS filter, ids
 | filter                                     | ids                   |
 |--------------------------------------------|-----------------------|
 | "vector: WHERE inside SEARCH"              | ["n18", "n19", "n23"] |
-| "vector: WHERE after SEARCH"               | ["n18"]               |
-| "full-text: LIMIT $k, then WHERE"          | []                    |
+| "vector: WHERE after SEARCH"               | ["n18", "n19", "n23"] |
+| "full-text: LIMIT $k, then WHERE"          | ["n17", "n18", "n19"] |
 | "full-text: LIMIT $k * 3, WHERE, LIMIT $k" | ["n17", "n18", "n19"] |
 4 rows
 ```

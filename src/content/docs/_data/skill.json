@@ -1,17 +1,17 @@
 {
   "source": "surfaces/relate-cli/src/skill/bundle",
-  "commit": "e0ea5364737f4b005190d13f59802eac311422bb",
-  "synced": "2026-11-20",
-  "version": "1.2.0",
+  "commit": "6e55309d16f483fbab2f20ca08ed42d9b0e68db5",
+  "synced": "2026-11-25",
+  "version": "1.3.0",
   "files": [
     {
       "path": "SKILL.md",
-      "sha256": "762dc534924c1cfb76a80663da956a8ed21e41d357fbe1cc5f66e8f6f4861455",
-      "upstream_sha256": "c595ae253d779d5f063c0a2163c3a838d92b93108ef2bee9b60786f942c87b3e"
+      "sha256": "5542a72333324cc3676c47b3075c510600182f020a3dd650e48be6a7e5f7a3a8",
+      "upstream_sha256": "ba29f5980e1c1acc6d2e63b7be6861a061aef38e2fad0a710a4d308d5d1a776f"
     },
     {
       "path": "references/agent-safety.md",
-      "sha256": "4c3a616f09b801fca4254dfa82e6c24b888d96d13051a2f1f56b9c6244ea495d"
+      "sha256": "c3da21507bc8eac8bcb253f6c42a0509df2ec3370ecad5ac2a2f474e54db6771"
     },
     {
       "path": "references/client-c.md",
@@ -19,47 +19,47 @@
     },
     {
       "path": "references/client-cli.md",
-      "sha256": "fa886a5eec869d07f52a96737e4fd41c9c0f10033162add3c7d4618cd81efd35"
+      "sha256": "28804ec0307d20c7fbeef2c83e8d6c64692e7444be83c8bc7b72491f58e1f392"
     },
     {
       "path": "references/client-dotnet.md",
-      "sha256": "76da89c312dce884c21b313a8a0600900643cf8c94f03499729acd4acbfd074f"
+      "sha256": "31f1b0125f3148d67f77384ad5276eefbaa983165a84cbd00067b280aa4f8f55"
     },
     {
       "path": "references/client-extensions.md",
-      "sha256": "9439bd8b6b06f6045e16cac23221f7545b0d3ec7bcf53bfc67640fd1310b9dfe"
+      "sha256": "56b8270b7c3b68fd953e54b72118d933c197d6fbf2d7bdafbb45bbcf406ac53c"
     },
     {
       "path": "references/client-go.md",
-      "sha256": "bd8156006a79602eb113c461fb950251a24fd897f1693e3fa710f1b8e0b3d51f"
+      "sha256": "7267ef83a9ba62795a798a3d4662bb59e22a64acc43aeb945467d864ee16a4ab"
     },
     {
       "path": "references/client-java.md",
-      "sha256": "5438ef388ad6ac10cbd45f61cbe94d08d06357945f79fcb464c9392657a2060d"
+      "sha256": "45462c0b777efdb380436e9d0df4ef8c1c021b6b946f4f83c45a69f1001c121e"
     },
     {
       "path": "references/client-javascript.md",
-      "sha256": "6887b6cad841ee3fdb6d53513e2fa7e2f156b6089df2ca05f1619d8df7e8480a"
+      "sha256": "11f005e3d052ab2babdad48b28e763b2929bc3e28bc5235fc8063d340cab6dc8"
     },
     {
       "path": "references/client-python.md",
-      "sha256": "2d492eaa04b332f12490f71e6d20214561a67b253206f18da33b5ec14a8ad6e9"
+      "sha256": "0426761fd936d0850cc34b8125ffb0d070fa7c85da673899ebf123f6db5eaa94"
     },
     {
       "path": "references/client-swift.md",
-      "sha256": "bf8d577e08db26a6efa83d0c547255279b23f078c77edeae358597c5394d339c"
+      "sha256": "fa1ee7018cac49a255a3659d7d99dbdc62ab8540056d3c166120c5bf7096da23"
     },
     {
       "path": "references/client-wasm.md",
-      "sha256": "e1cc53e91bd4b761b7a43b669f555c82e843f6653ae5acde96d114d88ddc97c4"
+      "sha256": "17819b1d58b3938bf0ecfd4b6810a63daf3ef7ee6e70caec058bff215538e3a5"
     },
     {
       "path": "references/operations.md",
-      "sha256": "e99e28a86d68d089984916dd6ab044c08795bbdfb4499966a53d9b6f25ac3b85"
+      "sha256": "8b3331b935a84c6fec7db50e22d2cc738c0dbfcd88e895db3e769719fe11d4b0"
     },
     {
       "path": "references/pull.md",
-      "sha256": "7554887eb994d422b6c19df9cc887411a743f90ff01828642062d3857d64bb57"
+      "sha256": "f1e40e20efb72e9e2f21dc284a2b53838d9d1a5531a9b5edb4a26a6450754ac6"
     },
     {
       "path": "references/push.md",

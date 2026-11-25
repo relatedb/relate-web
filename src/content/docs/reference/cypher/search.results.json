@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -16,17 +16,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 6,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 6,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -45,17 +45,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 1,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 1,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -68,10 +68,6 @@
           "name",
           "score"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"Grace\"",
@@ -81,6 +77,10 @@
             "\"Ada\"",
             "0.6184"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -109,17 +109,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -132,10 +132,6 @@
           "name",
           "score"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"Noor\"",
@@ -145,6 +141,10 @@
             "\"Grace\"",
             "0.22443993531397488"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -173,17 +173,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -195,10 +195,6 @@
         "columns": [
           "query",
           "names"
-        ],
-        "numeric": [
-          false,
-          false
         ],
         "rows": [
           [
@@ -218,6 +214,10 @@
             "[\"Noor\", \"Grace\"]"
           ]
         ],
+        "numeric": [
+          false,
+          false
+        ],
         "summary": "4 rows"
       },
       "graph": null,
@@ -236,44 +236,44 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "query": "stor*",
             "names": [
               "Ada"
-            ],
-            "query": "stor*"
+            ]
           },
           {
+            "query": "t?sts",
             "names": [
               "Grace",
               "Noor"
-            ],
-            "query": "t?sts"
+            ]
           },
           {
+            "query": "conformence~",
             "names": [
               "Grace"
-            ],
-            "query": "conformence~"
+            ]
           },
           {
+            "query": "docs^2 green",
             "names": [
               "Noor",
               "Grace"
-            ],
-            "query": "docs^2 green"
+            ]
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -285,10 +285,6 @@
         "columns": [
           "query",
           "names"
-        ],
-        "numeric": [
-          false,
-          false
         ],
         "rows": [
           [
@@ -303,6 +299,10 @@
             "\"CAF*\"",
             "[\"Cafe Orbit\", \"Café Lumen\"]"
           ]
+        ],
+        "numeric": [
+          false,
+          false
         ],
         "summary": "3 rows · nodes created: 2, properties set: 2, labels added: 2, indexes added: 1"
       },
@@ -322,39 +322,39 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "query": "cafe",
             "names": [
               "Cafe Orbit",
               "Café Lumen"
-            ],
-            "query": "cafe"
+            ]
           },
           {
+            "query": "café",
             "names": [
               "Cafe Orbit",
               "Café Lumen"
-            ],
-            "query": "café"
+            ]
           },
           {
+            "query": "CAF*",
             "names": [
               "Cafe Orbit",
               "Café Lumen"
-            ],
-            "query": "CAF*"
+            ]
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -368,17 +368,17 @@
           "vector",
           "fulltext"
         ],
-        "numeric": [
-          false,
-          true,
-          true
-        ],
         "rows": [
           [
             "\"Noor\"",
             "0.7151",
             "0.43535502091904305"
           ]
+        ],
+        "numeric": [
+          false,
+          true,
+          true
         ],
         "summary": "1 row"
       },
@@ -400,23 +400,23 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "fulltext": 0.43535502091904305,
             "name": "Noor",
-            "vector": 0.7151
+            "vector": 0.7151,
+            "fulltext": 0.43535502091904305
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -428,10 +428,6 @@
         "columns": [
           "id",
           "score"
-        ],
-        "numeric": [
-          false,
-          true
         ],
         "rows": [
           [
@@ -446,6 +442,10 @@
             "\"Ada\"",
             "0.6183618307113647"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "3 rows"
       },
@@ -478,17 +478,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -501,10 +501,6 @@
           "id",
           "score"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"Noor\"",
@@ -514,6 +510,10 @@
             "\"Grace\"",
             "0.22443993531397488"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -542,17 +542,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -564,10 +564,6 @@
         "columns": [
           "id",
           "rrf"
-        ],
-        "numeric": [
-          false,
-          true
         ],
         "rows": [
           [
@@ -582,6 +578,10 @@
             "\"Ada\"",
             "0.01111111111111111"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "3 rows"
       },
@@ -614,17 +614,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false

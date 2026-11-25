@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "agent-trace",
-  "hash": "23e8e04239e3685de25a31f6e5e9fc558c575d5e1dca7f17eb31a12cd654e1b0",
+  "hash": "8bf04280efb565e913942a1044297f7b506da5d6def5c86bd1833a6916505849",
   "inputs": [
     "public/wasm/relate_bg.wasm",
     "src/content/docs/_data/errors.json"

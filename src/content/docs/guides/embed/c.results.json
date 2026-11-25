@@ -1,14 +1,14 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "open": {
       "kind": "text",
-      "text": "ABI version 2\nrows=0 stats={\"constraints_added\":0,\"constraints_removed\":0,\"indexes_added\":0,\"indexes_removed\":0,\"labels_added\":5,\"labels_removed\":0,\"nodes_created\":5,\"nodes_deleted\":0,\"properties_set\":13,\"relationships_created\":5,\"relationships_deleted\":0}\nrows=0 stats={\"constraints_added\":0,\"constraints_removed\":0,\"indexes_added\":0,\"indexes_removed\":0,\"labels_added\":5,\"labels_removed\":0,\"nodes_created\":5,\"nodes_deleted\":0,\"properties_set\":13,\"relationships_created\":5,\"relationships_deleted\":0}\nrows=3 stats={\"constraints_added\":0,\"constraints_removed\":0,\"indexes_added\":0,\"indexes_removed\":0,\"labels_added\":0,\"labels_removed\":0,\"nodes_created\":0,\"nodes_deleted\":0,\"properties_set\":0,\"relationships_created\":0,\"relationships_deleted\":0}\nstatement failed: {\"code\":\"Neo.ClientError.Statement.SemanticError\",\"gql_status\":\"42N18\",\"stage\":\"runtime\",\"retryable\":false,\"message\":\"semantic error: WriteOnReadOnlyAccessDatabase: No write operations are allowed on this database. The database is in read-only mode on this Neo4j instance.\"}",
+      "text": "ABI version 2\nrows=0 stats={\"nodes_created\":5,\"nodes_deleted\":0,\"relationships_created\":5,\"relationships_deleted\":0,\"properties_set\":13,\"labels_added\":5,\"labels_removed\":0,\"indexes_added\":0,\"indexes_removed\":0,\"constraints_added\":0,\"constraints_removed\":0}\nrows=0 stats={\"nodes_created\":5,\"nodes_deleted\":0,\"relationships_created\":5,\"relationships_deleted\":0,\"properties_set\":13,\"labels_added\":5,\"labels_removed\":0,\"indexes_added\":0,\"indexes_removed\":0,\"constraints_added\":0,\"constraints_removed\":0}\nrows=3 stats={\"nodes_created\":0,\"nodes_deleted\":0,\"relationships_created\":0,\"relationships_deleted\":0,\"properties_set\":0,\"labels_added\":0,\"labels_removed\":0,\"indexes_added\":0,\"indexes_removed\":0,\"constraints_added\":0,\"constraints_removed\":0}\nstatement failed: {\"code\":\"Neo.ClientError.Statement.SemanticError\",\"gql_status\":\"42N18\",\"stage\":\"runtime\",\"retryable\":false,\"message\":\"semantic error: WriteOnReadOnlyAccessDatabase: No write operations are allowed on this database. The database is in read-only mode on this Neo4j instance.\"}",
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.2.0",
+      "verified": "1.3.0",
       "source_sha256": "4280f8181709f311bdb259d5f32084a965d72f14773ca572d14ac604e8156ac4"
     },
     "walk": {
@@ -17,7 +17,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.2.0",
+      "verified": "1.3.0",
       "source_sha256": "fbaad4ff324c8786fafc8019cf0b7e872f69777116b7db1734cb4619c788d837"
     },
     "params": {
@@ -26,7 +26,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.2.0",
+      "verified": "1.3.0",
       "source_sha256": "aa25ed96bbb2c9872d1ec7289e2438be04848dc690041a25da25271fa4c5351f"
     },
     "errors": {
@@ -35,7 +35,7 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.2.0",
+      "verified": "1.3.0",
       "source_sha256": "85ff2375023436db97c5803af2a00a44c4bc196809194796371975538884be55"
     },
     "transaction": {
@@ -44,16 +44,16 @@
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.2.0",
+      "verified": "1.3.0",
       "source_sha256": "0f029ef193a758938475f7868a0b3ce17508e2de09f2780e8ca468fa8c31dd9d"
     },
     "metadata": {
       "kind": "text",
-      "text": "column 0: name\ncolumn 1: role\nrows=3 query_type=r namespace=neo4j\nplan=NULL notifications=[]\nphases within elapsed: 1\nquery_type=r rows=0\nnotifications=[{\"category\":\"PERFORMANCE\",\"code\":\"Neo.ClientNotification.Statement.CartesianProduct\",\"description\":\"the MATCH patterns share no join anchor\",\"gql_status\":\"03N90\",\"operator_id\":1,\"remedy\":\"Give the patterns a join anchor: reuse a node variable across them, or add a pattern that relates their endpoints; otherwise run them as separate queries.\",\"severity\":\"INFORMATION\",\"title\":\"Cartesian product\"}]\nplan={\"profiled\":false,\"root\":{\"actual\":null,\"children\":[{\"actual\":null,\"children\":[],\"details\":\"(q:Project), (p:Person)\",\"estimated_rows\":null,\"identifiers\":[],\"operator\":\"Expand\",\"warnings\":[{\"category\":\"PERFORMANCE\",\"code\":\"Neo.ClientNotification.Statement.CartesianProduct\",\"description\":\"the MATCH patterns share no join anchor\",\"gql_status\":\"03N90\",\"remedy\":\"Give the patterns a join anchor: reuse a node variable across them, or add a pattern that relates their endpoints; otherwise run them as separate queries.\",\"severity\":\"INFORMATION\",\"title\":\"Cartesian product\"}]}],\"details\":\"2 item(s)\",\"estimated_rows\":null,\"identifiers\":[],\"operator\":\"ProduceResults\",\"warnings\":[]},\"schema\":\"relate.plan/v1\",\"statement\":\"MATCH (p:Person), (q:Project) RETURN p.name, q.name\"}",
+      "text": "column 0: name\ncolumn 1: role\nrows=3 query_type=r namespace=neo4j\nplan=NULL notifications=[]\nphases within elapsed: 1\nquery_type=r rows=0\nnotifications=[{\"code\":\"Neo.ClientNotification.Statement.CartesianProduct\",\"gql_status\":\"03N90\",\"severity\":\"INFORMATION\",\"category\":\"PERFORMANCE\",\"title\":\"Cartesian product\",\"description\":\"the MATCH patterns share no join anchor\",\"remedy\":\"Give the patterns a join anchor: reuse a node variable across them, or add a pattern that relates their endpoints; otherwise run them as separate queries.\",\"operator_id\":1}]\nplan={\"schema\":\"relate.plan/v1\",\"profiled\":false,\"statement\":\"MATCH (p:Person), (q:Project) RETURN p.name, q.name\",\"root\":{\"operator\":\"ProduceResults\",\"details\":\"2 item(s)\",\"identifiers\":[],\"estimated_rows\":null,\"actual\":null,\"fused_into\":null,\"fused_metrics\":null,\"children\":[{\"operator\":\"Expand\",\"details\":\"(q:Project), (p:Person)\",\"identifiers\":[],\"estimated_rows\":null,\"actual\":null,\"fused_into\":null,\"fused_metrics\":null,\"children\":[],\"warnings\":[{\"code\":\"Neo.ClientNotification.Statement.CartesianProduct\",\"gql_status\":\"03N90\",\"severity\":\"INFORMATION\",\"category\":\"PERFORMANCE\",\"title\":\"Cartesian product\",\"description\":\"the MATCH patterns share no join anchor\",\"remedy\":\"Give the patterns a join anchor: reuse a node variable across them, or add a pattern that relates their endpoints; otherwise run them as separate queries.\"}]}],\"warnings\":[]}}",
       "table": null,
       "graph": null,
       "expectError": false,
-      "verified": "1.2.0",
+      "verified": "1.3.0",
       "source_sha256": "2f6d1cb61ae9075e932b23479b028522cf009e42e929368c8b66a2868c20070e"
     }
   }
