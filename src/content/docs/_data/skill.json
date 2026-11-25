@@ -131,7 +131,7 @@
         {
           "slug": "hybrid-recall",
           "source_sha256": "057d4bf7712a4124a619ccec0dee2232f95358d8302c2ad6ddaee21db4b2d101",
-          "results_sha256": null
+          "results_sha256": "706b170e4c32a0cd40065b1a3096bd03dc68881586b175da2610a5671a3df3c7"
         }
       ]
     },
@@ -152,7 +152,7 @@
         {
           "slug": "hybrid-recall",
           "source_sha256": "057d4bf7712a4124a619ccec0dee2232f95358d8302c2ad6ddaee21db4b2d101",
-          "results_sha256": null
+          "results_sha256": "706b170e4c32a0cd40065b1a3096bd03dc68881586b175da2610a5671a3df3c7"
         },
         {
           "slug": "migration-rehearsal",
