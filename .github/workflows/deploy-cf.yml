@@ -71,7 +71,7 @@ jobs:
           fi
 
       # Full history: each docs page's "Updated" date is its file's last commit.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: steps.cf.outputs.configured == 'true'
         with:
           fetch-depth: 0
@@ -84,7 +84,7 @@ jobs:
         if: steps.cf.outputs.configured == 'true'
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         if: steps.cf.outputs.configured == 'true'
         with:
           node-version: 24
@@ -157,7 +157,7 @@ jobs:
 
       # dist/ carries dotfiles (.well-known/), which upload-artifact
       # leaves out unless asked.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: steps.cf.outputs.configured == 'true'
         with:
           name: site-dist
@@ -177,12 +177,12 @@ jobs:
       alias: ${{ steps.urls.outputs.alias }}
     steps:
       # functions/ and the src/lib/docs module they import, at the commit dist/ was built from.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.build.outputs.sha }}
           persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -191,7 +191,7 @@ jobs:
       # that holds the token.
       - run: npm ci --ignore-scripts
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: site-dist
           path: dist/

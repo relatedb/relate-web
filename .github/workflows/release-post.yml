@@ -85,7 +85,7 @@ jobs:
             echo "post=src/content/blog/relate-${version//./-}.md"
           } >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: steps.release.outputs.skip != 'true'
 
       - name: Skip a release that has a post
@@ -132,7 +132,7 @@ jobs:
             echo "$bin" >> "$GITHUB_PATH"
           fi
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         if: steps.release.outputs.skip != 'true' && steps.exists.outputs.skip != 'true' && steps.notes.outputs.skip != 'true'
         with:
           node-version: 24
@@ -172,7 +172,7 @@ jobs:
           } > "$RUNNER_TEMP/out/body.md"
           echo "drafted=true" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: steps.write.outputs.drafted == 'true'
         with:
           name: release-post
@@ -186,9 +186,9 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: release-post
           path: ${{ runner.temp }}/out
@@ -199,7 +199,7 @@ jobs:
         run: cp "$RUNNER_TEMP/out/post.md" "$POST"
 
       - name: Open the pull request
-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8.1.3
         with:
           token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
           base: main

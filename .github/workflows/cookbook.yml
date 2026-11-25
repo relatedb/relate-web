@@ -51,11 +51,11 @@ jobs:
     timeout-minutes: 30
     steps:
       # Full history: each docs page's "Updated" date is its file's last commit.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -98,11 +98,11 @@ jobs:
     timeout-minutes: 30
     steps:
       # Full history: each docs page's "Updated" date is its file's last commit.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         id: node
         with:
           node-version: 24
@@ -112,7 +112,7 @@ jobs:
 
       - name: Restore playground packages
         id: playground-modules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: playground/node_modules
           key: playground-modules-${{ runner.os }}-node${{ steps.node.outputs.node-version }}-${{ hashFiles('playground/package-lock.json') }}
@@ -131,7 +131,7 @@ jobs:
         run: echo "key=$(node scripts/build-playground.mjs --key)" >> "$GITHUB_OUTPUT"
 
       - name: Restore playground build
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: node_modules/.cache/relate-playground
           key: playground-build-${{ runner.os }}-${{ steps.playground-key.outputs.key }}
@@ -141,7 +141,7 @@ jobs:
 
       # dist/ carries dotfiles (.well-known/), which upload-artifact
       # leaves out unless asked.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: cookbook-dist
           path: dist/
@@ -155,18 +155,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
 
       - run: npm ci
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: cookbook-dist
           path: dist/
@@ -189,16 +189,16 @@ jobs:
       matrix:
         shard: [1, 2, 3, 4]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
 
       - run: npm ci
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: cookbook-dist
           path: dist/
