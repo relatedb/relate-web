@@ -1,0 +1,206 @@
+# Drafts the blog post for a relate release and opens a pull request with it
+# for a person to review (ADR-0075). Merging the pull request publishes the post.
+#
+# engine-release.yml stays deterministic (no agent writes anything there); this
+# is the separate, model-written step, so a model account is spent only here
+# and a failure here never holds up the docs refresh or the discovery files.
+#
+# Two jobs, the pattern of docs-evals.yml:
+#   draft         read-only token. Installs the release's binary, then runs Claude
+#                 Code headless with scripts/release-post/prompt.md to write
+#                 src/content/blog/relate-X-Y-Z.md from the release notes, running
+#                 every CLI example it shows. Only that one file leaves the job.
+#   pull-request  no model, no agent. Opens the pull request with the file; its
+#                 body carries the agent's Verified/Unverified report.
+#
+# Triggers: repository_dispatch relate-release with kind cli (upstream's release
+# pipelines, ADR-0546), or workflow_dispatch with the version. A release that has
+# a post already is skipped.
+#
+# Secrets and variables:
+#   ANTHROPIC_API_KEY             required; without it the run skips with a warning.
+#   RELEASE_POST_AGENT_PACKAGE    repository variable: the pinned
+#                                 @anthropic-ai/claude-code@<version> to install.
+#   RELATE_UPSTREAM_TOKEN         optional: reads the release (the repository is public).
+#   RELEASE_PR_TOKEN              optional: lets the pull request start the required
+#                                 Cookbook check (as in engine-release.yml).
+name: Release post
+
+on:
+  repository_dispatch:
+    types: [relate-release]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The relate release to write about (X.Y.Z)
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-post
+  cancel-in-progress: false
+
+env:
+  DO_NOT_TRACK: '1'
+  UPSTREAM_REPO: ${{ vars.RELATE_UPSTREAM_REPO || 'relatedb/relate' }}
+
+jobs:
+  draft:
+    if: github.event.client_payload.kind != 'extension'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      post: ${{ steps.release.outputs.post }}
+      drafted: ${{ steps.write.outputs.drafted }}
+    steps:
+      - name: The release
+        id: release
+        env:
+          PAYLOAD_VERSION: ${{ github.event.client_payload.version }}
+          PAYLOAD_TAG: ${{ github.event.client_payload.tag }}
+          INPUT_VERSION: ${{ inputs.version }}
+          HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+          PACKAGE: ${{ vars.RELEASE_POST_AGENT_PACKAGE }}
+        run: |
+          version="${PAYLOAD_VERSION:-$INPUT_VERSION}"
+          version="${version#v}"
+          tag="$PAYLOAD_TAG"
+          if [ -z "$version" ] && [[ "$tag" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            version="${BASH_REMATCH[1]}"
+          fi
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::the version must be X.Y.Z, not '$version'"
+            exit 1
+          fi
+          if [ "$HAS_KEY" != true ] || [ -z "$PACKAGE" ]; then
+            echo "::warning::ANTHROPIC_API_KEY or the variable RELEASE_POST_AGENT_PACKAGE is not set: no post is drafted"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+          {
+            echo "version=$version"
+            echo "tag=v$version"
+            echo "post=src/content/blog/relate-${version//./-}.md"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        if: steps.release.outputs.skip != 'true'
+
+      - name: Skip a release that has a post
+        id: exists
+        if: steps.release.outputs.skip != 'true'
+        env:
+          POST: ${{ steps.release.outputs.post }}
+        run: |
+          if [ -e "$POST" ]; then
+            echo "::notice::$POST exists: nothing to draft"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Read the release
+        id: notes
+        if: steps.release.outputs.skip != 'true' && steps.exists.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELATE_UPSTREAM_TOKEN || github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          out="$RUNNER_TEMP/release.json"
+          gh release view "$TAG" -R "$UPSTREAM_REPO" --json tagName,publishedAt,url,body,isPrerelease,isDraft > "$out"
+          if [ "$(jq -r '.isPrerelease or .isDraft' "$out")" = true ]; then
+            echo "::notice::$TAG is a draft or prerelease: no post"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "file=$out" >> "$GITHUB_OUTPUT"
+
+      # The binary the post's examples run against. A failed install is not
+      # fatal: the agent then reports every example as unverified.
+      - name: Install relate
+        if: steps.release.outputs.skip != 'true' && steps.exists.outputs.skip != 'true' && steps.notes.outputs.skip != 'true'
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          HOME="$RUNNER_TEMP/home" sh public/install.sh > "$RUNNER_TEMP/install.log" 2>&1 || tail -n 5 "$RUNNER_TEMP/install.log"
+          bin="$RUNNER_TEMP/home/.local/bin"
+          if [ "$("$bin/relate" --version 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -n1)" = "$VERSION" ]; then
+            echo "$bin" >> "$GITHUB_PATH"
+          else
+            echo "::warning::relate $VERSION is not installed: examples will be reported unverified"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.release.outputs.skip != 'true' && steps.exists.outputs.skip != 'true' && steps.notes.outputs.skip != 'true'
+        with:
+          node-version: 24
+
+      - name: Draft the post
+        id: write
+        if: steps.release.outputs.skip != 'true' && steps.exists.outputs.skip != 'true' && steps.notes.outputs.skip != 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PACKAGE: ${{ vars.RELEASE_POST_AGENT_PACKAGE }}
+          RELEASE_FILE: ${{ steps.notes.outputs.file }}
+          POST: ${{ steps.release.outputs.post }}
+        run: |
+          npm install -g "$PACKAGE"
+          # --bare: no hooks, skills, MCP servers or memory; ANTHROPIC_API_KEY only.
+          # The tools: read the repo, write the one post, run relate.
+          claude --bare -p \
+            --output-format text \
+            --allowedTools "Read,Write,Bash(relate:*)" \
+            < scripts/release-post/prompt.md > "$RUNNER_TEMP/report.md"
+          # Only the post may have changed.
+          changed="$(git status --porcelain --untracked-files=all)"
+          if [ "$changed" != "?? $POST" ]; then
+            echo "::error::the agent changed more than $POST:"; echo "$changed"; exit 1
+          fi
+          mkdir -p "$RUNNER_TEMP/out"
+          cp "$POST" "$RUNNER_TEMP/out/post.md"
+          {
+            echo "A draft of the release post, written by an agent from the release notes."
+            echo "Read it against the notes, then merge to publish."
+            echo
+            echo "Report from the drafting run:"
+            echo
+            cat "$RUNNER_TEMP/report.md"
+          } > "$RUNNER_TEMP/out/body.md"
+          echo "drafted=true" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        if: steps.write.outputs.drafted == 'true'
+        with:
+          name: release-post
+          path: ${{ runner.temp }}/out
+
+  pull-request:
+    needs: draft
+    if: needs.draft.outputs.drafted == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-post
+          path: ${{ runner.temp }}/out
+
+      - name: Place the post
+        env:
+          POST: ${{ needs.draft.outputs.post }}
+        run: cp "$RUNNER_TEMP/out/post.md" "$POST"
+
+      - name: Open the pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+          base: main
+          branch: release-post/v${{ needs.draft.outputs.version }}
+          delete-branch: true
+          add-paths: ${{ needs.draft.outputs.post }}
+          commit-message: Blog post for relate ${{ needs.draft.outputs.version }}
+          title: Blog post for relate ${{ needs.draft.outputs.version }}
+          body-path: ${{ runner.temp }}/out/body.md

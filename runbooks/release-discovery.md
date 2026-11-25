@@ -128,6 +128,20 @@ gh workflow run engine-release.yml -R relatedb/relate-web -f version=X.Y.Z
 Secrets: `RELATE_UPSTREAM_TOKEN` (read), `RELEASE_PR_TOKEN` (so the PR starts the
 required Cookbook check). Run it locally: `bash scripts/release-refresh.sh --version X.Y.Z`.
 
+## Release post pull request (`release-post.yml`)
+
+On a `cli` poke an agent drafts `src/content/blog/relate-X-Y-Z.md` from the release notes and a second
+job opens a pull request with it (ADR-0075). Review it against the notes and the report's
+`Unverified:` lines; merging publishes. By hand:
+
+```bash
+gh workflow run release-post.yml -R relatedb/relate-web -f version=X.Y.Z
+```
+
+Needs secret `ANTHROPIC_API_KEY` and repository variable `RELEASE_POST_AGENT_PACKAGE`
+(`@anthropic-ai/claude-code@<version>`); without them the run skips with a warning. A release
+that has a post is skipped: delete the file's branch and post to redo one.
+
 ## Status
 
 The fetch has been exercised only against a stubbed `gh`; no relate release

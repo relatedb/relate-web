@@ -79,3 +79,7 @@ Plain Markdown, one file per post, slug is the file name (short, lowercase, unda
 `updated`, `author`, `tags`, `draft`, `unlisted`. Tags are lowercase, hyphenated slugs. Tag a release post `release`, and tag a post with a language (`rust`, `python`, `javascript`, `java`, `go`, `dotnet`, `swift`, `c`) only when it has something for that language's developers, not just because it mentions it; the language list is in `src/lib/blog.ts`. A draft shows in dev only. An unlisted post is built
 at its URL (`noindex`) but is not in the index, the feed or the sitemap: use it to share a post for
 review, then remove the flag to publish.
+
+## Release posts
+
+Each core release gets a post named `relate-X-Y-Z`, tagged `release`. `release-post.yml` drafts it with an agent that reads this file and the existing release posts (ADR-0075), so they are its instructions: keep them current. A person reviews the pull request before it publishes.
