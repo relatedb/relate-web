@@ -79,5 +79,8 @@
     "mdast-util-directive": "^3.2.0",
     "mdast-util-mdx-jsx": "^3.2.1",
     "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "js-cookie": "^3.0.7"
   }
 }

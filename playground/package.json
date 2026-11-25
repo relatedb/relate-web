@@ -27,12 +27,15 @@
     "@vitejs/plugin-react": "^4",
     "terser": "^5.51.2",
     "typescript": "^5",
-    "vite": "^5"
+    "vite": "^6.4.4"
   },
   "overrides": {
     "@neo4j-cypher/react-codemirror": {
       "react": "$react",
       "react-dom": "$react-dom"
-    }
+    },
+    "js-cookie": "^3.0.7",
+    "zod": "^4.6.6",
+    "katex": "^0.18.2"
   }
 }
