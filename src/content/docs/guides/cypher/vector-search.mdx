@@ -100,7 +100,7 @@ RETURN p.name AS name, round(score, 4) AS score
 ORDER BY score DESC
 ```
 
-Noor, the second nearest, is a maintainer, so Ada takes the second place. The filter may name only the properties in the index's `WITH [...]` list, compared with simple comparisons or `IN` a list, joined by `AND`. A `WHERE` after the `SEARCH` clause filters only the rows the search already returned, so it can leave fewer than `LIMIT`.
+Noor, the second nearest, is a maintainer, so Ada takes the second place. The filter may name only the properties in the index's `WITH [...]` list, compared with simple comparisons or `IN` a list, joined by `AND`. A `WHERE` after the `SEARCH` clause narrows the candidates the same way, before the `LIMIT` window, so it too returns `LIMIT` rows when that many qualify.
 
 The result is an ordinary match, so the next clause can walk the graph from it:
 

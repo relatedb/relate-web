@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "mcp-tryout",
-  "hash": "fb4b908d59057ae700cda8f0501dce847fe14e423fd34c0c2d75be763f055308",
+  "hash": "1fb9984779debb8c500d29f6a32763f665c2e9ce5c027b0918d27dba03b720c1",
   "inputs": [
     "public/wasm/relate_bg.wasm",
     "src/content/docs/_data/errors.json"

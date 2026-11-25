@@ -247,9 +247,8 @@ RETURN slot, current
 
 **Recall fails with `type error: VectorIndexDimensionalityMismatch`.** The question's vector has a different length from the index. Embed the question with the same model as the facts.
 
-**Recall returns fewer than `k` rows.** The `f.closedAt IS NULL` filter sits after `SEARCH`, so it filters the `k` rows the index already chose. Inside the search, on a property declared with `WITH [...]`, it runs before the `LIMIT`.
 
-**Recall returns closed facts.** The search has no `WHERE f.closedAt IS NULL`. Put it inside the search's parentheses.
+**Recall returns closed facts.** The search has no `WHERE f.closedAt IS NULL`. Put it inside the search's parentheses, on a property declared with `WITH [...]`, or after the search on relate 1.3.0 and later.
 
 ## Related
 

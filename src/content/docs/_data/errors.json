@@ -2651,8 +2651,8 @@
       "retryable": false,
       "gql_status": null,
       "neo4j_code": "Neo.ClientError.General.TransactionOutOfMemoryError",
-      "message": "This statement tried to commit a single WAL record of at least <used>. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is <limit> (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).",
-      "cause": "One commit is over the 64 MiB per-commit WAL payload cap; nothing is written.",
+      "message": "This statement tried to commit a single WAL record of at least <used>. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is <limit> (ADR-0650); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).",
+      "cause": "One commit is over the 256 MiB per-commit WAL payload cap (64 MiB before 1.3.0), set at open by `RELATE_WAL_PAYLOAD_LIMIT`; nothing is written.",
       "remedy": "Commit the data in smaller transactions: `CALL { … } IN TRANSACTIONS OF <n> ROWS`, or batches sent by the client.",
       "python_class": "DataError",
       "http_status": 507,
@@ -2664,10 +2664,10 @@
       ],
       "note": "Up to and including 1.0.1 the message wrote the 64 MiB (67,108,864-byte) cap as `64 MB`, called it the per-record cap, and named no remedy beyond smaller transactions.",
       "recorded": {
-        "command": "relate --mode envelope \"WITH reduce(s = 'a', i IN range(1, 26) | s + s) AS s CREATE (:Blob {s: s})\"",
-        "stdout": "{\"columns\":[],\"columnTypes\":[],\"rows\":[],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":336.549697,\"parse_ms\":0.253463,\"plan_ms\":0.008546,\"execute_ms\":336.282429,\"lex_parse_ms\":0.018124,\"rewrite_ms\":0.000981,\"lower_ms\":0.014296,\"result_generation_ms\":0.00026},\"planCache\":\"miss\"}\n",
-        "stderr": "",
-        "exit": 0
+        "command": "relate --mode envelope \"WITH reduce(s = 'a', i IN range(1, 27) | s + s) AS s UNWIND range(1, 3) AS k CREATE (:Blob {k: k, s: s})\"",
+        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"capacity\",\"message\":\"This statement tried to commit a single WAL record of at least 256 MB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 256 MB (ADR-0650); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).\",\"retryable\":false}}\n",
+        "stderr": "This statement tried to commit a single WAL record of at least 256 MB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 256 MB (ADR-0650); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).\n",
+        "exit": 1
       }
     },
     {
@@ -3171,8 +3171,8 @@
       "retryable": false,
       "gql_status": null,
       "neo4j_code": "Neo.ClientError.Statement.SemanticError",
-      "message": "NestedEvaluationBudgetExceeded: nested evaluation exceeds 100000 passes per statement; nested subqueries compound per level (security budget).",
-      "cause": "Nested subqueries, conditional branches and `FOREACH` lists would exceed 100,000 evaluation passes in one statement.",
+      "message": "NestedEvaluationBudgetExceeded: nested evaluation exceeds 1000000 passes per statement; nested subqueries compound per level (security budget).",
+      "cause": "Nested subqueries, conditional branches and `FOREACH` lists would exceed 1,000,000 evaluation passes (100,000 before 1.3.0) in one statement.",
       "remedy": "Flatten the nesting or split the statement.",
       "python_class": null,
       "http_status": null,
@@ -3181,12 +3181,12 @@
         "docs/api/bolt/spec.md",
         "relate 1.0.0 (b02f283), release build"
       ],
-      "note": "A `CALL` subquery runs once per input row and each run counts against the budget, so a `CALL { … }` over more than 100,000 rows fails, `IN TRANSACTIONS` included; the same statement over 99,999 rows succeeds.",
+      "note": "A `CALL` subquery runs once per input row and each run counts against the budget, so a `CALL { … }` over more than 1,000,000 rows fails, `IN TRANSACTIONS` included; the same statement over 1,000,000 rows succeeds.",
       "recorded": {
-        "command": "relate --mode envelope \"UNWIND range(1, 100001) AS i CALL (i) { RETURN i AS j } RETURN count(*) AS c\"",
-        "stdout": "{\"columns\":[\"c\"],\"columnTypes\":[\"INTEGER\"],\"rows\":[{\"c\":100001}],\"truncated\":false,\"notifications\":[],\"timings\":{\"elapsed_ms\":245.052664,\"parse_ms\":0.189113,\"plan_ms\":0.010159,\"execute_ms\":244.847732,\"lex_parse_ms\":0.009768,\"rewrite_ms\":0.000781,\"lower_ms\":0.011541000000000001,\"result_generation_ms\":0.0008619999999999999},\"planCache\":\"miss\"}\n",
-        "stderr": "",
-        "exit": 0
+        "command": "relate --mode envelope \"UNWIND range(1, 1000001) AS i CALL (i) { RETURN i AS j } RETURN count(*) AS c\"",
+        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"execution\",\"message\":\"NestedEvaluationBudgetExceeded: nested evaluation exceeds 1000000 passes per statement; nested subqueries compound per level (security budget).\",\"retryable\":false}}\n",
+        "stderr": "NestedEvaluationBudgetExceeded: nested evaluation exceeds 1000000 passes per statement; nested subqueries compound per level (security budget).\n",
+        "exit": 1
       }
     },
     {
@@ -3797,12 +3797,12 @@
       "id": "engine-ontology-unsupported-version",
       "surface": "engine",
       "code": "validation_error",
-      "kind": "semantic",
+      "kind": "argument",
       "exit_code": 6,
       "retryable": false,
       "gql_status": null,
       "neo4j_code": null,
-      "message": "semantic error: Unsupported ontology spec version: '<uri>'. This version of Relate supports up to Ontology Graph Spec 1.1.0 ('https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json').",
+      "message": "semantic error: The ontology document uses an unsupported graph-spec version. The document names '<uri>'; This version of Relate supports up to Ontology Graph Spec 1.1.0 ('https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json').",
       "cause": "`db.ontology.set` got a document whose `schema` names a spec version this build does not support (preview: `RELATE_PREVIEW=ontology`).",
       "remedy": "Write the document against Ontology Graph Spec 1.1.0 or earlier.",
       "python_class": null,

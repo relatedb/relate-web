@@ -81,19 +81,19 @@
   "task_skills": [
     {
       "name": "relate-agent-memory",
-      "reviewed": "2026-11-20",
+      "reviewed": "2026-11-25",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "97e0edb6b2b36ecadd6dc41aa25a3c46817dad32dc11d9787dbbacc93ac77368"
+          "sha256": "f8940923a8001be3cda722fe563084238f8228830193a36713c4bff358107e15"
         },
         {
           "path": "references/bitemporal.md",
-          "sha256": "8d5b45b792f4400ef70a7e3fc522f934680502c10f7a2dac5dc8b820d19e3341"
+          "sha256": "06baab1192a962c97ef53bc6efd0923a8eef45fd40a07a037384153717712200"
         },
         {
           "path": "references/provenance.md",
-          "sha256": "81bc38c7dda9c47c76caa828172f47758f3ec653ee9053b7beca79f195d56741"
+          "sha256": "19141cd1bd683eb2a3575c1ef80be5876dab7eed0c2abed5fdb1aa5815491381"
         }
       ],
       "recipes": [
@@ -116,43 +116,43 @@
     },
     {
       "name": "relate-graphrag",
-      "reviewed": "2026-11-20",
+      "reviewed": "2026-11-25",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "4a7901e6447224252cb1dac986380d9327109e3f6afdbeca44a85234de40f946"
+          "sha256": "1f0fc054d8044e26ebd7d4942d52741fadb740721fd141acb630552c1fe44920"
         },
         {
           "path": "references/search-forms.md",
-          "sha256": "42da13b9c2ff57897cc53d7facbb7325e20b43ec869e79e7c2135550faccc937"
+          "sha256": "f5bfe2dd82398f2b51d9e4a9da50f0d433d53436714a85b8227f6a08af84e026"
         }
       ],
       "recipes": [
         {
           "slug": "hybrid-recall",
-          "source_sha256": "bb92a4786e91e2a5487a7fb4b0612f8c09ef05c9898dab828df709b09c8c033f",
-          "results_sha256": "aba3f65bb0a45f4a016f803f5bd1fb547ac799bbe6d70616512dfc41a51d307e"
+          "source_sha256": "057d4bf7712a4124a619ccec0dee2232f95358d8302c2ad6ddaee21db4b2d101",
+          "results_sha256": null
         }
       ]
     },
     {
       "name": "relate-migrate-from-vector-search",
-      "reviewed": "2026-11-20",
+      "reviewed": "2026-11-25",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "af32cbe0524e51bfdabfcc67dd1567792bfdcc40fbbe61e9fb8442f39be1d6b8"
+          "sha256": "c85fd5f4ebce5121b11ad097a5a1cfa6b0eeb42f697d57b58358051ec2529d1b"
         },
         {
           "path": "references/verify.md",
-          "sha256": "a0f78a89a13a927d87eb61e1596d13166616f8703ab22aa35e2bd44223a11cde"
+          "sha256": "64838636a20b0784587883b112f9fd1df488ffbcc21993daaf32e83437f303fb"
         }
       ],
       "recipes": [
         {
           "slug": "hybrid-recall",
-          "source_sha256": "bb92a4786e91e2a5487a7fb4b0612f8c09ef05c9898dab828df709b09c8c033f",
-          "results_sha256": "aba3f65bb0a45f4a016f803f5bd1fb547ac799bbe6d70616512dfc41a51d307e"
+          "source_sha256": "057d4bf7712a4124a619ccec0dee2232f95358d8302c2ad6ddaee21db4b2d101",
+          "results_sha256": null
         },
         {
           "slug": "migration-rehearsal",
@@ -163,15 +163,15 @@
     },
     {
       "name": "relate-query-tuning",
-      "reviewed": "2026-11-20",
+      "reviewed": "2026-11-25",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "a7b050b5d070752fd35542dcf2395de211bcc1e96f41472bcd98e136c18fb668"
+          "sha256": "7f527ec3fe6e0887e1a440ca6daba1bbba89a894c3e5d0d43ea5abd70266f7e2"
         },
         {
           "path": "references/notifications.md",
-          "sha256": "f291bb6c1a31df2f0154a60416984bf632b24bbce7569dd901dbfa95de3ae3a6"
+          "sha256": "4e1377b2a5557904372dd5e77f7373b80a093588c58892dc7e36bee49e5238b4"
         }
       ],
       "recipes": [
@@ -184,15 +184,15 @@
     },
     {
       "name": "relate-schema-design",
-      "reviewed": "2026-11-20",
+      "reviewed": "2026-11-25",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "3d2f27a23b7782fcf7d7efa86838b4bb645b69166d7ab5358214217890583a84"
+          "sha256": "adb36eb975d85ce13e406d10e8f9adae81db1c3396d15cd92646edfa26161819"
         },
         {
           "path": "references/discovery.md",
-          "sha256": "2abe339b1032385ba12dc5577333b9808c9fa67e683f7dba7549057524b80d5d"
+          "sha256": "9386c7da6b58e006e81ae77b81cf0164a26a5408d2bd79c47248d241f63a9348"
         }
       ],
       "recipes": [

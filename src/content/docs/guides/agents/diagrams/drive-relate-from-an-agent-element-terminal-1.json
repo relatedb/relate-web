@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "terminal",
-  "hash": "27c5f4166d05507e9c92d4e39bbd216c46498e89af00500a12e9cdd8c5a17c13",
+  "hash": "7e71692e6d9919ea2a177ca653284a29db9357388cf1fc1a86783188cc8242c7",
   "inputs": [
     "src/content/docs/_data/cli.json",
     "src/content/docs/_data/errors.json",

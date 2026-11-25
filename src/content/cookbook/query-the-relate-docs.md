@@ -414,8 +414,8 @@ Cursor setup, the check on destructive statements, Windsurf, the read-only
 open, and the safety page's introduction.
 
 > **Note**
-> A `WHERE` after the `SEARCH` clause filters only the rows the search
-> returned, so it can return fewer than `k`. Without `WITH [s.page]` on
+> A `WHERE` after the `SEARCH` clause narrows the candidates before the
+> `LIMIT` window, like one inside it. Without `WITH [s.page]` on
 > the index, the filter inside the search fails with
 > `WrongPropertyForVectorSearchFilter`.
 

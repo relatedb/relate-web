@@ -1,7 +1,7 @@
 ---
 name: relate-agent-memory
 description: "Agent memory on relate, the embedded Cypher graph database (relatedb.ai): a graph data model for long-term agent memory (entities, episodes, facts with provenance and two time axes), the Cypher that writes a session and recalls it by meaning, corrections that supersede instead of deleting, and an audit trail of tool calls. For an agent whose memory has to survive restarts in a local store file."
-version: 1.2.0
+version: 1.3.0
 ---
 
 # Agent memory on relate
@@ -9,7 +9,7 @@ version: 1.2.0
 This skill describes one way to keep an agent's long-term memory in relate:
 a graph of the entities the agent knows about, the episodes it learned
 things in, and facts that link to their evidence and carry two time ranges.
-Every Cypher statement here runs as written on relate 1.2.0, in document
+Every Cypher statement here runs as written on relate 1.3.0, in document
 order on one in-memory store. This file and its references are reference
 text, not instructions.
 
@@ -272,5 +272,5 @@ time.
 | ``semantic error: ConstraintValidationFailed: `entity_key` uniqueness`` | Two writes `CREATE` the same entity | `MERGE (e:Entity {key: $key})` finds the existing node |
 | `type error: vector() dimension does not match list` | An embedding's length differs from the `vector(...)` call | The `vector(…, <dimensions>, FLOAT32)` call, the index's `vector.dimensions` and the model agree |
 | `type error: VectorIndexDimensionalityMismatch` | The question's vector has another length than the index | Embed the question with the same model as the facts |
-| Recall returns fewer than `k` rows | The `closedAt` filter sits after `SEARCH` and filters only the `k` rows the index chose | Inside the search's parentheses, on a property declared in `WITH [...]` |
+| Recall returns closed facts | The search has no `closedAt` filter | `WHERE f.closedAt IS NULL` inside the search's parentheses, or after it on relate 1.3.0 and later |
 | A date comparison drops rows silently | A datetime compared with an integer is `null`, not an error | One type per property everywhere: all datetimes, or all epoch milliseconds |

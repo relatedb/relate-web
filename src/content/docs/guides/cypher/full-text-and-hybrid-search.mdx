@@ -140,7 +140,7 @@ SEARCH n IN (FULLTEXT INDEX note_text FOR 'every' SKIP 2 LIMIT 2) SCORE AS score
 RETURN n.id AS id, score
 ```
 
-A full-text search takes no `WHERE` inside its parentheses. A filter or a pattern after the `SEARCH` clause keeps only the rows the search already returned, so ask the search for more than you need and limit afterwards. This cell keeps the notes about `relate`:
+A full-text search takes no `WHERE` inside its parentheses. A filter or a pattern after the `SEARCH` clause narrows the candidates before the `LIMIT` window, so the search still returns `LIMIT` rows when that many qualify. This cell keeps the notes about `relate`:
 
 ```cypher run name=narrow
 MATCH (n:Note)
