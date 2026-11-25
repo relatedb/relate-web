@@ -150,9 +150,12 @@ jobs:
         working-directory: site
         run: node scripts/docs-samples.ts --require --lang python,js,rust,java,csharp,go,c
 
+      # DOCS_EXAMPLES=1 includes the example page, whose samples the unit tests read.
       - name: Record the samples
         if: inputs.record_to != ''
         working-directory: site
+        env:
+          DOCS_EXAMPLES: '1'
         run: |
           node scripts/docs-samples.ts --record --require --lang python,js,rust,java,csharp,go,c
           git add -A
@@ -228,8 +231,9 @@ jobs:
         working-directory: site
         env:
           REF: ${{ inputs.record_to }}
+          DOCS_EXAMPLES: '1'
         run: |
-          git apply --whitespace=nowarn "$RUNNER_TEMP/patch/samples.patch"
+          if [ -s "$RUNNER_TEMP/patch/samples.patch" ]; then git apply --whitespace=nowarn "$RUNNER_TEMP/patch/samples.patch"; fi
           node scripts/docs-samples.ts --record --require --lang swift
           git status --short
           if [ -z "$(git status --porcelain)" ]; then
