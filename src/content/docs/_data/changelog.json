@@ -20,7 +20,7 @@
           ]
         },
         {
-          "text": "`CALL { … } IN TRANSACTIONS` runs one engine pass per batch, and the nested-evaluation budget is a million passes per statement, so a batched load no longer refuses at the 100,001st row; the release notes measure a one-million-node load at 4.98 s and 0.99 GB peak."
+          "text": "A batched `CALL { … } IN TRANSACTIONS` runs one engine pass per batch, and the nested-evaluation budget is a million passes per statement, so a batched load no longer refuses at the 100,001st row; the release notes measure a one-million-node load at 4.98 s and 0.99 GB peak."
         },
         {
           "text": "`LOAD CSV` hands records to aggregations as they are read, and `UNWIND` over a list comprehension, `MATCH`-fed `ORDER BY … LIMIT` and `DISTINCT` stream, so memory stops scaling with the intermediate results of those statements."

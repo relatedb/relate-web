@@ -9,6 +9,14 @@ since: 0.16.0
 verified: 1.3.0
 verified_by:
   - cypher
+  - python
+  - node
+  - rust
+  - java
+  - dotnet
+  - go
+  - swift
+  - c
 samples:
   - https://relatedb.ai/docs/_example/example/samples/python-1.json
   - https://relatedb.ai/docs/_example/example/samples/js-1.json
