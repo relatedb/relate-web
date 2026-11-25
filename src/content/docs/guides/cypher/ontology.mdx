@@ -103,7 +103,7 @@ RELATE_PREVIEW=ontology relate --database ./team.rl --read-only --mode jsonl "CA
 ```
 
 ```text
-{"ontology":"{\"schema\":\"https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json\",\"id\":\"team\",\"version\":\"1\",\"description\":\"Who works on which project, and since when.\",\"nodes\":{\"Person\":{\"label\":\"Person\",\"description\":\"Someone on the team.\",\"properties\":{\"name\":{\"type\":\"STRING\",\"key\":true},\"role\":{\"type\":\"STRING\",\"must_exist\":true,\"description\":\"engineer or maintainer\"}}},\"Project\":{\"label\":\"Project\",\"description\":\"A code repository the team works on.\",\"properties\":{\"name\":{\"type\":\"STRING\",\"key\":true},\"language\":{\"type\":\"STRING\"}}}},\"relationships\":{\"WORKS_ON\":{\"type\":\"WORKS_ON\",\"description\":\"A person contributes to a project.\",\"from\":{\"node\":\"Person\"},\"to\":{\"node\":\"Project\"},\"properties\":{\"since\":{\"type\":\"INTEGER\",\"description\":\"the year the person started\"}}}}}"}
+{"ontology":"{\"schema\":\"https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json\",\"version\":\"1\",\"id\":\"team\",\"description\":\"Who works on which project, and since when.\",\"nodes\":{\"Person\":{\"labels\":{\"identifier\":\"Person\"},\"properties\":{\"name\":{\"type\":\"STRING\"},\"role\":{\"type\":\"STRING\",\"description\":\"engineer or maintainer\"}},\"constraints\":{\"name_Person_key\":{\"type\":\"KEY\",\"properties\":[\"name\"],\"name\":\"name_Person_key\"},\"role_Person_exists\":{\"type\":\"EXISTS\",\"properties\":[\"role\"],\"name\":\"role_Person_exists\"}},\"description\":\"Someone on the team.\"},\"Project\":{\"labels\":{\"identifier\":\"Project\"},\"properties\":{\"name\":{\"type\":\"STRING\"},\"language\":{\"type\":\"STRING\"}},\"constraints\":{\"name_Project_key\":{\"type\":\"KEY\",\"properties\":[\"name\"],\"name\":\"name_Project_key\"}},\"description\":\"A code repository the team works on.\"}},\"relationships\":{\"WORKS_ON\":{\"type\":\"WORKS_ON\",\"from\":{\"node\":\"Person\"},\"to\":{\"node\":\"Project\"},\"properties\":{\"since\":{\"type\":\"INTEGER\",\"description\":\"the year the person started\"}},\"description\":\"A person contributes to a project.\"}}}"}
 ```
 
 | Procedure | Mode | Returns |
@@ -131,11 +131,11 @@ relate --database ./team.rl --read-only --mode table "SHOW CONSTRAINTS YIELD nam
 +-----------------------+------------------------------+---------------+--------------+
 | name                  | type                         | labelsOrTypes | properties   |
 +-----------------------+------------------------------+---------------+--------------+
-| "constraint_bda177ce" | "NODE_KEY"                   | ["Person"]    | ["name"]     |
+| "name_Person_key"     | "NODE_KEY"                   | ["Person"]    | ["name"]     |
 | "constraint_786ac02f" | "NODE_PROPERTY_EXISTENCE"    | ["Person"]    | ["role"]     |
 | "constraint_7d617092" | "NODE_PROPERTY_TYPE"         | ["Person"]    | ["name"]     |
 | "constraint_819770c5" | "NODE_PROPERTY_TYPE"         | ["Person"]    | ["role"]     |
-| "constraint_1a7131b"  | "NODE_KEY"                   | ["Project"]   | ["name"]     |
+| "name_Project_key"    | "NODE_KEY"                   | ["Project"]   | ["name"]     |
 | "constraint_18daa608" | "NODE_PROPERTY_TYPE"         | ["Project"]   | ["language"] |
 | "constraint_77b97d24" | "NODE_PROPERTY_TYPE"         | ["Project"]   | ["name"]     |
 | "constraint_acbf0f7c" | "RELATIONSHIP_PROPERTY_TYPE" | ["WORKS_ON"]  | ["since"]    |

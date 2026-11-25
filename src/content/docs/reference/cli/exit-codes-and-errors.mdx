@@ -23,7 +23,7 @@ The first three lines are stderr, the fourth is stdout:
 syntax error: parse error: expected RightParen, got "RETURN" (RETURN)
   MATCH (n RETURN n
            ^
-{"error":{"code":"validation_error","column":10,"exit_code":6,"kind":"syntax","message":"syntax error: parse error: expected RightParen, got \"RETURN\" (RETURN)   MATCH (n RETURN n            ^","retryable":false,"source":"MATCH (n RETURN n"}}
+{"error":{"code":"validation_error","exit_code":6,"kind":"syntax","message":"syntax error: parse error: expected RightParen, got \"RETURN\" (RETURN)   MATCH (n RETURN n            ^","retryable":false,"column":10,"source":"MATCH (n RETURN n"}}
 exit=6
 ```
 
@@ -114,9 +114,9 @@ echo "exit=$?"
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["ok"],"notifications":[],"planCache":"miss","rows":[{"ok":1}],"timings":{"elapsed_ms":0.34937500000000005,"execute_ms":0.201167,"lex_parse_ms":0.029709,"lower_ms":0.029207999999999998,"parse_ms":0.09624999999999999,"plan_ms":0.042583,"result_generation_ms":0.000292,"rewrite_ms":0.0065},"truncated":false}
+{"columns":["ok"],"columnTypes":["INTEGER"],"rows":[{"ok":1}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.34937500000000005,"parse_ms":0.09624999999999999,"plan_ms":0.042583,"execute_ms":0.201167,"lex_parse_ms":0.029709,"rewrite_ms":0.0065,"lower_ms":0.029207999999999998,"result_generation_ms":0.000292},"planCache":"miss"}
 exit=0
-{"columnTypes":["ANY"],"columns":["p"],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":0.352833,"execute_ms":0.205334,"lex_parse_ms":0.026416,"lower_ms":0.036291000000000004,"parse_ms":0.093209,"plan_ms":0.047166,"result_generation_ms":0.00025,"rewrite_ms":0.007292},"truncated":false}
+{"columns":["p"],"columnTypes":["ANY"],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.352833,"parse_ms":0.093209,"plan_ms":0.047166,"execute_ms":0.205334,"lex_parse_ms":0.026416,"rewrite_ms":0.007292,"lower_ms":0.036291000000000004,"result_generation_ms":0.00025},"planCache":"miss"}
 exit=0
 ```
 
@@ -206,12 +206,12 @@ echo "exit=$?"
 ```
 
 ```text
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":0.539084,"execute_ms":0.388542,"lex_parse_ms":0.003583,"lower_ms":0.003083,"parse_ms":0.1435,"plan_ms":0.001583,"result_generation_ms":0.000167,"rewrite_ms":0.00025},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.539084,"parse_ms":0.1435,"plan_ms":0.001583,"execute_ms":0.388542,"lex_parse_ms":0.003583,"rewrite_ms":0.00025,"lower_ms":0.003083,"result_generation_ms":0.000167},"planCache":"miss"}
 syntax error: parse error: unexpected token "RETRN"
   RETRN 2
   ^
 statement 2 of 3 failed; 1 completed and committed; 1 not run
-{"error":{"code":"validation_error","column":1,"committed":1,"exit_code":6,"kind":"syntax","message":"syntax error: parse error: unexpected token \"RETRN\"   RETRN 2   ^","retryable":false,"source":"RETRN 2","statement":2,"statements":3}}
+{"error":{"code":"validation_error","exit_code":6,"kind":"syntax","message":"syntax error: parse error: unexpected token \"RETRN\"   RETRN 2   ^","retryable":false,"statement":2,"statements":3,"committed":1,"column":1,"source":"RETRN 2"}}
 exit=6
 ```
 

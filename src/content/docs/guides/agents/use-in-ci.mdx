@@ -35,7 +35,7 @@ EOF
 ```
 
 ```text
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":2.5163339999999996,"execute_ms":2.190625,"lex_parse_ms":0.017499999999999998,"lower_ms":0.019792,"parse_ms":0.30762500000000004,"plan_ms":0.012125,"result_generation_ms":0.000125,"rewrite_ms":0.0012920000000000002},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":2.5163339999999996,"parse_ms":0.30762500000000004,"plan_ms":0.012125,"execute_ms":2.190625,"lex_parse_ms":0.017499999999999998,"rewrite_ms":0.0012920000000000002,"lower_ms":0.019792,"result_generation_ms":0.000125},"planCache":"miss"}
 ```
 
 ## Write the check as a statement
@@ -69,7 +69,7 @@ echo "gate exit=$?"
 
 ```text
 relate exit=0
-{"data":[{"advisory":"ADV-2026-0012","cvss":8.1,"path":["team-api","token-sign"],"version":"NPM/token-sign@8.5.1"},{"advisory":"ADV-2026-0007","cvss":7.5,"path":["team-api","route-kit","path-match"],"version":"NPM/path-match@0.1.7"}],"planCache":"miss","timings":{"elapsed_ms":1.26275,"execute_ms":1.0196669999999999,"lex_parse_ms":0.025,"lower_ms":0.060458000000000005,"parse_ms":0.16883299999999998,"plan_ms":0.067625,"result_generation_ms":0.000375,"rewrite_ms":0.007208}}
+{"data":[{"advisory":"ADV-2026-0012","cvss":8.1,"version":"NPM/token-sign@8.5.1","path":["team-api","token-sign"]},{"advisory":"ADV-2026-0007","cvss":7.5,"version":"NPM/path-match@0.1.7","path":["team-api","route-kit","path-match"]}],"timings":{"elapsed_ms":1.26275,"parse_ms":0.16883299999999998,"plan_ms":0.067625,"execute_ms":1.0196669999999999,"lex_parse_ms":0.025,"rewrite_ms":0.007208,"lower_ms":0.060458000000000005,"result_generation_ms":0.000375},"planCache":"miss"}
 false
 gate exit=1
 ```
@@ -206,7 +206,7 @@ relate --version
 ```
 
 ```text
-Relate v1.2.0
+Relate v1.3.0
 License: Apache 2.0 (binary)
 ```
 

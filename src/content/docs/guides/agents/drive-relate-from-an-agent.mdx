@@ -60,7 +60,7 @@ relate query --database ./team.rl --mode envelope < team.cypher
 ```
 
 ```text
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":3.2087079999999997,"execute_ms":2.911125,"lex_parse_ms":0.01425,"lower_ms":0.021417,"parse_ms":0.279333,"plan_ms":0.012667,"result_generation_ms":0.000125,"rewrite_ms":0.0005},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":3.2087079999999997,"parse_ms":0.279333,"plan_ms":0.012667,"execute_ms":2.911125,"lex_parse_ms":0.01425,"rewrite_ms":0.0005,"lower_ms":0.021417,"result_generation_ms":0.000125},"planCache":"miss"}
 ```
 
 Every later command on this page opens `team.rl` with `--read-only`, which opens the store :term[read-only]{id=read-only}: relate never writes it, and a write fails with exit code 6.
@@ -74,7 +74,7 @@ relate --database ./team.rl --read-only --mode envelope 'MATCH (p:Person)-[w:WOR
 ```
 
 ```text
-{"columnTypes":["STRING","STRING","INTEGER"],"columns":["person","project","since"],"notifications":[],"planCache":"miss","rows":[{"person":"Grace","project":"opencypher-tck","since":2022},{"person":"Grace","project":"relate","since":2023},{"person":"Ada","project":"relate","since":2024}],"timings":{"elapsed_ms":0.454708,"execute_ms":0.2725,"lex_parse_ms":0.034041999999999996,"lower_ms":0.042833,"parse_ms":0.113917,"plan_ms":0.059333000000000004,"result_generation_ms":0.00025,"rewrite_ms":0.008042},"truncated":false}
+{"columns":["person","project","since"],"columnTypes":["STRING","STRING","INTEGER"],"rows":[{"person":"Grace","project":"opencypher-tck","since":2022},{"person":"Grace","project":"relate","since":2023},{"person":"Ada","project":"relate","since":2024}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.454708,"parse_ms":0.113917,"plan_ms":0.059333000000000004,"execute_ms":0.2725,"lex_parse_ms":0.034041999999999996,"rewrite_ms":0.008042,"lower_ms":0.042833,"result_generation_ms":0.00025},"planCache":"miss"}
 ```
 
 | Key | Holds |
@@ -98,7 +98,7 @@ relate --database ./team.rl --read-only --mode envelope "MATCH (p:Person {name: 
 ```
 
 ```text
-{"columnTypes":["ANY"],"columns":["role"],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":0.42174999999999996,"execute_ms":0.222083,"lex_parse_ms":0.031291,"lower_ms":0.047541,"parse_ms":0.127041,"plan_ms":0.063667,"result_generation_ms":0.00033299999999999996,"rewrite_ms":0.009458},"truncated":false}
+{"columns":["role"],"columnTypes":["ANY"],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.42174999999999996,"parse_ms":0.127041,"plan_ms":0.063667,"execute_ms":0.222083,"lex_parse_ms":0.031291,"rewrite_ms":0.009458,"lower_ms":0.047541,"result_generation_ms":0.00033299999999999996},"planCache":"miss"}
 ```
 
 A run of several statements prints one envelope per statement, one per line, so the output is JSON Lines. New keys may be added to the envelope; existing ones keep their names.
@@ -112,7 +112,7 @@ relate --database ./team.rl --read-only --mode envelope --param 'names=["Ada","N
 ```
 
 ```text
-{"columnTypes":["STRING","STRING"],"columns":["person","project"],"notifications":[],"planCache":"miss","rows":[{"person":"Ada","project":"relate"}],"timings":{"elapsed_ms":0.440333,"execute_ms":0.248584,"lex_parse_ms":0.033417,"lower_ms":0.049166,"parse_ms":0.12237500000000001,"plan_ms":0.060208,"result_generation_ms":0.000292,"rewrite_ms":0.008542000000000001},"truncated":false}
+{"columns":["person","project"],"columnTypes":["STRING","STRING"],"rows":[{"person":"Ada","project":"relate"}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.440333,"parse_ms":0.12237500000000001,"plan_ms":0.060208,"execute_ms":0.248584,"lex_parse_ms":0.033417,"rewrite_ms":0.008542000000000001,"lower_ms":0.049166,"result_generation_ms":0.000292},"planCache":"miss"}
 ```
 
 `--fetch-params N=SRC` reads a JSON file, or fetches an `http` or `https` URL, and binds the whole document as `$N`. In this example the document is a map, read from a file the first command writes:
@@ -123,7 +123,7 @@ relate --database ./team.rl --read-only --mode envelope --fetch-params filter=./
 ```
 
 ```text
-{"columnTypes":["STRING","STRING"],"columns":["person","project"],"notifications":[],"planCache":"miss","rows":[{"person":"Grace","project":"opencypher-tck"},{"person":"Grace","project":"relate"}],"timings":{"elapsed_ms":0.475125,"execute_ms":0.269167,"lex_parse_ms":0.036791,"lower_ms":0.050665999999999996,"parse_ms":0.131708,"plan_ms":0.064667,"result_generation_ms":0.000334,"rewrite_ms":0.008792},"truncated":false}
+{"columns":["person","project"],"columnTypes":["STRING","STRING"],"rows":[{"person":"Grace","project":"opencypher-tck"},{"person":"Grace","project":"relate"}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.475125,"parse_ms":0.131708,"plan_ms":0.064667,"execute_ms":0.269167,"lex_parse_ms":0.036791,"rewrite_ms":0.008792,"lower_ms":0.050665999999999996,"result_generation_ms":0.000334},"planCache":"miss"}
 ```
 
 A fetch is capped at 64 MiB and 60 seconds and has no URL allowlist. [Keep an agent safe](/docs/guides/agents/agent-safety#control-network-egress) lists it with the other flags that reach the network.
@@ -164,12 +164,12 @@ echo "exit=$?"
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["a"],"notifications":[],"planCache":"miss","rows":[{"a":1}],"timings":{"elapsed_ms":0.315959,"execute_ms":0.17925,"lex_parse_ms":0.019666,"lower_ms":0.028791,"parse_ms":0.088292,"plan_ms":0.039541,"result_generation_ms":0.00020800000000000001,"rewrite_ms":0.006834},"truncated":false}
+{"columns":["a"],"columnTypes":["INTEGER"],"rows":[{"a":1}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.315959,"parse_ms":0.088292,"plan_ms":0.039541,"execute_ms":0.17925,"lex_parse_ms":0.019666,"rewrite_ms":0.006834,"lower_ms":0.028791,"result_generation_ms":0.00020800000000000001},"planCache":"miss"}
 syntax error: parse error: unexpected token "RETRN"
   RETRN 2
   ^
 statement 2 of 3 failed; 1 completed and committed; 1 not run
-{"error":{"code":"validation_error","column":1,"committed":1,"exit_code":6,"kind":"syntax","message":"syntax error: parse error: unexpected token \"RETRN\"   RETRN 2   ^","retryable":false,"source":"RETRN 2","statement":2,"statements":3}}
+{"error":{"code":"validation_error","exit_code":6,"kind":"syntax","message":"syntax error: parse error: unexpected token \"RETRN\"   RETRN 2   ^","retryable":false,"statement":2,"statements":3,"committed":1,"column":1,"source":"RETRN 2"}}
 exit=6
 ```
 
@@ -195,7 +195,7 @@ CLAUDECODE=1 relate --mode envelope --max-rows 2 'UNWIND range(1, 250) AS x RETU
 
 ```text
 warning: result truncated to 2 rows (the statement returned 250); pass --max-rows 0 for all rows, or page with SKIP/LIMIT
-{"columnTypes":["INTEGER"],"columns":["x"],"notifications":[],"planCache":"miss","rowCap":{"kept":2,"total":250},"rows":[{"x":1},{"x":2}],"timings":{"elapsed_ms":0.494834,"execute_ms":0.344042,"lex_parse_ms":0.023459,"lower_ms":0.038375,"parse_ms":0.095,"plan_ms":0.047416,"result_generation_ms":0.001209,"rewrite_ms":0.007292},"truncated":true}
+{"columns":["x"],"columnTypes":["INTEGER"],"rows":[{"x":1},{"x":2}],"truncated":true,"rowCap":{"kept":2,"total":250},"notifications":[],"timings":{"elapsed_ms":0.494834,"parse_ms":0.095,"plan_ms":0.047416,"execute_ms":0.344042,"lex_parse_ms":0.023459,"rewrite_ms":0.007292,"lower_ms":0.038375,"result_generation_ms":0.001209},"planCache":"miss"}
 ```
 
 The cap limits what is printed, not what the engine computes: the engine builds the whole result first. A `LIMIT` or an aggregate in the statement bounds the work itself.
@@ -214,7 +214,7 @@ rows[3]{name,role}:
   Grace,engineer
   Noor,maintainer
 timings:
-  {"elapsed_ms":0.43470899999999996,"execute_ms":0.252333,"lex_parse_ms":0.032792,"lower_ms":0.044083,"parse_ms":0.11637499999999999,"plan_ms":0.056542,"result_generation_ms":0.00020800000000000001,"rewrite_ms":0.008208}
+  {"elapsed_ms":0.43470899999999996,"parse_ms":0.11637499999999999,"plan_ms":0.056542,"execute_ms":0.252333,"lex_parse_ms":0.032792,"rewrite_ms":0.008208,"lower_ms":0.044083,"result_generation_ms":0.00020800000000000001}
 planCache:
   miss
 ```
@@ -271,7 +271,7 @@ echo "exit=$?"
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["people"],"notifications":[],"planCache":"miss","rows":[{"people":3}],"timings":{"elapsed_ms":0.348958,"execute_ms":0.177792,"lex_parse_ms":0.031208999999999997,"lower_ms":0.044917,"parse_ms":0.109583,"plan_ms":0.053583,"result_generation_ms":0.000292,"rewrite_ms":0.008167},"truncated":false}
+{"columns":["people"],"columnTypes":["INTEGER"],"rows":[{"people":3}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.348958,"parse_ms":0.109583,"plan_ms":0.053583,"execute_ms":0.177792,"lex_parse_ms":0.031208999999999997,"rewrite_ms":0.008167,"lower_ms":0.044917,"result_generation_ms":0.000292},"planCache":"miss"}
 exit=0
 ```
 

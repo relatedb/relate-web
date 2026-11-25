@@ -289,7 +289,7 @@ CREATE (ada:Person {name: 'Ada', role: 'engineer'}),
 
 ### Convert the exported values
 
-The JSON export keeps `INT64`, `DOUBLE`, `BOOLEAN` and lists as JSON values, which arrive as relate's types; `DATE` and `TIMESTAMP` arrive as strings and need a conversion. This row has the shape the export writes:
+The JSON export keeps `INT64`, `DOUBLE`, `BOOLEAN` and lists as JSON values, which arrive as relate's types; `DATE` and `TIMESTAMP` arrive as strings and need a conversion. A `TIMESTAMP` has a space between its date and time, and relate reads only the ISO form with a `T`, so the statement replaces the space first. This row has the shape the export writes:
 
 ```json data=exported
 {"row": {"since": 2024, "score": 1.5, "active": true, "opened": "2026-10-02", "updated": "2026-10-02 09:30:00", "labels": ["bug", "planner"]}}
@@ -298,7 +298,7 @@ The JSON export keeps `INT64`, `DOUBLE`, `BOOLEAN` and lists as JSON values, whi
 ```cypher run name=types params=exported
 RETURN valueType($row.since) AS int64, valueType($row.score) AS double,
        valueType($row.active) AS boolean, valueType($row.labels) AS list,
-       date($row.opened) AS date, localdatetime($row.updated) AS timestamp
+       date($row.opened) AS date, localdatetime(replace($row.updated, ' ', 'T')) AS timestamp
 ```
 
 ### Assign the next id

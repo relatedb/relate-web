@@ -121,7 +121,7 @@ RELATE_PREVIEW=coll-zip relate --mode envelope "RETURN coll.zip([1, 2], ['a', 'b
 ```
 
 ```text
-{"columnTypes":["LIST"],"columns":["pairs"],"notifications":[],"planCache":"miss","rows":[{"pairs":[[1,"a"],[2,"b"]]}],"timings":{"elapsed_ms":0.500958,"execute_ms":0.357792,"lex_parse_ms":0.024290999999999997,"lower_ms":0.034375,"parse_ms":0.092541,"plan_ms":0.042917000000000004,"result_generation_ms":0.000959,"rewrite_ms":0.007333},"truncated":false}
+{"columns":["pairs"],"columnTypes":["LIST"],"rows":[{"pairs":[[1,"a"],[2,"b"]]}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.500958,"parse_ms":0.092541,"plan_ms":0.042917000000000004,"execute_ms":0.357792,"lex_parse_ms":0.024290999999999997,"rewrite_ms":0.007333,"lower_ms":0.034375,"result_generation_ms":0.000959},"planCache":"miss"}
 ```
 
 An unknown name fails the open with exit 1, and the message lists every name the binary knows:
@@ -132,8 +132,8 @@ echo "exit=$?"
 ```
 
 ```text
-Failed to open Relate: semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'bogus' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, complex-search-patterns, coll-zip, coll-has, gql-stddev-aliases)
-{"error":{"code":"fatal_error","exit_code":1,"kind":"semantic","message":"semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'bogus' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, complex-search-patterns, coll-zip, coll-has, gql-stddev-aliases)","retryable":false}}
+Failed to open Relate: semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'bogus' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation)
+{"error":{"code":"fatal_error","exit_code":1,"kind":"semantic","message":"semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'bogus' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation)","retryable":false}}
 exit=1
 ```
 

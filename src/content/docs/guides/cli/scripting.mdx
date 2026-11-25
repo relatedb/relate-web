@@ -60,8 +60,8 @@ relate query --database ./team.rl --mode envelope < seed.cypher
 ```
 
 ```text
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":1.884792,"execute_ms":1.53525,"lex_parse_ms":0.060958,"lower_ms":0.022833,"parse_ms":0.328208,"plan_ms":0.014167,"result_generation_ms":0.000125,"rewrite_ms":0.000458},"truncated":false}
-{"columnTypes":["INTEGER"],"columns":["nodes"],"notifications":[],"planCache":"miss","rows":[{"nodes":5}],"timings":{"elapsed_ms":0.08841700000000001,"execute_ms":0.012792000000000001,"lex_parse_ms":0.013417,"lower_ms":0.020583,"parse_ms":0.044417,"plan_ms":0.026875,"result_generation_ms":0.000167,"rewrite_ms":0.001708},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":1.884792,"parse_ms":0.328208,"plan_ms":0.014167,"execute_ms":1.53525,"lex_parse_ms":0.060958,"rewrite_ms":0.000458,"lower_ms":0.022833,"result_generation_ms":0.000125},"planCache":"miss"}
+{"columns":["nodes"],"columnTypes":["INTEGER"],"rows":[{"nodes":5}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.08841700000000001,"parse_ms":0.044417,"plan_ms":0.026875,"execute_ms":0.012792000000000001,"lex_parse_ms":0.013417,"rewrite_ms":0.001708,"lower_ms":0.020583,"result_generation_ms":0.000167},"planCache":"miss"}
 ```
 
 Each statement prints its own envelope, so the output is JSON Lines. A pipe works the same way as a file:
@@ -71,8 +71,8 @@ printf 'MATCH (p:Person) RETURN count(p) AS people;\nMATCH (p:Project) RETURN co
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["people"],"notifications":[],"planCache":"miss","rows":[{"people":3}],"timings":{"elapsed_ms":0.35266699999999995,"execute_ms":0.17525000000000002,"lex_parse_ms":0.031916,"lower_ms":0.048583,"parse_ms":0.11541699999999999,"plan_ms":0.053625,"result_generation_ms":0.000375,"rewrite_ms":0.009458},"truncated":false}
-{"columnTypes":["INTEGER"],"columns":["projects"],"notifications":[],"planCache":"miss","rows":[{"projects":2}],"timings":{"elapsed_ms":0.040834,"execute_ms":0.0029579999999999997,"lex_parse_ms":0.006625,"lower_ms":0.010458,"parse_ms":0.024208,"plan_ms":0.011292,"result_generation_ms":0.000083,"rewrite_ms":0.00075},"truncated":false}
+{"columns":["people"],"columnTypes":["INTEGER"],"rows":[{"people":3}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.35266699999999995,"parse_ms":0.11541699999999999,"plan_ms":0.053625,"execute_ms":0.17525000000000002,"lex_parse_ms":0.031916,"rewrite_ms":0.009458,"lower_ms":0.048583,"result_generation_ms":0.000375},"planCache":"miss"}
+{"columns":["projects"],"columnTypes":["INTEGER"],"rows":[{"projects":2}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.040834,"parse_ms":0.024208,"plan_ms":0.011292,"execute_ms":0.0029579999999999997,"lex_parse_ms":0.006625,"rewrite_ms":0.00075,"lower_ms":0.010458,"result_generation_ms":0.000083},"planCache":"miss"}
 ```
 
 For a short list, `-c` takes the statements as one argument, separated by `;`.
@@ -95,7 +95,7 @@ relate --mode envelope --param name=Ines --param since=2026 --param 'tags=["grap
 ```
 
 ```text
-{"columnTypes":["STRING","INTEGER","LIST"],"columns":["name","since","tags"],"notifications":[],"planCache":"miss","rows":[{"name":"Ines","since":2026,"tags":["graph","cli"]}],"timings":{"elapsed_ms":0.34808300000000003,"execute_ms":0.194666,"lex_parse_ms":0.021084,"lower_ms":0.043250000000000004,"parse_ms":0.107333,"plan_ms":0.037875,"result_generation_ms":0.00020800000000000001,"rewrite_ms":0.01025},"truncated":false}
+{"columns":["name","since","tags"],"columnTypes":["STRING","INTEGER","LIST"],"rows":[{"name":"Ines","since":2026,"tags":["graph","cli"]}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.34808300000000003,"parse_ms":0.107333,"plan_ms":0.037875,"execute_ms":0.194666,"lex_parse_ms":0.021084,"rewrite_ms":0.01025,"lower_ms":0.043250000000000004,"result_generation_ms":0.00020800000000000001},"planCache":"miss"}
 ```
 
 Single quotes keep the shell from expanding `$name` in the statement. To pass a string that starts like a number, such as a date or a version, JSON-quote it: `--param 'since="2026-11-07"'` binds the string `2026-11-07`, where a bare `since=2026-11-07` exits 2. A string that reads as a boolean or `null` needs the same quoting.
@@ -108,7 +108,7 @@ relate --database ./team.rl --mode envelope --fetch-params people=people.json 'U
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["merged"],"notifications":[],"planCache":"miss","rows":[{"merged":2}],"timings":{"elapsed_ms":2.125458,"execute_ms":1.924125,"lex_parse_ms":0.005458,"lower_ms":0.008334,"parse_ms":0.18954200000000002,"plan_ms":0.005,"result_generation_ms":0.00020800000000000001,"rewrite_ms":0.000375},"truncated":false}
+{"columns":["merged"],"columnTypes":["INTEGER"],"rows":[{"merged":2}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":2.125458,"parse_ms":0.18954200000000002,"plan_ms":0.005,"execute_ms":1.924125,"lex_parse_ms":0.005458,"rewrite_ms":0.000375,"lower_ms":0.008334,"result_generation_ms":0.00020800000000000001},"planCache":"miss"}
 ```
 
 ## Bound each statement with a timeout
@@ -215,14 +215,14 @@ echo "exit=$?"
 
 ```text
 applying migrations/001-ines.cypher
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":0.500167,"execute_ms":0.278458,"lex_parse_ms":0.006166,"lower_ms":0.008542000000000001,"parse_ms":0.20925,"plan_ms":0.007458,"result_generation_ms":0.00025,"rewrite_ms":0.000375},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.500167,"parse_ms":0.20925,"plan_ms":0.007458,"execute_ms":0.278458,"lex_parse_ms":0.006166,"rewrite_ms":0.000375,"lower_ms":0.008542000000000001,"result_generation_ms":0.00025},"planCache":"miss"}
 applying migrations/002-teams.cypher
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":0.404584,"execute_ms":0.2205,"lex_parse_ms":0.003708,"lower_ms":0.006709,"parse_ms":0.174375,"plan_ms":0.005,"result_generation_ms":0.00025,"rewrite_ms":0.00029099999999999997},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.404584,"parse_ms":0.174375,"plan_ms":0.005,"execute_ms":0.2205,"lex_parse_ms":0.003708,"rewrite_ms":0.00029099999999999997,"lower_ms":0.006709,"result_generation_ms":0.00025},"planCache":"miss"}
 syntax error: parse error: unexpected token "RETRUN"
   MATCH (p:Person) RETRUN count(p) AS people
                    ^
 statement 3 of 4 failed; 2 completed, not committed (open transaction); 1 not run
-{"error":{"code":"validation_error","column":18,"committed":0,"exit_code":6,"kind":"syntax","message":"syntax error: parse error: unexpected token \"RETRUN\"   MATCH (p:Person) RETRUN count(p) AS people                    ^","retryable":false,"source":"MATCH (p:Person) RETRUN count(p) AS people","statement":3,"statements":4}}
+{"error":{"code":"validation_error","exit_code":6,"kind":"syntax","message":"syntax error: parse error: unexpected token \"RETRUN\"   MATCH (p:Person) RETRUN count(p) AS people                    ^","retryable":false,"statement":3,"statements":4,"committed":0,"column":18,"source":"MATCH (p:Person) RETRUN count(p) AS people"}}
 Warning: exiting with an open transaction; rolling back uncommitted changes. Use .commit before exiting to persist them.
 exit=6
 ```
@@ -238,8 +238,8 @@ relate --database ./team.rl --read-only --mode envelope -c "MATCH (:Person {name
 ```
 
 ```text
-{"columnTypes":["STRING","INTEGER"],"columns":["project","since"],"notifications":[],"planCache":"miss","rows":[{"project":"relate","since":2026}],"timings":{"elapsed_ms":0.45795800000000003,"execute_ms":0.267375,"lex_parse_ms":0.032541,"lower_ms":0.045250000000000005,"parse_ms":0.119959,"plan_ms":0.060791,"result_generation_ms":0.00033299999999999996,"rewrite_ms":0.008},"truncated":false}
-{"columnTypes":["INTEGER"],"columns":["with_team"],"notifications":[],"planCache":"miss","rows":[{"with_team":0}],"timings":{"elapsed_ms":0.08483399999999999,"execute_ms":0.029584,"lex_parse_ms":0.009290999999999999,"lower_ms":0.015708,"parse_ms":0.036667,"plan_ms":0.015833,"result_generation_ms":0.000084,"rewrite_ms":0.002792},"truncated":false}
+{"columns":["project","since"],"columnTypes":["STRING","INTEGER"],"rows":[{"project":"relate","since":2026}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.45795800000000003,"parse_ms":0.119959,"plan_ms":0.060791,"execute_ms":0.267375,"lex_parse_ms":0.032541,"rewrite_ms":0.008,"lower_ms":0.045250000000000005,"result_generation_ms":0.00033299999999999996},"planCache":"miss"}
+{"columns":["with_team"],"columnTypes":["INTEGER"],"rows":[{"with_team":0}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.08483399999999999,"parse_ms":0.036667,"plan_ms":0.015833,"execute_ms":0.029584,"lex_parse_ms":0.009290999999999999,"rewrite_ms":0.002792,"lower_ms":0.015708,"result_generation_ms":0.000084},"planCache":"miss"}
 ```
 
 ## If it goes wrong

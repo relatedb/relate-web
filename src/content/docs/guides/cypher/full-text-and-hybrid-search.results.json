@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.2.0",
+  "verified": "1.3.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -16,17 +16,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 8,
-          "labels_removed": 0,
           "nodes_created": 8,
           "nodes_deleted": 0,
-          "properties_set": 22,
           "relationships_created": 6,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 22,
+          "labels_added": 8,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -45,17 +45,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 1,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 1,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -69,11 +69,6 @@
           "text",
           "score"
         ],
-        "numeric": [
-          false,
-          false,
-          true
-        ],
         "rows": [
           [
             "\"n6\"",
@@ -85,6 +80,11 @@
             "\"The WAL replays on open and trims a torn tail.\"",
             "0.4118477668724633"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -107,42 +107,38 @@
         "rows": [
           {
             "id": "n6",
-            "score": 1.1371966628886316,
-            "text": "Recovery tests cut the WAL at every byte."
+            "text": "Recovery tests cut the WAL at every byte.",
+            "score": 1.1371966628886316
           },
           {
             "id": "n1",
-            "score": 0.4118477668724633,
-            "text": "The WAL replays on open and trims a torn tail."
+            "text": "The WAL replays on open and trims a torn tail.",
+            "score": 0.4118477668724633
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
     },
     "terms": {
       "kind": "table",
-      "text": "| query           | ids                            |\n|-----------------|--------------------------------|\n| \"wal\"           | [\"n6\", \"n1\"]                   |\n| \"replay\"        | []                             |\n| \"replays\"       | [\"n5\", \"n1\"]                   |\n| \"test\"          | []                             |\n| \"the\"           | [\"n5\", \"n3\", \"n2\", \"n6\", \"n1\"] |\n| \"pull-request\"  | [\"n3\"]                         |\n| \"\\\"torn tail\\\"\" | [\"n1\"]                         |\n7 rows",
+      "text": "| query          | ids                            |\n|----------------|--------------------------------|\n| \"wal\"          | [\"n6\", \"n1\"]                   |\n| \"replay\"       | []                             |\n| \"replays\"      | [\"n5\", \"n1\"]                   |\n| \"test\"         | []                             |\n| \"the\"          | [\"n5\", \"n3\", \"n2\", \"n6\", \"n1\"] |\n| \"pull-request\" | [\"n3\"]                         |\n6 rows",
       "table": {
         "columns": [
           "query",
           "ids"
-        ],
-        "numeric": [
-          false,
-          false
         ],
         "rows": [
           [
@@ -168,13 +164,13 @@
           [
             "\"pull-request\"",
             "[\"n3\"]"
-          ],
-          [
-            "\"\\\"torn tail\\\"\"",
-            "[\"n1\"]"
           ]
         ],
-        "summary": "7 rows"
+        "numeric": [
+          false,
+          false
+        ],
+        "summary": "6 rows"
       },
       "graph": null,
       "envelope": {
@@ -192,62 +188,56 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "query": "wal",
             "ids": [
               "n6",
               "n1"
-            ],
-            "query": "wal"
+            ]
           },
           {
-            "ids": [],
-            "query": "replay"
+            "query": "replay",
+            "ids": []
           },
           {
+            "query": "replays",
             "ids": [
               "n5",
               "n1"
-            ],
-            "query": "replays"
+            ]
           },
           {
-            "ids": [],
-            "query": "test"
+            "query": "test",
+            "ids": []
           },
           {
+            "query": "the",
             "ids": [
               "n5",
               "n3",
               "n2",
               "n6",
               "n1"
-            ],
-            "query": "the"
+            ]
           },
           {
+            "query": "pull-request",
             "ids": [
               "n3"
-            ],
-            "query": "pull-request"
-          },
-          {
-            "ids": [
-              "n1"
-            ],
-            "query": "\"torn tail\""
+            ]
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -259,10 +249,6 @@
         "columns": [
           "query",
           "ids"
-        ],
-        "numeric": [
-          false,
-          false
         ],
         "rows": [
           [
@@ -286,6 +272,10 @@
             "[\"n6\"]"
           ]
         ],
+        "numeric": [
+          false,
+          false
+        ],
         "summary": "5 rows"
       },
       "graph": null,
@@ -304,49 +294,49 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "query": "tor*",
             "ids": [
               "n1"
-            ],
-            "query": "tor*"
+            ]
           },
           {
+            "query": "t?il",
             "ids": [
               "n1"
-            ],
-            "query": "t?il"
+            ]
           },
           {
+            "query": "replay~",
             "ids": [
               "n1",
               "n5"
-            ],
-            "query": "replay~"
+            ]
           },
           {
+            "query": "checkpont~1",
             "ids": [
               "n2"
-            ],
-            "query": "checkpont~1"
+            ]
           },
           {
+            "query": "test*",
             "ids": [
               "n6"
-            ],
-            "query": "test*"
+            ]
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -359,10 +349,6 @@
           "id",
           "score"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"n6\"",
@@ -372,6 +358,10 @@
             "\"n1\"",
             "1.24"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -400,17 +390,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -423,10 +413,6 @@
           "id",
           "score"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"n3\"",
@@ -436,6 +422,10 @@
             "\"n6\"",
             "0.19550121782258376"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -464,17 +454,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -488,11 +478,6 @@
           "text",
           "score"
         ],
-        "numeric": [
-          false,
-          false,
-          true
-        ],
         "rows": [
           [
             "\"n4\"",
@@ -504,6 +489,11 @@
             "\"The docs build replays every cell.\"",
             "0.21872908528665308"
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -526,27 +516,27 @@
         "rows": [
           {
             "id": "n4",
-            "score": 0.21872908528665308,
-            "text": "Release notes list every fixed scenario."
+            "text": "Release notes list every fixed scenario.",
+            "score": 0.21872908528665308
           },
           {
             "id": "n5",
-            "score": 0.21872908528665308,
-            "text": "The docs build replays every cell."
+            "text": "The docs build replays every cell.",
+            "score": 0.21872908528665308
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -565,17 +555,17 @@
         "plan_cache": "miss",
         "rows": [],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 1,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 1,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -587,10 +577,6 @@
         "columns": [
           "id",
           "score"
-        ],
-        "numeric": [
-          false,
-          true
         ],
         "rows": [
           [
@@ -605,6 +591,10 @@
             "\"n2\"",
             "0.8602553606033325"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "3 rows"
       },
@@ -637,17 +627,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -660,10 +650,6 @@
           "id",
           "score"
         ],
-        "numeric": [
-          false,
-          true
-        ],
         "rows": [
           [
             "\"n6\"",
@@ -673,6 +659,10 @@
             "\"n1\"",
             "0.4118477668724633"
           ]
+        ],
+        "numeric": [
+          false,
+          true
         ],
         "summary": "2 rows"
       },
@@ -701,17 +691,17 @@
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -726,13 +716,6 @@
           "fulltext_rank",
           "rrf",
           "project"
-        ],
-        "numeric": [
-          false,
-          true,
-          true,
-          true,
-          false
         ],
         "rows": [
           [
@@ -756,6 +739,13 @@
             "0.0161",
             "\"opencypher-tck\""
           ]
+        ],
+        "numeric": [
+          false,
+          true,
+          true,
+          true,
+          false
         ],
         "summary": "3 rows"
       },
@@ -781,39 +771,39 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "fulltext_rank": 1,
             "id": "n6",
-            "project": "opencypher-tck",
+            "vector_rank": 1,
+            "fulltext_rank": 1,
             "rrf": 0.0328,
-            "vector_rank": 1
+            "project": "opencypher-tck"
           },
           {
-            "fulltext_rank": 2,
             "id": "n1",
-            "project": "relate",
+            "vector_rank": null,
+            "fulltext_rank": 2,
             "rrf": 0.0161,
-            "vector_rank": null
+            "project": "relate"
           },
           {
-            "fulltext_rank": null,
             "id": "n3",
-            "project": "opencypher-tck",
+            "vector_rank": 2,
+            "fulltext_rank": null,
             "rrf": 0.0161,
-            "vector_rank": 2
+            "project": "opencypher-tck"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false
@@ -828,13 +818,6 @@
           "labelsOrTypes",
           "properties",
           "state"
-        ],
-        "numeric": [
-          false,
-          false,
-          false,
-          false,
-          false
         ],
         "rows": [
           [
@@ -851,6 +834,13 @@
             "[\"text\"]",
             "\"ONLINE\""
           ]
+        ],
+        "numeric": [
+          false,
+          false,
+          false,
+          false,
+          false
         ],
         "summary": "2 rows"
       },
@@ -876,40 +866,40 @@
         "plan_cache": "miss",
         "rows": [
           {
+            "name": "note_embedding",
+            "type": "VECTOR",
             "labelsOrTypes": [
               "Note"
             ],
-            "name": "note_embedding",
             "properties": [
               "embedding"
             ],
-            "state": "ONLINE",
-            "type": "VECTOR"
+            "state": "ONLINE"
           },
           {
+            "name": "note_text",
+            "type": "FULLTEXT",
             "labelsOrTypes": [
               "Note"
             ],
-            "name": "note_text",
             "properties": [
               "text"
             ],
-            "state": "ONLINE",
-            "type": "FULLTEXT"
+            "state": "ONLINE"
           }
         ],
         "stats": {
-          "constraints_added": 0,
-          "constraints_removed": 0,
-          "indexes_added": 0,
-          "indexes_removed": 0,
-          "labels_added": 0,
-          "labels_removed": 0,
           "nodes_created": 0,
           "nodes_deleted": 0,
-          "properties_set": 0,
           "relationships_created": 0,
-          "relationships_deleted": 0
+          "relationships_deleted": 0,
+          "properties_set": 0,
+          "labels_added": 0,
+          "labels_removed": 0,
+          "indexes_added": 0,
+          "indexes_removed": 0,
+          "constraints_added": 0,
+          "constraints_removed": 0
         }
       },
       "expectError": false

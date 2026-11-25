@@ -1,6 +1,6 @@
 {
-  "version": "1.2.0",
-  "recordedWith": "relate 1.2.0 (e0ea536), release build",
+  "version": "1.3.0",
+  "recordedWith": "relate 1.3.0 (6e55309), release build",
   "agentCap": 100,
   "harnessVariable": "CLAUDECODE",
   "harnessVariables": [
@@ -171,18 +171,18 @@
     },
     {
       "id": "engine-wal-payload-cap",
-      "pattern": "^This statement tried to commit a single WAL record of at least 64 MiB\\. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 64 MiB \\(ADR-0086\\); commit the data in smaller transactions \\(CALL \\{ [\\s\\S]+? \\} IN TRANSACTIONS OF n ROWS, or client-side batches\\)\\.$",
+      "pattern": "^This statement tried to commit a single WAL record of at least [\\s\\S]+?\\. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is [\\s\\S]+? \\(ADR-0086\\); commit the data in smaller transactions \\(CALL \\{ [\\s\\S]+? \\} IN TRANSACTIONS OF n ROWS, or client-side batches\\)\\.$",
       "kind": "capacity",
       "code": "fatal_error",
       "exit": 1,
       "retryable": false
     },
     {
-      "id": "engine-wal-payload-cap",
-      "pattern": "^This statement tried to commit a single WAL record of at least [\\s\\S]+?\\. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is [\\s\\S]+? \\(ADR-0086\\); commit the data in smaller transactions \\(CALL \\{ [\\s\\S]+? \\} IN TRANSACTIONS OF n ROWS, or client-side batches\\)\\.$",
-      "kind": "capacity",
-      "code": "fatal_error",
-      "exit": 1,
+      "id": "engine-ontology-unsupported-version",
+      "pattern": "^semantic error: The ontology document uses an unsupported graph-spec version\\. The document names 'https://example\\.com/schema\\.json'; This version of Relate supports up to Ontology Graph Spec 1\\.1\\.0 \\('https://neo4j\\.com/docs/ontology-graph-spec/1\\.1\\.0/schema\\.json'\\)\\.$",
+      "kind": "argument",
+      "code": "validation_error",
+      "exit": 6,
       "retryable": false
     },
     {
@@ -207,14 +207,6 @@
       "kind": "capacity",
       "code": "fatal_error",
       "exit": 1,
-      "retryable": false
-    },
-    {
-      "id": "engine-ontology-unsupported-version",
-      "pattern": "^semantic error: Unsupported ontology spec version: 'https://example\\.com/schema\\.json'\\. This version of Relate supports up to Ontology Graph Spec 1\\.1\\.0 \\('https://neo4j\\.com/docs/ontology-graph-spec/1\\.1\\.0/schema\\.json'\\)\\.$",
-      "kind": "semantic",
-      "code": "validation_error",
-      "exit": 6,
       "retryable": false
     },
     {

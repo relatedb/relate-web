@@ -197,7 +197,7 @@ RELATE_PREVIEW=ontology relate --database ./team.rl --read-only --mode jsonl "CA
 ```
 
 ```text
-{"ontology":"---\nschema: \"https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json\"\nversion: \"1\"\nid: team\nnodes:\n  Person:\n    label: Person\n    properties:\n      name:\n        type: STRING\n        must_exist: true"}
+{"ontology":"---\nschema: \"https://neo4j.com/docs/ontology-graph-spec/1.1.0/schema.json\"\nversion: \"1\"\nid: team\nnodes:\n  Person:\n    labels:\n      identifier: Person\n    properties:\n      name:\n        type: STRING\n    constraints:\n      name_Person_exists:\n        type: EXISTS\n        properties:\n          - name\n        name: name_Person_exists"}
 ```
 
 `db.ontology.apply` writes the graph type, which `SHOW CURRENT GRAPH TYPE` then prints:

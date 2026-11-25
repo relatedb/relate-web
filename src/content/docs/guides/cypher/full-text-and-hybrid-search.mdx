@@ -66,7 +66,7 @@ The score is BM25, the relevance score Neo4j's full-text index gives: each match
 The index lowercases text and splits it into words of letters and digits. A query goes through the same split, once its operators ([Combine words with operators](#combine-words-with-operators)) and its wildcard, fuzzy and boost suffixes ([Match part of a word, a typo, or an accent](#match-part-of-a-word-a-typo-or-an-accent)) are read; nothing else happens to either. This cell runs one search per query string and lists the notes each one finds:
 
 ```cypher run name=terms
-UNWIND ['wal', 'replay', 'replays', 'test', 'the', 'pull-request', '"torn tail"'] AS q
+UNWIND ['wal', 'replay', 'replays', 'test', 'the', 'pull-request'] AS q
 CALL (q) {
   MATCH (n:Note)
   SEARCH n IN (FULLTEXT INDEX note_text FOR q LIMIT 10) SCORE AS score
@@ -81,7 +81,7 @@ RETURN q AS query, ids
 | `replay`, `test` | No stemming: `replay` does not match `replays`, nor `test` `tests` |
 | `the` | No stop words: common words are terms like any other |
 | `pull-request` | Punctuation splits words: the query is the two terms `pull` and `request` |
-| `"torn tail"` | No phrase search: quotes are dropped, and the two words match separately |
+| `"torn tail"` | No phrase search: a quoted phrase fails with a syntax error, because the analyzer reads it as several words |
 
 `WITH ANALYZER 'english'` after the query stems the query's words and drops English stop words, but the indexed text keeps its written form: with it, `replays` searches for `replay` and `tests` for `test`, which no note holds. To match word variants, use a wildcard or a fuzzy term ([Match part of a word, a typo, or an accent](#match-part-of-a-word-a-typo-or-an-accent)), or store a normalized copy of the text in a second indexed property and search that.
 

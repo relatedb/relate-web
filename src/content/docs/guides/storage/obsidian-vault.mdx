@@ -81,7 +81,7 @@ relate --database ./team-vault --snapshot-format markdown --mode envelope "MATCH
 ```
 
 ```text
-{"columnTypes":["STRING","STRING"],"columns":["label","name"],"notifications":[],"planCache":"miss","rows":[{"label":"Person","name":"Ada"},{"label":"Person","name":"Grace"},{"label":"Person","name":"Noor"},{"label":"Project","name":"opencypher-tck"},{"label":"Project","name":"relate"}],"timings":{"elapsed_ms":0.545708,"execute_ms":0.362875,"lex_parse_ms":0.005791999999999999,"lower_ms":0.045417,"parse_ms":0.130916,"plan_ms":0.045958000000000006,"result_generation_ms":0.000166,"rewrite_ms":0.007416},"truncated":false}
+{"columns":["label","name"],"columnTypes":["STRING","STRING"],"rows":[{"label":"Person","name":"Ada"},{"label":"Person","name":"Grace"},{"label":"Person","name":"Noor"},{"label":"Project","name":"opencypher-tck"},{"label":"Project","name":"relate"}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.545708,"parse_ms":0.130916,"plan_ms":0.045958000000000006,"execute_ms":0.362875,"lex_parse_ms":0.005791999999999999,"rewrite_ms":0.007416,"lower_ms":0.045417,"result_generation_ms":0.000166},"planCache":"miss"}
 ```
 
 `opencypher-tck` is a node because Grace's note links it. The codec is now recorded in `.relate/manifest.json`, so later opens need no flag.
@@ -98,18 +98,13 @@ ls team-vault team-vault/Person team-vault/Project
 team-vault:
 Person
 Project
-index.md
-log.md
 
 team-vault/Person:
 Ada.md
 Grace.md
 Noor.md
-index.md
 
 team-vault/Project:
-index.md
-opencypher-tck.md
 relate.md
 ```
 
@@ -121,13 +116,11 @@ cat team-vault/Person/Ada.md
 
 ```text
 ---
-type: Person
-name: Ada
 role: engineer
-KNOWS:
-  - "[[Person/Grace]]"
 WORKS_ON:
   - "[[Project/relate]]"
+KNOWS:
+  - "[[Person/Grace]]"
 ---
 
 Writes the planner.
@@ -144,7 +137,7 @@ relate --database ./team-vault --read-only --mode envelope "MATCH (p:Person)-[r]
 ```
 
 ```text
-{"columnTypes":["STRING","STRING","STRING"],"columns":["person","rel","target"],"notifications":[],"planCache":"miss","rows":[{"person":"Ada","rel":"KNOWS","target":"Grace"},{"person":"Ada","rel":"WORKS_ON","target":"relate"},{"person":"Grace","rel":"WORKS_ON","target":"opencypher-tck"},{"person":"Grace","rel":"WORKS_ON","target":"relate"},{"person":"Noor","rel":"MAINTAINS","target":"relate"}],"timings":{"elapsed_ms":0.451625,"execute_ms":0.27304199999999995,"lex_parse_ms":0.03275,"lower_ms":0.045583,"parse_ms":0.113375,"plan_ms":0.057374999999999995,"result_generation_ms":0.000292,"rewrite_ms":0.0085},"truncated":false}
+{"columns":["person","rel","target"],"columnTypes":["STRING","STRING","STRING"],"rows":[{"person":"Ada","rel":"KNOWS","target":"Grace"},{"person":"Ada","rel":"WORKS_ON","target":"relate"},{"person":"Grace","rel":"WORKS_ON","target":"opencypher-tck"},{"person":"Grace","rel":"WORKS_ON","target":"relate"},{"person":"Noor","rel":"MAINTAINS","target":"relate"}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.451625,"parse_ms":0.113375,"plan_ms":0.057374999999999995,"execute_ms":0.27304199999999995,"lex_parse_ms":0.03275,"rewrite_ms":0.0085,"lower_ms":0.045583,"result_generation_ms":0.000292},"planCache":"miss"}
 ```
 
 A write becomes a note at the checkpoint. This statement adds Ines, with a body, working on `relate`:
@@ -155,7 +148,7 @@ cat team-vault/Person/Ines.md
 ```
 
 ```text
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":1.515666,"execute_ms":1.318625,"lex_parse_ms":0.006333,"lower_ms":0.006791,"parse_ms":0.186708,"plan_ms":0.0052499999999999995,"result_generation_ms":0.000167,"rewrite_ms":0.00033299999999999996},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":1.515666,"parse_ms":0.186708,"plan_ms":0.0052499999999999995,"execute_ms":1.318625,"lex_parse_ms":0.006333,"rewrite_ms":0.00033299999999999996,"lower_ms":0.006791,"result_generation_ms":0.000167},"planCache":"miss"}
 ---
 type: Person
 name: Ines
@@ -190,7 +183,7 @@ relate --database ./team-vault --read-only --mode envelope "MATCH (p:Person {nam
 ```
 
 ```text
-{"columnTypes":["STRING","LIST"],"columns":["body","maintains"],"notifications":[],"planCache":"miss","rows":[{"body":"Reviews every release.","maintains":["opencypher-tck","relate"]}],"timings":{"elapsed_ms":0.481791,"execute_ms":0.28125,"lex_parse_ms":0.033958,"lower_ms":0.049208,"parse_ms":0.125375,"plan_ms":0.065667,"result_generation_ms":0.000334,"rewrite_ms":0.00825},"truncated":false}
+{"columns":["body","maintains"],"columnTypes":["STRING","LIST"],"rows":[{"body":"Reviews every release.","maintains":["opencypher-tck","relate"]}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.481791,"parse_ms":0.125375,"plan_ms":0.065667,"execute_ms":0.28125,"lex_parse_ms":0.033958,"rewrite_ms":0.00825,"lower_ms":0.049208,"result_generation_ms":0.000334},"planCache":"miss"}
 ```
 
 While a process holds the vault open, it is the one writer: an edit made to the files then is refused at its next checkpoint ([If it goes wrong](#if-it-goes-wrong)).
@@ -205,7 +198,7 @@ cat team-vault/Person/Ada.md
 ```
 
 ```text
-{"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":1.363583,"execute_ms":1.1715,"lex_parse_ms":0.0047090000000000005,"lower_ms":0.004125,"parse_ms":0.18016700000000002,"plan_ms":0.006625,"result_generation_ms":0.000125,"rewrite_ms":0.000334},"truncated":false}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":1.363583,"parse_ms":0.18016700000000002,"plan_ms":0.006625,"execute_ms":1.1715,"lex_parse_ms":0.0047090000000000005,"rewrite_ms":0.000334,"lower_ms":0.004125,"result_generation_ms":0.000125},"planCache":"miss"}
 ---
 type: Person
 name: Ada
@@ -250,7 +243,7 @@ relate --database ./team-vault --read-only --mode envelope "MATCH (n) RETURN lab
 ```
 
 ```text
-{"columnTypes":["STRING","INTEGER"],"columns":["label","notes"],"notifications":[],"planCache":"miss","rows":[{"label":"Person","notes":4},{"label":"Project","notes":2}],"timings":{"elapsed_ms":0.622666,"execute_ms":0.442458,"lex_parse_ms":0.005958000000000001,"lower_ms":0.046542,"parse_ms":0.128,"plan_ms":0.046459,"result_generation_ms":0.00029099999999999997,"rewrite_ms":0.006541},"truncated":false}
+{"columns":["label","notes"],"columnTypes":["STRING","INTEGER"],"rows":[{"label":"Person","notes":4},{"label":"Project","notes":2}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.622666,"parse_ms":0.128,"plan_ms":0.046459,"execute_ms":0.442458,"lex_parse_ms":0.005958000000000001,"rewrite_ms":0.006541,"lower_ms":0.046542,"result_generation_ms":0.00029099999999999997},"planCache":"miss"}
 ```
 
 ## If it goes wrong
@@ -258,7 +251,7 @@ relate --database ./team-vault --read-only --mode envelope "MATCH (n) RETURN lab
 - **`Failed to open Relate: storage error: ambiguous legacy storage role at <path>; explicit offline migration required`** (exit code 1). A folder of notes was opened without `--snapshot-format markdown`. Nothing in it changed; open it again with the flag.
 - **`Failed to open Relate: storage error: read-only open requires an existing database at <path>`** (exit code 1). The first open was `--read-only`. Open the vault once without `--read-only`, after committing it to git.
 - **`Failed to open Relate: storage error: markdown vault: <note>: '<KEY>' holds map-form link entries but no file declares the relationship type with a bare wikilink; declare it or use a bare link`** (exit code 1). A key holds links with properties and no note declares that relationship type with a plain `- "[[Folder/note]]"` link. Add a bare link under that key in one note.
-- **`Error: final checkpoint failed: storage error: markdown vault: node <id> of label <Label> has no 'name' property; the markdown vault requires a non-null unique 'name' on :<Label>`** (exit code 1). A statement created a node without its key. The write committed, and every writable open fails its checkpoint the same way until the key is set:
+- **`Error: final checkpoint failed: storage error: markdown vault: node <id> of label <Label> has no 'name' property; the markdown vault requires a non-null unique 'name' on :<Label>; pin another property by declaring key: true on the :<Label> node type in the vault's committed ontology file (ontology.yaml or ontology.json)`** (exit code 1). A statement created a node without its key. The write committed, and every writable open fails its checkpoint the same way until the key is set:
 
   ```bash verify
   relate --database ./team-vault --mode envelope "CREATE (:Person {role: 'reviewer'})"
@@ -266,8 +259,8 @@ relate --database ./team-vault --read-only --mode envelope "MATCH (n) RETURN lab
   ```
 
   ```text
-  {"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":2.6516669999999998,"execute_ms":2.385125,"lex_parse_ms":0.008209000000000001,"lower_ms":0.006791,"parse_ms":0.253625,"plan_ms":0.002333,"result_generation_ms":0.000292,"rewrite_ms":0.000542},"truncated":false}
-  Error: final checkpoint failed: storage error: markdown vault: node 7 of label Person has no 'name' property; the markdown vault requires a non-null unique 'name' on :Person
+  {"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":2.6516669999999998,"parse_ms":0.253625,"plan_ms":0.002333,"execute_ms":2.385125,"lex_parse_ms":0.008209000000000001,"rewrite_ms":0.000542,"lower_ms":0.006791,"result_generation_ms":0.000292},"planCache":"miss"}
+  Error: final checkpoint failed: storage error: markdown vault: node 8 of label Person has no 'name' property; the markdown vault requires a non-null unique 'name' on :Person; pin another property by declaring key: true on the :Person node type in the vault's committed ontology file (ontology.yaml or ontology.json)
   exit=1
   ```
 
@@ -279,7 +272,7 @@ relate --database ./team-vault --read-only --mode envelope "MATCH (n) RETURN lab
   ```
 
   ```text
-  {"columnTypes":[],"columns":[],"notifications":[],"planCache":"miss","rows":[],"timings":{"elapsed_ms":12.825,"execute_ms":12.275584,"lex_parse_ms":0.21241700000000002,"lower_ms":0.013875,"parse_ms":0.522375,"plan_ms":0.017249999999999998,"result_generation_ms":0.000167,"rewrite_ms":0.001167},"truncated":false}
+  {"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":12.825,"parse_ms":0.522375,"plan_ms":0.017249999999999998,"execute_ms":12.275584,"lex_parse_ms":0.21241700000000002,"rewrite_ms":0.001167,"lower_ms":0.013875,"result_generation_ms":0.000167},"planCache":"miss"}
   Ada.md
   Grace.md
   Ines.md

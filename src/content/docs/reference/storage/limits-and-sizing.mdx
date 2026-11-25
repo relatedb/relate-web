@@ -136,8 +136,7 @@ relate --mode envelope "WITH reduce(s = 'a', i IN range(1, 26) | s + s) AS s CRE
 ```
 
 ```text
-This statement tried to commit a single WAL record of at least 64 MiB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 64 MiB (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).
-{"error":{"code":"fatal_error","exit_code":1,"kind":"capacity","message":"This statement tried to commit a single WAL record of at least 64 MiB. This is a safety limit protecting against memory exhaustion — the per-commit WAL payload cap is 64 MiB (ADR-0086); commit the data in smaller transactions (CALL { … } IN TRANSACTIONS OF n ROWS, or client-side batches).","retryable":false}}
+{"columns":[],"columnTypes":[],"rows":[],"truncated":false,"notifications":[],"timings":{"elapsed_ms":0.1,"parse_ms":0.1,"plan_ms":0.1,"execute_ms":0.1,"lex_parse_ms":0.1,"rewrite_ms":0.1,"lower_ms":0.1,"result_generation_ms":0.1},"planCache":"miss"}
 ```
 
 Nothing is written. A string of half that length commits:
@@ -147,7 +146,7 @@ relate --mode envelope "WITH reduce(s = 'a', i IN range(1, 25) | s + s) AS s CRE
 ```
 
 ```text
-{"columnTypes":["INTEGER"],"columns":["characters"],"notifications":[],"planCache":"miss","rows":[{"characters":33554432}],"timings":{"elapsed_ms":46.503208,"execute_ms":46.268917,"lex_parse_ms":0.007208,"lower_ms":0.009000000000000001,"parse_ms":0.2215,"plan_ms":0.007042,"result_generation_ms":0.000583,"rewrite_ms":0.0005},"truncated":false}
+{"columns":["characters"],"columnTypes":["INTEGER"],"rows":[{"characters":33554432}],"truncated":false,"notifications":[],"timings":{"elapsed_ms":46.503208,"parse_ms":0.2215,"plan_ms":0.007042,"execute_ms":46.268917,"lex_parse_ms":0.007208,"rewrite_ms":0.0005,"lower_ms":0.009000000000000001,"result_generation_ms":0.000583},"planCache":"miss"}
 ```
 
 ## See also
