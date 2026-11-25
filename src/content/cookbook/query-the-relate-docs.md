@@ -263,7 +263,7 @@ ORDER BY score DESC, s.id
 ```table
 | page                         | heading                  | score  |
 |------------------------------|--------------------------|--------|
-| "guides/agents/agent-safety" | "Verify"                 | 0.8147 |
+| "guides/agents/agent-safety" | "Verify"                 | 0.8123 |
 | "guides/agents/agent-safety" | "Turn on safe mode"      | 0.8067 |
 | "guides/agents/agent-safety" | "Permission matrix"      | 0.8035 |
 | "reference/api/python"       | "Open options"           | 0.8021 |
@@ -305,7 +305,7 @@ ORDER BY score DESC, page
 ```table
 | page                 | sections                                                                       | score  | read_first         | terms                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 |----------------------|--------------------------------------------------------------------------------|--------|--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| "Keep an agent safe" | ["Verify", "Turn on safe mode", "Permission matrix", "Control network egress"] | 0.8147 | ["Install relate"] | ["checkpoint: The step that writes a fresh snapshot of committed state and recycles old WAL segments: every 300 seconds by default, on clean exit, and on `.checkpoint`.", "MCP: The Model Context Protocol, which agent hosts use to call tools; `relate serve --mcp` exposes a store as `read_cypher`, `get_schema` and `write_cypher`.", "read-only: An open mode (`--read-only`) that never writes, checkpoints or migrates the store; writes fail, and a directory store can be read beside its writer.", "safe mode: An opt-in policy (`--safe`) that refuses a new named node without a label, an unbounded `MATCH` read and a remote `--load`, before anything runs.", "store: A relate database: a directory, a single `.rl` file, or `:memory:`, opened with `--database`."] |
+| "Keep an agent safe" | ["Verify", "Turn on safe mode", "Permission matrix", "Control network egress"] | 0.8123 | ["Install relate"] | ["checkpoint: The step that writes a fresh snapshot of committed state and recycles old WAL segments: every 300 seconds by default, on clean exit, and on `.checkpoint`.", "MCP: The Model Context Protocol, which agent hosts use to call tools; `relate serve --mcp` exposes a store as `read_cypher`, `get_schema` and `write_cypher`.", "read-only: An open mode (`--read-only`) that never writes, checkpoints or migrates the store; writes fail, and a directory store can be read beside its writer.", "safe mode: An opt-in policy (`--safe`) that refuses a new named node without a label, an unbounded `MATCH` read and a remote `--load`, before anything runs.", "store: A relate database: a directory, a single `.rl` file, or `:memory:`, opened with `--database`."] |
 | "Python API"         | ["Open options"]                                                               | 0.8021 | []                 | ["client: A language package that runs the relate engine inside a program's process: the Python, Node.js, Rust, Java, .NET, Go and Swift clients.", "node: An entity in the graph: it carries zero or more labels and a map of properties, and relationships connect it to other nodes.", "path: An alternating sequence of nodes and relationships that a pattern matched, bound with `p = …` and read with `nodes(p)`, `relationships(p)` and `length(p)`.", "relationship: A directed, typed connection between two nodes, with properties of its own; every relationship has exactly one type and a start and an end node.", "store: A relate database: a directory, a single `.rl` file, or `:memory:`, opened with `--database`."]                                               |
 2 rows
 ```
@@ -362,8 +362,8 @@ ORDER BY score DESC, s.id
 | "Python API"         | "Cursor"                                       | 0.8454 | ["python"]               |
 | "Connect over MCP"   | "Cursor"                                       | 0.8432 | ["agents", "cli", "mcp"] |
 | "Python API"         | "ResultGraph"                                  | 0.8089 | ["python"]               |
+| "Keep an agent safe" | "Check destructive statements before they run" | 0.8044 | ["agents", "cli", "mcp"] |
 | "Python API"         | "Open options"                                 | 0.8043 | ["python"]               |
-| "Keep an agent safe" | "Check destructive statements before they run" | 0.8036 | ["agents", "cli", "mcp"] |
 5 rows
 ```
 
@@ -401,7 +401,7 @@ ORDER BY score DESC, s.id
 | page                             | heading                                        | score  |
 |----------------------------------|------------------------------------------------|--------|
 | "guides/agents/connect-over-mcp" | "Cursor"                                       | 0.8432 |
-| "guides/agents/agent-safety"     | "Check destructive statements before they run" | 0.8036 |
+| "guides/agents/agent-safety"     | "Check destructive statements before they run" | 0.8044 |
 | "guides/agents/connect-over-mcp" | "Windsurf"                                     | 0.8007 |
 | "guides/agents/agent-safety"     | "Open the store read-only"                     | 0.8006 |
 | "guides/agents/agent-safety"     | "Keep an agent safe"                           | 0.7974 |

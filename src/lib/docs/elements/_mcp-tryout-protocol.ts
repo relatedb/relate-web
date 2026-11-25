@@ -241,9 +241,9 @@ export function requestLine(id: number, call: Call): string {
   return raw !== undefined && args !== call.arguments ? line.replace(JSON.stringify(RAW), () => compactJson(raw)) : line;
 }
 
-/** The server's tool result: a struct's fields in order, then a sorted map (`content`, `isError`; `text`, `type`). */
+/** The server's tool result: structs write their fields in declaration order since 1.3.0 (`content`, `isError`; `type`, `text`); sorted before. */
 export const replyLine = (id: number, text: string, isError: boolean) =>
-  `{"jsonrpc":"2.0","id":${id},"result":{"content":[{"text":${JSON.stringify(text)},"type":"text"}],"isError":${isError}}}`;
+  `{"jsonrpc":"2.0","id":${id},"result":{"content":[{"type":"text","text":${JSON.stringify(text)}}],"isError":${isError}}}`;
 
 /** `value` as JSON with every object's keys sorted, as serde_json's default (BTreeMap) map writes them. */
 export function sortedJson(value: unknown): string {
@@ -251,6 +251,37 @@ export function sortedJson(value: unknown): string {
     v && typeof v === 'object' && !Array.isArray(v) ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, v[k]])) : v,
   );
 }
+
+/** The field order of the structs a tool result carries (1.3.0 declaration order); a key not listed follows, sorted. */
+const FIELD_ORDER: Record<string, readonly string[]> = {
+  stats: ['nodes_created', 'nodes_deleted', 'relationships_created', 'relationships_deleted', 'properties_set', 'labels_added', 'labels_removed', 'indexes_added', 'indexes_removed', 'constraints_added', 'constraints_removed'],
+  notification: ['code', 'gql_status', 'severity', 'category', 'title', 'description', 'remedy', 'operator_id'],
+  plan: ['schema', 'profiled', 'statement', 'root'],
+  planNode: ['operator', 'details', 'identifiers', 'estimated_rows', 'actual', 'fused_into', 'fused_metrics', 'children', 'warnings'],
+  schemaNode: ['type', 'count', 'properties', 'relationships'],
+  schemaRelationship: ['direction', 'labels', 'properties'],
+};
+const orderedKeys = (obj: Record<string, unknown>, kind: string) => {
+  const order = FIELD_ORDER[kind] ?? [];
+  return [...order.filter((k) => k in obj), ...Object.keys(obj).filter((k) => !order.includes(k)).sort()];
+};
+/** `value` as JSON, the objects named by `kindOf` in their struct's field order and every other object's keys sorted (a map). */
+function structJson(value: unknown, kindOf: (v: Record<string, unknown>, parent: string) => string | undefined, parent = ''): string {
+  if (Array.isArray(value)) return `[${value.map((v) => structJson(v, kindOf, parent)).join(',')}]`;
+  if (value && typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    const kind = kindOf(obj, parent);
+    const keys = kind ? orderedKeys(obj, kind) : Object.keys(obj).sort();
+    return `{${keys.map((k) => `${JSON.stringify(k)}:${structJson(obj[k], kindOf, kind ?? k)}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+/** A plan, a notification list or the stats of a result, in the server's field order. */
+const planKind = (v: Record<string, unknown>, parent: string) =>
+  'operator' in v ? 'planNode' : 'schema' in v && 'root' in v ? 'plan' : 'code' in v && 'gql_status' in v ? 'notification' : parent === 'stats' ? 'stats' : undefined;
+/** The `get_schema` result: a label's entry and a relationship type's entry are structs, the maps around them sorted. */
+export const schemaJson = (schema: unknown) =>
+  structJson(schema, (v) => (v.type === 'node' && 'count' in v ? 'schemaNode' : 'direction' in v ? 'schemaRelationship' : undefined));
 
 /** A statement with its whitespace collapsed and a trailing `;` dropped: how two spellings of one statement compare. */
 export const normalise = (s: string) => s.replace(/\s+/g, ' ').trim().replace(/;$/, '').trim();
@@ -271,7 +302,14 @@ export function resultText(executed: string, explained: string, tool: 'read_cyph
   exec.set('plan', plan.get('plan') ?? 'null');
   exec.set('error', 'null');
   if (tool === 'write_cypher') exec.set('rows', '[]');
-  return `{${[...exec.keys()].sort().map((k) => `${JSON.stringify(k)}:${exec.get(k)}`).join(',')}}`;
+  // The server's order since 1.3.0: the result's members, then the timings, the plan cache, `error` and the plan.
+  const order = ['columns', 'columnTypes', 'rows', 'stats', 'notifications', 'elapsed_ms', 'parse_ms', 'plan_ms', 'execute_ms', 'lex_parse_ms', 'rewrite_ms', 'lower_ms', 'result_generation_ms', 'plan_cache', 'error', 'plan'];
+  const keys = [...order.filter((k) => exec.has(k)), ...[...exec.keys()].filter((k) => !order.includes(k)).sort()];
+  const text = (k: string) => {
+    const raw = exec.get(k)!;
+    return k === 'stats' || k === 'notifications' || k === 'plan' ? structJson(JSON.parse(raw), planKind, k) : raw;
+  };
+  return `{${keys.map((k) => `${JSON.stringify(k)}:${text(k)}`).join(',')}}`;
 }
 
 // ---------------------------------------------------------------- the gate
@@ -547,7 +585,7 @@ export async function callTool(run: RunScript, call: Call, id: number, options: 
         schema[label] = labelEntry(three);
       }
     }
-    return answer(sortedJson(schema), false, 'engine', { schema });
+    return answer(schemaJson(schema), false, 'engine', { schema });
   }
 
   if (call.tool === 'write_cypher' && options.readOnly) return answer(UNKNOWN_WRITE_TOOL, true, 'recorded');

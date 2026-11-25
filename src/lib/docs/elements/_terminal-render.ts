@@ -155,8 +155,8 @@ export interface Envelope {
   timings: Map<string, string>;
 }
 
-/** The keys of the CLI's `timings` object, in the order it prints them (sorted). */
-export const TIMING_KEYS = ['elapsed_ms', 'execute_ms', 'lex_parse_ms', 'lower_ms', 'parse_ms', 'plan_ms', 'result_generation_ms', 'rewrite_ms'] as const;
+/** The keys of the CLI's `timings` object, in the order it prints them (the statement's phases in order, since 1.3.0; sorted before). */
+export const TIMING_KEYS = ['elapsed_ms', 'parse_ms', 'plan_ms', 'execute_ms', 'lex_parse_ms', 'rewrite_ms', 'lower_ms', 'result_generation_ms'] as const;
 
 /** A wire envelope from its JSON text (the engine's, or a recording's re-serialized). */
 export function readEnvelope(text: string): Envelope {
@@ -194,8 +194,7 @@ export function recordedEnvelopeText(envelope: unknown): string {
   const rows = (e.rows ?? []).map(
     (row) =>
       '{' +
-      Object.keys(row)
-        .sort(byteOrder)
+      [...new Set([...(e.columns ?? []).filter((c) => c in row), ...Object.keys(row)])]
         .map((k) => {
           const v = row[k];
           const raw = JSON.stringify(v);
@@ -439,18 +438,18 @@ export function renderTable(env: Envelope, rows: Json[]): string[] {
 
 const rowCapJson = (kept: number, total: number) => `{"kept":${kept},"total":${total}}`;
 
-/** `--mode envelope`: one compact object, keys sorted, with the timings and the plan cache's outcome, no stats. */
+/** `--mode envelope`: one compact object, keys in the CLI's order (since 1.3.0; sorted before), with the timings and the plan cache's outcome, no stats. */
 export function renderEnvelope(env: Envelope, rows: Json[], total: number): string[] {
   const cut = rows.length < total;
   const parts = [
-    `"columnTypes":${JSON.stringify(env.columnTypes)}`,
     `"columns":${JSON.stringify(env.columns)}`,
-    '"notifications":[]',
-    `"planCache":${planCacheJson(env)}`,
-    ...(cut ? [`"rowCap":${rowCapJson(rows.length, total)}`] : []),
+    `"columnTypes":${JSON.stringify(env.columnTypes)}`,
     `"rows":[${env.columns.length ? rows.map((r) => r.raw).join(',') : ''}]`,
-    `"timings":${timingsJson(env)}`,
     `"truncated":${cut}`,
+    ...(cut ? [`"rowCap":${rowCapJson(rows.length, total)}`] : []),
+    '"notifications":[]',
+    `"timings":${timingsJson(env)}`,
+    `"planCache":${planCacheJson(env)}`,
   ];
   return [`{${parts.join(',')}}`];
 }
@@ -583,14 +582,14 @@ export interface Progress {
 export const progressLine = (p: Progress) =>
   `statement ${p.statement} of ${p.statements} failed; ${p.statement - 1} completed and committed; ${p.statements - p.statement} not run`;
 
-/** The `{"error": …}` object the JSON modes print on stdout (errors.rs `error_map`), keys sorted. */
+/** The `{"error": …}` object the JSON modes print on stdout (errors.rs `error_map`), keys in insertion order since 1.3.0 (sorted before). */
 export function errorObject(message: string, cls: ErrorClass, progress: Progress | null): string {
   const fields: Record<string, unknown> = { code: cls.code, exit_code: cls.exit, kind: cls.kind, message: sanitizeErrorText(message), retryable: cls.retryable };
   if (progress) Object.assign(fields, { statement: progress.statement, statements: progress.statements, committed: progress.statement - 1 });
   const pos = syntaxPosition(message);
   if (pos && 'source' in pos) Object.assign(fields, { column: pos.column, source: pos.source });
   else if (pos) Object.assign(fields, { line: pos.line, column: pos.column });
-  const keys = Object.keys(fields).sort(byteOrder);
+  const keys = Object.keys(fields);
   return `{"error":{${keys.map((k) => `${JSON.stringify(k)}:${JSON.stringify(fields[k])}`).join(',')}}}`;
 }
 
