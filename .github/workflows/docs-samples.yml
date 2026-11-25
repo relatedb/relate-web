@@ -71,6 +71,8 @@ jobs:
       ref: ${{ steps.gate.outputs.ref }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.record_to || github.ref }}
 
       - name: Upstream ref
         id: gate
