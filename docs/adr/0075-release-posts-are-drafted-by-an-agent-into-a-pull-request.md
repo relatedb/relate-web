@@ -1,4 +1,4 @@
-# ADR-0075: Release posts are drafted by an agent into a pull request
+# ADR-0075: Release posts are drafted by an agent into the release's pull request
 
 Status: Proposed
 
@@ -15,28 +15,33 @@ about the product, so a person must read it before it is public.
 
 ## Decision
 
-A separate workflow, `release-post.yml`, listens for the same `relate-release` poke (core
-releases only), and by hand with a version. It reads the release notes, installs the release's
+The post is drafted by `release-post.yml`, which `engine-release.yml` calls as a job on the same
+`relate-release` poke (core releases only). It reads the release notes, installs the release's
 binary, and runs a headless agent with a checked-in prompt that points at `BLOG-VOICE.md`, the
 tone contract and the existing release posts. The agent writes one file, `relate-X-Y-Z.md`, and
 runs each CLI example it shows. It reports which examples ran and which could not (client-language
-examples). A second job, with no model, opens a pull request holding that one file, with the
-report as the body. Merging the pull request is the publication.
+examples). The drafted file goes to the docs refresh job as an artifact, and the refresh adds it
+to its own pull request, with the report as a section of the body. A release makes one pull
+request, and merging it publishes the post. Run by hand with a version, `release-post.yml` opens
+its own pull request.
 
-- The drafting job has a read-only token and the model credential; the job that opens the pull
+- The drafting job has a read-only token and the model credential; the job that opens a pull
   request has the write token and no model. Only the post leaves the drafting job, and the job
   fails if the agent changed anything else.
 - The release notes are data to summarise, never instructions to the agent.
 - A release that already has a post, a draft or prerelease, and a run with no credential or no
-  pinned agent package are skipped, not failed.
-- `engine-release.yml` is unchanged: a failure here never holds up the docs refresh or the
-  deployed discovery files.
+  pinned agent package are skipped, not failed. A failed or skipped draft never stops the refresh:
+  its pull request opens without the post.
+- The drafting job runs before the refresh starts, so the refresh pull request waits for it.
 
 ## Alternatives considered
 
-- **Add the step to `engine-release.yml`.** A reasonable choice: one workflow per release.
-  Rejected: that workflow's contract is that no agent writes anything, and a model failure or
-  spend would then sit inside the refresh the docs depend on.
+- **A separate workflow that opens its own pull request.** The first shape of this decision. A
+  release then made two pull requests (the docs refresh and the post) to review and merge, with
+  two sets of checks. Rejected: one pull request per release is easier to review, and the
+  reusable-workflow call keeps the model job isolated from the refresh all the same.
+- **Draft the post inside the refresh job.** Rejected: the refresh's contract is that no agent
+  writes anything in it, and the model credential would then sit in the job that builds clients.
 - **A template filled from the release notes, no model.** Reasonable: deterministic and free.
   Rejected: the posts are curated, not a copy of the notes, and the result would not read as
   Archie.
@@ -47,11 +52,12 @@ report as the body. Merging the pull request is the publication.
 
 ## Consequences
 
-- Each core release produces a pull request with a draft post; review is reading it against the
-  notes and the unverified list, then merging.
+- Each core release produces one pull request, the docs refresh with the draft post in it; review
+  is reading the post against the notes and the unverified list, then merging.
 - The model account is spent once per release, only here. Setting `ANTHROPIC_API_KEY` and the
   `RELEASE_POST_AGENT_PACKAGE` variable turns the workflow on; until then it skips.
 - `BLOG-VOICE.md` and the existing release posts are now also the agent's instructions, so a change
   to either changes what the agent writes.
-- Not exercised against a live account yet: the first run is a dry run to confirm the headless
-  invocation and the tool allowlist.
+- The by-hand run has been exercised on a past release, which fixed the agent's write permission
+  and the binary on its path. The combined path (the call from `engine-release.yml`) is a dry run
+  away from confirmed.

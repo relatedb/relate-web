@@ -58,12 +58,12 @@ jobs:
             echo "::notice::the embeddings are current: nothing to commit"
             exit 0
           fi
-          # Only the embeddings may change.
-          if [ "$(echo "$changed" | grep -vc ' src/content/docs/_data/embeddings.json$')" != 0 ]; then
-            echo "::error::docs:embeddings changed more than embeddings.json:"; echo "$changed"; exit 1
+          # Only the embeddings and the recipe's `docs` data block built from them may change.
+          if [ "$(echo "$changed" | grep -vcE ' src/content/(docs/_data/embeddings\.json|cookbook/query-the-relate-docs\.md)$')" != 0 ]; then
+            echo "::error::docs:embeddings changed more than its two files:"; echo "$changed"; exit 1
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/content/docs/_data/embeddings.json
+          git add src/content/docs/_data/embeddings.json src/content/cookbook/query-the-relate-docs.md
           git commit -m 'Docs: re-record the embeddings'
           git push origin "HEAD:refs/heads/$REF"

@@ -4,6 +4,9 @@ subtitle: Relating with Astro, Next.js, SvelteKit, Observable, react-admin, Phas
 description: Seven npm packages put a Relate database in a web page and connect it to the frameworks you already use.
 date: 2026-11-23
 tags: [integrations, web, javascript]
+image: /blog/web-integrations.jpg
+card: /blog/web-integrations-card.jpg
+imageAlt: A claymation map in the style of the Seven Bridges of Königsberg, with seven Archies as the bridges (Blacksmith's, Connecting, Green, Merchant's, Wooden, High and Honey) arching over a blue river between felt islands.
 draft: false
 ---
 

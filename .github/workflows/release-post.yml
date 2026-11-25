@@ -13,9 +13,12 @@
 #   pull-request  no model, no agent. Opens the pull request with the file; its
 #                 body carries the agent's Verified/Unverified report.
 #
-# Triggers: repository_dispatch relate-release with kind cli (upstream's release
-# pipelines, ADR-0546), or workflow_dispatch with the version. A release that has
-# a post already is skipped.
+# Used two ways (ADR-0075). Called by engine-release.yml on a cli relate-release
+# poke (upstream's release pipelines, ADR-0546) with embedded: true: it drafts the
+# post and uploads it as the artifact release-post, and engine-release.yml adds it
+# to the docs refresh pull request, so a release makes one pull request. Run by
+# hand (workflow_dispatch, with the version) it opens its own pull request. A
+# release that has a post already is skipped.
 #
 # Secrets and variables:
 #   ANTHROPIC_API_KEY             required; without it the run skips with a warning.
@@ -27,8 +30,24 @@
 name: Release post
 
 on:
-  repository_dispatch:
-    types: [relate-release]
+  workflow_call:
+    inputs:
+      version:
+        description: The relate release to write about (X.Y.Z; default the poke's tag's)
+        type: string
+        required: false
+        default: ''
+      embedded:
+        description: The caller adds the post to its own pull request
+        type: boolean
+        default: true
+    outputs:
+      drafted:
+        description: 'true when a post was drafted and uploaded as the artifact release-post'
+        value: ${{ jobs.draft.outputs.drafted }}
+      post:
+        description: The post's path
+        value: ${{ jobs.draft.outputs.post }}
   workflow_dispatch:
     inputs:
       version:
@@ -180,7 +199,7 @@ jobs:
 
   pull-request:
     needs: draft
-    if: needs.draft.outputs.drafted == 'true'
+    if: needs.draft.outputs.drafted == 'true' && inputs.embedded != true
     runs-on: ubuntu-latest
     permissions:
       contents: write
