@@ -2,6 +2,8 @@
 // /blog/<slug>/: one post. A single <article> with the title, byline and date, so reader modes and
 // agents get the prose and little else.
 import { render } from 'astro:content';
+import { readFileSync } from 'node:fs';
+import sharp from 'sharp';
 import Base from '../../layouts/Base.astro';
 import TagList from '../../components/blog/TagList.astro';
 import { browsable, isoDate, longDate, postPath, posts, related } from '../../lib/blog.ts';
@@ -14,7 +16,15 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const more = related(post, await browsable());
-const { title, subtitle, description, date, updated, author, tags } = post.data;
+const { title, subtitle, description, date, updated, author, tags, image, imageAlt, card: cardPath } = post.data;
+// The hero's own size (it sets the img box, so the page does not jump) and the card's, read from public/.
+const sizeOf = async (src: string) => {
+  const { width = 0, height = 0 } = await sharp(readFileSync(new URL(`../../../public${src}`, import.meta.url))).metadata();
+  return { width, height };
+};
+const heroSize = image ? await sizeOf(image) : undefined;
+const cardSrc = cardPath ?? image;
+const card = cardSrc ? { src: cardSrc, alt: imageAlt ?? title, ...(await sizeOf(cardSrc)) } : undefined;
 // The page title reads "Title: subtitle"; the heading shows the title and the subtitle under it.
 const fullTitle = subtitle ? `${title}${/[.!?]$/.test(title) ? ' ' : ': '}${subtitle}` : title;
 const modified = isoDate(updated ?? date);
@@ -30,15 +40,17 @@ const jsonld = [
     dateModified: modified,
     author: authors.map((name) => ({ '@type': name === 'The Relate Authors' ? 'Organization' : 'Person', name })),
     publisher: { '@type': 'Organization', name: SITE_NAME },
+    ...(cardSrc ? { image: absolute(cardSrc) } : {}),
     mainEntityOfPage: absolute(postPath(post)),
     ...(tags.length ? { keywords: tags.join(', ') } : {}),
   },
 ];
 ---
-<Base title={fullTitle} description={description} path={postPath(post)} type="article" modified={modified} jsonld={jsonld} noindex={post.data.draft || post.data.unlisted}>
+<Base title={fullTitle} description={description} path={postPath(post)} type="article" modified={modified} jsonld={jsonld} noindex={post.data.draft || post.data.unlisted} image={card}>
   <div class="blog">
     <p class="blog-back"><a href="/blog/">&larr; Related Posts</a></p>
     <article class="post">
+      {image && <img class="post-hero" src={image} alt={imageAlt ?? ''} width={heroSize?.width} height={heroSize?.height} />}
       <header>
         <h1>{title}</h1>
         {subtitle && <p class="post-sub">{subtitle}</p>}

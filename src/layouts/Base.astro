@@ -25,8 +25,10 @@ interface Props {
   jsonld?: JsonLd[];
   /** Never indexed, launch build included. */
   noindex?: boolean;
+  /** The page's own card image (see SeoHead). */
+  image?: { src: string; alt: string; width: number; height: number };
 }
-const { title, description = '', playgroundHref, chrome = 'site', path, type, twinHref, describedby, modified, jsonld, noindex } = Astro.props;
+const { title, description = '', playgroundHref, chrome = 'site', path, type, twinHref, describedby, modified, jsonld, noindex, image } = Astro.props;
 // The 404 page answers at every missing URL, so it has no canonical and is never indexed.
 const notFound = Astro.url.pathname.replace(/\/$/, '') === '/404';
 ---
@@ -47,6 +49,7 @@ const notFound = Astro.url.pathname.replace(/\/$/, '') === '/404';
       modified={modified}
       jsonld={jsonld}
       noindex={noindex || notFound}
+      image={image}
     />
     <link rel="preload" href="/fonts/relate-sans.woff2" as="font" type="font/woff2" crossorigin />
     <script is:inline>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>

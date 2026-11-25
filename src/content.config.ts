@@ -128,6 +128,11 @@ const blog = defineCollection({
       draft: z.boolean().default(false),
       /** Built and reachable by its URL, but not listed in the index, the feed or the sitemap, and `noindex`. */
       unlisted: z.boolean().default(false),
+      // A hero image under public/ (shown above the post and used as its link-preview card), 2:1, with its alt text.
+      image: z.string().regex(/^\/[^\s]+\.(png|jpg|webp)$/, 'a path under public/, like /blog/name.png').optional(),
+      imageAlt: z.string().optional(),
+      // The link-preview card (1200x630) when the hero is not that shape; the hero is the card otherwise.
+      card: z.string().regex(/^\/[^\s]+\.(png|jpg|webp)$/, 'a path under public/').optional(),
     })
     .strict(),
 });

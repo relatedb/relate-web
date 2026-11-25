@@ -54,3 +54,6 @@
 .post-more li { margin: 0 0 14px; }
 .post-more a { font: 500 18px/26px var(--font); text-decoration: none; }
 .post-more-sub { display: block; color: var(--ink-muted); font-size: 15px; line-height: 22px; }
+
+.post-hero { display: block; width: 100%; height: auto; margin: 0 0 28px; border-radius: 12px; object-fit: cover; object-position: right center; }
+@media (max-width: 640px) { .post-hero { aspect-ratio: 16 / 9; } }

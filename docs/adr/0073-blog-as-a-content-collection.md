@@ -59,4 +59,4 @@ footer links, the index heading, the feed); the path and the collection stay `bl
 - Posts have no markdown twin, no entry in `llms.txt` and no Pagefind indexing yet. Each is a
   small addition when wanted (ADR-0069 describes the twin for the home page and cookbook).
 - The dual-theme Shiki rules moved from `cookbook.css` to `base.css`, since the blog uses them too.
-- Per-post social images and pagination are not built; the default card applies.
+- A post may set `image` (a wide PNG, JPG or WebP under `public/`) and `imageAlt`: it shows above the title. A post may also set `card` (1200x630) as its link-preview card; without one the hero is the card, and without either the default card applies. Pagination is not built.
