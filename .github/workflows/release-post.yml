@@ -123,10 +123,13 @@ jobs:
         run: |
           HOME="$RUNNER_TEMP/home" sh public/install.sh > "$RUNNER_TEMP/install.log" 2>&1 || tail -n 5 "$RUNNER_TEMP/install.log"
           bin="$RUNNER_TEMP/home/.local/bin"
-          if [ "$("$bin/relate" --version 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -n1)" = "$VERSION" ]; then
-            echo "$bin" >> "$GITHUB_PATH"
+          got="$("$bin/relate" --version 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -n1)"
+          if [ -z "$got" ]; then
+            echo "::warning::relate is not installed: examples will be reported unverified"
           else
-            echo "::warning::relate $VERSION is not installed: examples will be reported unverified"
+            # install.sh installs the latest release: a mismatch means a re-run for an older one.
+            [ "$got" = "$VERSION" ] || echo "::warning::installed relate $got, not $VERSION: examples run against $got"
+            echo "$bin" >> "$GITHUB_PATH"
           fi
 
       - uses: actions/setup-node@v4
@@ -148,9 +151,11 @@ jobs:
           # The tools: read the repo, write the one post, run relate.
           claude --bare -p \
             --output-format text \
+            --permission-mode acceptEdits \
             --allowedTools "Read,Write,Bash(relate:*)" \
-            < scripts/release-post/prompt.md > "$RUNNER_TEMP/report.md"
-          # Only the post may have changed.
+            < scripts/release-post/prompt.md > "$RUNNER_TEMP/report.md" || { cat "$RUNNER_TEMP/report.md"; exit 1; }
+          echo '--- the agent report ---'; cat "$RUNNER_TEMP/report.md"; echo '--- end ---'
+          # Only the post may have changed, and it must exist.
           changed="$(git status --porcelain --untracked-files=all)"
           if [ "$changed" != "?? $POST" ]; then
             echo "::error::the agent changed more than $POST:"; echo "$changed"; exit 1
