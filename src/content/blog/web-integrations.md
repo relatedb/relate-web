@@ -1,5 +1,5 @@
 ---
-title: Seven Bridges of Integrationsburg
+title: Seven Bridges of Integrationsberg
 subtitle: Relating with Astro, Next.js, SvelteKit, Observable, react-admin, Phaser, and vanilla JS
 description: Seven npm packages put a Relate database in a web page and connect it to the frameworks you already use.
 date: 2026-11-23
