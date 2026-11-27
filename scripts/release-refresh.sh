@@ -180,14 +180,27 @@ step "install.sh, releases.json, extensions.json (+ .sig)" sync_discovery
 
 bin=""
 install_binary() {
-  local home="$work/home"
+  # install.sh reads relatedb.ai/releases.json, which the deploy for this same release poke
+  # publishes at the same time: wait (up to ~10 minutes) for it to name the release.
+  local home="$work/home" got="" attempt
   mkdir -p "$home"
-  HOME="$home" sh public/install.sh >"$work/install.log" 2>&1 || { tail -n 5 "$work/install.log" >&2; note "$(tail -n 1 "$work/install.log")"; return 1; }
-  local got
-  got="$("$home/.local/bin/relate" --version | head -n 1)"
+  for attempt in $(seq 1 20); do
+    if HOME="$home" sh public/install.sh >"$work/install.log" 2>&1; then
+      got="$("$home/.local/bin/relate" --version | head -n 1)"
+      case "$got" in *"v$version") break ;; esac
+    else
+      got=""
+    fi
+    [ "$attempt" -lt 20 ] && { say "relatedb.ai does not offer v$version yet (attempt $attempt of 20); waiting"; sleep 30; }
+  done
+  if [ -z "$got" ]; then
+    tail -n 5 "$work/install.log" >&2
+    note "$(tail -n 1 "$work/install.log")"
+    return 1
+  fi
   case "$got" in
     *"v$version") ;;
-    *) note "install.sh installed '$got', not v$version (it installs the latest release; is $tag the latest?)"; return 1 ;;
+    *) note "install.sh installed '$got', not v$version after waiting (it installs the latest release the live releases.json names; is $tag the latest?)"; return 1 ;;
   esac
   bin="$home/.local/bin/relate"
   note "$got, signature and checksum verified by install.sh"
