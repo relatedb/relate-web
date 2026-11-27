@@ -32,7 +32,7 @@ switch between two server-rendered lists (CSS only, no script).
   release and read by the same.
 - **A quality bar, then a model screen.** `select` in `src/lib/projects.ts` drops forks, archived
   and private repositories, ones with no description and the project's own owner. A refresh that
-  would keep no project fails. Then a model (`claude-haiku-5-5`, `ANTHROPIC_API_KEY`) reads the
+  would keep no project fails. Then a model (`claude-haiku-5-5`, `ANTHROPIC_API_KEY`; no sampling parameters, which that model rejects) reads the
   name, description and topics of each new or changed project, and hides anything hateful, sexual,
   harassing, malicious, a scam, an impersonation of relate or Neo4j, or plainly off-topic
   (`src/lib/projects-review.ts`). The text is third-party, so it goes to the model as data in a
@@ -86,8 +86,8 @@ switch between two server-rendered lists (CSS only, no script).
   a store in a repository).
 - A refresh rewrites `graph.json` whole, so every refresh pull request shows one changed line.
 - A screen is a filter, not a guarantee: a cleverly worded repository can pass, and a false
-  positive is hidden quietly. The run summary is where hidden projects show; the model is at
-  `temperature: 0`, and an `override` ends a dispute.
+  positive is hidden quietly. The run summary is where hidden projects show, and an `override` ends a
+  dispute.
 - The first run after this change reviews every listed project once (they carry no review yet),
   and they stay visible meanwhile.
 - Descriptions are third-party text, rendered escaped and clipped to 200 characters.
