@@ -1,9 +1,12 @@
 # Drafts the blog post for a relate release and opens a pull request with it
 # for a person to review (ADR-0075). Merging the pull request publishes the post.
 #
-# engine-release.yml stays deterministic (no agent writes anything there); this
-# is the separate, model-written step, so a model account is spent only here
-# and a failure here never holds up the docs refresh or the discovery files.
+# The post is its own track: it starts on the same relate-release poke as the docs
+# refresh (engine-release.yml) and the deploy, but nothing waits for the others. The
+# announcement can go out within minutes of the release, while the docs refresh (the
+# recordings, samples and checks) takes as long as it takes. engine-release.yml stays
+# deterministic (no agent writes anything there); this is the model-written step, so
+# a model account is spent only here and a failure here never holds up the refresh.
 #
 # Two jobs, the pattern of docs-evals.yml:
 #   draft         read-only token. Installs the release's binary, then runs Claude
@@ -13,12 +16,11 @@
 #   pull-request  no model, no agent. Opens the pull request with the file; its
 #                 body carries the agent's Verified/Unverified report.
 #
-# Used two ways (ADR-0075). Called by engine-release.yml on a cli relate-release
-# poke (upstream's release pipelines, ADR-0546) with embedded: true: it drafts the
-# post and uploads it as the artifact release-post, and engine-release.yml adds it
-# to the docs refresh pull request, so a release makes one pull request. Run by
-# hand (workflow_dispatch, with the version) it opens its own pull request. A
-# release that has a post already is skipped.
+# Starts on a cli relate-release poke (upstream's release pipelines, ADR-0546) or by
+# hand (workflow_dispatch, with the version). It opens its own pull request, which
+# carries the agent's Verified/Unverified report. A release that has a post already is
+# skipped. The binary the examples run against is installed once relatedb.ai offers
+# the release (the deploy for the same poke publishes releases.json).
 #
 # Secrets and variables:
 #   ANTHROPIC_API_KEY             required; without it the run skips with a warning.
@@ -30,24 +32,8 @@
 name: Release post
 
 on:
-  workflow_call:
-    inputs:
-      version:
-        description: The relate release to write about (X.Y.Z; default the poke's tag's)
-        type: string
-        required: false
-        default: ''
-      embedded:
-        description: The caller adds the post to its own pull request
-        type: boolean
-        default: true
-    outputs:
-      drafted:
-        description: 'true when a post was drafted and uploaded as the artifact release-post'
-        value: ${{ jobs.draft.outputs.drafted }}
-      post:
-        description: The post's path
-        value: ${{ jobs.draft.outputs.post }}
+  repository_dispatch:
+    types: [relate-release]
   workflow_dispatch:
     inputs:
       version:
@@ -190,7 +176,8 @@ jobs:
           cp "$POST" "$RUNNER_TEMP/out/post.md"
           {
             echo "A draft of the release post, written by an agent from the release notes."
-            echo "Read it against the notes, then merge to publish."
+            echo "Read it against the notes and the report below, then merge to publish. It does not wait"
+            echo "for the release's docs refresh, so the announcement can go out first."
             echo
             echo "Report from the drafting run:"
             echo
@@ -206,7 +193,7 @@ jobs:
 
   pull-request:
     needs: draft
-    if: needs.draft.outputs.drafted == 'true' && inputs.embedded != true
+    if: needs.draft.outputs.drafted == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write

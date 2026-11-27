@@ -130,12 +130,12 @@ required Cookbook check). Run it locally: `bash scripts/release-refresh.sh --ver
 
 ## Release post (`release-post.yml`)
 
-On a `cli` poke `engine-release.yml` calls `release-post.yml`, where an agent drafts
-`src/content/blog/relate-X-Y-Z.md` from the release notes. The refresh adds it to the docs refresh
-pull request, with the agent's report as a section of the body (ADR-0075). The post is public when
-that pull request merges: read it against the notes and the report's `Unverified:` lines. A failed
-or skipped draft leaves the pull request without a post. For one release by hand (it opens its own
-pull request):
+On a `cli` poke `release-post.yml` starts beside `engine-release.yml` and the deploy, and an agent
+drafts `src/content/blog/relate-X-Y-Z.md` from the release notes into its own pull request, with the
+agent's report as the body (ADR-0075). It does not wait for the docs refresh: the announcement can
+merge within minutes of the release. The post is public when that pull request merges: read it
+against the notes and the report's `Unverified:` lines. A failed or skipped draft opens no pull
+request. For one release by hand:
 
 ```bash
 gh workflow run release-post.yml -R relatedb/relate-web -f version=X.Y.Z

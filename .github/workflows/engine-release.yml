@@ -27,8 +27,9 @@
 #     RELATE_WEB_DISPATCH_TOKEN is set the pokes skip; run this by hand.
 #   - workflow_dispatch with the version, to refresh from a release by hand
 #
-# The release's blog post is drafted by the `post` job (release-post.yml) and added
-# to this pull request: one pull request per release (ADR-0075).
+# The release's blog post is not part of this pull request: release-post.yml starts on
+# the same poke and opens its own, so the announcement does not wait for this refresh
+# (ADR-0075).
 #
 # Secrets (all optional; each one's absence is reported, not fatal):
 #   RELATE_UPSTREAM_TOKEN  read access to the upstream repository's contents
@@ -69,23 +70,9 @@ env:
   UPSTREAM_REPO: ${{ vars.RELATE_UPSTREAM_REPO || 'relatedb/relate' }}
 
 jobs:
-  # The release's blog post, drafted by an agent (release-post.yml, ADR-0075). It
-  # opens no pull request here: the refresh adds the file to its own, so a release
-  # makes one pull request. A failed or skipped draft never stops the refresh.
-  post:
-    # A by-hand run needs the version (the draft cannot work it out from a tag input).
-    if: github.event.client_payload.kind != 'extension' && (github.event_name == 'repository_dispatch' || inputs.version != '')
-    uses: ./.github/workflows/release-post.yml
-    with:
-      version: ${{ inputs.version || github.event.client_payload.version }}
-      embedded: true
-    secrets: inherit
-
   refresh:
-    needs: post
     # An extension release changes no docs: its signed index is published by the deploys.
-    # !cancelled(): the refresh runs whether the draft succeeded, failed or was skipped.
-    if: ${{ !cancelled() && github.event.client_payload.kind != 'extension' }}
+    if: ${{ github.event.client_payload.kind != 'extension' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -207,31 +194,6 @@ jobs:
           fi
           cat "$report" >> "$GITHUB_STEP_SUMMARY"
           echo "report=$report" >> "$GITHUB_OUTPUT"
-
-      # The drafted post joins the refresh's pull request, with the agent's report
-      # as a section of its body.
-      - name: Add the release post
-        if: needs.post.outputs.drafted == 'true'
-        uses: actions/download-artifact@v8
-        with:
-          name: release-post
-          path: ${{ runner.temp }}/post
-
-      - name: Place the release post
-        if: needs.post.outputs.drafted == 'true'
-        env:
-          POST: ${{ needs.post.outputs.post }}
-          REPORT: ${{ steps.refresh.outputs.report }}
-        run: |
-          cp "$RUNNER_TEMP/post/post.md" "site/$POST"
-          {
-            echo
-            echo "## Blog post"
-            echo
-            echo "\`$POST\` is in this pull request, drafted by an agent from the release notes (ADR-0075). It is public when this merges: read it against the notes."
-            echo
-            sed '1,3d' "$RUNNER_TEMP/post/body.md"
-          } >> "$REPORT"
 
       - name: Open the pull request
         uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8.1.3

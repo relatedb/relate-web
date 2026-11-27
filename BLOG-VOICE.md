@@ -82,4 +82,4 @@ review, then remove the flag to publish.
 
 ## Release posts
 
-Each core release gets a post named `relate-X-Y-Z`, tagged `release`. `release-post.yml` (called from `engine-release.yml`) drafts it with an agent that reads this file and the existing release posts (ADR-0075), so they are its instructions: keep them current. The post arrives inside the release's docs refresh pull request, and a person reviews it there before it publishes.
+Each core release gets a post named `relate-X-Y-Z`, tagged `release`. `release-post.yml` (it starts on the same release poke as `engine-release.yml`, and does not wait for it) drafts it with an agent that reads this file and the existing release posts (ADR-0075), so they are its instructions: keep them current. The post arrives in its own pull request, and a person reviews it there before it publishes. It goes out before the release's docs update, so it links only the GitHub release notes and the changelog.
