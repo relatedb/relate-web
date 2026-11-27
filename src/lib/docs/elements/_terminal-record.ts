@@ -13,11 +13,12 @@
 // (plus the harness variable) in the environment.
 
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { maskTimings } from '../checks/cli.ts';
 import { MODES, type Mode } from './_terminal-render.ts';
 
 export const FIXTURES_JSON = 'src/lib/docs/elements/_terminal-fixtures.json';
@@ -142,6 +143,14 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const root = join(dirname(fileURLToPath(import.meta.url)), '../../../..');
   const facts = (await import('./_terminal-facts.ts')).factsNow().want;
   const fixtures = record(bin, facts.harnessVariable);
-  writeFileSync(join(root, FIXTURES_JSON), `${JSON.stringify(fixtures, null, 1)}\n`);
-  console.log(`wrote ${FIXTURES_JSON}: ${fixtures.cases.length} statements, ${fixtures.recordedWith}`);
+  const file = join(root, FIXTURES_JSON);
+  const text = `${JSON.stringify(fixtures, null, 1)}\n`;
+  // Timings differ on every run: a re-record that changed nothing else leaves the file alone, so a
+  // refresh's diff shows only what moved.
+  if (existsSync(file) && maskTimings(readFileSync(file, 'utf8')) === maskTimings(text)) {
+    console.log(`${FIXTURES_JSON}: unchanged (${fixtures.cases.length} statements, ${fixtures.recordedWith}; timings aside)`);
+  } else {
+    writeFileSync(file, text);
+    console.log(`wrote ${FIXTURES_JSON}: ${fixtures.cases.length} statements, ${fixtures.recordedWith}`);
+  }
 }

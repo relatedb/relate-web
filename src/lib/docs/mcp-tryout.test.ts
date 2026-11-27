@@ -229,9 +229,8 @@ test('an operator the gate does not know counts as a write, and the outcome name
 });
 
 test('a trailing semicolon is sent and kept in the plan, as the server keeps it', async () => {
-  // relate 1.4.0, `relate serve --mcp stdio --database :memory:`, timings masked.
-  const server =
-    '{"jsonrpc":"2.0","id":2,"result":{"content":[{"type":"text","text":"{\\"columns\\":[\\"a\\"],\\"columnTypes\\":[\\"INTEGER\\"],\\"rows\\":[{\\"a\\":1}],\\"stats\\":{\\"nodes_created\\":0,\\"nodes_deleted\\":0,\\"relationships_created\\":0,\\"relationships_deleted\\":0,\\"properties_set\\":0,\\"labels_added\\":0,\\"labels_removed\\":0,\\"indexes_added\\":0,\\"indexes_removed\\":0,\\"constraints_added\\":0,\\"constraints_removed\\":0},\\"notifications\\":[],\\"elapsed_ms\\":<ms>,\\"parse_ms\\":<ms>,\\"plan_ms\\":<ms>,\\"execute_ms\\":<ms>,\\"lex_parse_ms\\":<ms>,\\"rewrite_ms\\":<ms>,\\"lower_ms\\":<ms>,\\"result_generation_ms\\":<ms>,\\"plan_cache\\":\\"miss\\",\\"error\\":null,\\"plan\\":{\\"schema\\":\\"relate.plan/v1\\",\\"profiled\\":false,\\"statement\\":\\"RETURN 1 AS a;\\",\\"root\\":{\\"operator\\":\\"ProduceResults\\",\\"details\\":\\"1 item(s)\\",\\"identifiers\\":[],\\"estimated_rows\\":null,\\"actual\\":null,\\"fused_into\\":null,\\"fused_metrics\\":null,\\"body_of\\":null,\\"children\\":[],\\"warnings\\":[]}}}"}],"isError":false}}';
+  // The line the release binary answers with, recorded by elements/_mcp-tryout-fixtures.ts (timings masked).
+  const server = (JSON.parse(readFileSync(join(ROOT, 'src/lib/docs/elements/_mcp-tryout-fixtures.json'), 'utf8')) as { semicolon: string }).semicolon;
   assert.equal(await reply(null, { tool: 'read_cypher', arguments: { statement: 'RETURN 1 AS a;  ' } }, 2), server);
 });
 

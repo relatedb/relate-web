@@ -283,6 +283,29 @@ function fences(tree: Root): Code[] {
   return out;
 }
 
+/**
+ * Replaces the content of the ```text fence that opens on 1-based line `openLine` of `text` with
+ * `content` (the output a `bash verify` step produced): the fence's own indentation is kept, and an
+ * empty `content` leaves an empty fence. Returns null when that line is not a plain ```text fence
+ * with a closing fence after it, so a stale line number never rewrites the wrong lines.
+ */
+export function replaceFence(text: string, openLine: number, content: string): string | null {
+  const lines = text.split('\n');
+  const open = /^(\s*)(`{3,}|~{3,})text\s*$/.exec(lines[openLine - 1] ?? '');
+  if (!open) return null;
+  const [, indent, mark] = open;
+  let close = -1;
+  for (let i = openLine; i < lines.length; i++) {
+    if (lines[i].trim() === mark) {
+      close = i;
+      break;
+    }
+  }
+  if (close < 0) return null;
+  const body = content === '' ? [] : content.split('\n').map((l) => (l === '' ? l : indent + l));
+  return [...lines.slice(0, openLine), ...body, ...lines.slice(close)].join('\n');
+}
+
 /** The ```bash verify steps of a page, in page order. `offset` is the number of lines before the body (the frontmatter). */
 export function verifySteps(body: string, file: string, offset = 0): VerifyStep[] {
   const list = fences(parsePage(body));

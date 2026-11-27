@@ -42,10 +42,17 @@
 // from engine.json (`commit`, `source_build`) when engine.json names the same
 // version, otherwise no commit and "release build".
 //
+// --update-fences (with or without --record) accepts the drift of the page fences: each ```text fence
+// that follows a `bash verify` step and no longer matches is rewritten from the binary's output
+// (real timings included, the way an authored fence shows a run), the page steps are replayed once
+// more, and the changes are printed as the diffs to review. Use it after a release, when the
+// drift is the engine's (a version line, a new flag, a new field) and the diff is the review: a
+// fence that should not have changed is a regression to fix in the engine or the page, not accept.
+//
 // COMMANDS_ONLY=1 skips the page fences; PAGES_ONLY=1 skips the data files.
 
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { parseArgs } from 'node:util';
@@ -63,6 +70,7 @@ import {
   recordedStep,
   recordedWithLine,
   recordingsOf,
+  replaceFence,
   replayEnv,
   sameOutput,
   unifiedDiff,
@@ -73,7 +81,7 @@ import {
 } from '../src/lib/docs/checks/cli.ts';
 import { pageFiles, ROOT } from '../src/lib/docs/content.ts';
 
-const { values: args } = parseArgs({ options: { record: { type: 'boolean', default: false } } });
+const { values: args } = parseArgs({ options: { record: { type: 'boolean', default: false }, 'update-fences': { type: 'boolean', default: false } } });
 
 const rel = (f: string) => relative(ROOT, f);
 const STEP_TIMEOUT_MS = 120_000;
@@ -267,8 +275,9 @@ async function checkData(binary: string): Promise<number> {
 // Page fences
 
 /** Replays every page's verify steps; returns the count and, per page whose steps all passed, the steps as recorded. */
-function checkPages(binary: string): { count: number; passed: Record<string, RecordedStep[]> } {
+function checkPages(binary: string, accept = false): { count: number; passed: Record<string, RecordedStep[]>; accepted: number } {
   let count = 0;
+  let accepted = 0;
   const passed: Record<string, RecordedStep[]> = {};
   for (const page of pageFiles()) {
     if (page.data.status === 'planned') continue;
@@ -276,6 +285,7 @@ function checkPages(binary: string): { count: number; passed: Record<string, Rec
     if (!steps.length) continue;
     const before = drift;
     const s = sandbox(binary);
+    const edits: { line: number; content: string }[] = [];
     try {
       for (const step of steps) {
         count++;
@@ -290,15 +300,35 @@ function checkPages(binary: string): { count: number; passed: Record<string, Rec
           continue;
         }
         const actual = out.stdout.replace(/\n$/, '');
-        if (!sameOutput(step.expected, actual)) fail(`${where} (expected output at line ${step.expectedLine})`, unifiedDiff(maskTimings(step.expected), maskTimings(actual), ['page', 'binary']));
+        if (!sameOutput(step.expected, actual)) {
+          const diff = unifiedDiff(maskTimings(step.expected), maskTimings(actual), ['page', 'binary']);
+          if (accept && step.expectedLine !== null && out.exit !== null) {
+            console.log(`\nUPDATE ${where} (expected output at line ${step.expectedLine})\n${diff}`);
+            edits.push({ line: step.expectedLine, content: actual });
+          } else fail(`${where} (expected output at line ${step.expectedLine})`, diff);
+        }
       }
     } finally {
       rmSync(s.base, { recursive: true, force: true });
     }
+    if (edits.length) {
+      // Bottom-up, so an earlier fence's line number is still right after a later one changes size.
+      let text = readFileSync(page.file, 'utf8');
+      for (const e of edits.sort((a, b) => b.line - a.line)) {
+        const next = replaceFence(text, e.line, e.content);
+        if (next === null) fail(`${rel(page.file)}:${e.line}`, '  the expected output is not a plain ```text fence this tool can rewrite; edit the page by hand');
+        else {
+          text = next;
+          accepted++;
+        }
+      }
+      writeFileSync(page.file, text);
+      console.log(`updated ${edits.length} fence(s) in ${rel(page.file)}`);
+    }
     if (drift === before) passed[pageStepsKey(page.file)] = steps.map(recordedStep);
     else if (args.record) console.log(`not recorded: ${rel(page.file)} (a step drifted; the page's text fence is authored, so fix the page and record again)`);
   }
-  return { count, passed };
+  return { count, passed, accepted };
 }
 
 /** --record: the replayed page steps and the build into cli.json, and the build into errors.json. */
@@ -348,7 +378,12 @@ async function main(): Promise<number> {
   }
 
   const recordings = process.env.PAGES_ONLY === '1' ? 0 : await checkData(binary);
-  const pages = process.env.COMMANDS_ONLY === '1' ? null : checkPages(binary);
+  let pages = process.env.COMMANDS_ONLY === '1' ? null : checkPages(binary, args['update-fences']);
+  if (pages && pages.accepted > 0) {
+    // The pages changed on disk: replay them once more, as a check, to confirm they now agree and to record them.
+    console.log(`\ndocs:cli-check: ${pages.accepted} fence(s) updated from the binary; replaying the pages to confirm`);
+    pages = checkPages(binary);
+  }
   const steps = pages?.count ?? 0;
   if (args.record) {
     const binaryVersion = /^Relate v(\d+\.\d+\.\d+\S*)\n/.exec(version.stdout ?? '')?.[1] ?? null;
