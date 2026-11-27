@@ -2,8 +2,13 @@
 # repositories tagged `relate`, kept as a relate graph (a directory store, json codec). Daily and by hand; opens a pull request when the list changed,
 # so a person reads what is about to appear on the site.
 #
-# The pull request is opened with RELEASE_PR_TOKEN when it is set, so its required checks start;
-# with the job's own token they do not (GitHub's rule) and need a re-run or an empty commit.
+# New and changed projects are screened by a model first (ANTHROPIC_API_KEY): anything questionable
+# is hidden, and the run's summary lists what and why.
+#
+# The pull request is opened with RELEASE_PR_TOKEN, so its checks start (with the job's own token
+# they do not: GitHub's rule). The job then waits for the checks and squash-merges the pull
+# request when they pass, so no one merges a refresh by hand; a failing check leaves it open.
+# Without RELEASE_PR_TOKEN the pull request is left for a person.
 name: Projects refresh
 
 on:
@@ -25,7 +30,7 @@ env:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
 
@@ -38,9 +43,11 @@ jobs:
       - name: Search GitHub and update the store
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node scripts/projects.ts
 
       - name: Open the pull request
+        id: cpr
         uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8.1.3
         with:
           token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
@@ -55,3 +62,26 @@ jobs:
             `relate` on GitHub (ADR-0076). `graph.json` is one line, so read the change with
             `git diff --word-diff=porcelain` or query the store. To leave a project out, set
             `hidden` on it: `relate query --database src/data/projects.relate "MATCH (p:Project {fullName: 'owner/name'}) SET p.hidden = true"`.
+
+      - name: Merge when the checks pass
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN }}
+          PR: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice::RELEASE_PR_TOKEN is not set: its checks did not start, so pull request $PR is left for a person to merge"
+            exit 0
+          fi
+          # The checks register a little after the pull request opens.
+          for _ in $(seq 1 24); do
+            [ "$(gh pr checks "$PR" --json name --jq length 2>/dev/null || echo 0)" -gt 0 ] && break
+            sleep 10
+          done
+          if [ "$(gh pr checks "$PR" --json name --jq length 2>/dev/null || echo 0)" -eq 0 ]; then
+            echo "::warning::no checks started on pull request $PR: not merging"
+            exit 1
+          fi
+          # Exits non-zero when any check fails; the pull request stays open.
+          gh pr checks "$PR" --watch --interval 30
+          gh pr merge "$PR" --squash --delete-branch
