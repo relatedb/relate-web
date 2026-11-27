@@ -199,7 +199,7 @@ relate --database ./team-md --read-only --mode envelope "MATCH (p:Person)-[:WORK
 - **`Failed to clone database: storage error: clone destination already exists`** (exit code 1). `relate clone` never overwrites. Pick a new destination path.
 - **`Failed to clone database: storage error: markdown vault: node <id> of label <Label> has no '<property>' property; the markdown vault requires a non-null unique '<property>' on :<Label>`** (exit code 1). A `markdown` destination names each note after a key property, and a node of that label lacks it. Set the property on every node of the label first. A failed clone removes the destination it created.
 - **`Failed to clone database: storage error: markdown vault: two nodes of label <Label> share the key value '<value>'; the vault filename would collide`** (exit code 1). Two nodes of one label have the same key value. Make the values unique, or keep the store in `parquet` or `json`.
-- **`Error: invalid --to-snapshot-format: storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown or rkyv)`** (exit code 2). The codec name is misspelled.
+- **`Error: invalid --to-snapshot-format: storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown, rkyv or vortex)`** (exit code 2). The codec name is misspelled.
 - **`Failed to clone database: storage locked: <path>`** (exit code 1). The source is a `.rl` file that a process holds open for writing. Clone it when that process exits ([storage locked](/docs/reference/errors#cli-clone-locked)).
 
 ## Related

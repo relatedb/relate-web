@@ -1013,7 +1013,7 @@
       "retryable": false,
       "gql_status": null,
       "neo4j_code": null,
-      "message": "storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown or rkyv)",
+      "message": "storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown, rkyv or vortex)",
       "cause": "`RELATE_SNAPSHOT_FORMAT` names no codec; a query run's open fails, `:memory:` included.",
       "remedy": "Use `parquet`, `json` or `markdown`, or unset it.",
       "python_class": null,

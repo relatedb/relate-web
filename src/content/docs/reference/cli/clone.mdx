@@ -86,7 +86,7 @@ Without `--to-snapshot-format`, the destination keeps the source's codec. With i
 | `json` | `parquet` | directory to directory |
 | `markdown` | `parquet` | directory to directory, directory to `.rl` |
 
-Any other value exits 2 with `Error: invalid --to-snapshot-format: storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown or rkyv)`. `rkyv` is not compiled into the release binary: `--to-snapshot-format rkyv` exits 1 with `Failed to clone database: storage error: rkyv snapshot codec is not compiled into this build (enable the "rkyv-codec" feature)`. [Storage formats](/docs/reference/storage/formats#codecs) describes each codec's files.
+Any other value exits 2 with `Error: invalid --to-snapshot-format: storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown, rkyv or vortex)`. `rkyv` is not compiled into the release binary: `--to-snapshot-format rkyv` exits 1 with `Failed to clone database: storage error: rkyv snapshot codec is not compiled into this build (enable the "rkyv-codec" feature)`. [Storage formats](/docs/reference/storage/formats#codecs) describes each codec's files.
 
 Each pairing in the table, with the codec `relate info` reports for every result:
 

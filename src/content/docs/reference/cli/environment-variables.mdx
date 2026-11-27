@@ -58,7 +58,7 @@ These set the defaults for a persistent store's write path and snapshot. `:memor
 | --- | --- | --- | --- |
 | `RELATE_DURABILITY_MODE` | `--durability-mode` | `full` (default), `everysecond`, `snapshot` | Exit 2: `Error: invalid RELATE_DURABILITY_MODE: semantic error: invalid durability mode "<value>"; expected full, everysecond, or snapshot` |
 | `RELATE_CHECKPOINT_INTERVAL_SECS` | `--checkpoint-interval-secs` | Whole seconds, default `300`; `0` turns the timer off | Ignored: the default `300` applies |
-| `RELATE_SNAPSHOT_FORMAT` | `--snapshot-format` | `parquet` (default), `json`, `markdown`, for an empty directory | Exit 1: `Failed to open Relate: storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown or rkyv)` |
+| `RELATE_SNAPSHOT_FORMAT` | `--snapshot-format` | `parquet` (default), `json`, `markdown`, for an empty directory | Exit 1: `Failed to open Relate: storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown, rkyv or vortex)` |
 | `RELATE_MARKDOWN_BODY_PROPERTIES` | `--markdown-body-properties` | The flag's list grammar; default `body` | Exit 1: `Failed to open Relate: semantic error: invalid markdown body properties '<value>': an entry names no property` |
 | `RELATE_SHARD_TARGET_BYTES` | none | The target size of one Parquet shard written at a checkpoint, `1` to `1073741824` bytes; default 256 MiB | The checkpoint fails, exit 1, after the run's statements have committed to the WAL: `Error: final checkpoint failed: storage error: RELATE_SHARD_TARGET_BYTES must be an integer in 1..=1073741824`; an empty value fails the same way |
 
@@ -132,8 +132,8 @@ echo "exit=$?"
 ```
 
 ```text
-Failed to open Relate: semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'bogus' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation)
-{"error":{"code":"fatal_error","exit_code":1,"kind":"semantic","message":"semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'bogus' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation)","retryable":false}}
+Failed to open Relate: semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'bogus' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation, vortex-store)
+{"error":{"code":"fatal_error","exit_code":1,"kind":"semantic","message":"semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'bogus' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation, vortex-store)","retryable":false}}
 exit=1
 ```
 

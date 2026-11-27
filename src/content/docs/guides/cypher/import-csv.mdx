@@ -162,7 +162,6 @@ Each of these exits with a nonzero :term[exit code]{id=exit-code} and prints the
 | `Failed to open Relate: semantic error: LOAD CSV invalid configuration` | 1 | The directory given to `--load-csv-dir` does not exist. | Create the directory first, or correct the path. |
 | `LOAD CSV file exceeds byte limit` | 1 | The file is larger than 8,388,608 bytes. | Split the file and load the parts one statement each. |
 | `type error: LOAD CSV FIELDTERMINATOR must be exactly one character` | 6 | `FIELDTERMINATOR` has more or fewer than one character. | Use one character, such as `';'` or `'\t'`. |
-| `syntax error: WriteBeforeCallInTransactions: a write cannot precede CALL IN TRANSACTIONS` | 6 | `LOAD CSV` and `CALL { … } IN TRANSACTIONS` in one statement; `LOAD CSV` counts as a write here. | Load without `IN TRANSACTIONS`, or split the file and run one statement per part. |
 
 ## Related
 

@@ -1,7 +1,7 @@
 {
   "$schema_note": "The surfaces capability matrix (<Matrix />, src/components/docs/matrix.ts). features are the rows, surfaces the columns, cells[feature][surface] = {value: yes|no|partial|unknown, note, sources}; every source id is a key of `sources`. A cell nobody has checked is \"unknown\", never a guess.",
-  "verified": "1.2.0",
-  "checked": "2026-11-20",
+  "verified": "1.4.0",
+  "checked": "2026-11-27",
   "sources": {
     "binary": "A run of the relate v0.1.2 release binary (upstream tag v0.1.2, commit f0c09d2) on 2026-11-09, with DO_NOT_TRACK=1: the query session, and `relate serve` on in-memory, directory and `.rl` stores, with `--read-only` and with `--load`, over Bolt (the Neo4j Python driver 6.4.0), HTTP and MCP (stdio and streamable HTTP). `--load` loaded a `.rl` file from an http URL on loopback; an https URL on loopback reached a verified TLS handshake, which refused the local test CA's certificate, so no store was loaded over https.",
     "cli-json": "src/content/docs/_data/cli.json (the recorded CLI facts, verified against v1.2.0).",
@@ -26,7 +26,8 @@
     "recheck-1.0.0": "The v1.0.0 recheck on 2026-11-11: upstream docs/api (every surface's spec) and the client sources diffed from v0.1.2 to v1.0.0 (b02f283), which change the element-id spelling, the Go and Swift notification types, the sanitizing of echoed values and, in the Rust crate, remove change data capture, and no other cell's fact; every docs CLI recording and `bash verify` step replayed on the v1.0.0 release binary; every language sample replayed on relate-db and @relate/relate from PyPI and npm, the relate crate from crates.io and the Java, Go, Swift and C clients built at the tag; and `relate serve` rerun over Bolt (a raw client and the Neo4j Python driver 6.4.0), HTTP and MCP on stdio.",
     "dotnet-client": "A run of a C# probe program on the .NET client (clients/dotnet, Relate.Net) at upstream v1.2.0 (commit e0ea536) on 2026-11-20, built and run the way the docs sample runner runs C# samples (scripts/docs-samples.ts), against librelate_ffi built from the same commit.",
     "spec-dotnet": "Upstream docs/api/dotnet/spec.md and clients/dotnet/docs/UserGuide.md at v1.2.0 (e0ea536).",
-    "recheck-1.2.0": "The v1.2.0 recheck on 2026-11-20: upstream docs/api, docs/reference and the client sources diffed from v1.1.0 (f529cbb) to v1.2.0 (e0ea536), which add the .NET client (its own column), move the Java client to Maven Central, rename a directory store's engine folder from `.cypherlite/` to `.relate/`, add display-only plan steps and the `01N60` notification, and change no other cell's fact; every docs CLI recording and `bash verify` step replayed on the v1.2.0 release binary; and every language sample replayed on relate-db, @relate/relate and the relate crate from PyPI, npm and crates.io, ai.relatedb:relate from Maven Central, and the C, Go, Swift and .NET clients built at the tag."
+    "recheck-1.2.0": "The v1.2.0 recheck on 2026-11-20: upstream docs/api, docs/reference and the client sources diffed from v1.1.0 (f529cbb) to v1.2.0 (e0ea536), which add the .NET client (its own column), move the Java client to Maven Central, rename a directory store's engine folder from `.cypherlite/` to `.relate/`, add display-only plan steps and the `01N60` notification, and change no other cell's fact; every docs CLI recording and `bash verify` step replayed on the v1.2.0 release binary; and every language sample replayed on relate-db, @relate/relate and the relate crate from PyPI, npm and crates.io, ai.relatedb:relate from Maven Central, and the C, Go, Swift and .NET clients built at the tag.",
+    "recheck-1.4.0": "The v1.4.0 recheck on 2026-11-27: upstream docs/api, docs/reference and the client sources diffed from v1.2.0 (e0ea536) to v1.4.0 (8c69d6e), which add a per-statement time budget on every surface but the browser build (a `.timeout` command, `statement_timeout` and its siblings in the clients, the `timeout_seconds`, `maxExecutionTime` and `tx_timeout` request fields, and the `serve --query-timeout-secs` default of 30), stream huge auto-commit results over HTTP and Bolt, bind temporal, point and vector parameters as their Cypher kinds in the Go client, and ship the .NET client on nuget.org, and change no cell's fact; every docs CLI recording and `bash verify` step replayed on the v1.4.0 release binary; and every language sample replayed on the v1.4.0 clients."
   },
   "surfaces": [
     {
@@ -181,7 +182,8 @@
           "binary",
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -190,7 +192,8 @@
         "sources": [
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -199,7 +202,8 @@
         "sources": [
           "node-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -208,7 +212,8 @@
         "sources": [
           "wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -218,7 +223,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -228,7 +234,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -238,7 +245,8 @@
           "jvm-go-swift-clients",
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -256,7 +264,8 @@
           "jvm-go-swift-clients",
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -266,7 +275,8 @@
           "jvm-go-swift-clients",
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -276,7 +286,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -286,7 +297,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -296,7 +308,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -307,7 +320,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -316,7 +330,8 @@
         "sources": [
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -325,7 +340,8 @@
         "sources": [
           "node-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -335,7 +351,8 @@
           "wasm",
           "spec-wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -345,7 +362,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -355,7 +373,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -365,7 +384,8 @@
           "jvm-go-swift-clients",
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -383,7 +403,8 @@
           "jvm-go-swift-clients",
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -393,7 +414,8 @@
           "jvm-go-swift-clients",
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -403,7 +425,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -413,7 +436,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -423,7 +447,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -434,7 +459,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -443,7 +469,8 @@
         "sources": [
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -452,7 +479,8 @@
         "sources": [
           "node-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -462,7 +490,8 @@
           "wasm",
           "spec-wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -472,7 +501,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -482,7 +512,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -493,7 +524,8 @@
           "spec-java",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -512,7 +544,8 @@
           "jvm-go-swift-clients",
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -523,7 +556,8 @@
           "spec-swift",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -533,7 +567,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -543,7 +578,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -553,7 +589,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -564,7 +601,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -573,7 +611,8 @@
         "sources": [
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -582,7 +621,8 @@
         "sources": [
           "node-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -591,7 +631,8 @@
         "sources": [
           "wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -601,7 +642,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -611,7 +653,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -621,7 +664,8 @@
           "jvm-go-swift-clients",
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -639,7 +683,8 @@
           "jvm-go-swift-clients",
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -649,7 +694,8 @@
           "jvm-go-swift-clients",
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -659,7 +705,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -669,7 +716,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -678,7 +726,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -689,7 +738,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -699,7 +749,8 @@
           "spec-python",
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -709,7 +760,8 @@
           "node-client",
           "spec-javascript",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -719,7 +771,8 @@
           "wasm",
           "spec-wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -729,7 +782,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -739,7 +793,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -749,7 +804,8 @@
           "jvm-go-swift-clients",
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -767,7 +823,8 @@
           "jvm-go-swift-clients",
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -777,7 +834,8 @@
           "jvm-go-swift-clients",
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -787,7 +845,8 @@
           "binary",
           "spec-bolt",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -797,7 +856,8 @@
           "binary",
           "spec-http",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -807,7 +867,8 @@
           "binary",
           "spec-mcp",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -818,7 +879,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -827,7 +889,8 @@
         "sources": [
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -836,7 +899,8 @@
         "sources": [
           "node-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -845,7 +909,8 @@
         "sources": [
           "wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -855,7 +920,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -865,7 +931,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -875,7 +942,8 @@
           "jvm-go-swift-clients",
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -893,7 +961,8 @@
           "jvm-go-swift-clients",
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -903,7 +972,8 @@
           "jvm-go-swift-clients",
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -913,7 +983,8 @@
           "binary",
           "spec-bolt",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -922,7 +993,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -932,7 +1004,8 @@
           "binary",
           "spec-mcp",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -943,7 +1016,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -953,7 +1027,8 @@
           "spec-python",
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -963,7 +1038,8 @@
           "spec-javascript",
           "node-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -972,7 +1048,8 @@
         "sources": [
           "wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -982,7 +1059,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -992,7 +1070,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -1002,7 +1081,8 @@
           "spec-java",
           "jvm-go-swift-clients",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -1020,7 +1100,8 @@
           "spec-go",
           "jvm-go-swift-clients",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -1030,7 +1111,8 @@
           "spec-swift",
           "jvm-go-swift-clients",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -1040,7 +1122,8 @@
           "binary",
           "spec-bolt",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -1049,7 +1132,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -1059,7 +1143,8 @@
           "binary",
           "spec-mcp",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -1070,7 +1155,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -1080,7 +1166,8 @@
           "python-client",
           "spec-python",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -1090,7 +1177,8 @@
           "node-client",
           "spec-javascript",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -1100,7 +1188,8 @@
           "wasm",
           "spec-wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -1110,7 +1199,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -1120,7 +1210,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -1130,7 +1221,8 @@
           "jvm-go-swift-clients",
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -1148,7 +1240,8 @@
           "jvm-go-swift-clients",
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -1158,7 +1251,8 @@
           "jvm-go-swift-clients",
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -1168,7 +1262,8 @@
           "binary",
           "spec-bolt",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -1178,7 +1273,8 @@
           "binary",
           "spec-http",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -1188,7 +1284,8 @@
           "binary",
           "spec-mcp",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -1199,7 +1296,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -1209,7 +1307,8 @@
           "spec-python",
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -1219,7 +1318,8 @@
           "node-client",
           "spec-javascript",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -1228,7 +1328,8 @@
         "sources": [
           "wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -1237,7 +1338,8 @@
         "sources": [
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -1247,7 +1349,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -1257,7 +1360,8 @@
           "jvm-go-swift-clients",
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -1274,7 +1378,8 @@
         "sources": [
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -1283,7 +1388,8 @@
         "sources": [
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -1292,7 +1398,8 @@
         "sources": [
           "spec-bolt",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -1301,7 +1408,8 @@
         "sources": [
           "spec-http",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -1310,7 +1418,8 @@
         "sources": [
           "spec-mcp",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -1322,7 +1431,8 @@
           "binary",
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -1332,7 +1442,8 @@
           "python-client",
           "spec-python",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -1341,7 +1452,8 @@
         "sources": [
           "spec-javascript",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -1350,7 +1462,8 @@
         "sources": [
           "wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -1360,7 +1473,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -1369,7 +1483,8 @@
         "sources": [
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -1378,7 +1493,8 @@
         "sources": [
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -1394,7 +1510,8 @@
         "sources": [
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -1403,7 +1520,8 @@
         "sources": [
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -1413,7 +1531,8 @@
           "binary",
           "spec-bolt",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -1423,7 +1542,8 @@
           "binary",
           "spec-http",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -1433,7 +1553,8 @@
           "binary",
           "spec-mcp",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -1444,7 +1565,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -1453,7 +1575,8 @@
         "sources": [
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -1462,7 +1585,8 @@
         "sources": [
           "node-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -1471,7 +1595,8 @@
         "sources": [
           "wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -1481,7 +1606,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -1491,7 +1617,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -1501,7 +1628,8 @@
           "jvm-go-swift-clients",
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -1519,7 +1647,8 @@
           "jvm-go-swift-clients",
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -1529,7 +1658,8 @@
           "jvm-go-swift-clients",
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -1538,7 +1668,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -1547,7 +1678,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -1556,7 +1688,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -1567,7 +1700,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -1576,7 +1710,8 @@
         "sources": [
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -1585,7 +1720,8 @@
         "sources": [
           "node-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -1594,7 +1730,8 @@
         "sources": [
           "wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -1604,7 +1741,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -1614,7 +1752,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -1624,7 +1763,8 @@
           "jvm-go-swift-clients",
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -1642,7 +1782,8 @@
           "jvm-go-swift-clients",
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -1652,7 +1793,8 @@
           "jvm-go-swift-clients",
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -1661,7 +1803,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -1670,7 +1813,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -1679,7 +1823,8 @@
         "sources": [
           "binary",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -1691,7 +1836,8 @@
           "binary",
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -1700,7 +1846,8 @@
         "sources": [
           "python-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -1709,7 +1856,8 @@
         "sources": [
           "node-client",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -1718,7 +1866,8 @@
         "sources": [
           "wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -1728,7 +1877,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -1738,7 +1888,8 @@
           "c-client",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -1748,7 +1899,8 @@
           "jvm-go-swift-clients",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -1766,7 +1918,8 @@
           "jvm-go-swift-clients",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -1776,7 +1929,8 @@
           "jvm-go-swift-clients",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -1786,7 +1940,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -1796,7 +1951,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -1806,7 +1962,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -1818,7 +1975,8 @@
           "binary",
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -1828,7 +1986,8 @@
           "python-client",
           "spec-python",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -1838,7 +1997,8 @@
           "node-client",
           "spec-javascript",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -1847,7 +2007,8 @@
         "sources": [
           "wasm",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -1857,7 +2018,8 @@
           "rust-crate",
           "spec-rust",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -1867,7 +2029,8 @@
           "c-client",
           "spec-c",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -1877,7 +2040,8 @@
           "jvm-go-swift-clients",
           "spec-java",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -1895,7 +2059,8 @@
           "jvm-go-swift-clients",
           "spec-go",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -1905,7 +2070,8 @@
           "jvm-go-swift-clients",
           "spec-swift",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -1915,7 +2081,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -1925,7 +2092,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -1935,7 +2103,8 @@
           "binary",
           "serve-help",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     },
@@ -1947,7 +2116,8 @@
           "binary",
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "python": {
@@ -1956,7 +2126,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "node": {
@@ -1965,7 +2136,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "browser": {
@@ -1974,7 +2146,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "rust": {
@@ -1983,7 +2156,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "c": {
@@ -1992,7 +2166,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "java": {
@@ -2001,7 +2176,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "dotnet": {
@@ -2017,7 +2193,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "swift": {
@@ -2026,7 +2203,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "bolt": {
@@ -2035,7 +2213,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "http": {
@@ -2044,7 +2223,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       },
       "mcp": {
@@ -2053,7 +2233,8 @@
         "sources": [
           "cli-json",
           "recheck-1.0.0",
-          "recheck-1.2.0"
+          "recheck-1.2.0",
+          "recheck-1.4.0"
         ]
       }
     }
