@@ -3700,7 +3700,7 @@
       "gql_status": null,
       "neo4j_code": null,
       "message": "syntax error: WriteBeforeCallInTransactions: a write cannot precede CALL IN TRANSACTIONS",
-      "cause": "A write, `LOAD CSV` included, before `CALL { … } IN TRANSACTIONS` in the same statement.",
+      "cause": "A write before `CALL { … } IN TRANSACTIONS` in the same statement. `LOAD CSV` only reads a file and is not one.",
       "remedy": "Move the write inside the subquery, or run it as its own statement.",
       "python_class": null,
       "http_status": null,

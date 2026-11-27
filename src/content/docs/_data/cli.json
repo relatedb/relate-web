@@ -5370,8 +5370,8 @@
         "expected_sha256": "91903f5b8c149ea74aa2158c3adc6be0de4a001060396800f43af4123141adc2"
       },
       {
-        "command": "relate --load-csv-dir ./import --mode table \"LOAD CSV WITH HEADERS FROM 'people.csv' AS row FIELDTERMINATOR ';' CALL (row) { CREATE (:Person {name: row.name}) } IN TRANSACTIONS OF 1 ROWS\"",
-        "expected_sha256": "e05621c89566b57576f6cb8c7336da2acf42814c6ec68a2500a6358a8f0a2f78"
+        "command": "relate --load-csv-dir ./import --mode table \"LOAD CSV WITH HEADERS FROM 'people.csv' AS row FIELDTERMINATOR ';' CALL (row) { CREATE (:Person {name: row.name}) } IN TRANSACTIONS OF 1 ROWS RETURN count(*) AS batched\"",
+        "expected_sha256": "f10ea687f673a66d0d8e052d98aa78c9c7a29c9d05772a327760ff1c3447d2dd"
       }
     ],
     "reference/errors.mdx": [

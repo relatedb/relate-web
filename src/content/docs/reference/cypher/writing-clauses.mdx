@@ -95,7 +95,7 @@ Reading a deleted entity's properties later in the same statement fails; a value
 | `syntax error: VariableAlreadyBound: variable '<name>' already declared` | 6 | `MATCH (a) CREATE (a:Person)` |
 | `type error: InvalidPropertyType` | 6 | A map, a mixed list or a list holding `null` as a property value |
 | `syntax error: InvalidClauseComposition: invalid FOREACH: invalid use of MATCH inside 'FOREACH'` | 6 | A reading clause inside `FOREACH` |
-| `syntax error: WriteBeforeCallInTransactions: a write cannot precede CALL IN TRANSACTIONS` | 6 | A write, or `LOAD CSV`, before `CALL { … } IN TRANSACTIONS` in the same statement |
+| `syntax error: WriteBeforeCallInTransactions: a write cannot precede CALL IN TRANSACTIONS` | 6 | A write before `CALL { … } IN TRANSACTIONS` in the same statement; `LOAD CSV` is not one |
 | `syntax error: parse error: MERGE requires exactly one pattern path at line 0, col 0` | 6 | Two comma-separated patterns in one `MERGE` |
 | `MergeReadOwnWrites: cannot MERGE with null properties` | 1 | A `MERGE` pattern property that is `null` |
 | `ConstraintVerificationFailed: DeleteConnectedNode: Cannot delete node with relationships unless DETACH` | 1 | `DELETE` or `NODETACH DELETE` on a node with relationships |
@@ -246,14 +246,18 @@ relate --load-csv-dir ./import --mode table "LOAD CSV WITH HEADERS FROM 'people.
 +-------+--------------+
 ```
 
-`LOAD CSV` counts as a write before `CALL { … } IN TRANSACTIONS`, so the batched form fails before it runs:
+`LOAD CSV` only reads a file, so it may precede `CALL { … } IN TRANSACTIONS`: this is the bulk-load idiom, committing the file in batches of input rows:
 
 ```bash verify
-relate --load-csv-dir ./import --mode table "LOAD CSV WITH HEADERS FROM 'people.csv' AS row FIELDTERMINATOR ';' CALL (row) { CREATE (:Person {name: row.name}) } IN TRANSACTIONS OF 1 ROWS"
+relate --load-csv-dir ./import --mode table "LOAD CSV WITH HEADERS FROM 'people.csv' AS row FIELDTERMINATOR ';' CALL (row) { CREATE (:Person {name: row.name}) } IN TRANSACTIONS OF 1 ROWS RETURN count(*) AS batched"
 ```
 
 ```text
-syntax error: WriteBeforeCallInTransactions: a write cannot precede CALL IN TRANSACTIONS
++---------+
+| batched |
++---------+
+| 2       |
++---------+
 ```
 
 ## See also
