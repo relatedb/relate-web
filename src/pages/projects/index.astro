@@ -1,17 +1,20 @@
 ---
 // /projects/: the GitHub repositories tagged with the `relate` topic, ranked by recent activity or
-// by stars (ADR-0076). The list is read from src/data/projects.json at build; a weekly workflow
-// refreshes it. The two rankings are two server-rendered lists, switched with CSS alone.
+// by stars (ADR-0076). The list is a Cypher query over the relate store src/data/projects.relate at
+// build; a weekly workflow refreshes the store. The two rankings are two server-rendered lists,
+// switched with CSS alone.
 import Base from '../../layouts/Base.astro';
-import { byActivity, byStars, PROJECTS_LISTED, type Project } from '../../lib/projects.ts';
-import data from '../../data/projects.json';
+import { PROJECTS_LISTED } from '../../lib/projects.ts';
+import { fetchedAt, openStore, ranked } from '../../lib/projects-store.ts';
 import '../../styles/projects.css';
 
-const projects = data.projects as Project[];
+const store = openStore(undefined, { readOnly: true });
 const lists = [
-  { id: 'activity', label: 'Recent activity', ranked: byActivity(projects) },
-  { id: 'stars', label: 'Stars', ranked: byStars(projects) },
+  { id: 'activity', label: 'Recent activity', ranked: ranked(store, 'activity') },
+  { id: 'stars', label: 'Stars', ranked: ranked(store, 'stars') },
 ] as const;
+const total = lists[0].ranked.length;
+const refreshed = fetchedAt(store);
 const fmt = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeZone: 'UTC' });
 const day = (iso: string) => fmt.format(new Date(iso));
 ---
@@ -59,7 +62,7 @@ const day = (iso: string) => fmt.format(new Date(iso));
     ))}
 
     <p class="projects-foot">
-      {projects.length} projects, from GitHub on{' '}<time datetime={data.fetchedAt}>{day(data.fetchedAt)}</time>.
+      {total} projects{refreshed && <>, from GitHub on{' '}<time datetime={refreshed}>{day(refreshed)}</time></>}.
       A project that should not be listed can be reported in an{' '}
       <a href="https://github.com/relatedb/relate-web/issues">issue</a>.
     </p>

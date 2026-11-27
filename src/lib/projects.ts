@@ -1,5 +1,5 @@
 // The projects browser (ADR-0076): GitHub repositories tagged with the `relate` topic, listed
-// and ranked. Pure and free of Node imports, so the refresh script, the page and the tests share it.
+// and ranked. Pure (no store, no Node imports): the selection and the types. The store is projects-store.ts.
 
 /** A repository as the page shows it. */
 export interface Project {
@@ -10,6 +10,8 @@ export interface Project {
   language: string | null;
   /** ISO timestamp of the last push. */
   pushedAt: string;
+  /** The repository's topics, lowercase and sorted (set by `select`; not read back for the page). */
+  topics?: string[];
 }
 
 /** The fields the GitHub search API returns that the selection reads. */
@@ -23,15 +25,12 @@ export interface RawRepo {
   fork: boolean;
   archived: boolean;
   private?: boolean;
+  topics?: string[];
   owner: { login: string };
 }
 
-export interface Curation {
-  /** Owners left out: the project's own repositories, which are not community projects. */
-  excludeOwners: string[];
-  /** Repositories left out by hand (`owner/name`): off-topic uses of the word, or ones that should not be featured. */
-  exclude: string[];
-}
+/** Owners left out: the project's own repositories, which are not community projects. */
+export const EXCLUDED_OWNERS = ['relatedb'];
 
 /**
  * Whether the page is public in the sitemap and to search engines. Off while the page is shared
@@ -45,19 +44,18 @@ const clip = (s: string) => (s.length > DESCRIPTION_MAX ? `${s.slice(0, DESCRIPT
 
 /**
  * The repositories worth listing: not a fork, archived or private, with a description (a small
- * quality bar), not owned by the project and not on the exclude list. Names compare
- * case-insensitively, as GitHub's do.
+ * quality bar) and not owned by the project. Names compare case-insensitively, as GitHub's do.
+ * A repository to leave out by hand is marked `hidden` in the store, not here.
  */
-export function select(raw: RawRepo[], curation: Curation): Project[] {
-  const owners = new Set(curation.excludeOwners.map((o) => o.toLowerCase()));
-  const names = new Set(curation.exclude.map((n) => n.toLowerCase()));
+export function select(raw: RawRepo[]): Project[] {
+  const owners = new Set(EXCLUDED_OWNERS.map((o) => o.toLowerCase()));
   const seen = new Set<string>();
   const out: Project[] = [];
   for (const r of raw) {
     const description = (r.description ?? '').replace(/\s+/g, ' ').trim();
     const key = r.full_name.toLowerCase();
     if (r.fork || r.archived || r.private || !description) continue;
-    if (owners.has(r.owner.login.toLowerCase()) || names.has(key) || seen.has(key)) continue;
+    if (owners.has(r.owner.login.toLowerCase()) || seen.has(key)) continue;
     seen.add(key);
     out.push({
       fullName: r.full_name,
@@ -66,17 +64,8 @@ export function select(raw: RawRepo[], curation: Curation): Project[] {
       stars: r.stargazers_count,
       language: r.language,
       pushedAt: r.pushed_at,
+      topics: [...new Set((r.topics ?? []).map((t) => t.toLowerCase()))].sort(),
     });
   }
   return out;
 }
-
-const byName = (a: Project, b: Project) => a.fullName.localeCompare(b.fullName);
-
-/** Most recently pushed first; ties by stars, then name. */
-export const byActivity = (list: Project[]): Project[] =>
-  [...list].sort((a, b) => b.pushedAt.localeCompare(a.pushedAt) || b.stars - a.stars || byName(a, b));
-
-/** Most stars first; ties by activity, then name. */
-export const byStars = (list: Project[]): Project[] =>
-  [...list].sort((a, b) => b.stars - a.stars || b.pushedAt.localeCompare(a.pushedAt) || byName(a, b));

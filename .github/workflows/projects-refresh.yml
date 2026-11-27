@@ -1,5 +1,5 @@
-# Refreshes src/data/projects.json, the data behind /projects/ (ADR-0076): the GitHub
-# repositories tagged `relate`. Weekly and by hand; opens a pull request when the list changed,
+# Refreshes the projects store, src/data/projects.relate, behind /projects/ (ADR-0076): the GitHub
+# repositories tagged `relate`, kept as a relate graph (a directory store, json codec). Weekly and by hand; opens a pull request when the list changed,
 # so a person reads what is about to appear on the site.
 #
 # The pull request is opened with RELEASE_PR_TOKEN when it is set, so its required checks start;
@@ -33,7 +33,9 @@ jobs:
         with:
           node-version: 24
 
-      - name: Search GitHub for the topic
+      - run: npm ci
+
+      - name: Search GitHub and update the store
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/projects.ts
@@ -45,10 +47,11 @@ jobs:
           base: main
           branch: projects-refresh
           delete-branch: true
-          add-paths: src/data/projects.json
+          add-paths: src/data/projects.relate
           commit-message: 'Projects: refresh the list from GitHub'
           title: 'Projects: refresh the list from GitHub'
           body: |
-            The weekly refresh of `src/data/projects.json`: repositories tagged `relate` on GitHub
-            (ADR-0076). Read the diff for anything that should not be listed; a removal is a line in
-            `src/data/projects-curation.json`.
+            The weekly refresh of the projects store, `src/data/projects.relate`: repositories tagged
+            `relate` on GitHub (ADR-0076). `graph.json` is one line, so read the change with
+            `git diff --word-diff=porcelain` or query the store. To leave a project out, set
+            `hidden` on it: `relate query --database src/data/projects.relate "MATCH (p:Project {fullName: 'owner/name'}) SET p.hidden = true"`.

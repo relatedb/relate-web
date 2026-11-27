@@ -15,7 +15,7 @@ import { lastUpdated } from '../lib/docs/content.ts';
 import { docsSite } from '../lib/docs/site.ts';
 import { isListed, isoDate, postPath, posts } from '../lib/blog.ts';
 import { PROJECTS_LISTED } from '../lib/projects.ts';
-import projects from '../data/projects.json';
+import { fetchedAt, openStore } from '../lib/projects-store.ts';
 
 export const GET: APIRoute = async () => {
   const { pages } = await cookbook();
@@ -33,7 +33,7 @@ export const GET: APIRoute = async () => {
     ...(blog.length
       ? [{ path: '/blog/', modified: isoDate(blog[0].data.updated ?? blog[0].data.date) }, ...blog.map((p) => ({ path: postPath(p), modified: isoDate(p.data.updated ?? p.data.date) }))]
       : []),
-    ...(PROJECTS_LISTED ? [{ path: '/projects/', modified: projects.fetchedAt }] : []),
+    ...(PROJECTS_LISTED ? [{ path: '/projects/', modified: fetchedAt(openStore(undefined, { readOnly: true })) ?? release }] : []),
     { path: '/playground/', modified: release },
   ];
   const urls = entries
