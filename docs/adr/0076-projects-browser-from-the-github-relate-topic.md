@@ -28,8 +28,8 @@ switch between two server-rendered lists (CSS only, no script).
 - **The page is a query.** `/projects/` opens the store read-only at build and ranks with
   `ORDER BY` (activity or stars), so a visit makes no GitHub request.
 - **The client is pinned with the engine.** `@relate/relate` is an exact-version dependency
-  that follows `_data/engine.json`: bump it with the release, since a store is written by one
-  release and read by the same.
+  that follows `_data/engine.json`: the release refresh (`scripts/release-refresh.sh`) bumps it
+  in the same pull request, so a store is written and read by one release.
 - **A quality bar, then a model screen.** `select` in `src/lib/projects.ts` drops forks, archived
   and private repositories, ones with no description and the project's own owner. A refresh that
   would keep no project fails. Then a model (`claude-haiku-5-5`, `ANTHROPIC_API_KEY`; no sampling parameters, which that model rejects) reads the

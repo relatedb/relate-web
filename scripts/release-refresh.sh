@@ -29,6 +29,8 @@
 #      release's publication date, UTC) and commit (the tag's), merged into
 #      the file by scripts/engine-bump.ts so its recorded runs survive;
 #      source_build is dropped
+#      the Node client the projects store uses (@relate/relate) is pinned to the
+#      same version (npm install --save-exact), when package.json has it
 #   6. the skill bundle: with an upstream checkout at the tag (--upstream),
 #      `npm run skill:sync -- --upstream <dir>` publishes it to public/skills/
 #      and records the commit; without one, the verified binary's embedded
@@ -37,6 +39,8 @@
 #      the step
 #   7. `npm run docs:cli-check -- --record` against the binary (RELATE_BIN, and
 #      first on PATH), when that script exists
+#      then the terminal element's facts are regenerated from the recorded CLI
+#      facts (src/lib/docs/elements/_terminal-facts.ts --write)
 #   8. `npm run cookbook:record`, then `npm run docs:check -- --record` and
 #      `npm run docs:check`
 #      (with DOCS_CHANGELOG_PENDING=<version>: the release's changelog entry
@@ -176,14 +180,27 @@ step "install.sh, releases.json, extensions.json (+ .sig)" sync_discovery
 
 bin=""
 install_binary() {
-  local home="$work/home"
+  # install.sh reads relatedb.ai/releases.json, which the deploy for this same release poke
+  # publishes at the same time: wait (up to ~10 minutes) for it to name the release.
+  local home="$work/home" got="" attempt
   mkdir -p "$home"
-  HOME="$home" sh public/install.sh >"$work/install.log" 2>&1 || { tail -n 5 "$work/install.log" >&2; note "$(tail -n 1 "$work/install.log")"; return 1; }
-  local got
-  got="$("$home/.local/bin/relate" --version | head -n 1)"
+  for attempt in $(seq 1 20); do
+    if HOME="$home" sh public/install.sh >"$work/install.log" 2>&1; then
+      got="$("$home/.local/bin/relate" --version | head -n 1)"
+      case "$got" in *"v$version") break ;; esac
+    else
+      got=""
+    fi
+    [ "$attempt" -lt 20 ] && { say "relatedb.ai does not offer v$version yet (attempt $attempt of 20); waiting"; sleep 30; }
+  done
+  if [ -z "$got" ]; then
+    tail -n 5 "$work/install.log" >&2
+    note "$(tail -n 1 "$work/install.log")"
+    return 1
+  fi
   case "$got" in
     *"v$version") ;;
-    *) note "install.sh installed '$got', not v$version (it installs the latest release; is $tag the latest?)"; return 1 ;;
+    *) note "install.sh installed '$got', not v$version after waiting (it installs the latest release the live releases.json names; is $tag the latest?)"; return 1 ;;
   esac
   bin="$home/.local/bin/relate"
   note "$got, signature and checksum verified by install.sh"
@@ -241,6 +258,18 @@ write_engine() {
 }
 step "_data/engine.json" write_engine
 
+# The projects store (ADR-0076) is read and written with the Node client, pinned to the engine release.
+pin_client() {
+  if ! node -e 'process.exit(require("./package.json").dependencies?.["@relate/relate"] ? 0 : 1)'; then
+    note "package.json has no @relate/relate dependency: nothing to pin"
+    return 0
+  fi
+  npm install --save-exact --ignore-scripts --no-audit --no-fund "@relate/relate@$version" >"$work/pin-client.log" 2>&1 ||
+    { tail -n 20 "$work/pin-client.log" >&2; note "failed: $(why "$work/pin-client.log")"; return 1; }
+  note "@relate/relate pinned to $version"
+}
+step "@relate/relate pin" pin_client
+
 # ---------------------------------------------------------------------------
 # 6. The skill bundle
 
@@ -284,6 +313,15 @@ cli_check() {
   note "recorded against $("$bin" --version | head -n 1)"
 }
 step "docs:cli-check --record" cli_check
+
+# The terminal element's facts are built from cli.json and errors.json, which the step above just
+# re-recorded: left stale, `docs:check --record` fails on every page with a terminal.
+terminal_facts() {
+  node src/lib/docs/elements/_terminal-facts.ts --write >"$work/terminal-facts.log" 2>&1 ||
+    { tail -n 20 "$work/terminal-facts.log" >&2; note "failed: $(why "$work/terminal-facts.log")"; return 1; }
+  note "$(tail -n 1 "$work/terminal-facts.log")"
+}
+step "terminal facts" terminal_facts
 
 npm_step() { # LOG ARGS...
   local log="$work/$1.log"

@@ -140,9 +140,16 @@ jobs:
         env:
           VERSION: ${{ steps.release.outputs.version }}
         run: |
-          HOME="$RUNNER_TEMP/home" sh public/install.sh > "$RUNNER_TEMP/install.log" 2>&1 || tail -n 5 "$RUNNER_TEMP/install.log"
+          # install.sh reads relatedb.ai/releases.json, which the deploy for this same release poke
+          # publishes at the same time: wait (up to ~10 minutes) for it to name the release.
           bin="$RUNNER_TEMP/home/.local/bin"
-          got="$("$bin/relate" --version 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -n1)"
+          got=""
+          for attempt in $(seq 1 20); do
+            HOME="$RUNNER_TEMP/home" sh public/install.sh > "$RUNNER_TEMP/install.log" 2>&1 || tail -n 5 "$RUNNER_TEMP/install.log"
+            got="$("$bin/relate" --version 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -n1)"
+            [ "$got" = "$VERSION" ] && break
+            [ "$attempt" -lt 20 ] && { echo "relatedb.ai does not offer $VERSION yet (installed '${got:-nothing}'); waiting"; sleep 30; }
+          done
           if [ -z "$got" ]; then
             echo "::warning::relate is not installed: examples will be reported unverified"
           else
