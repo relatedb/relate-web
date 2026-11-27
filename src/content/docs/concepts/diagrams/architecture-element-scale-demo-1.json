@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "scale-demo",
-  "hash": "5c6e703d89f368f5028bf025089b88eb76df7cd0449f24678d12e31c0f77522a",
+  "hash": "9de493a96cfee559e2c4dfd3f0a82ff894a8c8df0f1667f72d071bd88bff735a",
   "inputs": [],
   "live": "a button runs the three cells again at the size picked (the largest by default, the middle size on a narrow screen) on a separate in-memory database in your browser, apart from the page's database, and shows each cell's result and engine time; a second button runs the count and the walk again from a node you name; it shows how much memory that database's engine holds; Free closes it and returns the memory.",
   "engine": true,

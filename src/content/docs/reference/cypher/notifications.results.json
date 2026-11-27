@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.3.0",
+  "verified": "1.4.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -64,6 +64,7 @@
             "actual": null,
             "fused_into": null,
             "fused_metrics": null,
+            "body_of": null,
             "children": [
               {
                 "operator": "NodeByLabelScan",
@@ -73,6 +74,7 @@
                 "actual": null,
                 "fused_into": null,
                 "fused_metrics": null,
+                "body_of": null,
                 "children": [],
                 "warnings": [
                   {
@@ -140,6 +142,7 @@
             "actual": null,
             "fused_into": null,
             "fused_metrics": null,
+            "body_of": null,
             "children": [
               {
                 "operator": "NodeByLabelScan",
@@ -149,6 +152,7 @@
                 "actual": null,
                 "fused_into": null,
                 "fused_metrics": null,
+                "body_of": null,
                 "children": [],
                 "warnings": []
               }

@@ -1,7 +1,7 @@
 ---
 name: relate
 description: Relate is an embedded openCypher graph database with a single-binary CLI. Use this skill when the user wants to run Cypher queries, manage a local graph database, or embed it from Python; its focused references cover vector search, geospatial, operations, and agent safety.
-version: 1.3.0
+version: 1.4.0
 ---
 
 # Relate
