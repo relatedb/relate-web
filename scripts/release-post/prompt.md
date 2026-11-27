@@ -35,6 +35,9 @@ Write the post the way the existing four are written:
   Go, Swift, .NET, C) can't be run here: show one only when the release notes give it, copied
   unchanged. End your final reply with a line `Verified: <what>` for each example that ran and a
   line `Unverified: <what>` for each that could not.
+- This post goes out before the release's docs update is merged. Link only the GitHub release notes
+  (and the site's changelog at `/docs/reference/changelog/` when you mention the changelog); do not link
+  other docs pages, and do not say a docs page "describes" or "covers" the change.
 - Do not explain who "The Chords" are. Do not use em dashes where a comma or period would do.
 
 When you are done, reply with the post's path, then the `Verified:` and `Unverified:` lines.
