@@ -26,6 +26,7 @@ import {
   recordedStep,
   recordedWithLine,
   recordingsOf,
+  replaceFence,
   sameOutput,
   unifiedDiff,
   verifySteps,
@@ -294,4 +295,25 @@ test('the shipped data files and pages pass the source check', () => {
   cliCheck({ pages: pageFiles() }, report);
   assert.deepEqual(found, []);
   assert.ok(allRecordings().length > 100);
+});
+
+test('replaceFence rewrites the content of the text fence at a line, keeping indentation', () => {
+  const page = ['intro', '', '```bash verify', 'relate --version', '```', '', '```text', 'Relate v1.3.0', 'License: x', '```', '', 'tail'].join('\n');
+  const out = replaceFence(page, 7, 'Relate v1.4.0\nLicense: x');
+  assert.equal(out, ['intro', '', '```bash verify', 'relate --version', '```', '', '```text', 'Relate v1.4.0', 'License: x', '```', '', 'tail'].join('\n'));
+  // a different number of lines
+  assert.equal(replaceFence(page, 7, 'one'), ['intro', '', '```bash verify', 'relate --version', '```', '', '```text', 'one', '```', '', 'tail'].join('\n'));
+  // an empty output leaves an empty fence
+  assert.equal(replaceFence(page, 7, '')?.split('\n').slice(6, 9).join('|'), '```text|```|');
+  // indented inside a list, with a blank line kept blank
+  const nested = ['- step', '', '  ```text', '  old', '  ```'].join('\n');
+  assert.equal(replaceFence(nested, 3, 'a\n\nb'), ['- step', '', '  ```text', '  a', '', '  b', '  ```'].join('\n'));
+});
+
+test('replaceFence refuses a line that is not a plain text fence, or has no closing fence', () => {
+  const page = ['```bash verify', 'x', '```', '```text', 'unterminated'].join('\n');
+  assert.equal(replaceFence(page, 1, 'y'), null);
+  assert.equal(replaceFence(page, 2, 'y'), null);
+  assert.equal(replaceFence(page, 4, 'y'), null);
+  assert.equal(replaceFence(page, 99, 'y'), null);
 });

@@ -24,6 +24,7 @@
     "cookbook:codebase-data": "node scripts/codebase-recipe-data.ts",
     "projects:refresh": "node scripts/projects.ts",
     "projects:test": "node --test \"src/lib/projects.test.ts\"",
+    "docs:rerecord": "node scripts/docs-rerecord.ts",
     "docs:test": "node --test \"src/lib/docs/*.test.ts\"",
     "docs:diagrams": "node scripts/diagrams/render.mjs --collection docs",
     "docs:check": "node scripts/docs.ts",
