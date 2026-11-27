@@ -4,7 +4,7 @@
 // the right. A menu button opens the sidebar on phones (src/scripts/docs/chrome.ts).
 import Search from './Search.astro';
 import ThemeSwitch from '../ThemeSwitch.astro';
-import { WORDMARK } from '../../lib/home/brand-art.ts';
+import { LOCKUP } from '../../lib/home/lockup.ts';
 
 interface Props {
   /** The section this bar belongs to. */
@@ -32,7 +32,7 @@ const links = [
       </button>
     )}
     <a class="dh-lockup" href="/" aria-label="relate, home" translate="no">
-      <Fragment set:html={WORDMARK.replace('class="wm2"', 'class="lockup-mark"')} />
+      <Fragment set:html={LOCKUP.replace('class="wm2"', 'class="lockup-mark"')} />
     </a>
     <span class="dh-sep" aria-hidden="true"></span>
     <a class="dh-section" href={section === 'Docs' ? '/docs/' : '/cookbook/'}>{section}</a>

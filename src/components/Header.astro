@@ -1,6 +1,6 @@
 ---
 import ThemeSwitch from './ThemeSwitch.astro';
-import { WORDMARK } from '../lib/home/brand-art.ts';
+import { LOCKUP } from '../lib/home/lockup.ts';
 import engine from '../content/docs/_data/engine.json';
 // Site-wide top bar: lockup, links, the theme picker, GitHub and the call to action. Used by every
 // page (home and sections) so navigation stays consistent. The footer has a theme picker too.
@@ -38,7 +38,7 @@ const links = [
 <header class="nav" id="top">
   <div class="nav-in">
     <a class="lockup" href="/" aria-label="relate, home" translate="no">
-      <Fragment set:html={WORDMARK.replace('class="wm2"', 'class="lockup-mark"')} />
+      <Fragment set:html={LOCKUP.replace('class="wm2"', 'class="lockup-mark"')} />
     </a>
     <nav class="nav-links" id="topNav" aria-label="Main">
       {links.map((l) => (

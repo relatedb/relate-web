@@ -241,6 +241,14 @@ header.nav.scrolled { box-shadow: 0 1px 0 var(--line); }
   color: var(--logo); text-decoration: none;
 }
 .lockup-mark { display: block; height: 22px; width: auto; overflow: visible; }
+/* "by Neo4j" sits over the word and cross-fades in on hover or keyboard focus. */
+.lockup-mark .lk-relate, .lockup-mark .lk-by { transition: opacity .18s ease; }
+.lockup-mark .lk-by { opacity: 0; }
+.lockup:hover .lk-relate, .lockup:focus-visible .lk-relate,
+.dh-lockup:hover .lk-relate, .dh-lockup:focus-visible .lk-relate { opacity: 0; }
+.lockup:hover .lk-by, .lockup:focus-visible .lk-by,
+.dh-lockup:hover .lk-by, .dh-lockup:focus-visible .lk-by { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .lockup-mark .lk-relate, .lockup-mark .lk-by { transition: none; } }
 .nav-ver {
   flex: none; font: 400 12px/16px var(--mono); color: var(--ink-muted); white-space: nowrap;
 }
