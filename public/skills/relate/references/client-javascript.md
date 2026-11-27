@@ -138,6 +138,14 @@ shared (acyclic) reference binds at each place it appears.
   render the remedy rather than jumping to source.
 - **One writer process per database** — the same single-writer rule as the
   CLI applies; `:memory:` is ephemeral.
+- **Experimental Vortex store (ADR-0703)** — set
+  `process.env.RELATE_PREVIEW = "vortex-store"` before the **first** open:
+  the variable is process-global, so every `Database.open` in the process
+  attaches the store. The native library must be a build with the
+  `vortex-store` feature enabled (a default build fails the open closed
+  naming the feature); there is no per-open JS switch yet. Answers, the
+  dialect and the checkpoint format are unchanged.
 
 Full contract: `docs/api/javascript/spec.md` (types, errors, lifecycle,
 namespaces).
+- **Statement timeout (ADR-0692):** `conn.setStatementTimeout(ms)` bounds each statement on the connection (`0` clears; the default is none). A statement past it throws a `RelateError` (`query timed out after …`); the connection stays usable.

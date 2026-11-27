@@ -28,7 +28,7 @@ printf '.<command>\n' | relate query [--database PATH]
 
 | Command | Effect | Prints on success | Fails with |
 | --- | --- | --- | --- |
-| `.help` | Lists the commands | Five summary lines | — |
+| `.help` | Lists the commands | Six summary lines | — |
 | `.quit`, `.exit` | Ends the session; lines after it are not read | Nothing | — |
 | `.begin` | Opens an explicit transaction | Nothing | `semantic error: already in a transaction` |
 | `.commit` | Commits the open transaction | Nothing | `semantic error: no transaction` |
@@ -36,6 +36,7 @@ printf '.<command>\n' | relate query [--database PATH]
 | `.checkpoint` | Writes a checkpoint of a persistent store now | Nothing | The store's write error, on a read-only store |
 | `.info` | Prints the store's metadata, live counts, and catalog | A key/value block and two result sets | — |
 | `.timer on`, `.timer off` | Turns per-statement timing on or off | `Timer: on` or `Timer: off` | `Usage: .timer on\|off`, printed on stdout with exit code 0 |
+| `.timeout`, `.timeout DURATION`, `.timeout off` | Shows, sets or removes the session's time budget for a statement | `Timeout: off` or `Timeout: <duration>` | `Usage: .timeout [DURATION\|off] (…)`, printed on stdout with exit code 0 |
 
 ## `.help`
 
@@ -50,6 +51,7 @@ printf '.help\n' | relate query
   .begin / .commit / .rollback / .checkpoint
   .info
   .timer on|off
+  .timeout [DURATION|off]
   .quit
 ```
 
@@ -194,9 +196,26 @@ Usage: .timer on|off
 exit=0
 ```
 
+## `.timeout`
+
+`.timeout` with no argument prints the session's time budget for a statement, `Timeout: off` when a session starts. `.timeout 5s` sets it and prints the new value, and `.timeout off` removes it. The durations are the ones `--timeout` takes (`500ms`, `10s`, `2m`). An argument that is not a duration prints the usage line, with the reason, and leaves the budget as it was.
+
+```bash verify
+printf '.timeout\n.timeout 5s\n.timeout off\n.timeout x\n' | relate query
+echo "exit=$?"
+```
+
+```text
+Timeout: off
+Timeout: 5s
+Timeout: off
+Usage: .timeout [DURATION|off] ('x' is not a duration (try 500ms, 10s, 2m))
+exit=0
+```
+
 ## Commands that do not exist
 
-Many shells have more dot commands. relate has only the eight on this page, and every other word fails with `Error: unknown command <name>`, exit code 1 in a script. The jobs those commands do elsewhere are done this way:
+Many shells have more dot commands. relate has only the nine on this page, and every other word fails with `Error: unknown command <name>`, exit code 1 in a script. The jobs those commands do elsewhere are done this way:
 
 | Job | In relate |
 | --- | --- |

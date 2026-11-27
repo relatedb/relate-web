@@ -6,6 +6,100 @@
   ],
   "releases": [
     {
+      "version": "1.4.0",
+      "date": "2026-11-27",
+      "published_at": "2026-11-27T14:45:55Z",
+      "previous": "1.3.0",
+      "summary": "Statements run under a wall-clock budget, the Neo4j and APOC write procedures that graph tooling calls work with no shim, huge results stream over HTTP and Bolt instead of buffering, and several query shapes answer the same results faster.",
+      "added": [
+        {
+          "text": "A statement timeout: `relate serve` cancels a statement after 30 seconds by default (`--query-timeout-secs`, `0` disables it) under an optional ceiling (`--query-timeout-max-secs`), and a request can set its own budget (Bolt `tx_timeout`, HTTP `maxExecutionTime`, MCP `timeout_seconds`).",
+          "pages": [
+            "reference/server/mcp",
+            "guides/serve/http-query-api",
+            "guides/serve/bolt"
+          ]
+        },
+        {
+          "text": "The CLI session has a `.timeout [DURATION|off]` dot command beside the `--timeout` flag, and the embedded library, the C API and the language clients set a budget per connection (Python's `Connection.statement_timeout` and its siblings).",
+          "pages": [
+            "reference/cli/dot-commands"
+          ]
+        },
+        {
+          "text": "The Neo4j and APOC write procedures `db.create.setNodeVectorProperty`, `db.create.setRelationshipVectorProperty`, `apoc.create.addLabels` and `apoc.merge.relationship` run with no opt-in and no client change."
+        },
+        {
+          "text": "An HTTP answer past the stream threshold is encoded batch by batch into the chunked body, and a Bolt `PULL {n}` is answered from bounded batches produced on demand, so a multi-million-row result no longer has to fit the server's memory; explicit transactions still buffer."
+        },
+        {
+          "text": "An experimental Vortex columnar property store, off by default: it needs the `vortex-store` build feature and `RELATE_PREVIEW=vortex-store`, and answers, the Cypher dialect and the checkpoint format are unchanged."
+        },
+        {
+          "text": "Per-key value statistics are built lazily per label and served through `GRAPH COUNTS`, and a cached plan that read them replans when they change; `planCache` metadata reports `replan` with one of four causes."
+        },
+        {
+          "text": "The Linux installer refuses a system below the documented glibc 2.35 floor before it downloads anything, and names the distribution floors and the alternatives."
+        }
+      ],
+      "changed": [
+        {
+          "text": "A statement that runs longer than 30 seconds on `relate serve` is now cancelled with a timeout, where the server used to run queries unbounded; give the statement its own budget or start the server with `--query-timeout-secs 0`.",
+          "breaking": true,
+          "pages": [
+            "guides/serve/http-query-api",
+            "guides/serve/bolt"
+          ]
+        },
+        {
+          "text": "`CALL { … } IN TRANSACTIONS OF $batchSize ROWS` rejects a FLOAT batch size, and a FLOAT concurrency, instead of truncating it.",
+          "breaking": true
+        },
+        {
+          "text": "`LOAD CSV … CALL (row) { … } IN TRANSACTIONS` runs, while a write anywhere before the batched call is refused at compile time with nothing written.",
+          "pages": [
+            "reference/cypher/writing-clauses",
+            "reference/cypher/composing-clauses",
+            "guides/cypher/import-csv"
+          ]
+        },
+        {
+          "text": "A variable-length relationship slot that rebinds an outer single-relationship binding is the plan-time `GroupVariableReuse` error instead of a null reconciliation.",
+          "breaking": true
+        },
+        {
+          "text": "A `WITH`'s trailing `WHERE` filters the page the projection produced, as Neo4j does, and a write fed by it no longer receives rows the page cut."
+        },
+        {
+          "text": "`EXPLAIN` and `PROFILE` of `CALL { … } IN TRANSACTIONS` render the body's operators as plan children, and `PROFILE` reports the batches run, committed and rolled back.",
+          "pages": [
+            "reference/cypher/explain-and-profile"
+          ]
+        },
+        {
+          "text": "A result value that is small in memory but exponential once expanded is refused with the expression-memory-limit error instead of hanging, and a `table` or `markdown` cell longer than 4096 characters is cut with a trailing `…`."
+        },
+        {
+          "text": "The Go client binds temporal, point and vector parameters as their Cypher kinds, and refuses entity values as parameters."
+        }
+      ],
+      "deprecated": [],
+      "fixed": [
+        {
+          "text": "`toString()` and `toStringOrNull()` render list values in display form, so `RETURN toString([1, 2])` answers `'[1, 2]'` instead of failing the statement."
+        },
+        {
+          "text": "`LIMIT n` without `ORDER BY` over a variable-length or quantified pattern returns `min(n, total)` rows, and `count(*)`, grouped counts and `count(DISTINCT …)` honor a relationship variable pinned by an earlier clause."
+        },
+        {
+          "text": "`ON CREATE SET labels(n) = …` keeps the merge pattern's own labels, so re-running the same `MERGE` matches instead of creating a second node."
+        },
+        {
+          "text": "A POINT-index distance seek at or beyond a quarter circumference no longer drops points in the far hemisphere."
+        }
+      ]
+    },
+    {
       "version": "1.3.0",
       "date": "2026-11-25",
       "published_at": "2026-11-25T13:01:10Z",

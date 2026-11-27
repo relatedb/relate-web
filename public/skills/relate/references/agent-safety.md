@@ -60,8 +60,8 @@ transaction. `--read-only` is the fence for that.
   as complete. The `--json` / `--mode envelope` riders and `--toon`'s
   terminal entries carry every statement's `"timings"` object (the phase
   split and the fine sub-split, in milliseconds) and the `"planCache"`
-  outcome (`miss` / `hit-raw-fastpath` / `hit-template` /
-  `replan-generation-mismatch` / `bypassed`) on every run; in `--jsonl`
+  outcome (`miss` / `hit-raw-fastpath` / `hit-template` / `replan` /
+  `bypassed`) on every run; in `--jsonl`
   that terminal line is the `--timings` opt-in (default off — the stream
   is pure rows), so pass the flag to read where a slow statement spends
   its time and whether the plan cache served it). Raise it
@@ -69,6 +69,13 @@ transaction. `--read-only` is the fence for that.
   `RELATE_MAX_ROWS`. The cap follows agent mode (ADR-0407's ladder):
   force it on with `--agent-mode`, off with `--no-agent-mode` or
   `RELATE_AGENT_MODE=0`. The cap bounds what is printed, not the engine's work.
+- Statement time: bound a statement with `--timeout DURATION` (exit 7,
+  `code: "timeout"`) or, in the shell, `.timeout 30s` (ADR-0692). The
+  served surfaces apply a 30 s default per statement (`relate serve
+  --query-timeout-secs N`, ceiling `--query-timeout-max-secs`); a request
+  overrides it (Bolt `tx_timeout`, HTTP `maxExecutionTime`, MCP
+  `timeout_seconds`), and a timed-out statement is cancelled with its
+  snapshot released.
 - Statement scope: prefer several small queries over one giant `UNWIND`
   batch when a task is exploratory.
 

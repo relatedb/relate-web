@@ -1,7 +1,7 @@
 {
   "$schema_note": "Facts about the relate CLI for the docs pipeline (DOCS-PLAN.md §8 check 3, the <ExitCodes>/<Flags>/<EnvVars> components). Summaries are paraphrases; strings in `messages` and in backticks are quoted from the binary or the sources character for character. Facts the sources disagreed on were settled against the binary named in `recorded_with` (`settled_by`); before launch that is a source build, not a published release (engine.json `source_build`). `verify` marks what the binary cannot show. `recorded` holds a replayable run of the binary (see `recording`); `help` and `agent_context` hold the recorded `--help` pages and agent briefings.",
   "binary": "relate",
-  "verified": "1.3.0",
+  "verified": "1.4.0",
   "upstream": {
     "repo": "relatedb/relate",
     "commit": "5e77ee6706821065804a9b77eb66ffd2985d1ac4",
@@ -1039,6 +1039,28 @@
           ]
         },
         {
+          "id": "serve-query-timeout-secs",
+          "flag": "--query-timeout-secs",
+          "value": "N",
+          "default": "30",
+          "env": "RELATE_QUERY_TIMEOUT_SECS",
+          "summary": "Default statement budget on every surface (Bolt, HTTP, MCP): a statement running longer is cancelled and fails with a timeout. A request's own value (Bolt `tx_timeout`, HTTP `maxExecutionTime`) replaces it; `0` disables the default.",
+          "sources": [
+            "relate serve --help"
+          ]
+        },
+        {
+          "id": "serve-query-timeout-max-secs",
+          "flag": "--query-timeout-max-secs",
+          "value": "N",
+          "default": "0",
+          "env": "RELATE_QUERY_TIMEOUT_MAX_SECS",
+          "summary": "Ceiling over every statement budget, a request's included; `0` is no ceiling.",
+          "sources": [
+            "relate serve --help"
+          ]
+        },
+        {
           "id": "serve-ws-max-connections",
           "flag": "--ws-max-connections",
           "value": "N",
@@ -1437,7 +1459,7 @@
       "command_id": "serve",
       "recorded": {
         "command": "relate serve --help",
-        "stdout": "Usage: relate serve --database PATH [--host HOST] [--http PORT] [--origin ORIGIN] [--mcp PORT|stdio] [--bolt PORT [--bolt-identity STRING] [--ws-allow-origin ORIGIN] [--ws-max-connections N]] [--read-only[=FRESHNESS]] [--load SOURCE] [--auth USER:PASSWORD] [--concurrent-logical-workspace-limit SIZE] [--max-traversal-depth N] [--expression-memory-limit SIZE] [--safe | --no-safe] [--logical-graph-size-limit SIZE] [--durability-mode MODE] [--snapshot-format F]\n\nserve hosts Relate's network surfaces on one open database until\nSIGINT/SIGTERM. At least one surface flag is required; ports\nhave no defaults, and a taken port is a startup error.\n  -d, --database PATH  The store to serve (directory, .rl bundle, or :memory:)\n  --host HOST    Bind host for every served surface. Default\n                       127.0.0.1 (loopback only). Any other host deliberately\n                       exposes the PLAINTEXT surfaces to the network — serve\n                       has no TLS — and a loud WARNING prints at startup\n  --http PORT    HTTP Query API v2 endpoint (POST /db/<name>/query/v2; plus the\n                       public GET / discovery document) on --host:PORT\n  --origin ORIGIN  Allow a browser Origin on the HTTP surface (repeatable;\n                   an exact URL or * for any). Default: loopback origins plus\n                   https://browser.neo4j.io and https://console.neo4j.io\n  --tx-idle-timeout-secs N\n                   Expire an HTTP managed transaction after N seconds idle; the\n                   next registry operation sweeps it. Default:\n                   RELATE_TX_IDLE_TIMEOUT_SECS, else 60. 0 disables expiry\n  --max-open-transactions N\n                   Cap on open HTTP managed transactions. Over cap\n                   is a typed 429 naming this flag. Default:\n                   RELATE_MAX_OPEN_TRANSACTIONS, else 128. 0 is unlimited\n  --mcp PORT|stdio\n                   MCP server: PORT serves the streamable HTTP transport\n                   on --host:PORT; the `stdio` keyword serves the stdio\n                   transport in the foreground (newline-delimited JSON-RPC\n                   on stdin/stdout, for MCP hosts) until the host closes\n                   stdin — no auth challenge\n  --bolt PORT    Bolt server (Bolt + Bolt-over-WebSocket) on --host:PORT.\n                   WebSocket Origins default to loopback (any port) plus the\n                   hosted Neo4j Browser and Neo4j Console; another Origin\n                   needs --ws-allow-origin\n  --ws-allow-origin ORIGIN\n                   Allow this Origin on Bolt-over-WebSocket upgrades\n                   (repeatable; an exact http(s) URL or * for any). Overrides\n                   the default: loopback plus https://browser.neo4j.io and\n                   https://console.neo4j.io with auth on, loopback only with\n                   --auth none\n  --bolt-identity STRING\n                   HELLO `server` agent string for the Bolt surface.\n                   Default: RELATE_IDENTITY, else\n                   Relate/<version>. Sent verbatim — a Neo4j-shaped\n                   value (Neo4j/5.26.0) admits strict tooling like\n                   cypher-shell without claiming feature parity\n  --ws-max-connections N\n                   Opt-in cap on concurrent WebSocket sessions.\n                   Default: RELATE_WS_MAX_CONNECTIONS, else unlimited —\n                   bulk data transfers legitimately run many sessions. The\n                   process-wide --max-connections cap still applies\n  --read-only[=FRESHNESS]  Open the existing store read-only:\n                   no writer lease, never creates it; every\n                   write fails. FRESHNESS is snapshot (default: a frozen\n                   snapshot at open) or live: tail the WAL and\n                   follow the writer's commits; refuses .rl and :memory:.\n                   Attach the value; once per run\n  --load SOURCE   Load the served store's content from SOURCE — a\n                   .rl bundle, a store directory, or an https URL — into\n                   --database. A :memory:\n                   target (the default) turns the source into the\n                   in-memory store: read-only, nothing held open or\n                   locked, a fetched copy released after the load. A path\n                   target creates the store there (the path must not\n                   exist) and opens it writable by default\n  --auth USER:PASSWORD  Basic-auth credential shared by every served\n                       surface; `none` disables auth. Default:\n                       RELATE_AUTH, else a generated token printed at\n                       startup (persisted as <dir>.auth-token, 0600)\n  --max-connections N  Process-wide session cap shared by every surface.\n                       Over cap is accept-then-close. Default:\n                       RELATE_MAX_CONNECTIONS, else 128\n  --header-deadline-secs N\n                   Absolute deadline for a complete HTTP/MCP request header\n                   block. Trickled headers are dropped at the\n                   deadline. Default: RELATE_HEADER_DEADLINE_SECS, else 10. 0 disables the deadline\n  --body-deadline-secs N\n                   Absolute deadline for a complete HTTP/MCP request body.\n                   Trickled bodies are dropped at the deadline.\n                   Default: RELATE_BODY_DEADLINE_SECS, else 60. 0 disables the deadline\n  --concurrent-logical-workspace-limit SIZE\n                       Admit queries against a shared logical-workspace\n                       pool (bytes or mb/mib/gb/gib). A positive\n                       value turns admission on. Omit, or an unset\n                       RELATE_CONCURRENT_LOGICAL_WORKSPACE_LIMIT, leaves\n                       it off. 0 is rejected. Same resolution as the query\n                       session's flag\n  --max-traversal-depth N\n                       Largest explicit traversal hop bound a served\n                       statement may ask for (1 through 2000). Default:\n                       RELATE_MAX_TRAVERSAL_DEPTH, else 500. An *1..N or\n                       {1,N} bound above it fails at admission with\n                       TraversalDepthExceeded\n  --expression-memory-limit SIZE\n                       Per-value expression build cap for the served store\n                       (bytes, mb/mib/gb/gib, or none). Default:\n                       256 MiB, or raise/lower it here; none disables the\n                       cap for known bulk pipelines\n  --safe, --no-safe\n                       Refuse agent-typical dangerous statement shapes on\n                       the served store. Default:\n                       RELATE_SAFE_MODE=1/0, else off. --no-safe\n                       negates an enabled environment default\n  --logical-graph-size-limit SIZE\n                       Live graph + index cap for the served store (bytes\n                       or mb/mib/gb/gib). Default:\n                       RELATE_LOGICAL_GRAPH_SIZE_LIMIT, else unlimited —\n                       the same resolution as the query session's flag\n  --durability-mode MODE\n                       Commit durability policy for the served store:\n                       full, everysecond, or snapshot. Default:\n                       RELATE_DURABILITY_MODE, else full — the same\n                       resolution as the query session's flag\n  --snapshot-format F\n                       Snapshot format for the served store (parquet|json|markdown).\n                       Default: RELATE_SNAPSHOT_FORMAT (a codec name), else\n                       the build default — the same grammar as the query\n                       session's flag\n\nExamples:\n  # Serve the HTTP Query API and MCP on one store\n  relate serve --database ./mydata --http 7474 --mcp 8000\n",
+        "stdout": "Usage: relate serve --database PATH [--host HOST] [--http PORT] [--origin ORIGIN] [--mcp PORT|stdio] [--bolt PORT [--bolt-identity STRING] [--ws-allow-origin ORIGIN] [--ws-max-connections N]] [--read-only[=FRESHNESS]] [--load SOURCE] [--auth USER:PASSWORD] [--concurrent-logical-workspace-limit SIZE] [--max-traversal-depth N] [--expression-memory-limit SIZE] [--safe | --no-safe] [--logical-graph-size-limit SIZE] [--durability-mode MODE] [--snapshot-format F]\n\nserve hosts Relate's network surfaces on one open database until\nSIGINT/SIGTERM. At least one surface flag is required; ports\nhave no defaults, and a taken port is a startup error.\n  -d, --database PATH  The store to serve (directory, .rl bundle, or :memory:)\n  --host HOST    Bind host for every served surface. Default\n                       127.0.0.1 (loopback only). Any other host deliberately\n                       exposes the PLAINTEXT surfaces to the network — serve\n                       has no TLS — and a loud WARNING prints at startup\n  --http PORT    HTTP Query API v2 endpoint (POST /db/<name>/query/v2; plus the\n                       public GET / discovery document) on --host:PORT\n  --origin ORIGIN  Allow a browser Origin on the HTTP surface (repeatable;\n                   an exact URL or * for any). Default: loopback origins plus\n                   https://browser.neo4j.io and https://console.neo4j.io\n  --tx-idle-timeout-secs N\n                   Expire an HTTP managed transaction after N seconds idle; the\n                   next registry operation sweeps it. Default:\n                   RELATE_TX_IDLE_TIMEOUT_SECS, else 60. 0 disables expiry\n  --max-open-transactions N\n                   Cap on open HTTP managed transactions. Over cap\n                   is a typed 429 naming this flag. Default:\n                   RELATE_MAX_OPEN_TRANSACTIONS, else 128. 0 is unlimited\n  --mcp PORT|stdio\n                   MCP server: PORT serves the streamable HTTP transport\n                   on --host:PORT; the `stdio` keyword serves the stdio\n                   transport in the foreground (newline-delimited JSON-RPC\n                   on stdin/stdout, for MCP hosts) until the host closes\n                   stdin — no auth challenge\n  --bolt PORT    Bolt server (Bolt + Bolt-over-WebSocket) on --host:PORT.\n                   WebSocket Origins default to loopback (any port) plus the\n                   hosted Neo4j Browser and Neo4j Console; another Origin\n                   needs --ws-allow-origin\n  --ws-allow-origin ORIGIN\n                   Allow this Origin on Bolt-over-WebSocket upgrades\n                   (repeatable; an exact http(s) URL or * for any). Overrides\n                   the default: loopback plus https://browser.neo4j.io and\n                   https://console.neo4j.io with auth on, loopback only with\n                   --auth none\n  --bolt-identity STRING\n                   HELLO `server` agent string for the Bolt surface.\n                   Default: RELATE_IDENTITY, else\n                   Relate/<version>. Sent verbatim — a Neo4j-shaped\n                   value (Neo4j/5.26.0) admits strict tooling like\n                   cypher-shell without claiming feature parity\n  --ws-max-connections N\n                   Opt-in cap on concurrent WebSocket sessions.\n                   Default: RELATE_WS_MAX_CONNECTIONS, else unlimited —\n                   bulk data transfers legitimately run many sessions. The\n                   process-wide --max-connections cap still applies\n  --read-only[=FRESHNESS]  Open the existing store read-only:\n                   no writer lease, never creates it; every\n                   write fails. FRESHNESS is snapshot (default: a frozen\n                   snapshot at open) or live: tail the WAL and\n                   follow the writer's commits; refuses .rl and :memory:.\n                   Attach the value; once per run\n  --load SOURCE   Load the served store's content from SOURCE — a\n                   .rl bundle, a store directory, or an https URL — into\n                   --database. A :memory:\n                   target (the default) turns the source into the\n                   in-memory store: read-only, nothing held open or\n                   locked, a fetched copy released after the load. A path\n                   target creates the store there (the path must not\n                   exist) and opens it writable by default\n  --auth USER:PASSWORD  Basic-auth credential shared by every served\n                       surface; `none` disables auth. Default:\n                       RELATE_AUTH, else a generated token printed at\n                       startup (persisted as <dir>.auth-token, 0600)\n  --max-connections N  Process-wide session cap shared by every surface.\n                       Over cap is accept-then-close. Default:\n                       RELATE_MAX_CONNECTIONS, else 128\n  --query-timeout-secs N\n                   Default statement budget on every surface (Bolt, HTTP,\n                   MCP): a statement running longer is cancelled and fails\n                   with a timeout. A request's own value (Bolt tx_timeout,\n                   HTTP maxExecutionTime) replaces it. Default:\n                   RELATE_QUERY_TIMEOUT_SECS, else 30. 0 disables the default\n  --query-timeout-max-secs N\n                   Ceiling over every statement budget, a request's\n                   included. Default: RELATE_QUERY_TIMEOUT_MAX_SECS, else\n                   0 (no ceiling)\n  --header-deadline-secs N\n                   Absolute deadline for a complete HTTP/MCP request header\n                   block. Trickled headers are dropped at the\n                   deadline. Default: RELATE_HEADER_DEADLINE_SECS, else 10. 0 disables the deadline\n  --body-deadline-secs N\n                   Absolute deadline for a complete HTTP/MCP request body.\n                   Trickled bodies are dropped at the deadline.\n                   Default: RELATE_BODY_DEADLINE_SECS, else 60. 0 disables the deadline\n  --concurrent-logical-workspace-limit SIZE\n                       Admit queries against a shared logical-workspace\n                       pool (bytes or mb/mib/gb/gib). A positive\n                       value turns admission on. Omit, or an unset\n                       RELATE_CONCURRENT_LOGICAL_WORKSPACE_LIMIT, leaves\n                       it off. 0 is rejected. Same resolution as the query\n                       session's flag\n  --max-traversal-depth N\n                       Largest explicit traversal hop bound a served\n                       statement may ask for (1 through 2000). Default:\n                       RELATE_MAX_TRAVERSAL_DEPTH, else 500. An *1..N or\n                       {1,N} bound above it fails at admission with\n                       TraversalDepthExceeded\n  --expression-memory-limit SIZE\n                       Per-value expression build cap for the served store\n                       (bytes, mb/mib/gb/gib, or none). Default:\n                       256 MiB, or raise/lower it here; none disables the\n                       cap for known bulk pipelines\n  --safe, --no-safe\n                       Refuse agent-typical dangerous statement shapes on\n                       the served store. Default:\n                       RELATE_SAFE_MODE=1/0, else off. --no-safe\n                       negates an enabled environment default\n  --logical-graph-size-limit SIZE\n                       Live graph + index cap for the served store (bytes\n                       or mb/mib/gb/gib). Default:\n                       RELATE_LOGICAL_GRAPH_SIZE_LIMIT, else unlimited —\n                       the same resolution as the query session's flag\n  --durability-mode MODE\n                       Commit durability policy for the served store:\n                       full, everysecond, or snapshot. Default:\n                       RELATE_DURABILITY_MODE, else full — the same\n                       resolution as the query session's flag\n  --snapshot-format F\n                       Snapshot format for the served store (parquet|json|markdown).\n                       Default: RELATE_SNAPSHOT_FORMAT (a codec name), else\n                       the build default — the same grammar as the query\n                       session's flag\n\nExamples:\n  # Serve the HTTP Query API and MCP on one store\n  relate serve --database ./mydata --http 7474 --mcp 8000\n",
         "stderr": "",
         "exit": 0
       }
@@ -1469,7 +1491,7 @@
       "command_id": null,
       "recorded": {
         "command": "relate agent-context",
-        "stdout": "relate v1.3.0 — agent context\n\nCommands (detail: relate agent-context <COMMAND>):\n  query           Run a statement session (oneshot, stdin, or shell)\n  clone           Copy a database into a new store and exit\n  info            Print store metadata for a database without opening it\n  pull            Copy a Neo4j/Aura subgraph into a database\n  push            Copy a database subgraph into Neo4j/Aura\n  skill           Install, inspect, or remove the embedded agent skill bundle\n  upgrade         Update the relate binary (alias: update)\n  telemetry       Manage anonymous usage metrics (on, off, status)\n  feedback        File a GitHub issue about CLI friction, or manage the agent grant (enable, disable)\n  agent-feedback  Send one consented feedback report (agent surface)\n  run             Run an installed extension action into a store the host owns\n  serve           Host the HTTP Query API and MCP surfaces on a database\n  agent-context   Print the compact agent briefing (commands, flags, exit codes)\n  extension       Scaffold, install, check, list, or remove command extensions\n\nQuery-run flags (relate [OPTIONS] [QUERY]):\n  --help --version --database --json --csv --markdown --jsonl --toon --noheader --mode --format --pretty --timings --param --fetch-params --snapshot-format --markdown-body-properties --wal-dir --checkpoint-interval-secs --durability-mode --logical-graph-size-limit --expression-memory-limit --concurrent-logical-workspace-limit --max-traversal-depth --safe --no-safe --agent-mode --no-agent-mode --max-rows --width --timeout --load --read-only --load-csv-dir --namespace --command\n\nExit codes:\n  0  success: success, including an empty result\n  1  fatal_error: runtime failure: store open or I/O error, capacity limit, query execution failure, internal error\n  2  usage_error: unknown flag, bad or missing value, extra positional\n  5  conflict: write-write conflict, or the store is locked by another opener\n  6  validation_error: the statement is rejected: syntax, semantic or type error\n  7  timeout: a statement exceeded --timeout\n",
+        "stdout": "relate v1.4.0 — agent context\n\nCommands (detail: relate agent-context <COMMAND>):\n  query           Run a statement session (oneshot, stdin, or shell)\n  clone           Copy a database into a new store and exit\n  info            Print store metadata for a database without opening it\n  pull            Copy a Neo4j/Aura subgraph into a database\n  push            Copy a database subgraph into Neo4j/Aura\n  skill           Install, inspect, or remove the embedded agent skill bundle\n  upgrade         Update the relate binary (alias: update)\n  telemetry       Manage anonymous usage metrics (on, off, status)\n  feedback        File a GitHub issue about CLI friction, or manage the agent grant (enable, disable)\n  agent-feedback  Send one consented feedback report (agent surface)\n  run             Run an installed extension action into a store the host owns\n  serve           Host the HTTP Query API and MCP surfaces on a database\n  agent-context   Print the compact agent briefing (commands, flags, exit codes)\n  extension       Scaffold, install, check, list, or remove command extensions\n\nQuery-run flags (relate [OPTIONS] [QUERY]):\n  --help --version --database --json --csv --markdown --jsonl --toon --noheader --mode --format --pretty --timings --param --fetch-params --snapshot-format --markdown-body-properties --wal-dir --checkpoint-interval-secs --durability-mode --logical-graph-size-limit --expression-memory-limit --concurrent-logical-workspace-limit --max-traversal-depth --safe --no-safe --agent-mode --no-agent-mode --max-rows --width --timeout --load --read-only --load-csv-dir --namespace --command\n\nExit codes:\n  0  success: success, including an empty result\n  1  fatal_error: runtime failure: store open or I/O error, capacity limit, query execution failure, internal error\n  2  usage_error: unknown flag, bad or missing value, extra positional\n  5  conflict: write-write conflict, or the store is locked by another opener\n  6  validation_error: the statement is rejected: syntax, semantic or type error\n  7  timeout: a statement exceeded --timeout\n",
         "stderr": "",
         "exit": 0
       }
@@ -1589,7 +1611,7 @@
       "command_id": "serve",
       "recorded": {
         "command": "relate agent-context serve",
-        "stdout": "serve — Host the HTTP Query API and MCP surfaces on a database\nUsage: relate serve --database PATH [--host HOST] [--http PORT] [--origin ORIGIN] [--mcp PORT|stdio] [--bolt PORT [--bolt-identity STRING] [--ws-allow-origin ORIGIN] [--ws-max-connections N]] [--read-only[=FRESHNESS]] [--load SOURCE] [--auth USER:PASSWORD] [--concurrent-logical-workspace-limit SIZE] [--max-traversal-depth N] [--expression-memory-limit SIZE] [--safe | --no-safe] [--logical-graph-size-limit SIZE] [--durability-mode MODE] [--snapshot-format F]\nFlags:\n  --database\n  --host\n  --http\n  --origin\n  --tx-idle-timeout-secs\n  --max-open-transactions\n  --mcp\n  --bolt\n  --bolt-identity\n  --ws-allow-origin\n  --ws-max-connections\n  --read-only\n  --load\n  --auth\n  --max-connections\n  --header-deadline-secs\n  --body-deadline-secs\n  --concurrent-logical-workspace-limit\n  --max-traversal-depth\n  --expression-memory-limit\n  --safe\n  --no-safe\n  --logical-graph-size-limit\n  --durability-mode\n  --snapshot-format\nExamples:\n  # Serve the HTTP Query API and MCP on one store\n  relate serve --database ./mydata --http 7474 --mcp 8000\nExit codes:\n  0  success: success, including an empty result\n  1  fatal_error: runtime failure: store open or I/O error, capacity limit, query execution failure, internal error\n  2  usage_error: unknown flag, bad or missing value, extra positional\n  5  conflict: write-write conflict, or the store is locked by another opener\n  6  validation_error: the statement is rejected: syntax, semantic or type error\n  7  timeout: a statement exceeded --timeout\n",
+        "stdout": "serve — Host the HTTP Query API and MCP surfaces on a database\nUsage: relate serve --database PATH [--host HOST] [--http PORT] [--origin ORIGIN] [--mcp PORT|stdio] [--bolt PORT [--bolt-identity STRING] [--ws-allow-origin ORIGIN] [--ws-max-connections N]] [--read-only[=FRESHNESS]] [--load SOURCE] [--auth USER:PASSWORD] [--concurrent-logical-workspace-limit SIZE] [--max-traversal-depth N] [--expression-memory-limit SIZE] [--safe | --no-safe] [--logical-graph-size-limit SIZE] [--durability-mode MODE] [--snapshot-format F]\nFlags:\n  --database\n  --host\n  --http\n  --origin\n  --tx-idle-timeout-secs\n  --max-open-transactions\n  --mcp\n  --bolt\n  --bolt-identity\n  --ws-allow-origin\n  --ws-max-connections\n  --read-only\n  --load\n  --auth\n  --max-connections\n  --query-timeout-secs\n  --query-timeout-max-secs\n  --header-deadline-secs\n  --body-deadline-secs\n  --concurrent-logical-workspace-limit\n  --max-traversal-depth\n  --expression-memory-limit\n  --safe\n  --no-safe\n  --logical-graph-size-limit\n  --durability-mode\n  --snapshot-format\nExamples:\n  # Serve the HTTP Query API and MCP on one store\n  relate serve --database ./mydata --http 7474 --mcp 8000\nExit codes:\n  0  success: success, including an empty result\n  1  fatal_error: runtime failure: store open or I/O error, capacity limit, query execution failure, internal error\n  2  usage_error: unknown flag, bad or missing value, extra positional\n  5  conflict: write-write conflict, or the store is locked by another opener\n  6  validation_error: the statement is rejected: syntax, semantic or type error\n  7  timeout: a statement exceeded --timeout\n",
         "stderr": "",
         "exit": 0
       }
@@ -1916,7 +1938,7 @@
       "messages": [
         "Error: invalid --snapshot-format: storage error: unknown snapshot format '<value>' (expected parquet or json or markdown)"
       ],
-      "note": "`RELATE_SNAPSHOT_FORMAT` takes the same codec names; an unknown one fails the open with `storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown or rkyv)`. The flag wins over the variable.",
+      "note": "`RELATE_SNAPSHOT_FORMAT` takes the same codec names; an unknown one fails the open with `storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown, rkyv or vortex)`. The flag wins over the variable.",
       "recorded": {
         "command": "relate --snapshot-format csv --database ./store \"RETURN 1 AS ok\"",
         "stdout": "",
@@ -2295,13 +2317,13 @@
       "recorded": [
         {
           "command": "relate --version",
-          "stdout": "Relate v1.3.0\nLicense: Apache 2.0 (binary)\n",
+          "stdout": "Relate v1.4.0\nLicense: Apache 2.0 (binary)\n",
           "stderr": "",
           "exit": 0
         },
         {
           "command": "relate -v",
-          "stdout": "Relate v1.3.0\nLicense: Apache 2.0 (binary)\n",
+          "stdout": "Relate v1.4.0\nLicense: Apache 2.0 (binary)\n",
           "stderr": "",
           "exit": 0
         }
@@ -3180,7 +3202,7 @@
     "hint_note": "With agent mode on, a run that fails prints the hint line on stderr once, after its error; a run with agent mode off never prints it, and neither does a usage error found before the mode resolves."
   },
   "recording": "Each `recorded` run: the bash command line in `command`, with the binary on PATH as `relate`, in a fresh empty directory, with a fresh HOME and an environment of PATH, HOME, TMPDIR and DO_NOT_TRACK=1 only; `setup` runs first, `hold` keeps a second process on the store while `command` runs. In the output the directory is written `<dir>` and the home directory `<home>`. `npm run docs:cli-check` replays every one against a binary.",
-  "recorded_with": "relate 1.3.0 (6e55309), release build",
+  "recorded_with": "relate 1.4.0 (8c69d6e), release build",
   "page_steps": {
     "concepts/agent-native.mdx": [
       {
@@ -3265,7 +3287,7 @@
       },
       {
         "command": "relate agent-context",
-        "expected_sha256": "d8982d8a63f6ca7bfb177189f2d13a563d11a0417cef55c1210f6cd7a6bd1873"
+        "expected_sha256": "3fa09f74aaa0c6c5b4cd4ca8a752e6b26a7d006319902ac69e7fd6dd1ddef14f"
       },
       {
         "command": "cat > team.cypher <<'EOF'\nCREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace);\nEOF",
@@ -3449,7 +3471,7 @@
       },
       {
         "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"shell\",\"version\":\"0\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/list\",\"params\":{}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"CREATE (:Person {name: \\\"Eve\\\"})\"}}}' \\\n  | relate serve --mcp stdio --database ./graph.rl --read-only 2>/dev/null",
-        "expected_sha256": "27589a2136d3138899226f4b428a0e50347af274166e010a34c5ed308c974ed8"
+        "expected_sha256": "2735aaf1a5086b5247ee72f852da6c06537c6a41cf97b550029a3900b28a571f"
       }
     ],
     "guides/agents/diffable-memory.mdx": [
@@ -3571,7 +3593,7 @@
       },
       {
         "command": "grep -E '^(name|version):' \"$HOME/.claude/skills/relate/SKILL.md\"",
-        "expected_sha256": "0a175c592e4a379ab241b99c811a91a525c3fb2cc4e56386e39ade973bc3fdaf"
+        "expected_sha256": "359776a1b0b0e7394edb4be3e78488c182330f0d905666f370a6503a5d4947a2"
       }
     ],
     "guides/agents/run-in-a-sandbox.mdx": [
@@ -3595,7 +3617,7 @@
       },
       {
         "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"shell\",\"version\":\"0\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"get_schema\",\"arguments\":{}}}' \\\n  | relate serve --mcp stdio --database ./team.rl --read-only 2>/dev/null",
-        "expected_sha256": "6532d7a8875ed704ebe46b87d23d66e6809da2c212ea299948938b221b3da1e1"
+        "expected_sha256": "99088b91e0f47b5ebc39ccc2b7139221cac3818f0e732c4157b283f28853750e"
       },
       {
         "command": "relate --database ./team.rl --read-only --mode envelope \"EXPLAIN MATCH (p:Person)-[:WORKS_AT]->(c:Company) RETURN c.name AS company, count(p) AS people\" | jq -c '.notifications[] | {gql_status, description}'",
@@ -3629,7 +3651,7 @@
       },
       {
         "command": "relate --version",
-        "expected_sha256": "a40d39f90198874a0c477fc6f0694202cde54a5ac2bab5c1c460fa568d7aa855"
+        "expected_sha256": "a8e4db8bf01ef704776820d944fd3ff8b1cf486b9d4ceb161ed52d353ade8a74"
       }
     ],
     "guides/cli/interactive-shell.mdx": [
@@ -3947,7 +3969,7 @@
       },
       {
         "command": "relate extension check ./greet",
-        "expected_sha256": "f335d05cba1005fb943087e5f6c9660e5e3bb1f0d32e252b03d1b28624a44167"
+        "expected_sha256": "94e058c61d8e6383398eb5fc24da7b2f4b363da1d37e8b25e540bf500b603142"
       },
       {
         "command": "relate run greet --help",
@@ -3967,7 +3989,7 @@
       },
       {
         "command": "relate extension install greet --from ./greet\nrelate extension check \"$HOME/.config/relate/extensions/greet\"",
-        "expected_sha256": "a6aaff6d9fc42ebe9be6b50a42c44e040d3645f053854e909abea3e695bfe78a"
+        "expected_sha256": "007fda368678f8ffe72702421295d8711d2fe96b6ca529059a42ce3f85ed836e"
       }
     ],
     "guides/extensions/write-an-extension.mdx": [
@@ -3993,7 +4015,7 @@
       },
       {
         "command": "relate extension check ./word-count",
-        "expected_sha256": "665d98cc60a773b213681054206c2e70d012d91e1b69e65258ba2c2c8367e110"
+        "expected_sha256": "271349853c470aa76162eb6206a83739af9f8ec86db8205246f790e26c64edca"
       },
       {
         "command": "mkdir notes\nprintf 'Ada fixed the planner bug.\\nGrace reviewed the planner change and the parser change.\\n' > notes/standup.md\nprintf 'The parser tests pass.\\nNoor wants planner examples before the release.\\n' > notes/retro.md",
@@ -4027,7 +4049,7 @@
       },
       {
         "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"check\",\"version\":\"0\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/list\",\"params\":{}}' \\\n  | relate serve --mcp stdio --database ./team --read-only 2>/dev/null",
-        "expected_sha256": "6ca9b72513b589fdae4644223f92f49cad53413e718454df4694909cc35dd8ac"
+        "expected_sha256": "a3e9a8b8868520c68681c931f124e03be2c455c8335fe6c5da00d2d319575655"
       },
       {
         "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: $project}) RETURN p.name AS name, w.since AS since ORDER BY since\",\"parameters\":{\"project\":\"relate\"}}}}' \\\n  | relate serve --mcp stdio --database ./team --read-only 2>/dev/null \\\n  | grep -o '\\\\\"rows\\\\\":\\[[^]]*\\]'",
@@ -4277,7 +4299,7 @@
       },
       {
         "command": "relate --version",
-        "expected_sha256": "a40d39f90198874a0c477fc6f0694202cde54a5ac2bab5c1c460fa568d7aa855"
+        "expected_sha256": "a8e4db8bf01ef704776820d944fd3ff8b1cf486b9d4ceb161ed52d353ade8a74"
       },
       {
         "command": "relate --database ./team.rl --read-only --mode envelope \"MATCH (p:Person) RETURN count(p) AS people\"\necho \"exit=$?\"",
@@ -4321,7 +4343,7 @@
       },
       {
         "command": "relate --version",
-        "expected_sha256": "a40d39f90198874a0c477fc6f0694202cde54a5ac2bab5c1c460fa568d7aa855"
+        "expected_sha256": "a8e4db8bf01ef704776820d944fd3ff8b1cf486b9d4ceb161ed52d353ade8a74"
       },
       {
         "command": "relate --database ./team.rl --mode envelope \"MATCH (n) RETURN count(n) AS nodes\"",
@@ -4345,7 +4367,7 @@
       },
       {
         "command": "relate serve --bolt 8843 --http 8842 --database ./graph.rl --read-only 2> serve.log &\nserver=$!\nuntil curl -s -o /dev/null http://127.0.0.1:8842/; do sleep 0.1; done\ncurl -s -w '\\n' http://127.0.0.1:8842/\nexec 3<>/dev/tcp/127.0.0.1/8843\nprintf '\\x60\\x60\\xb0\\x17\\x00\\x00\\x04\\x05\\x00\\x00\\x04\\x04\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00' >&3\nhead -c 4 <&3 > reply.bin\nexec 3>&-\nprintf '\\x00\\x00\\x04\\x05' | cmp -s - reply.bin && echo \"Bolt 5.4 agreed\"\nkill $server\nwait $server",
-        "expected_sha256": "d9260b2d22d45b8a8dd906347ac3c2115bec717c946d532d61e85d0ec25f54b2"
+        "expected_sha256": "72a193c0810590fd25a495ffd5a1715b5f004fea71779154c5abdc39a764f83e"
       }
     ],
     "guides/serve/docker.mdx": [
@@ -4365,7 +4387,7 @@
       },
       {
         "command": "relate serve --http 8842 --database ./graph.rl --read-only 2> serve.log &\nserver=$!\nuntil curl -s -o /dev/null http://127.0.0.1:8842/; do sleep 0.1; done\ncurl -s -w '\\n' http://127.0.0.1:8842/\ncurl -s -u \"$(cat graph.rl.auth-token)\" -H 'Content-Type: application/json' \\\n  -d '{\"statement\": \"MATCH (p:Person)-[:WORKS_ON]->(:Project {name: $project}) RETURN p.name AS name ORDER BY name\", \"parameters\": {\"project\": \"relate\"}}' \\\n  -w '\\n%{http_code}\\n' http://127.0.0.1:8842/db/neo4j/query/v2\ncurl -s -u \"$(cat graph.rl.auth-token)\" -H 'Content-Type: application/json' \\\n  -d '{\"statement\": \"CREATE (:Person {name: $name})\", \"parameters\": {\"name\": \"Eve\"}}' \\\n  -w '\\n%{http_code}\\n' http://127.0.0.1:8842/db/neo4j/query/v2\ncurl -s -H 'Content-Type: application/json' -d '{\"statement\": \"RETURN 1 AS ok\"}' \\\n  -w '\\n%{http_code}\\n' http://127.0.0.1:8842/db/neo4j/query/v2\nkill $server\nwait $server",
-        "expected_sha256": "1c419c66c4d1e2a9799786c30add9c7423a088579d386ec507f6700f10726b85"
+        "expected_sha256": "ab3a834e605fb0c074b2d1618143cd8486655edb0c73662c3f5e15a1039bd5bb"
       }
     ],
     "guides/serve/mcp.mdx": [
@@ -4645,7 +4667,7 @@
     "reference/cli/agent-context.mdx": [
       {
         "command": "relate agent-context",
-        "expected_sha256": "d8982d8a63f6ca7bfb177189f2d13a563d11a0417cef55c1210f6cd7a6bd1873"
+        "expected_sha256": "3fa09f74aaa0c6c5b4cd4ca8a752e6b26a7d006319902ac69e7fd6dd1ddef14f"
       },
       {
         "command": "relate agent-context info",
@@ -4743,7 +4765,7 @@
     "reference/cli/dot-commands.mdx": [
       {
         "command": "printf '.help\\n' | relate query",
-        "expected_sha256": "af020a8b02f1c17f95c293dc8f7f929de67ea2ec9ed6f60aed2cb55ad2bd33a4"
+        "expected_sha256": "8b32d00e44285f1023bc64e1689699be4232f4a5904eb449040ef3d9500bcf05"
       },
       {
         "command": "printf \".quit\\nCREATE (:Note {text: 'never runs'});\\n\" | relate query --mode envelope\necho \"exit=$?\"",
@@ -4778,6 +4800,10 @@
         "expected_sha256": "e8556cd36316b6206bdf95c6f8f91274a3c9147fda36a6f6fac1695bbec9746c"
       },
       {
+        "command": "printf '.timeout\\n.timeout 5s\\n.timeout off\\n.timeout x\\n' | relate query\necho \"exit=$?\"",
+        "expected_sha256": "8e336b90e47f2fbe2f63c1f1e6dc600ed04febbe7bdc2300b1b7ce524d90af28"
+      },
+      {
         "command": "printf '.mode csv\\n' | relate query\necho \"exit=$?\"",
         "expected_sha256": "582c27cb1c2a9eb4eec78296c93741151cc34089ad83b3ccdb95863946c76b3f"
       }
@@ -4797,7 +4823,7 @@
       },
       {
         "command": "RELATE_PREVIEW=bogus relate --mode jsonl \"RETURN 1 AS ok\"\necho \"exit=$?\"",
-        "expected_sha256": "be3e8c021dc3bb44381c092eb0d5643970c1002c59ff4a2bd9bc9c3e5bd85929"
+        "expected_sha256": "29bf9349236d5442d6723d13cdffb32d30009c7be78e2a8073755a1a4e402a14"
       },
       {
         "command": "DO_NOT_TRACK=1 RELATE_TELEMETRY=1 relate telemetry status",
@@ -4853,7 +4879,7 @@
       },
       {
         "command": "relate extension check team-import",
-        "expected_sha256": "434ff29ee06a8a4933f925cd5e571f5391ca1f86cb860afa7adc6bc3965d46c1"
+        "expected_sha256": "88dcd0b506e8b4faa1f1c9f3b6f813b5be8e5c2e4d6cbba5b56e604ff7a4ec48"
       },
       {
         "command": "relate extension install team-import --from ./team-import\nrelate extension list",
@@ -4907,7 +4933,7 @@
       },
       {
         "command": "relate --version",
-        "expected_sha256": "a40d39f90198874a0c477fc6f0694202cde54a5ac2bab5c1c460fa568d7aa855"
+        "expected_sha256": "a8e4db8bf01ef704776820d944fd3ff8b1cf486b9d4ceb161ed52d353ade8a74"
       }
     ],
     "reference/cli/info.mdx": [
@@ -5201,7 +5227,7 @@
       },
       {
         "command": "RELATE_PREVIEW=chronological relate --mode table \"RETURN 1 AS one\"",
-        "expected_sha256": "46abe3393991d6cebeb2eb6f09c85664d47674385ce5891749263801749d44d6"
+        "expected_sha256": "6af9c547393b2900230eb50af66792641fab4759d3ace6b64522e802b2cca2a3"
       }
     ],
     "reference/cypher/differences-from-neo4j.mdx": [
@@ -5233,7 +5259,7 @@
       },
       {
         "command": "relate --database ./team.rl --read-only --mode json \"EXPLAIN MATCH (p:Person)-[:KNOWS]->(f:Person) RETURN f.name AS friend\"",
-        "expected_sha256": "a2f0009831427c8fd9444644913ef20247d16d2e9555df0048b52d53c2565e79"
+        "expected_sha256": "bf5e86d73a94d9a0a7a386061a72690a3808b0a805c400b2e1385ac426018150"
       }
     ],
     "reference/cypher/functions.mdx": [
@@ -5370,8 +5396,8 @@
         "expected_sha256": "91903f5b8c149ea74aa2158c3adc6be0de4a001060396800f43af4123141adc2"
       },
       {
-        "command": "relate --load-csv-dir ./import --mode table \"LOAD CSV WITH HEADERS FROM 'people.csv' AS row FIELDTERMINATOR ';' CALL (row) { CREATE (:Person {name: row.name}) } IN TRANSACTIONS OF 1 ROWS\"",
-        "expected_sha256": "e05621c89566b57576f6cb8c7336da2acf42814c6ec68a2500a6358a8f0a2f78"
+        "command": "relate --load-csv-dir ./import --mode table \"LOAD CSV WITH HEADERS FROM 'people.csv' AS row FIELDTERMINATOR ';' CALL (row) { CREATE (:Person {name: row.name}) } IN TRANSACTIONS OF 1 ROWS RETURN count(*) AS batched\"",
+        "expected_sha256": "f10ea687f673a66d0d8e052d98aa78c9c7a29c9d05772a327760ff1c3447d2dd"
       }
     ],
     "reference/errors.mdx": [
@@ -5389,11 +5415,11 @@
     "reference/project.mdx": [
       {
         "command": "relate --version",
-        "expected_sha256": "a40d39f90198874a0c477fc6f0694202cde54a5ac2bab5c1c460fa568d7aa855"
+        "expected_sha256": "a8e4db8bf01ef704776820d944fd3ff8b1cf486b9d4ceb161ed52d353ade8a74"
       },
       {
         "command": "RELATE_PREVIEW=time-travel relate \"RETURN 1 AS ok\"",
-        "expected_sha256": "91feaf9627e69c7e2cebf35e842c05848a8bc26789eba773eb23b95b98367cac"
+        "expected_sha256": "2fb04706831abde88486dda26e64a32c069b5f547dc4feea4de67d23c3fb2da2"
       }
     ],
     "reference/security.mdx": [
@@ -5417,7 +5443,7 @@
     "reference/server/mcp.mdx": [
       {
         "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"shell\",\"version\":\"0\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/list\"}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"ping\"}' \\\n  | relate serve --mcp stdio --database :memory: 2>/dev/null",
-        "expected_sha256": "e9cd2eb13a12129142a6ebbb25f295f3cbd7d4779c7a27e641dcd2693bde6d84"
+        "expected_sha256": "49aa7e08781645c4fe9d4e9d2738d4068a677c7280879084365b744644ee9599"
       },
       {
         "command": "relate --database ./team.rl \"CREATE (ada:Person {name: 'Ada', role: 'engineer'}),\n       (grace:Person {name: 'Grace', role: 'engineer'}),\n       (noor:Person {name: 'Noor', role: 'maintainer'}),\n       (relate:Project {name: 'relate', language: 'Rust'}),\n       (tck:Project {name: 'opencypher-tck', language: 'Gherkin'}),\n       (ada)-[:WORKS_ON {since: 2024}]->(relate),\n       (grace)-[:WORKS_ON {since: 2023}]->(relate),\n       (grace)-[:WORKS_ON {since: 2022}]->(tck),\n       (noor)-[:MAINTAINS]->(relate),\n       (ada)-[:KNOWS]->(grace)\"",
@@ -5429,11 +5455,11 @@
       },
       {
         "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"MATCH (p:Person)-[w:WORKS_ON]->(:Project {name: $project}) RETURN p.name AS name, w.since AS since ORDER BY since\",\"parameters\":{\"project\":\"relate\"}}}}' \\\n  | relate serve --mcp stdio --database ./team.rl --read-only 2>/dev/null \\\n  | sed -E 's/(_ms\\\\\":)[0-9.e-]+/\\1<ms>/g'",
-        "expected_sha256": "3e748e37d10f260d9bd0d6df94f7ddfdfbf320b8ccb8f98fe3e152a0aad64272"
+        "expected_sha256": "84f5965341d39f8299f77a686a329fcce11f422b4c8a2e62bd704c9c71fe5f40"
       },
       {
         "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"write_cypher\",\"arguments\":{\"statement\":\"CREATE (:Person {name: $name, role: $role})\",\"parameters\":{\"name\":\"Ada\",\"role\":\"engineer\"}}}}' \\\n  | relate serve --mcp stdio --database :memory: 2>/dev/null \\\n  | sed -E 's/(_ms\\\\\":)[0-9.e-]+/\\1<ms>/g'",
-        "expected_sha256": "545eebd982577ba3eb634bcdced278dec0e26190abfe40e5d646491347aed006"
+        "expected_sha256": "f2370409cdfd52a5f6215a64c634d4a05b871d45224001bd6f4e322138d82401"
       },
       {
         "command": "printf '%s\\n' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"MATCH (p:Person {name: $name}) DETACH DELETE p\",\"parameters\":{\"name\":\"Ada\"}}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"CREATE INDEX person_name FOR (p:Person) ON (p.name)\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"write_cypher\",\"arguments\":{\"statement\":\"CREATE (:Person {name: \\\"Eve\\\"})\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"query\":\"MATCH (p:Person) RETURN count(p) AS people\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":5,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"RETURN $limit AS n\",\"parameters\":\"10\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"tools/call\",\"params\":{\"name\":\"read_cypher\",\"arguments\":{\"statement\":\"RETURN $limit AS n\"}}}' \\\n  '{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"tools/call\",\"params\":{\"name\":\"get_schema\",\"arguments\":{\"sample_size\":-2}}}' \\\n  | relate serve --mcp stdio --database ./team.rl --read-only 2>/dev/null",

@@ -1,6 +1,6 @@
 {
-  "version": "1.3.0",
-  "recordedWith": "relate 1.3.0 (6e55309), release build",
+  "version": "1.4.0",
+  "recordedWith": "relate 1.4.0 (8c69d6e), release build",
   "agentCap": 100,
   "harnessVariable": "CLAUDECODE",
   "harnessVariables": [
@@ -442,6 +442,14 @@
       "retryable": false
     },
     {
+      "id": "cli-invalid-env-snapshot-format",
+      "pattern": "^storage error: unknown snapshot codec '[\\s\\S]+?' \\(expected parquet, json, markdown, rkyv or vortex\\)$",
+      "kind": "storage",
+      "code": "fatal_error",
+      "exit": 1,
+      "retryable": false
+    },
+    {
       "id": "engine-unsupported-cypher-version",
       "pattern": "^UnsupportedCypherVersion: [\\s\\S]+? is not a valid option for cypher version\\. Valid options are: 25$",
       "kind": "syntax",
@@ -479,14 +487,6 @@
       "kind": "type",
       "code": "validation_error",
       "exit": 6,
-      "retryable": false
-    },
-    {
-      "id": "cli-invalid-env-snapshot-format",
-      "pattern": "^storage error: unknown snapshot codec '[\\s\\S]+?' \\(expected parquet, json, markdown or rkyv\\)$",
-      "kind": "storage",
-      "code": "fatal_error",
-      "exit": 1,
       "retryable": false
     },
     {

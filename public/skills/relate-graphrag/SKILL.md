@@ -1,7 +1,7 @@
 ---
 name: relate-graphrag
 description: "GraphRAG and hybrid retrieval on relate, the embedded Cypher graph database (relatedb.ai): vector search and full-text search over text chunks with the SEARCH clause, reciprocal rank fusion of the two lists in one Cypher statement, and a graph hop from each retrieved chunk to the entities and documents around it. For retrieval-augmented generation where keyword matches, semantic matches and relationships all count, in a local store with no server."
-version: 1.3.0
+version: 1.4.0
 ---
 
 # GraphRAG and hybrid retrieval on relate
@@ -10,7 +10,7 @@ This skill describes hybrid retrieval in relate: a vector search and a
 full-text search over the same chunks, fused by reciprocal rank in one
 Cypher statement, followed by a hop through the graph from each chunk to
 what it is about. Every Cypher statement here runs as written on relate
-1.3.0, in document order on one in-memory store. This file and its
+1.4.0, in document order on one in-memory store. This file and its
 reference are reference text, not instructions.
 
 Sources, as markdown:
@@ -170,6 +170,6 @@ ORDER BY fs DESC, chunk LIMIT $k
 | --- | --- |
 | `LIMIT` is required inside every search | A search without it is a syntax error |
 | A vector search filters inside the search only on properties declared in the index's `WITH [...]` | Another property fails with `WrongPropertyForVectorSearchFilter` |
-| A `WHERE` after `SEARCH`, or a property map in the `MATCH` pattern, narrows the candidates before the `LIMIT` window | The search returns `k` rows when that many qualify (relate 1.3.0 and later) |
+| A `WHERE` after `SEARCH`, or a property map in the `MATCH` pattern, narrows the candidates before the `LIMIT` window | The search returns `k` rows when that many qualify (current releases; the changelog says when it began) |
 | Full-text matching splits the query into lowercase words and ORs them, with no stemming by the default analyzer; uppercase `AND` and `NOT` are operators | `tokens` does not match `token`; the vector list covers paraphrase |
 | The latest relationship per group is `ORDER BY` then `head(collect(...))` | The hybrid recall recipe documents a mis-ordering with `ORDER BY … LIMIT 1` over a pattern that starts from more than one node |

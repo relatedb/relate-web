@@ -1,6 +1,6 @@
 {
   "$schema_note": "Every error an agent can meet, for /docs/reference/errors and explain_error (DOCS-PLAN.md §2, §8 check 3d). `id` is a stable anchor (#<id>); renaming one needs a redirect. `message` is quoted character for character, from the binary where `recorded` holds a run of it (replayed by `npm run docs:cli-check`; see cli.json `recording`), otherwise from upstream; `<name>` marks a variable part and `…` an elision. null means the sources do not say. `verify` marks what the release binary cannot show.",
-  "verified": "1.3.0",
+  "verified": "1.4.0",
   "upstream": {
     "repo": "relatedb/relate",
     "commit": "5e77ee6706821065804a9b77eb66ffd2985d1ac4",
@@ -947,8 +947,8 @@
       "note": "The error object's `message` drops the `Failed to open Relate: ` prefix.",
       "recorded": {
         "command": "RELATE_PREVIEW=telepathy relate --mode envelope \"RETURN 1 AS ok\"",
-        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"semantic\",\"message\":\"semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'telepathy' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation)\",\"retryable\":false}}\n",
-        "stderr": "Failed to open Relate: semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'telepathy' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation)\n",
+        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"semantic\",\"message\":\"semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'telepathy' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation, vortex-store)\",\"retryable\":false}}\n",
+        "stderr": "Failed to open Relate: semantic error: SemanticError: invalid RELATE_PREVIEW value: unknown preview feature 'telepathy' (known features: hybrid-search, local-callables, graph-type-opt-props, graph-type-default-values, graph-type-implied-labels, ontology, obfuscated-literals, mixed-label-syntax, float16-coordinate-types, chronological-comparisons, coll-zip, coll-has, cypher-annotations, gql-stddev-aliases, graph-type-show-variants, path-construction, path-concatenation, vortex-store)\n",
         "exit": 1
       }
     },
@@ -1013,7 +1013,7 @@
       "retryable": false,
       "gql_status": null,
       "neo4j_code": null,
-      "message": "storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown or rkyv)",
+      "message": "storage error: unknown snapshot codec '<value>' (expected parquet, json, markdown, rkyv or vortex)",
       "cause": "`RELATE_SNAPSHOT_FORMAT` names no codec; a query run's open fails, `:memory:` included.",
       "remedy": "Use `parquet`, `json` or `markdown`, or unset it.",
       "python_class": null,
@@ -1025,8 +1025,8 @@
       ],
       "recorded": {
         "command": "RELATE_SNAPSHOT_FORMAT=csv relate -d ./x --mode envelope \"RETURN 1\"",
-        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"storage\",\"message\":\"storage error: unknown snapshot codec 'csv' (expected parquet, json, markdown or rkyv)\",\"retryable\":false}}\n",
-        "stderr": "Failed to open Relate: storage error: unknown snapshot codec 'csv' (expected parquet, json, markdown or rkyv)\n",
+        "stdout": "{\"error\":{\"code\":\"fatal_error\",\"exit_code\":1,\"kind\":\"storage\",\"message\":\"storage error: unknown snapshot codec 'csv' (expected parquet, json, markdown, rkyv or vortex)\",\"retryable\":false}}\n",
+        "stderr": "Failed to open Relate: storage error: unknown snapshot codec 'csv' (expected parquet, json, markdown, rkyv or vortex)\n",
         "exit": 1
       }
     },
@@ -4193,7 +4193,7 @@
       "recorded": {
         "command": "printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"check\",\"version\":\"0\"}}}' '{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}' '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"write_cypher\",\"arguments\":{\"query\":\"CREATE (:B)\"}}}' | relate serve --mcp stdio --database ./graph.rl --read-only",
         "setup": "relate --database ./graph.rl \"CREATE (:A)\"",
-        "stdout": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"tools\":{}},\"serverInfo\":{\"name\":\"relate-mcp\",\"version\":\"1.3.0\"}}}\n{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"unknown tool 'write_cypher'\"}],\"isError\":true}}\n",
+        "stdout": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"tools\":{}},\"serverInfo\":{\"name\":\"relate-mcp\",\"version\":\"1.4.0\"}}}\n{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"unknown tool 'write_cypher'\"}],\"isError\":true}}\n",
         "stderr": "serve: opened the store read-only — no writer lease and never creates the store; every write fails\nserve: MCP (stdio) serving on stdin/stdout (auth: none)\nserve: stdin closed, shutting down\n",
         "exit": 0
       }
@@ -5276,5 +5276,5 @@
       "engine-unsupported-administration-command"
     ]
   },
-  "recorded_with": "relate 1.3.0 (6e55309), release build"
+  "recorded_with": "relate 1.4.0 (8c69d6e), release build"
 }

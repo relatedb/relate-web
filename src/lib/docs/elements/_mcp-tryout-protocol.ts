@@ -257,7 +257,7 @@ const FIELD_ORDER: Record<string, readonly string[]> = {
   stats: ['nodes_created', 'nodes_deleted', 'relationships_created', 'relationships_deleted', 'properties_set', 'labels_added', 'labels_removed', 'indexes_added', 'indexes_removed', 'constraints_added', 'constraints_removed'],
   notification: ['code', 'gql_status', 'severity', 'category', 'title', 'description', 'remedy', 'operator_id'],
   plan: ['schema', 'profiled', 'statement', 'root'],
-  planNode: ['operator', 'details', 'identifiers', 'estimated_rows', 'actual', 'fused_into', 'fused_metrics', 'children', 'warnings'],
+  planNode: ['operator', 'details', 'identifiers', 'estimated_rows', 'actual', 'fused_into', 'fused_metrics', 'body_of', 'children', 'warnings'],
   schemaNode: ['type', 'count', 'properties', 'relationships'],
   schemaRelationship: ['direction', 'labels', 'properties'],
 };

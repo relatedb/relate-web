@@ -39,7 +39,10 @@ and `graph()`.
 
 A `plan` tree for a seek-started `MATCH` nests display-only fused children
 (ADR-0622): ordinary `children` entries, never executed operators, with no
-rows/time/memory of their own (the parent's totals stand).
+rows/time/memory of their own (the parent's totals stand). A batched
+`CALL { … } IN TRANSACTIONS` nests its body's operators the same way
+(REL8-2047), marked by `body_of`: they run inside the operator's batch, so
+they are not executed operators either and carry no metrics of their own.
 
 A PROFILE operator's `actual` carries a `memo` dict — `probes`, `hits`,
 `inserts`, `refused`, `bytes`, `disabled_count` (and `kinds` on the root) —
@@ -69,6 +72,13 @@ memo tables' allocation, never part of `memory_bytes`.
   on the thread that opened it; others get `ProgrammingError`.
 - **One writer process per database**; `read_only=True` opens are
   unlimited. `:memory:` vanishes on close.
+- **Experimental Vortex store (ADR-0703)** — set
+  `os.environ["RELATE_PREVIEW"] = "vortex-store"` before the **first**
+  open: the variable is process-global, so every `relate.connect` /
+  `relate.Database` in the process attaches the store. Needs a build with
+  the `vortex-store` feature enabled (a default build fails the open
+  closed naming the feature); there is no per-open Python switch yet.
+  Answers, the dialect and the checkpoint format are unchanged.
 - **Dicts are always maps** — pass `relate.Point(srid, x, y)` for a
   point; a missing `$param` fails the statement, never binds `null`.
 - **Library skill in the wheel** — `relate/.agents/skills/relate/SKILL.md`
@@ -76,3 +86,4 @@ memo tables' allocation, never part of `memory_bytes`.
 
 Full contract: `docs/api/python/spec.md` (parameters, returned values,
 error classification, bookmarks, threading).
+- **Statement timeout (ADR-0692):** `conn.statement_timeout = seconds` bounds each statement on the connection (`None`/`0` clears; the default is none). A statement past it raises `OperationalError` (`query timed out after …`); the connection stays usable.

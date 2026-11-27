@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "verified": "1.3.0",
+  "verified": "1.4.0",
   "cells": {
     "seed": {
       "kind": "table",
@@ -97,14 +97,14 @@
     },
     "version": {
       "kind": "table",
-      "text": "| version |\n|---------|\n| \"1.3.0\" |\n1 row",
+      "text": "| version |\n|---------|\n| \"1.4.0\" |\n1 row",
       "table": {
         "columns": [
           "version"
         ],
         "rows": [
           [
-            "\"1.3.0\""
+            "\"1.4.0\""
           ]
         ],
         "numeric": [
@@ -126,7 +126,7 @@
         "plan_cache": "miss",
         "rows": [
           {
-            "version": "1.3.0"
+            "version": "1.4.0"
           }
         ],
         "stats": {

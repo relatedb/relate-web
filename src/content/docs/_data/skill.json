@@ -1,61 +1,61 @@
 {
   "source": "surfaces/relate-cli/src/skill/bundle",
-  "commit": "6e55309d16f483fbab2f20ca08ed42d9b0e68db5",
-  "synced": "2026-11-25",
-  "version": "1.3.0",
+  "commit": "8c69d6e429d1d4751a5e7ba45d5a48f5a7ebf0d8",
+  "synced": "2026-11-27",
+  "version": "1.4.0",
   "files": [
     {
       "path": "SKILL.md",
-      "sha256": "5542a72333324cc3676c47b3075c510600182f020a3dd650e48be6a7e5f7a3a8",
+      "sha256": "9e4e128df8100eed66ed02da273d7272b34a76583182b4d45ba811a46ff07cde",
       "upstream_sha256": "ba29f5980e1c1acc6d2e63b7be6861a061aef38e2fad0a710a4d308d5d1a776f"
     },
     {
       "path": "references/agent-safety.md",
-      "sha256": "c3da21507bc8eac8bcb253f6c42a0509df2ec3370ecad5ac2a2f474e54db6771"
+      "sha256": "2a7737f73de9d9e3d8e7e61d23870c8950cde7851ebfbc92e381bf1c88590538"
     },
     {
       "path": "references/client-c.md",
-      "sha256": "e7245d0e09103dd0641853bc89a95ed82357c79fcca52820e06da8b1fe5776e1"
+      "sha256": "fb20b5ade194ee6355c178cb608dfea42c1c0da544661a8fca2cb558ea6055aa"
     },
     {
       "path": "references/client-cli.md",
-      "sha256": "28804ec0307d20c7fbeef2c83e8d6c64692e7444be83c8bc7b72491f58e1f392"
+      "sha256": "c76c2a6244edb9a4717b491b28d8b8f5e6b303f376fd51a791d89979d63a0c17"
     },
     {
       "path": "references/client-dotnet.md",
-      "sha256": "31f1b0125f3148d67f77384ad5276eefbaa983165a84cbd00067b280aa4f8f55"
+      "sha256": "67f9f03c267c0561b94b0323a6321c36aba8ea0bf18a6d084ea2eed49bc3493a"
     },
     {
       "path": "references/client-extensions.md",
-      "sha256": "56b8270b7c3b68fd953e54b72118d933c197d6fbf2d7bdafbb45bbcf406ac53c"
+      "sha256": "8e7a239148e749c0a913e06ffcbc75752de2e208e86684dd406e20eaba9dbf78"
     },
     {
       "path": "references/client-go.md",
-      "sha256": "7267ef83a9ba62795a798a3d4662bb59e22a64acc43aeb945467d864ee16a4ab"
+      "sha256": "a6582c67154a61154447aef1e32fd762acc6f612564a1a76e984e8cec29f83c4"
     },
     {
       "path": "references/client-java.md",
-      "sha256": "45462c0b777efdb380436e9d0df4ef8c1c021b6b946f4f83c45a69f1001c121e"
+      "sha256": "194dd8c00b2558fcd40632b1fac12e29df81ba405672f148f093da83530f07a1"
     },
     {
       "path": "references/client-javascript.md",
-      "sha256": "11f005e3d052ab2babdad48b28e763b2929bc3e28bc5235fc8063d340cab6dc8"
+      "sha256": "f05248d5924df7a588d025f102424f1aa574ecc94824f3038140120e69c5fc20"
     },
     {
       "path": "references/client-python.md",
-      "sha256": "0426761fd936d0850cc34b8125ffb0d070fa7c85da673899ebf123f6db5eaa94"
+      "sha256": "16fe794939879f2ba9952892252df5f714f9a0870f6b15ef82df6b0575deb8f5"
     },
     {
       "path": "references/client-swift.md",
-      "sha256": "fa1ee7018cac49a255a3659d7d99dbdc62ab8540056d3c166120c5bf7096da23"
+      "sha256": "a433a63350ce18aa2db9316b6d49684a46200e86a842a38df9ff9bb378773dcc"
     },
     {
       "path": "references/client-wasm.md",
-      "sha256": "17819b1d58b3938bf0ecfd4b6810a63daf3ef7ee6e70caec058bff215538e3a5"
+      "sha256": "97e59ef65813dd39bacf39974c34c046317a563f1bab8bbf3e71cdaf6e8c8c55"
     },
     {
       "path": "references/operations.md",
-      "sha256": "8b3331b935a84c6fec7db50e22d2cc738c0dbfcd88e895db3e769719fe11d4b0"
+      "sha256": "262292d1fa984fce6b3ae97dbb81dd916243d8618ccf34e8b90668ac6ae60e09"
     },
     {
       "path": "references/pull.md",
@@ -81,26 +81,26 @@
   "task_skills": [
     {
       "name": "relate-agent-memory",
-      "reviewed": "2026-11-25",
+      "reviewed": "2026-11-27",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "f8940923a8001be3cda722fe563084238f8228830193a36713c4bff358107e15"
+          "sha256": "4af3d8605b00496ff236ba8817bec167a66554ca6546b253b1a45984fa6167e5"
         },
         {
           "path": "references/bitemporal.md",
-          "sha256": "06baab1192a962c97ef53bc6efd0923a8eef45fd40a07a037384153717712200"
+          "sha256": "708dfe295c68c8d6b013fda0369f34ff9efdb9662172c30482e9e95768c43517"
         },
         {
           "path": "references/provenance.md",
-          "sha256": "19141cd1bd683eb2a3575c1ef80be5876dab7eed0c2abed5fdb1aa5815491381"
+          "sha256": "23008ac86338177d8f53384aae277de7167bc3bd38ade571aec68649051297f9"
         }
       ],
       "recipes": [
         {
           "slug": "agent-memory",
           "source_sha256": "48b9343afedc0750a292495cfb3a9baeb63018087d24d10d356bd55212494a04",
-          "results_sha256": "a146c1a7a10d6b46f54b956089abbefa016a2979a33326461d04c99bf3417866"
+          "results_sha256": "c07b8344f92c89808791984a9d111274addd2de13c38d09f51b4979d3cadfe67"
         },
         {
           "slug": "bitemporal-decisions",
@@ -116,15 +116,15 @@
     },
     {
       "name": "relate-graphrag",
-      "reviewed": "2026-11-25",
+      "reviewed": "2026-11-27",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "1f0fc054d8044e26ebd7d4942d52741fadb740721fd141acb630552c1fe44920"
+          "sha256": "de55fba95d4d63d9ad702e97574315342f4b108395a388071413ba6f791b09a9"
         },
         {
           "path": "references/search-forms.md",
-          "sha256": "f5bfe2dd82398f2b51d9e4a9da50f0d433d53436714a85b8227f6a08af84e026"
+          "sha256": "416fed408db39beb8727d01b621a27c46d3f26a7b0d0ea2db11cf633891c152b"
         }
       ],
       "recipes": [
@@ -137,15 +137,15 @@
     },
     {
       "name": "relate-migrate-from-vector-search",
-      "reviewed": "2026-11-25",
+      "reviewed": "2026-11-27",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "c85fd5f4ebce5121b11ad097a5a1cfa6b0eeb42f697d57b58358051ec2529d1b"
+          "sha256": "b2a877202008779d01409aa04d95ad90c68bfacc5469cd3ca52eb4ea3a539a44"
         },
         {
           "path": "references/verify.md",
-          "sha256": "64838636a20b0784587883b112f9fd1df488ffbcc21993daaf32e83437f303fb"
+          "sha256": "5222ee48db41be02084a7ba19932dc77d8c5f590b290139789acd61c5581338a"
         }
       ],
       "recipes": [
@@ -157,21 +157,21 @@
         {
           "slug": "migration-rehearsal",
           "source_sha256": "d5a2caf03ecffb575d5456124a22e06ea0f6013ce8e426ae7886ef0431479f95",
-          "results_sha256": "2032fff4b5ba3640bf807bf326fe19261f53affa2d258adbe7412ea50c40954c"
+          "results_sha256": "6756bc16376d0af4d6aa9010d90c8fdcfb53f3cfaf3dd0362b6cc7f716d2219c"
         }
       ]
     },
     {
       "name": "relate-query-tuning",
-      "reviewed": "2026-11-25",
+      "reviewed": "2026-11-27",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "7f527ec3fe6e0887e1a440ca6daba1bbba89a894c3e5d0d43ea5abd70266f7e2"
+          "sha256": "7b61cf2982cd4a30ce75c5f06168d19782d8739b4089e6d65a1e0d22acc969e8"
         },
         {
           "path": "references/notifications.md",
-          "sha256": "4e1377b2a5557904372dd5e77f7373b80a093588c58892dc7e36bee49e5238b4"
+          "sha256": "95f6dcafa4b3631676b4f270c0fffd8c8214a9590db3fb4ca2f605a895c26eaa"
         }
       ],
       "recipes": [
@@ -184,22 +184,22 @@
     },
     {
       "name": "relate-schema-design",
-      "reviewed": "2026-11-25",
+      "reviewed": "2026-11-27",
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "adb36eb975d85ce13e406d10e8f9adae81db1c3396d15cd92646edfa26161819"
+          "sha256": "7329383b2a1256c7b9c4797d26aa3cf1c536170eef12d13a1743f3b715b576b6"
         },
         {
           "path": "references/discovery.md",
-          "sha256": "9386c7da6b58e006e81ae77b81cf0164a26a5408d2bd79c47248d241f63a9348"
+          "sha256": "6fdf9c058db51ae3521633793dd110f88ef424e62934e5b1b4277383a0932ef2"
         }
       ],
       "recipes": [
         {
           "slug": "agent-memory",
           "source_sha256": "48b9343afedc0750a292495cfb3a9baeb63018087d24d10d356bd55212494a04",
-          "results_sha256": "a146c1a7a10d6b46f54b956089abbefa016a2979a33326461d04c99bf3417866"
+          "results_sha256": "c07b8344f92c89808791984a9d111274addd2de13c38d09f51b4979d3cadfe67"
         },
         {
           "slug": "tool-call-provenance",

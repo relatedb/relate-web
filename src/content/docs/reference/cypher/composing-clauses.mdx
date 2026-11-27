@@ -83,7 +83,7 @@ A `CALL { … }` subquery runs once for each incoming row. The scope clause in p
 | `ON ERROR RETRY [FOR <duration>] [THEN …]` | Without `THEN`: `FAIL` | Accepted, but no batch is retried: the duration is ignored and the `THEN` fallback applies at once. Without `THEN`, the statement fails as under `ON ERROR FAIL` |
 | `REPORT STATUS AS <variable>` | Off | Binds a map per input row: `started`, `committed`, `transactionId` and `errorMessage`. Needs `ON ERROR CONTINUE`, `BREAK`, or `RETRY … THEN CONTINUE` or `THEN BREAK`; otherwise `syntax error: InvalidReportStatusUsage: REPORT STATUS requires ON ERROR CONTINUE, BREAK, or RETRY with THEN CONTINUE or THEN BREAK` |
 
-A write before `CALL { … } IN TRANSACTIONS` in the same statement fails with `syntax error: WriteBeforeCallInTransactions: a write cannot precede CALL IN TRANSACTIONS`, and `LOAD CSV` counts as a write ([writing clauses](/docs/reference/cypher/writing-clauses#examples)). Every input row runs the subquery once and counts against the fixed budget of 100,000 nested evaluation passes per statement ([limitations](/docs/reference/limitations)).
+A write before `CALL { … } IN TRANSACTIONS` in the same statement fails with `syntax error: WriteBeforeCallInTransactions: a write cannot precede CALL IN TRANSACTIONS`. `LOAD CSV` only reads a file, so it may precede the call: it is the bulk-load idiom ([writing clauses](/docs/reference/cypher/writing-clauses#examples)). Every input row runs the subquery once and counts against the fixed budget of 100,000 nested evaluation passes per statement ([limitations](/docs/reference/limitations)).
 
 ## Subquery expressions
 

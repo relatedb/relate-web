@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "timeline",
-  "hash": "c4736c5217d2485fc16fe1eca3eaf081b681dd0a56a1b6dfe20f9c4e92cf5492",
+  "hash": "32424071c7319e03ed94237b6796d5c7474ad73e901e2ea4e170251948fb1b64",
   "inputs": [],
   "live": "the drawing reads its rows again from each run of the statement it draws on the page's database in your browser, so an edit to the statement or its parameters redraws it; Tab reaches the marks and the arrow keys move along a lane and between lanes, each mark read out with its values; where the page names an as-of statement, a time slider runs that statement again with the time as its parameter and lights up the rows it returns.",
   "engine": true,
@@ -9,8 +9,8 @@
   "caption": "The session step's rows on a time axis, as recorded",
   "svg": true,
   "svgSha256": {
-    "light": "fc90e3f2ee0583a6c76071b2516e4d95e1edaa62e0ad5fc46b27d42321b4d255",
-    "dark": "f87c6a21a7bc1098ae4d0b1e6693d19e3110365cc3090da4aeabd1388e89958d"
+    "light": "6f8101aaec8d674eddae1cfd855dfa1239a2ecbe05ebde3ada7ccbfa612d2772",
+    "dark": "0775b4f0e2af2e6166d2324e2f96a48a75f0dd1cb39743abce83cb9c3bc7d714"
   },
   "textSha256": "50fa9723e10e9ca2186b844265fefe2bcecd509527619cafe3fad9a7d863b27d"
 }
