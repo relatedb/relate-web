@@ -267,6 +267,7 @@ header.nav.scrolled { box-shadow: 0 1px 0 var(--line); }
   color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 500; line-height: 1.3;
 }
 .nav-gh:hover { color: var(--ink-muted); }
+.nav-dc { margin-right: -14px; } /* the two icons sit close together */
 .nav-links a.nl-gh { display: none; }
 .nav-cta {
   display: inline-flex; align-items: center;
