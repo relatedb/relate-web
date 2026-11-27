@@ -23,7 +23,7 @@ switch between two server-rendered lists (CSS only, no script).
   `Topic` nodes, with `OWNED_BY`, `WRITTEN_IN` and `TAGGED` relationships and uniqueness
   constraints. `scripts/projects.ts` searches GitHub for the topic and upserts with `MERGE`
   through the `@relate/relate` client (`src/lib/projects-store.ts`); the Projects refresh
-  workflow runs it weekly and by hand and opens a pull request when the store changed. A project
+  workflow runs it daily and by hand and opens a pull request when the store changed. A project
   that leaves the topic is marked `listed: false`, not deleted.
 - **The page is a query.** `/projects/` opens the store read-only at build and ranks with
   `ORDER BY` (activity or stars), so a visit makes no GitHub request.
@@ -63,7 +63,7 @@ switch between two server-rendered lists (CSS only, no script).
 
 - A repository is listed by adding the topic; no application is needed. Off-topic uses of the
   word appear until they are hidden by hand.
-- The weekly pull request is small and routine; a person merges it.
+- The daily run reuses one pull request (a fixed branch), so at most one is open, and a person merges it when they like; a day with no change opens nothing.
 - The repository gains a dependency (`@relate/relate`, a native library; one platform package per
   OS and CPU) and a committed store directory, WAL segment markers included (the docs' rule for
   a store in a repository).

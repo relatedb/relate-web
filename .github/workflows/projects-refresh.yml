@@ -1,5 +1,5 @@
 # Refreshes the projects store, src/data/projects.relate, behind /projects/ (ADR-0076): the GitHub
-# repositories tagged `relate`, kept as a relate graph (a directory store, json codec). Weekly and by hand; opens a pull request when the list changed,
+# repositories tagged `relate`, kept as a relate graph (a directory store, json codec). Daily and by hand; opens a pull request when the list changed,
 # so a person reads what is about to appear on the site.
 #
 # The pull request is opened with RELEASE_PR_TOKEN when it is set, so its required checks start;
@@ -8,7 +8,7 @@ name: Projects refresh
 
 on:
   schedule:
-    - cron: '17 6 * * 1'
+    - cron: '17 6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -51,7 +51,7 @@ jobs:
           commit-message: 'Projects: refresh the list from GitHub'
           title: 'Projects: refresh the list from GitHub'
           body: |
-            The weekly refresh of the projects store, `src/data/projects.relate`: repositories tagged
+            The daily refresh of the projects store, `src/data/projects.relate`: repositories tagged
             `relate` on GitHub (ADR-0076). `graph.json` is one line, so read the change with
             `git diff --word-diff=porcelain` or query the store. To leave a project out, set
             `hidden` on it: `relate query --database src/data/projects.relate "MATCH (p:Project {fullName: 'owner/name'}) SET p.hidden = true"`.

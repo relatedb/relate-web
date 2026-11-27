@@ -1,7 +1,7 @@
 ---
 // /projects/: the GitHub repositories tagged with the `relate` topic, ranked by recent activity or
 // by stars (ADR-0076). The list is a Cypher query over the relate store src/data/projects.relate at
-// build; a weekly workflow refreshes the store. The two rankings are two server-rendered lists,
+// build; a daily workflow refreshes the store. The two rankings are two server-rendered lists,
 // switched with CSS alone.
 import Base from '../../layouts/Base.astro';
 import { PROJECTS_LISTED } from '../../lib/projects.ts';
@@ -26,12 +26,11 @@ const day = (iso: string) => fmt.format(new Date(iso));
 >
   <div class="projects">
     <header class="projects-head">
-      <h1>Projects built with relate</h1>
+      <h1>Built with Relate</h1>
       <p class="projects-lede">
-        Open-source repositories on GitHub tagged with the{' '}
-        <a href="https://github.com/topics/relate">relate topic</a>. Add the topic to yours and it
-        appears here after the next weekly refresh. The list is automatic; the projects are the
-        authors' own and have not been reviewed by the relate team.
+        GitHub projects tagged as{' '}
+        <a href="https://github.com/topics/relate"><code>relate</code></a>. Refreshed daily. 
+      <br/>Unreviewed. Owned by the respective author.
       </p>
     </header>
 

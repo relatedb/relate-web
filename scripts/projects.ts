@@ -1,6 +1,6 @@
 // Refreshes the projects store, src/data/projects.relate: the GitHub repositories tagged with the
 // `relate` topic (ADR-0076). `npm run projects:refresh`; the Projects refresh workflow runs it
-// weekly. Reads GITHUB_TOKEN or GH_TOKEN when set (a higher rate limit); the search needs none.
+// daily. Reads GITHUB_TOKEN or GH_TOKEN when set (a higher rate limit); the search needs none.
 import { select, type RawRepo } from '../src/lib/projects.ts';
 import { openStore, upsert } from '../src/lib/projects-store.ts';
 
