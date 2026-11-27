@@ -1,7 +1,7 @@
 {
   "format": 2,
   "element": "embed-question",
-  "hash": "4c02356767c4371b56b297e30847f66f016133768af9af850be5c35a898cb443",
+  "hash": "99c7fe99937733331121d62b8105b6ee583e1a03ab9b3b1e4e5f77e78c34c4ca",
   "inputs": [],
   "live": "a button that states the download size fetches the model's weights and tokenizer from huggingface.co and the ONNX runtime from this site, checks each file's SHA-256, embeds the question you type in your browser (the question is never sent anywhere), and runs the step's vector search with that vector in place of the stored one on the page's database in your browser; nothing downloads before the press.",
   "engine": true,

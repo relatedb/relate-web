@@ -206,8 +206,8 @@ RETURN COUNT { MATCH (:Page) } AS pages, COUNT { MATCH (:Section) } AS sections,
 ```table
 | pages | sections | terms | capabilities | recipes | relationships |
 |-------|----------|-------|--------------|---------|---------------|
-| 146   | 75       | 65    | 20           | 11      | 2610          |
-1 row · nodes created: 458, relationships created: 2610, properties set: 1658, labels added: 458
+| 146   | 75       | 65    | 20           | 11      | 2611          |
+1 row · nodes created: 458, relationships created: 2611, properties set: 1658, labels added: 458
 ```
 
 ## Full-text search matches words
@@ -234,11 +234,11 @@ ORDER BY score DESC, s.id
 ```table
 | page                          | heading                       | score              |
 |-------------------------------|-------------------------------|--------------------|
-| "guides/cypher/vector-search" | "Prerequisites"               | 2.9736807299272354 |
-| "reference/api/python"        | "ResultGraph"                 | 2.2897079349485847 |
-| "guides/cypher/vector-search" | "Find the nearest nodes"      | 2.1949714704385515 |
-| "guides/cypher/vector-search" | "Search by vector similarity" | 1.7640152067700454 |
-| "guides/agents/agent-safety"  | "Back up before a write"      | 1.7067160319667616 |
+| "guides/cypher/vector-search" | "Prerequisites"               | 2.9739065538107528 |
+| "reference/api/python"        | "ResultGraph"                 | 2.2897675765332837 |
+| "guides/cypher/vector-search" | "Find the nearest nodes"      | 2.19497923205526   |
+| "guides/cypher/vector-search" | "Search by vector similarity" | 1.7641528712511614 |
+| "guides/agents/agent-safety"  | "Back up before a write"      | 1.7068581828021214 |
 5 rows
 ```
 
