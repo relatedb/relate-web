@@ -1,0 +1,67 @@
+---
+// /projects/: the GitHub repositories tagged with the `relate` topic, ranked by recent activity or
+// by stars (ADR-0076). The list is read from src/data/projects.json at build; a weekly workflow
+// refreshes it. The two rankings are two server-rendered lists, switched with CSS alone.
+import Base from '../../layouts/Base.astro';
+import { byActivity, byStars, PROJECTS_LISTED, type Project } from '../../lib/projects.ts';
+import data from '../../data/projects.json';
+import '../../styles/projects.css';
+
+const projects = data.projects as Project[];
+const lists = [
+  { id: 'activity', label: 'Recent activity', ranked: byActivity(projects) },
+  { id: 'stars', label: 'Stars', ranked: byStars(projects) },
+] as const;
+const fmt = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeZone: 'UTC' });
+const day = (iso: string) => fmt.format(new Date(iso));
+---
+<Base
+  title="Projects built with relate"
+  description="Open-source projects on GitHub that carry the relate topic, ranked by recent activity or by stars."
+  path="/projects/"
+  noindex={!PROJECTS_LISTED}
+>
+  <div class="projects">
+    <header class="projects-head">
+      <h1>Projects built with relate</h1>
+      <p class="projects-lede">
+        Open-source repositories on GitHub tagged with the{' '}
+        <a href="https://github.com/topics/relate">relate topic</a>. Add the topic to yours and it
+        appears here after the next weekly refresh. The list is automatic; the projects are the
+        authors' own and have not been reviewed by the relate team.
+      </p>
+    </header>
+
+    <fieldset class="projects-sort">
+      <legend>Rank by</legend>
+      {lists.map((l, i) => (
+        <>
+          <input type="radio" name="rank" id={`rank-${l.id}`} value={l.id} checked={i === 0} />
+          <label for={`rank-${l.id}`}>{l.label}</label>
+        </>
+      ))}
+    </fieldset>
+
+    {lists.map((l) => (
+      <ol class={`projects-list projects-by-${l.id}`} aria-label={`Projects ranked by ${l.label.toLowerCase()}`}>
+        {l.ranked.map((p) => (
+          <li>
+            <h2><a href={p.url} rel="noopener">{p.fullName}</a></h2>
+            <p class="projects-desc">{p.description}</p>
+            <p class="projects-meta">
+              <span>{p.stars.toLocaleString('en-US')} {p.stars === 1 ? 'star' : 'stars'}</span>
+              {p.language && <span>{p.language}</span>}
+              <span>Updated <time datetime={p.pushedAt}>{day(p.pushedAt)}</time></span>
+            </p>
+          </li>
+        ))}
+      </ol>
+    ))}
+
+    <p class="projects-foot">
+      {projects.length} projects, from GitHub on{' '}<time datetime={data.fetchedAt}>{day(data.fetchedAt)}</time>.
+      A project that should not be listed can be reported in an{' '}
+      <a href="https://github.com/relatedb/relate-web/issues">issue</a>.
+    </p>
+  </div>
+</Base>

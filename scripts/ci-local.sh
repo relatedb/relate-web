@@ -42,7 +42,7 @@ export CI="${CI:-true}"
 export DO_NOT_TRACK=1
 
 steps=(
-  "unit-tests|npm run cookbook:test && npm run docs:test"
+  "unit-tests|npm run cookbook:test && npm run docs:test && npm run projects:test"
   "adr-check|npm run adr:check"
   "docs-check|npm run docs:check"
   "docs-lint|npm run docs:lint"
