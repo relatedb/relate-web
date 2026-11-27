@@ -29,6 +29,8 @@
 #      release's publication date, UTC) and commit (the tag's), merged into
 #      the file by scripts/engine-bump.ts so its recorded runs survive;
 #      source_build is dropped
+#      the Node client the projects store uses (@relate/relate) is pinned to the
+#      same version (npm install --save-exact), when package.json has it
 #   6. the skill bundle: with an upstream checkout at the tag (--upstream),
 #      `npm run skill:sync -- --upstream <dir>` publishes it to public/skills/
 #      and records the commit; without one, the verified binary's embedded
@@ -240,6 +242,18 @@ write_engine() {
   fi
 }
 step "_data/engine.json" write_engine
+
+# The projects store (ADR-0076) is read and written with the Node client, pinned to the engine release.
+pin_client() {
+  if ! node -e 'process.exit(require("./package.json").dependencies?.["@relate/relate"] ? 0 : 1)'; then
+    note "package.json has no @relate/relate dependency: nothing to pin"
+    return 0
+  fi
+  npm install --save-exact --ignore-scripts --no-audit --no-fund "@relate/relate@$version" >"$work/pin-client.log" 2>&1 ||
+    { tail -n 20 "$work/pin-client.log" >&2; note "failed: $(why "$work/pin-client.log")"; return 1; }
+  note "@relate/relate pinned to $version"
+}
+step "@relate/relate pin" pin_client
 
 # ---------------------------------------------------------------------------
 # 6. The skill bundle
