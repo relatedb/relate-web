@@ -3,7 +3,6 @@
 // the lockup and the section's name on the left, the site links and search on
 // the right. A menu button opens the sidebar on phones (src/scripts/docs/chrome.ts).
 import Search from './Search.astro';
-import ThemeSwitch from '../ThemeSwitch.astro';
 import { LOCKUP } from '../../lib/home/lockup.ts';
 
 interface Props {
@@ -43,7 +42,6 @@ const links = [
         </a>
       ))}
     </nav>
-    <ThemeSwitch />
     <Search placeholder={section === 'Docs' ? 'Search docs' : 'Search docs and recipes'} />
   </div>
 </header>

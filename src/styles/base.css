@@ -287,9 +287,6 @@ header.nav.scrolled { box-shadow: 0 1px 0 var(--line); }
 .menu-btn[aria-expanded="true"] i:first-child { transform: translateY(4.5px) rotate(45deg); }
 .menu-btn[aria-expanded="true"] i:last-child { transform: translateY(-4.5px) rotate(-45deg); }
 
-/* The picker in the top bar is a size down from the footer's. */
-.nav-right .themesw button { width: 32px; height: 28px; }
-
 /* Below this width the links fold into the menu (GitHub moves from the bar into it); the bar needs about 930px. */
 @media (max-width: 940px) {
   .nav-right { gap: 8px; }
@@ -310,21 +307,8 @@ header.nav.scrolled { box-shadow: 0 1px 0 var(--line); }
   .nav-ver { display: none; }
   .nav-in { padding: 0 16px; gap: 4px; }
   .nav-right { gap: 4px; }
-  .nav-right .themesw button { width: 28px; }
   .nav-cta { padding: 0 12px; }
 }
-/* The folded menu's picker: only on narrow phones, where the bar's own one would push the bar past the screen. */
-.nav-links .nav-theme { display: none; }
-@media (max-width: 440px) {
-  .nav-right > .themesw { display: none; }
-  .nav-links .nav-theme {
-    display: flex; align-items: center; justify-content: space-between;
-    height: 52px; padding: 0 24px; border-top: 1px solid var(--line);
-    font-size: 15px; font-weight: 500; color: var(--ink);
-  }
-  .nav-links .nav-theme .themesw button { width: 32px; height: 28px; }
-}
-
 /* ---------- Footer ---------- */
 .foot { margin-top: 72px; border-top: 1px solid var(--line); }
 .fgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding-inline: var(--edge); }
