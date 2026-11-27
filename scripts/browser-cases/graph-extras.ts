@@ -62,8 +62,20 @@ const nodePoint = (id: string, key: string) =>
     const c = cellOf(${JSON.stringify(id)});
     const v = await viewOf(${JSON.stringify(id)});
     // The canvas itself in the middle of the viewport: the cell's code can push it below the fold.
-    c.querySelector('.graph-stage').scrollIntoView({ block: 'center' });
+    const stage = c.querySelector('.graph-stage');
+    stage.scrollIntoView({ block: 'center' });
     await wait(300);
+    // Wait for the layout to settle: a point read while the nodes still move is a click that misses.
+    // Stable means the node's screen point and the stage's place on the page unchanged over five samples.
+    const read = () => { const q = v.state().screen[${JSON.stringify(key)}]; const r = stage.getBoundingClientRect(); return q ? [q.x, q.y, r.left, r.top] : null; };
+    let last = read(), still = 0;
+    const t0 = performance.now();
+    while (still < 5 && performance.now() - t0 < 5000) {
+      await wait(80);
+      const now = read();
+      still = now && last && now.every((n, i) => Math.abs(n - last[i]) < 0.5) ? still + 1 : 0;
+      last = now;
+    }
     const p = v.state().screen[${JSON.stringify(key)}];
     return { log: [], failures: p ? [] : ['no screen point for ${key}'], x: p?.x, y: p?.y };
   `);
@@ -156,20 +168,25 @@ export default {
     {
       name: 'the layout switch moves the nodes, a pinned node keeps its place, and Pin works from the keyboard',
       scenario: async (tab: BrowserTab): Promise<Outcome> => {
-        const at = await tab.evaluate<Outcome & { x?: number; y?: number }>(nodePoint('named-path', 'n0'));
-        if (at.failures.length) return at;
         // A real click on Ada holds her in the inspector; Enter on its focused Pin button pins her.
-        await tab.click(at.x!, at.y!);
-        const ready = await tab.evaluate<Outcome>(
-          view(`
-            const log = [], failures = [];
-            const c = cellOf('named-path');
-            const pinBtn = await until(() => [...c.querySelectorAll('.graph-inspector-actions [data-action=pin]')].find((b) => b.textContent === 'Pin'), 3000);
-            expect(log, failures, 'a click holds the node, with a Pin button', !!pinBtn);
-            pinBtn?.focus();
-            return { log, failures };
-          `),
-        );
+        // The point is read once the layout has settled, and a click that still misses (a node that
+        // moved between the read and the click) is repeated from a fresh read, up to three times.
+        let ready: Outcome = { log: [], failures: ['no click was made'] };
+        for (let attempt = 0; attempt < 3 && ready.failures.length; attempt++) {
+          const at = await tab.evaluate<Outcome & { x?: number; y?: number }>(nodePoint('named-path', 'n0'));
+          if (at.failures.length) return at;
+          await tab.click(at.x!, at.y!);
+          ready = await tab.evaluate<Outcome>(
+            view(`
+              const log = [], failures = [];
+              const c = cellOf('named-path');
+              const pinBtn = await until(() => [...c.querySelectorAll('.graph-inspector-actions [data-action=pin]')].find((b) => b.textContent === 'Pin'), 3000);
+              expect(log, failures, 'a click holds the node, with a Pin button', !!pinBtn);
+              pinBtn?.focus();
+              return { log, failures };
+            `),
+          );
+        }
         if (ready.failures.length) return ready;
         await tab.press('Enter', 'Enter', 13);
         const out = await tab.evaluate<Outcome>(
