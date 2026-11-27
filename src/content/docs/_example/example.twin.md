@@ -6,7 +6,7 @@ surfaces:
   - python
 status: stable
 since: 0.16.0
-verified: 1.3.0
+verified: 1.4.0
 verified_by:
   - cypher
   - python
@@ -39,7 +39,7 @@ last_updated: 2026-11-07
 
 A throwaway page that exercises every docs construct, for the pipeline's tests. Not part of the site.
 
-> Verified against relate 1.3.0. If your `relate --version` is newer, read https://relatedb.ai/docs/reference/changelog/#since-1.3.0
+> Verified against relate 1.4.0. If your `relate --version` is newer, read https://relatedb.ai/docs/reference/changelog/#since-1.4.0
 
 This page opens a store and writes through the write-ahead log. The second store link adds no second entry to the terms. A colon in prose, like ratio a:b, stays text. Badges: (since 0.16) and (preview).
 
@@ -584,18 +584,18 @@ The crate is on crates.io; the first build compiles the engine from source, with
 <dependency>
   <groupId>ai.relatedb</groupId>
   <artifactId>relate</artifactId>
-  <version>1.3.0</version>
+  <version>1.4.0</version>
 </dependency>
 ```
 
-In Gradle, `implementation("ai.relatedb:relate:1.3.0")` with `mavenCentral()`. Its POM brings in the client's two dependencies, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`).
+In Gradle, `implementation("ai.relatedb:relate:1.4.0")` with `mavenCentral()`. Its POM brings in the client's two dependencies, JNA (`net.java.dev.jna:jna`) and Jackson (`com.fasterxml.jackson.core:jackson-databind`).
 
 #### .NET
 
 `Relate.Net`, for .NET 8 or later, is not on NuGet. From your project's folder, clone the release tag beside it and reference the client's project:
 
 ```bash
-git clone --branch v1.3.0 --depth 1 https://github.com/relatedb/relate ../relate
+git clone --branch v1.4.0 --depth 1 https://github.com/relatedb/relate ../relate
 dotnet add reference ../relate/clients/dotnet/src/Relate.Net/Relate.Net.csproj
 ```
 
@@ -606,10 +606,10 @@ The build copies the engine library beside your program from `RelateNativeLibrar
 In a Go module (`go mod init <module>` creates one):
 
 ```bash
-go get github.com/relatedb/relate/clients/go@v1.3.0
+go get github.com/relatedb/relate/clients/go@v1.4.0
 ```
 
-`v1.3.0` is the relate release: each release tags the module with its own version.
+`v1.4.0` is the relate release: each release tags the module with its own version.
 
 The module uses cgo and links `librelate_ffi`, from the `relate-ffi-<target>.tar.gz` archive attached to each release.
 
@@ -870,7 +870,7 @@ relate, the embedded Cypher graph database (relatedb.ai).
 | Read-only open. An open that loads the store once and refuses every write. | yes: `--read-only`; a write exits 6 | yes: `read_only=True` | yes: `new RelateDb(true)` |
 | Explicit transactions. Several statements committed or rolled back together. | yes: `.begin`, `.commit`, `.rollback` in a script on stdin or the shell | yes: `autocommit = False`, then `commit()` or `rollback()` | no: each statement commits on its own; `BEGIN` is a syntax error |
 
-Each cell is yes, no, partial or unknown, with the call, flag or reason. Checked on 2026-11-20 against relate 1.2.0: runs of the CLI binary and `relate serve` (Bolt, HTTP and MCP), the WebAssembly build this site ships, and the Python, Node.js, C, Java, Go, Swift and Rust clients (and the .NET client, at 1.2.0, the release that added it), and each surface's upstream reference. The C, Java, .NET, Go and Swift clients load the same C ABI library as the Node.js client.
+Each cell is yes, no, partial or unknown, with the call, flag or reason. Checked on 2026-11-27 against relate 1.4.0: runs of the CLI binary and `relate serve` (Bolt, HTTP and MCP), the WebAssembly build this site ships, and the Python, Node.js, C, Java, Go, Swift and Rust clients (and the .NET client, at 1.2.0, the release that added it), and each surface's upstream reference. The C, Java, .NET, Go and Swift clients load the same C ABI library as the Node.js client.
 
 ## Links
 
