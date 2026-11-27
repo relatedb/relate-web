@@ -39,6 +39,8 @@
 #      the step
 #   7. `npm run docs:cli-check -- --record` against the binary (RELATE_BIN, and
 #      first on PATH), when that script exists
+#      then the terminal element's facts are regenerated from the recorded CLI
+#      facts (src/lib/docs/elements/_terminal-facts.ts --write)
 #   8. `npm run cookbook:record`, then `npm run docs:check -- --record` and
 #      `npm run docs:check`
 #      (with DOCS_CHANGELOG_PENDING=<version>: the release's changelog entry
@@ -298,6 +300,15 @@ cli_check() {
   note "recorded against $("$bin" --version | head -n 1)"
 }
 step "docs:cli-check --record" cli_check
+
+# The terminal element's facts are built from cli.json and errors.json, which the step above just
+# re-recorded: left stale, `docs:check --record` fails on every page with a terminal.
+terminal_facts() {
+  node src/lib/docs/elements/_terminal-facts.ts --write >"$work/terminal-facts.log" 2>&1 ||
+    { tail -n 20 "$work/terminal-facts.log" >&2; note "failed: $(why "$work/terminal-facts.log")"; return 1; }
+  note "$(tail -n 1 "$work/terminal-facts.log")"
+}
+step "terminal facts" terminal_facts
 
 npm_step() { # LOG ARGS...
   local log="$work/$1.log"
