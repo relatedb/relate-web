@@ -66,6 +66,7 @@ jobs:
         run: |
           npm run cookbook:test
           npm run docs:test
+          npm run projects:test
 
       - name: Check decision records
         run: npm run adr:check

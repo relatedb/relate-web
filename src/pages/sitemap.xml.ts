@@ -2,7 +2,8 @@
 // landing and every docs page, generated so new pages are listed without a
 // hand edit, each with its last change (`lastmod`, from git: src/lib/docs/content.ts).
 // URLs name relatedb.ai, as the home page's canonical link does (LAUNCH.md). The
-// blog and its posts are listed once a post is published (ADR-0073).
+// blog and its posts are listed once a post is published (ADR-0073); /projects/ once
+// it is linked from the site (PROJECTS_LISTED, ADR-0076).
 import { join } from 'node:path';
 
 import type { APIRoute } from 'astro';
@@ -13,6 +14,8 @@ import { cookbook } from '../lib/cookbook/site.ts';
 import { lastUpdated } from '../lib/docs/content.ts';
 import { docsSite } from '../lib/docs/site.ts';
 import { isListed, isoDate, postPath, posts } from '../lib/blog.ts';
+import { PROJECTS_LISTED } from '../lib/projects.ts';
+import { fetchedAt, openStore } from '../lib/projects-store.ts';
 
 export const GET: APIRoute = async () => {
   const { pages } = await cookbook();
@@ -30,6 +33,7 @@ export const GET: APIRoute = async () => {
     ...(blog.length
       ? [{ path: '/blog/', modified: isoDate(blog[0].data.updated ?? blog[0].data.date) }, ...blog.map((p) => ({ path: postPath(p), modified: isoDate(p.data.updated ?? p.data.date) }))]
       : []),
+    ...(PROJECTS_LISTED ? [{ path: '/projects/', modified: fetchedAt(openStore(undefined, { readOnly: true })) ?? release }] : []),
     { path: '/playground/', modified: release },
   ];
   const urls = entries

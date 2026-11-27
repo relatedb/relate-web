@@ -153,3 +153,4 @@ Copy `template.md`.
 | [0073](0073-blog-as-a-content-collection.md) | The blog is a content collection of plain Markdown posts | Proposed |
 | [0074](0074-cloudflare-pages-is-the-only-host.md) | Cloudflare Pages is the only host | Accepted |
 | [0075](0075-release-posts-are-drafted-by-an-agent-into-a-pull-request.md) | Release posts are drafted by an agent into the release's pull request | Proposed |
+| [0076](0076-projects-browser-from-the-github-relate-topic.md) | The projects browser is a relate graph built from the GitHub `relate` topic | Proposed |
