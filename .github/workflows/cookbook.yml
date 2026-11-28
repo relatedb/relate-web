@@ -21,8 +21,15 @@
 # no build) beside `build`, which uploads dist/; then `built` and four
 # `browser` shares of the headless Chrome run (BROWSER_SHARD), each on the
 # uploaded dist/. The last job, `check`, passes only when every other job
-# passed: it is the one status to require. There is no paths filter, so it
-# always reports. `npm run ci` runs the same steps one after another.
+# passed or was skipped on purpose: it is the one status to require. There is
+# no paths filter, so it always reports.
+#
+# What a pull request runs depends on what it touches (the `changes` job,
+# src/lib/ci/changes.ts, ADR-0077): a change to only the projects store, to
+# only notes and records, or to only blog posts skips the work that cannot see
+# it (the build and the browser, the docs checks). Any other path, a push to
+# main and a manual run run everything. `npm run ci` runs every step one
+# after another.
 #
 # A failure in "Check recipes" prints each recipe's recorded and actual
 # result. If the engine changed on purpose (a public/wasm refresh), run
@@ -44,9 +51,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Which of the jobs below this change needs (src/lib/ci/changes.ts). A pull
+  # request is compared with its base; a push to main and a manual run always
+  # run everything.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      profile: ${{ steps.plan.outputs.profile }}
+      docs: ${{ steps.plan.outputs.docs }}
+      build: ${{ steps.plan.outputs.build }}
+      browser: ${{ steps.plan.outputs.browser }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Plan
+        id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            # The checkout is the merge of the head into the base: its first parent is the base.
+            node scripts/ci-changes.ts --from HEAD^1 --to HEAD
+          else
+            node scripts/ci-changes.ts --full
+          fi
+          # Written to the log too, for a person wondering why a job was skipped.
+          { echo "### What this run checks"; echo; echo "Profile: \`$(grep -o '^profile=.*' "$GITHUB_OUTPUT" | cut -d= -f2)\`"; } >> "$GITHUB_STEP_SUMMARY"
+
   # Everything that reads only the sources: the unit tests, the decision
   # records, the docs and recipe checks, the prose lint and the site's types.
   source:
+    needs: changes
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -67,27 +109,39 @@ jobs:
           npm run cookbook:test
           npm run docs:test
           npm run projects:test
+          npm run ci:test
 
       - name: Check decision records
         run: npm run adr:check
 
+      # A change to only the projects store (the daily refresh) is checked by reading it as the
+      # page does, in place of a site build.
+      - name: Check the projects store
+        if: needs.changes.outputs.profile == 'projects-data'
+        run: npm run projects:verify
+
       - name: Check docs
+        if: needs.changes.outputs.docs == 'true'
         run: npm run docs:check
 
       # Vale for docs:lint: the pinned release, checked against its published
       # SHA-256 by the same script a laptop runs (scripts/vale/install.sh).
       - name: Install Vale
+        if: needs.changes.outputs.docs == 'true'
         run: |
           bash scripts/vale/install.sh --dir "$HOME/.local/bin"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Lint docs prose
+        if: needs.changes.outputs.docs == 'true'
         run: npm run docs:lint
 
       - name: Check recipes
+        if: needs.changes.outputs.docs == 'true'
         run: npm run cookbook:check
 
       - name: Type check
+        if: needs.changes.outputs.docs == 'true'
         run: npm run check
 
   # The playground's types and the site build. The playground's packages and
@@ -95,6 +149,8 @@ jobs:
   # packages on the playground lockfile, the build on the key
   # scripts/build-playground.mjs computes from its inputs.
   build:
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -153,6 +209,7 @@ jobs:
   # docs:check --built on the uploaded build.
   built:
     needs: build
+    if: needs.build.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -181,7 +238,8 @@ jobs:
   # playground's sample data, the cookbook -> playground hand-off, the docs
   # pages' cells and every interactive element's cases.
   browser:
-    needs: build
+    needs: [changes, build]
+    if: needs.build.result == 'success' && needs.changes.outputs.browser == 'true'
     name: browser (${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -209,11 +267,12 @@ jobs:
           BROWSER_SHARD: ${{ matrix.shard }}/4
         run: npm run cookbook:browser
 
-  # The one status to require: every job above passed (a skipped or
-  # cancelled job fails it too).
+  # The one status to require: every job above passed, or was skipped because
+  # the change cannot reach it (`changes` decides; if it failed, nothing is
+  # trusted). A failed or cancelled job fails it.
   check:
     if: always()
-    needs: [source, build, built, browser]
+    needs: [changes, source, build, built, browser]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -222,4 +281,9 @@ jobs:
           RESULTS: ${{ toJSON(needs) }}
         run: |
           echo "$RESULTS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
-          echo "$RESULTS" | jq -e 'all(.[]; .result == "success")' > /dev/null
+          echo "$RESULTS" | jq -e '.changes.result == "success" and .source.result == "success"' > /dev/null
+          echo "$RESULTS" | jq -e 'all(.[]; .result == "success" or .result == "skipped")' > /dev/null
+          # A build that ran (or was skipped) decides its dependents; a skipped dependent of a
+          # build that was not skipped means the build failed, which the line above caught.
+          echo "$RESULTS" | jq -e '(.changes.outputs.build != "true") or (.build.result == "success" and .built.result == "success")' > /dev/null
+          echo "$RESULTS" | jq -e '(.changes.outputs.browser != "true") or (.browser.result == "success")' > /dev/null
