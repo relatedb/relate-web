@@ -154,3 +154,4 @@ Copy `template.md`.
 | [0074](0074-cloudflare-pages-is-the-only-host.md) | Cloudflare Pages is the only host | Accepted |
 | [0075](0075-release-posts-are-drafted-by-an-agent-into-a-pull-request.md) | Release posts are drafted by an agent into their own pull request | Proposed |
 | [0076](0076-projects-browser-from-the-github-relate-topic.md) | The projects browser is a relate graph built from the GitHub `relate` topic | Proposed |
+| [0077](0077-ci-runs-only-the-checks-a-change-can-affect.md) | CI runs only the checks a change can affect | Proposed |
